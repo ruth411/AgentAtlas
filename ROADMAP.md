@@ -330,37 +330,110 @@ and structured 422 from the API.
 
 ### Stage 7c: API Schema Ingestion
 
-#### Capabilities Built
+Stage 7c is split into three sub-stages so each schema family can be shipped
+and audited on its own merits:
 
-- OpenAPI 3.x ingestion agent.
-- JSON Schema ingestion agent.
-- GraphQL schema ingestion agent.
-- Schema validation before claim generation (reject syntactically broken schemas).
-- Claim generation per endpoint / type / field, with provenance back to the
-  schema URI and the specific JSON pointer of the assertion.
+- **7c.1 — OpenAPI 3.x — SHIPPED.** Per-endpoint claim generation with auxiliary
+  auth / side-effect / destructive / deprecated annotations, JSON Pointer
+  (RFC 6901) provenance back to the originating spec node, shared SSRF guard,
+  contract-gated source allowlist, manual redirect re-validation,
+  ETag / Last-Modified conditional revalidation via the shared
+  `docs_fetch_cache`, schema validation via `openapi-spec-validator`, and 41
+  adversarial tests covering bad schemes, private/loopback/link-local IPs,
+  redirect attacks, oversized payloads, malformed JSON, non-OpenAPI-3 specs,
+  invalid OpenAPI schemas, empty / no-operation specs, cache reuse, bulk
+  ingest, and structured 422 from the API.
+- **7c.2 — JSON Schema — SHIPPED.** Per-top-level-property claim generation
+  with auxiliary `feature_deprecated` annotations, JSON Pointer provenance
+  back to the originating schema node, shared SSRF guard, contract-gated
+  source allowlist with new `schema_aggregator_hosts.json_schema` so
+  `json.schemastore.org` is trusted for JSON Schema evidence without leaking
+  trust into other lanes, dialect-specific meta-schema validation via
+  `jsonschema.validator_for($schema)`, ETag/Last-Modified revalidation via
+  the shared `docs_fetch_cache`, and 37 adversarial tests covering bad
+  schemes, redirect attacks, oversized / malformed / non-dict-root / meta-
+  schema-invalid bodies, no-properties schemas, required-vs-optional
+  reflection, JSON Pointer escaping, aggregator-host trust resolution, cache
+  reuse, bulk ingest, and structured 422 from the API.
+- **7c.3 — GraphQL SDL — SHIPPED.** Per-root-field claim generation
+  (Query / Mutation / Subscription) with auxiliary `side_effect` /
+  `destructive_action` / `feature_deprecated` annotations, fragment-style
+  `#<OperationType>.<fieldName>` provenance back to the SDL location, shared
+  SSRF guard, contract-gated source allowlist (vendor `official_hosts`
+  only — no aggregator block), manual redirect re-validation, full SDL parse
+  + type-system validation via `graphql-core`'s `build_schema`,
+  ETag/Last-Modified revalidation via the shared `docs_fetch_cache`,
+  contract-driven destructive-prefix detection (`delete`, `remove`,
+  `destroy`, etc.) that upgrades the matching Mutation primary claim to
+  `CRITICAL`, and 40 adversarial tests covering bad schemes, redirect
+  attacks, oversized payloads, malformed SDL, no-root-operations schemas,
+  per-operation risk mapping, destructive detection, deprecation, cache
+  reuse, bulk ingest, and structured 422 from the API.
+
+#### Capabilities Built (7c.1)
+
+- OpenAPI 3.x ingestion agent (`openai-api` tool, contract-gated source).
+- Schema validation via `openapi-spec-validator` before any claim generation.
+- One `api_endpoint_exists` claim per (method, path), plus auxiliary
+  `auth_requirement` / `side_effect` / `destructive_action` /
+  `feature_deprecated` claims as warranted by the operation.
+- Evidence `source_uri` includes a JSON Pointer fragment to the exact spec
+  node that grounded each claim.
+- Cache reuses the Stage 7b `docs_fetch_cache` for conditional revalidation.
 
 #### Pass Cases
 
-- A live OpenAPI document for `openai-api` produces `api_endpoint_exists` claims
-  with structured side-effect annotations.
-- Malformed schemas are rejected with structured errors and do not create claims.
+- An `openai-api` OpenAPI spec produces `api_endpoint_exists` claims with
+  structured side-effect annotations and JSON Pointer provenance.
+- Malformed JSON, non-OpenAPI-3 specs, and OpenAPI specs that fail the
+  meta-schema validator are rejected with structured errors and create no
+  claims.
 
 ---
 
-### Stage 7d: MCP Metadata Ingestion
+### Stage 7d: MCP Metadata Ingestion — SHIPPED
+
+Stage 7d is shipped. AgentAtlas can now spawn allowlisted MCP servers
+locally over stdio, drive the standard JSON-RPC `initialize` + `tools/list`
+handshake, capture the full reply as a durable audit artifact, and emit
+structured claims per advertised tool with risk hints derived from
+annotations and tool-name patterns.
 
 #### Capabilities Built
 
-- MCP tool metadata ingestion where applicable.
-- Trust resolution from the MCP server identity, not from claim-side assertions.
-- Claim generation for `mcp_tool_exists`, including parameter schema and
-  side-effect declarations.
+- Stdio JSON-RPC client for MCP servers, with hard wall-clock + byte caps
+  and guaranteed subprocess termination on the success and failure paths.
+- Per-server positive-shape argv allowlist plus a limited placeholder
+  vocabulary (`{sandbox_dir}`, `{database_url}`) so the contract gates both
+  which servers and how they are invoked.
+- Stage 0 contract expansion: new `mcp_server_tools[]` list (5 entries:
+  `mcp-filesystem`, `mcp-fetch`, `mcp-git`, `mcp-slack`, `mcp-postgres`)
+  parallel to the original `initial_tools` list; `ClaimStore.create` gate
+  unions both.
+- Trust contract extension: each MCP tool carries an `mcp_publisher` field
+  (`anthropic` / `third-party`).
+- Claim generation per MCP tool: primary `mcp_tool_exists` plus auxiliary
+  `side_effect` (when not `readOnlyHint: true`), `destructive_action` (when
+  `destructiveHint: true` or the tool name matches a contract-listed
+  destructive prefix), and `feature_deprecated` (annotation or description
+  heuristic). Risk mapping: read-only → LOW, mutating → HIGH, destructive →
+  CRITICAL.
+- `POST /ingestion/mcp` + `POST /ingestion/mcp/publishers/{publisher}` API
+  routes returning structured `MCP_INGESTION_FAILED` (422) on rejection.
+- 30 adversarial tests covering the spawn allowlist, JSON-RPC reply
+  handling, per-tool risk branches, deprecation, bulk-by-publisher, and the
+  API surface. Tests run hermetically via a `FakeMcpRunner` so they do not
+  require `npx` / `uvx` to be installed.
 
 #### Pass Cases
 
-- An MCP server's listed tools can be ingested into structured claims.
-- An MCP server that itself lacks signed identity does not promote its claims
-  past `L1_schema_valid`.
+- An allowlisted MCP server (e.g., `mcp-filesystem`) can be ingested into a
+  structured `mcp_tool_exists` claim per advertised tool, with the full
+  JSON-RPC payload recoverable as a `mcp_tool_list` audit artifact.
+- A spawn command outside `allowed_commands` is rejected at both contract
+  validation time and runtime (`SafeMcpServerRunner` sanity check).
+- A misbehaving server that exceeds the time or byte cap is killed cleanly
+  without leaking the subprocess.
 
 ---
 

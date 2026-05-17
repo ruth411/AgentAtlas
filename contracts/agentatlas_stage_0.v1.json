@@ -41,6 +41,38 @@
       "interfaces": ["rest-api", "sdk"]
     }
   ],
+  "mcp_server_tools": [
+    {
+      "tool_id": "mcp-filesystem",
+      "name": "MCP Filesystem Server",
+      "publisher": "anthropic",
+      "interfaces": ["mcp"]
+    },
+    {
+      "tool_id": "mcp-fetch",
+      "name": "MCP Fetch Server",
+      "publisher": "anthropic",
+      "interfaces": ["mcp"]
+    },
+    {
+      "tool_id": "mcp-git",
+      "name": "MCP Git Server",
+      "publisher": "anthropic",
+      "interfaces": ["mcp"]
+    },
+    {
+      "tool_id": "mcp-slack",
+      "name": "MCP Slack Server",
+      "publisher": "third-party",
+      "interfaces": ["mcp"]
+    },
+    {
+      "tool_id": "mcp-postgres",
+      "name": "MCP Postgres Server",
+      "publisher": "third-party",
+      "interfaces": ["mcp"]
+    }
+  ],
   "claim_types": [
     "tool_exists",
     "cli_command_exists",
@@ -52,7 +84,8 @@
     "destructive_action",
     "environment_requirement",
     "feature_deprecated",
-    "workflow_step"
+    "workflow_step",
+    "config_field_exists"
   ],
   "evidence_types": [
     "official_docs",

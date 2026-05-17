@@ -13,6 +13,7 @@ class ClaimType(StrEnum):
     ENVIRONMENT_REQUIREMENT = "environment_requirement"
     FEATURE_DEPRECATED = "feature_deprecated"
     WORKFLOW_STEP = "workflow_step"
+    CONFIG_FIELD_EXISTS = "config_field_exists"
 
 
 class EvidenceType(StrEnum):
@@ -39,6 +40,10 @@ class IngestionStatus(StrEnum):
 class IngestionArtifactType(StrEnum):
     CLI_OUTPUT = "cli_output"
     DOCS_CONTENT = "docs_content"
+    OPENAPI_SPEC = "openapi_spec"
+    JSON_SCHEMA_DOC = "json_schema_doc"
+    GRAPHQL_SDL = "graphql_sdl"
+    MCP_TOOL_LIST = "mcp_tool_list"
 
 
 class RiskLevel(StrEnum):

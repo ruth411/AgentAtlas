@@ -29,10 +29,8 @@ from functools import cache
 from hashlib import sha256
 import html
 from html.parser import HTMLParser
-import ipaddress
 import json
 from pathlib import Path
-import socket
 from typing import Any, Protocol
 from urllib.parse import urlparse
 
@@ -61,6 +59,11 @@ from app.services.claim_store import (
     ToolNotAllowedError,
 )
 from app.services.evidence_trust import _trust_sources  # reuse the loader cache
+from app.services.http_safety import (
+    HttpFetchError,
+    assert_url_is_safe,
+    host_in_allowlist,
+)
 from app.services.ids import (
     generate_claim_id,
     generate_evidence_id,
@@ -305,7 +308,12 @@ class DocsIngestionService:
         url = spec.url
         redirect_chain: list[str] = []
         for hop in range(spec.max_redirects + 1):
-            _assert_url_is_safe(url, allowed_hosts=_official_hosts_for_tool(spec.tool_id))
+            try:
+                assert_url_is_safe(
+                    url, allowed_hosts=_official_hosts_for_tool(spec.tool_id)
+                )
+            except HttpFetchError as exc:
+                raise DocsIngestionError(str(exc)) from exc
             headers: dict[str, str] = {
                 "User-Agent": "AgentAtlas-DocsIngestion/1.0",
                 "Accept": ", ".join(spec.allowed_content_types),
@@ -504,7 +512,7 @@ def _validate_docs_ingestion_sources(data: dict[str, Any]) -> None:
             if parsed.scheme != "https":
                 raise ValueError(f"tool '{tool_id}' source url must be https")
             hostname = (parsed.hostname or "").lower()
-            if not _host_in_allowlist(hostname, official_hosts):
+            if not host_in_allowlist(hostname, official_hosts):
                 raise ValueError(
                     f"tool '{tool_id}' source host {hostname!r} is not in official_hosts"
                 )
@@ -520,65 +528,15 @@ def _official_hosts_for_tool(tool_id: str) -> frozenset[str]:
     return frozenset(tool["official_hosts"])
 
 
-def _host_in_allowlist(hostname: str, allowed: set[str] | frozenset[str]) -> bool:
-    return any(hostname == host or hostname.endswith("." + host) for host in allowed)
-
-
-# -------- SSRF guard --------
-
-
+# Backwards-compat shim — older tests / external imports still reference
+# `_assert_url_is_safe` here. The real implementation now lives in
+# `app/services/http_safety.py` so the docs and openapi lanes share one
+# auditable definition.
 def _assert_url_is_safe(url: str, *, allowed_hosts: frozenset[str]) -> None:
-    parsed = urlparse(url)
-    if parsed.scheme != "https":
-        raise DocsIngestionError(f"Only https:// URLs are allowed; got scheme {parsed.scheme!r}.")
-    hostname = (parsed.hostname or "").lower()
-    if not hostname:
-        raise DocsIngestionError("URL is missing a hostname.")
-    if not _host_in_allowlist(hostname, allowed_hosts):
-        raise DocsIngestionError(
-            f"Host {hostname!r} is not in the allowed hosts for this tool."
-        )
-    # Hostname literal as IP. Parse FIRST, raise SECOND so we don't swallow
-    # the safety rejection (DocsIngestionError subclasses ValueError, which
-    # made a broader try/except mask the loopback / link-local rejection).
-    ip_literal: ipaddress.IPv4Address | ipaddress.IPv6Address | None
     try:
-        ip_literal = ipaddress.ip_address(hostname)
-    except ValueError:
-        ip_literal = None
-    if ip_literal is not None:
-        _assert_public_ip(ip_literal)
-        return
-    # Resolve hostname to all addresses and require each to be public.
-    try:
-        infos = socket.getaddrinfo(hostname, 443, type=socket.SOCK_STREAM)
-    except OSError as exc:
-        raise DocsIngestionError(f"Could not resolve {hostname!r}: {exc}") from exc
-    seen: set[str] = set()
-    for info in infos:
-        sockaddr = info[4]
-        addr = str(sockaddr[0])
-        if addr in seen:
-            continue
-        seen.add(addr)
-        try:
-            _assert_public_ip(ipaddress.ip_address(addr))
-        except DocsIngestionError as exc:
-            raise DocsIngestionError(
-                f"Hostname {hostname!r} resolves to disallowed address {addr}: {exc}"
-            ) from exc
-
-
-def _assert_public_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> None:
-    if (
-        ip.is_private
-        or ip.is_loopback
-        or ip.is_link_local
-        or ip.is_multicast
-        or ip.is_reserved
-        or ip.is_unspecified
-    ):
-        raise DocsIngestionError(f"IP {ip} is private / loopback / reserved.")
+        assert_url_is_safe(url, allowed_hosts=allowed_hosts)
+    except HttpFetchError as exc:
+        raise DocsIngestionError(str(exc)) from exc
 
 
 # -------- HTML sanitizer (stdlib only) --------

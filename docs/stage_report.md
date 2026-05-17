@@ -17,8 +17,10 @@ It records what each stage proves, which artifacts satisfy the stage, what remai
 | Stage 6 | Canonical Publication and Spec Compilation | pass |
 | Stage 7a | Safe CLI Ingestion Layer | pass |
 | Stage 7b | Safe Docs Ingestion Layer | pass |
-| Stage 7c | API schema ingestion (OpenAPI / JSON Schema / GraphQL) | not started |
-| Stage 7d | MCP metadata ingestion | not started |
+| Stage 7c.1 | OpenAPI schema ingestion | pass |
+| Stage 7c.2 | JSON Schema ingestion | pass |
+| Stage 7c.3 | GraphQL SDL ingestion | pass |
+| Stage 7d | MCP metadata ingestion | pass |
 
 ## Stage 0: Product Lock and Trust Contract
 
@@ -538,11 +540,271 @@ or rendering executable HTML/JS as content.
 
 ### Deferred
 
-- API schema ingestion (Stage 7c).
+- JSON Schema ingestion (Stage 7c.2).
+- GraphQL schema ingestion (Stage 7c.3).
 - MCP metadata ingestion (Stage 7d).
 - LLM/prose extraction from captured artifacts.
 - Canonical auto-publication after ingestion.
 - Runtime sandbox verification and L3 promotion (Stage 8).
+
+## Stage 7c.1: Safe OpenAPI Schema Ingestion
+
+Verdict: pass.
+
+Stage 7c.1 is complete when AgentAtlas can safely fetch an allowlisted
+OpenAPI 3.x specification for a gated tool, validate it against the OpenAPI
+meta-schema, persist the raw body for audit, and derive structured per-operation
+claims whose evidence carries byte-level provenance — without ever following a
+redirect to a non-allowlisted host, accepting a non-JSON body, or trusting a
+spec the meta-schema rejects.
+
+### Required Artifacts
+
+| Artifact | Purpose | Status |
+| --- | --- | --- |
+| `contracts/openapi_ingestion_sources.v1.json` | Versioned per-tool allowlist of OpenAPI source URLs, plus default timeout, max-bytes, cache TTL, max-redirects, max-endpoints-per-spec, allowed-content-types. | complete |
+| `backend/app/schemas/enums.py` | Adds `IngestionArtifactType.OPENAPI_SPEC`. | complete |
+| `backend/app/api/errors.py` | Adds `OPENAPI_INGESTION_FAILED`. | complete |
+| `backend/app/schemas/ingestion.py` | Adds `OpenApiIngestionRequest`, `OpenApiIngestionResponse`, `OpenApiIngestionSummary`. | complete |
+| `backend/alembic/versions/0010_extend_artifact_type_for_openapi.py` | Extends the `raw_ingestion_artifacts.artifact_type` check constraint to include `openapi_spec`. | complete |
+| `backend/app/services/http_safety.py` | Shared SSRF guard (https-only, host allowlist + subdomain rules, IP literal parse, resolved-address public-class check) reused by 7b and 7c.1. | complete |
+| `backend/app/services/openapi_ingestion.py` | SSRF-safe httpx fetcher with manual redirect re-validation, content-type allowlist, max-bytes cap, hard timeout, `openapi-spec-validator` meta-schema check, per-(method, path) claim generator with auxiliary auth / side-effect / destructive / deprecated claims, JSON Pointer (RFC 6901) provenance in `Evidence.source_uri`, cache reuse via `docs_fetch_cache`. | complete |
+| `backend/app/api/routes_ingestion.py` | `POST /ingestion/openapi` and `POST /ingestion/openapi/tools/{tool_id}`; both return structured `OPENAPI_INGESTION_FAILED` (422) on rejection. | complete |
+| `backend/tests/test_openapi_ingestion.py` | 41 adversarial cases covering contract gate, SSRF, redirects, content-type, max-bytes, empty / malformed JSON / non-OpenAPI-3 / schema-invalid bodies, no-operation specs, per-method risk + auxiliary claim emission, JSON Pointer escaping, cache hit reuse, bulk ingest, and the API surface. | complete |
+
+### Pass Case Audit
+
+| Pass case | Satisfied by |
+| --- | --- |
+| OpenAPI specs are only fetched from allowlisted sources for allowlisted tools. | `openapi_fetch_spec()` refuses any URL not declared in `openapi_ingestion_sources.v1.json`; the contract loader also asserts each URL's hostname is in the per-tool `official_hosts` from `tool_trust_sources.v1.json`. |
+| Redirects to non-allowlisted hosts are rejected, not followed. | httpx auto-redirects are disabled (`follow_redirects=False`); the service follows redirects manually, re-running `assert_url_is_safe` at every hop. Test: `test_redirect_to_disallowed_host_is_rejected`. |
+| Malformed or non-OpenAPI bodies do not produce claims. | Body must parse as a JSON object; `openapi` must start with `3.`; `openapi-spec-validator` must accept the document. Tests: `test_malformed_json_rejected`, `test_non_dict_root_rejected`, `test_non_openapi_3_rejected`, `test_invalid_openapi_schema_rejected_by_validator`. |
+| Ingestion produces structured claims with byte-level provenance. | Each (method, path) operation yields one `api_endpoint_exists` claim plus the auxiliary set warranted by the operation. `Evidence.source_uri = <final_url>#<json_pointer>` so an auditor can walk back to the exact spec node. Test: `test_json_pointer_escapes_special_chars`. |
+| Destructive and mutating operations are flagged with elevated risk. | DELETE → `RiskLevel.CRITICAL` + `destructive_action` claim. POST/PUT/PATCH → `RiskLevel.HIGH` + `side_effect` claim. Test: `test_delete_operation_emits_destructive_claim`, `test_post_emits_side_effect_claim`. |
+| Authentication requirements are surfaced as claims. | Operations whose effective security block (per-operation override or spec-global default) is non-empty emit `auth_requirement`. Tests: `test_operation_with_spec_global_security_emits_auth_claim`, `test_operation_local_security_overrides_spec_security`. |
+| Deprecated operations are flagged. | `operation.deprecated == True` emits `feature_deprecated`. Test: `test_deprecated_operation_emits_deprecation_claim`. |
+| Raw evidence is recoverable. | `GET /ingestion/artifacts/{artifact_id}` returns the byte-stable raw body the ingester saw; `artifact_type` is `openapi_spec`. |
+
+### Quality Bar
+
+- Only `https://` is accepted; HTTP, FTP, file, and unknown schemes are rejected at the shared SSRF guard.
+- Hostname is resolved via `socket.getaddrinfo`, and every returned address must be public. IP literals (`127.0.0.1`, `169.254.169.254`) are rejected at the literal-parse step before resolution.
+- Response body is read once with a `max_bytes` cap (default 8 MiB; OpenAPI specs are larger than docs); oversized bodies are rejected.
+- `content-type` must be in `allowed_content_types` (`application/json`, `application/vnd.oai.openapi+json`, `text/json`); HTML / JS / YAML are rejected.
+- ETag and Last-Modified are persisted in the shared `docs_fetch_cache`; on revalidation the service sends `If-None-Match` / `If-Modified-Since`, and a 304 reuses the cached artifact without re-fetching.
+- Cache reuse creates a *new* claim and verification result per ingest call but does not duplicate the raw artifact.
+- Per-(method, path) emission is capped by `max_endpoints_per_spec` (default 500) to bound work on adversarially large specs.
+- The HTTP client is injected via the `OpenApiHttpClient` Protocol so tests use a `FakeOpenApiClient` rather than hitting the network.
+- DNS is monkeypatchable in tests so SSRF cases don't depend on real DNS.
+- `POST /ingestion/openapi/tools/{tool_id}` ingests every allowlisted source for a tool in one call.
+- Bulk and single endpoints both return `OPENAPI_INGESTION_FAILED` (422) on rejection with `tool_id` / `url` in `details`.
+- Full backend validation currently reports `324 passed`; ruff is clean.
+
+### Deferred
+
+- GraphQL schema ingestion (Stage 7c.3).
+- MCP metadata ingestion (Stage 7d).
+- LLM/prose extraction from OpenAPI descriptions beyond first-line summaries.
+- Canonical auto-publication after ingestion.
+- Runtime sandbox verification and L3 promotion (Stage 8).
+
+## Stage 7c.2: Safe JSON Schema Ingestion
+
+Verdict: pass.
+
+Stage 7c.2 is complete when AgentAtlas can safely fetch an allowlisted JSON
+Schema document for a gated tool, validate it against the dialect declared by
+its own `$schema` keyword, persist the raw body for audit, and derive a
+structured claim per top-level configuration field with byte-level provenance
+back to the originating schema node.
+
+### Required Artifacts
+
+| Artifact | Purpose | Status |
+| --- | --- | --- |
+| `contracts/json_schema_ingestion_sources.v1.json` | Versioned per-tool allowlist of JSON Schema source URLs, plus default timeout, max-bytes, cache TTL, max-redirects, max-fields-per-schema, allowed-content-types, and per-source `subject_prefix` for readable claim subjects. | complete |
+| `contracts/tool_trust_sources.v1.json` | New top-level `schema_aggregator_hosts.json_schema` allowing `json.schemastore.org` as a trusted aggregator without widening per-tool `official_hosts`. | complete |
+| `backend/app/schemas/enums.py` | Adds `ClaimType.CONFIG_FIELD_EXISTS` and `IngestionArtifactType.JSON_SCHEMA_DOC`. | complete |
+| `backend/app/api/errors.py` | Adds `JSON_SCHEMA_INGESTION_FAILED`. | complete |
+| `backend/app/schemas/ingestion.py` | Adds `JsonSchemaIngestionRequest`, `JsonSchemaIngestionResponse`, `JsonSchemaIngestionSummary`. | complete |
+| `backend/alembic/versions/0011_extend_checks_for_json_schema.py` | Extends the `knowledge_claims.claim_type` CHECK with `config_field_exists` and the `raw_ingestion_artifacts.artifact_type` CHECK with `json_schema_doc`; downgrade reverses both. | complete |
+| `backend/app/services/evidence_trust.py` | Extends the schema-evidence trust resolver to union per-tool `official_hosts` with `schema_aggregator_hosts.json_schema`, so schemastore-hosted schemas resolve to HIGH trust without leaking trust into the docs / openapi lanes. | complete |
+| `backend/app/services/json_schema_ingestion.py` | SSRF-safe httpx fetcher with manual redirect re-validation, content-type allowlist, max-bytes cap, hard timeout, `jsonschema`-driven dialect-specific meta-schema check (`validator_for($schema)`), per-top-level-property claim generator with auxiliary `feature_deprecated` claims, JSON Pointer (RFC 6901) provenance in `Evidence.source_uri`, cache reuse via `docs_fetch_cache`. | complete |
+| `backend/app/api/routes_ingestion.py` | `POST /ingestion/json_schema` and `POST /ingestion/json_schema/tools/{tool_id}`; both return structured `JSON_SCHEMA_INGESTION_FAILED` (422) on rejection. | complete |
+| `backend/tests/test_json_schema_ingestion.py` | 37 adversarial cases covering contract gate, SSRF, redirects, content-type, max-bytes, empty / malformed JSON / non-dict-root / meta-schema-invalid / no-properties bodies, required-vs-optional reflection, deprecation, JSON Pointer escaping, aggregator-host trust resolution, cache hit reuse, bulk ingest, and the API surface. | complete |
+
+### Pass Case Audit
+
+| Pass case | Satisfied by |
+| --- | --- |
+| JSON Schemas are only fetched from allowlisted sources for allowlisted tools. | `json_schema_fetch_spec()` refuses any URL not declared in `json_schema_ingestion_sources.v1.json`; the contract loader also asserts each URL's hostname is in the per-tool `official_hosts` *or* the top-level `schema_aggregator_hosts.json_schema`. |
+| schemastore.org is trusted as an aggregator, but only for JSON Schema evidence. | `schema_aggregator_hosts("json_schema")` is unioned into the allow-set only inside this service and inside the JSON_SCHEMA / GRAPHQL_SCHEMA branch of `_server_trust_cap`. Other lanes (docs, openapi) are unaffected. Test: `test_evidence_from_aggregator_host_resolves_to_high_trust`. |
+| Redirects to non-allowlisted hosts are rejected, not followed. | httpx auto-redirects are disabled; the service follows redirects manually, re-running `assert_url_is_safe` at every hop. Test: `test_redirect_to_disallowed_host_is_rejected`. |
+| Malformed schemas don't produce claims. | Body must parse as a JSON object; the dialect picked from `$schema` (or Draft 2020-12 default) must accept the document via `check_schema()`. Tests: `test_malformed_json_rejected`, `test_non_dict_root_rejected`, `test_invalid_meta_schema_rejected_by_validator`. |
+| Ingestion produces structured claims with byte-level provenance. | One `config_field_exists` per top-level property in `properties`, plus `feature_deprecated` where `deprecated: true`. `Evidence.source_uri = <final_url>#<json_pointer>` so an auditor can walk back to the exact schema node. Test: `test_json_pointer_escapes_special_chars`. |
+| Required vs optional fields are surfaced in claim statements. | The claim statement explicitly says "required field" / "optional field" based on the schema's `required` array. Test: `test_required_vs_optional_reflected_in_statement`. |
+| Raw evidence is recoverable. | `GET /ingestion/artifacts/{artifact_id}` returns the byte-stable raw body; `artifact_type` is `json_schema_doc`. |
+
+### Quality Bar
+
+- Only `https://` is accepted; HTTP, FTP, file, and unknown schemes are rejected at the shared SSRF guard.
+- Hostname is resolved via `socket.getaddrinfo`, and every returned address must be public.
+- Response body is read once with a `max_bytes` cap (default 4 MiB); oversized bodies are rejected.
+- `content-type` must be in `allowed_content_types` (`application/json`, `application/schema+json`, `application/schema-instance+json`, `text/json`).
+- Dialect detection: `validator_for(document)` picks Draft 4 / 6 / 7 / 2019-09 / 2020-12 based on `$schema`; docs without `$schema` default to Draft 2020-12.
+- ETag and Last-Modified are persisted in the shared `docs_fetch_cache`; a 304 reuses the cached artifact without re-fetching.
+- Cache reuse creates a *new* claim and verification result per ingest call but does not duplicate the raw artifact.
+- Top-level field emission is capped by `max_fields_per_schema` (default 500).
+- Risk for `config_field_exists` is fixed at LOW (declaring a config field is not by itself a risky action); `feature_deprecated` is MEDIUM.
+- `POST /ingestion/json_schema/tools/{tool_id}` ingests every allowlisted source for a tool in one call.
+- Bulk and single endpoints both return `JSON_SCHEMA_INGESTION_FAILED` (422) on rejection with `tool_id` / `url` in `details`.
+- Full backend validation currently reports `361 passed`; ruff is clean; alembic upgrade → downgrade → upgrade cycle clean through migration 0011.
+
+### Deferred
+
+- MCP metadata ingestion (Stage 7d).
+- Deeper schema traversal (nested `properties`, `definitions` / `$defs`, `oneOf` / `anyOf`).
+- Cross-reference resolution (`$ref` following beyond the local document).
+- Canonical auto-publication after ingestion.
+- Runtime sandbox verification and L3 promotion (Stage 8).
+
+## Stage 7c.3: Safe GraphQL SDL Ingestion
+
+Verdict: pass.
+
+Stage 7c.3 is complete when AgentAtlas can safely fetch an allowlisted
+GraphQL Schema Definition Language (SDL) document from a gated tool's own
+official host, parse and type-system-validate it via `graphql-core`, persist
+the raw body for audit, and derive a structured claim per root operation
+field — without ever following a redirect to a non-allowlisted host,
+accepting a non-SDL body, or trusting an SDL the parser rejects.
+
+### Required Artifacts
+
+| Artifact | Purpose | Status |
+| --- | --- | --- |
+| `contracts/graphql_ingestion_sources.v1.json` | Versioned per-tool allowlist of SDL source URLs, plus default timeout, max-bytes, cache TTL, max-redirects, max-root-fields-per-schema, the `destructive_field_name_prefixes` allowlist, allowed-content-types, and per-source `subject_prefix`. | complete |
+| `backend/app/schemas/enums.py` | Adds `IngestionArtifactType.GRAPHQL_SDL`. | complete |
+| `backend/app/api/errors.py` | Adds `GRAPHQL_INGESTION_FAILED`. | complete |
+| `backend/app/schemas/ingestion.py` | Adds `GraphqlIngestionRequest`, `GraphqlIngestionResponse`, `GraphqlIngestionSummary`. | complete |
+| `backend/alembic/versions/0012_extend_artifact_type_for_graphql.py` | Extends the `raw_ingestion_artifacts.artifact_type` CHECK to include `graphql_sdl`; downgrade reverses. | complete |
+| `backend/app/services/graphql_ingestion.py` | SSRF-safe httpx fetcher with manual redirect re-validation, content-type allowlist, max-bytes cap, hard timeout, full SDL parse + type-system check via `graphql.build_schema`, per-root-field claim generator (Query / Mutation / Subscription) with auxiliary `side_effect` / `destructive_action` / `feature_deprecated` claims, `#<OperationType>.<fieldName>` provenance in `Evidence.source_uri`, cache reuse via `docs_fetch_cache`. | complete |
+| `backend/app/api/routes_ingestion.py` | `POST /ingestion/graphql` and `POST /ingestion/graphql/tools/{tool_id}`; both return structured `GRAPHQL_INGESTION_FAILED` (422) on rejection. | complete |
+| `backend/tests/test_graphql_ingestion.py` | 40 adversarial cases covering contract gate, SSRF, redirects, content-type, max-bytes, empty / malformed-SDL / no-root-operations bodies, per-operation risk mapping (Query LOW, Mutation HIGH, destructive Mutation CRITICAL, Subscription LOW), side-effect / destructive / deprecation emission, provenance fragment, official-host trust resolution, cache hit reuse, bulk ingest, and the API surface. | complete |
+
+### Pass Case Audit
+
+| Pass case | Satisfied by |
+| --- | --- |
+| SDL is fetched only from allowlisted sources for allowlisted tools. | `graphql_fetch_spec()` refuses any URL not declared in `graphql_ingestion_sources.v1.json`; the contract loader also asserts each URL's hostname is in the per-tool `official_hosts` from `tool_trust_sources.v1.json` (no aggregator block — SDL is fetched only from the vendor's own host). |
+| Redirects to non-allowlisted hosts are rejected, not followed. | httpx auto-redirects are disabled; the service follows redirects manually, re-running `assert_url_is_safe` at every hop. Test: `test_redirect_to_disallowed_host_is_rejected`. |
+| Malformed SDL does not produce claims. | `build_schema(sdl)` raises `GraphQLError` on parse or type-system invariant violations; the error is captured into the run's `errors` list with no claims emitted. Test: `test_malformed_sdl_rejected`. |
+| Ingestion produces structured claims with byte-level provenance. | One `api_endpoint_exists` per root field, plus auxiliaries as warranted. `Evidence.source_uri = <final_url>#<OperationType>.<fieldName>` so an auditor can trace any assertion back to the SDL location. Test: `test_provenance_fragment_uses_operation_dot_field`. |
+| Mutations are flagged with elevated risk and a side-effect claim. | Mutation root fields → `RiskLevel.HIGH` on the primary `api_endpoint_exists` claim plus an auxiliary `side_effect` claim. Test: `test_non_destructive_mutation_is_high_risk_not_critical`, `test_mutation_emits_side_effect_claim`. |
+| Destructive mutations are flagged CRITICAL and produce a destructive claim. | Mutation field name matched against `destructive_field_name_prefixes` (`delete`, `remove`, `destroy`, `drop`, `purge`, `revoke`, `wipe`) → primary risk upgraded to `CRITICAL` plus an auxiliary `destructive_action` claim. Test: `test_destructive_mutation_is_critical_and_emits_destructive_claim`. |
+| Deprecated fields are surfaced as claims. | `@deprecated(reason: ...)` directive becomes `field.deprecation_reason`; service emits `feature_deprecated` with the reason in the statement. Test: `test_deprecated_field_emits_deprecation_claim`. |
+| Raw evidence is recoverable. | `GET /ingestion/artifacts/{artifact_id}` returns the byte-stable raw SDL; `artifact_type` is `graphql_sdl`. |
+
+### Quality Bar
+
+- Only `https://` is accepted; HTTP, FTP, file, and unknown schemes are rejected at the shared SSRF guard.
+- Hostname is resolved via `socket.getaddrinfo`, and every returned address must be public.
+- Response body is read once with a `max_bytes` cap (default 8 MiB).
+- `content-type` must be in `allowed_content_types` (`application/graphql`, `text/graphql`, `text/plain`, `application/octet-stream`).
+- SDL is parsed via `graphql.build_schema()` so both syntax and type-system invariants are enforced; broken SDL never produces claims.
+- ETag and Last-Modified are persisted in the shared `docs_fetch_cache`; on revalidation a 304 reuses the cached artifact and re-parses the cached raw SDL body.
+- Cache reuse creates a *new* claim and verification result per ingest call but does not duplicate the raw artifact.
+- Root-field emission is capped by `max_root_fields_per_schema` (default 500); fields beyond the cap are reported in `skipped_fields`.
+- Risk mapping: Query / Subscription → LOW; Mutation → HIGH; destructive-prefix Mutation → CRITICAL. `feature_deprecated` is MEDIUM.
+- `POST /ingestion/graphql/tools/{tool_id}` ingests every allowlisted source for a tool in one call.
+- Bulk and single endpoints both return `GRAPHQL_INGESTION_FAILED` (422) on rejection with `tool_id` / `url` in `details`.
+- Full backend validation currently reports `401 passed`; ruff is clean; alembic upgrade → downgrade → upgrade cycle clean through migration 0012.
+
+### Deferred
+
+- Introspection-query ingestion (the alternative source path; deliberately
+  out of scope to avoid building a credentials lane).
+- Deeper SDL coverage: object/interface/union fields beyond the three root
+  operation types, input-type field annotations, directive definitions.
+- `extend type` resolution across multi-file SDL splits.
+- Canonical auto-publication after ingestion.
+- Runtime sandbox verification and L3 promotion (Stage 8).
+
+## Stage 7d: Safe MCP Server Metadata Ingestion
+
+Verdict: pass.
+
+Stage 7d is complete when AgentAtlas can safely spawn an allowlisted Model
+Context Protocol (MCP) server as a local subprocess, drive the standard
+JSON-RPC `initialize` + `tools/list` handshake, persist the full JSON-RPC
+payload as a durable audit artifact, and derive a structured claim per
+advertised MCP tool with risk hints — without ever invoking a command that
+isn't in the positive-shape allowlist, leaking a runaway process, or letting
+a server's output bypass the prompt-injection boundary.
+
+### Stage 0 contract change
+
+Stage 7d deliberately expands the Stage 0 scope. The original
+`initial_tools` list (`git`, `github-cli`, `docker`, `vercel-cli`,
+`openai-api`) remains locked exactly as before. A new parallel
+`mcp_server_tools` array now lists the five MCP-proxied tools we cover —
+`mcp-filesystem`, `mcp-fetch`, `mcp-git`, `mcp-slack`, `mcp-postgres`. The
+`ClaimStore.create` tool_id gate unions both lists, preserving the
+auditable distinction between native-ingestion scope and MCP-proxy scope
+while letting claims for either kind clear the gate. The
+`test_stage_0_contract_locks_initial_tool_scope` test still pins the
+original five exactly; a new
+`test_stage_0_contract_locks_mcp_server_tool_scope` test pins the MCP
+expansion to its current five so any further widening is deliberate.
+
+### Required Artifacts
+
+| Artifact | Purpose | Status |
+| --- | --- | --- |
+| `contracts/agentatlas_stage_0.v1.json` | Adds `mcp_server_tools[]` array (5 entries) as a deliberate Stage 7d scope expansion. | complete |
+| `contracts/tool_trust_sources.v1.json` | Adds 5 MCP server tools with `mcp_publisher` field marking each as `anthropic` or `third-party`. | complete |
+| `contracts/mcp_ingestion_sources.v1.json` | Per-server spawn metadata: `command`, positive-shape `argv` template (placeholders limited to `{sandbox_dir}` / `{database_url}`), publisher, package URI, plus contract-wide `protocol_version`, `default_timeout_seconds`, `default_max_bytes`, `max_tools_per_server`, `destructive_tool_name_prefixes`, `allowed_commands` (only `npx` / `uvx`), `allowed_template_placeholders`. | complete |
+| `backend/app/services/claim_store.py` | `_stage_0_tool_ids()` now unions `initial_tools` ∪ `mcp_server_tools`, comment-documents the architectural distinction. | complete |
+| `backend/app/schemas/enums.py` | Adds `IngestionArtifactType.MCP_TOOL_LIST`. | complete |
+| `backend/app/api/errors.py` | Adds `MCP_INGESTION_FAILED`. | complete |
+| `backend/app/schemas/ingestion.py` | Adds `McpIngestionRequest`, `McpIngestionResponse`, `McpIngestionSummary`. | complete |
+| `backend/alembic/versions/0013_extend_artifact_type_for_mcp.py` | Extends the `raw_ingestion_artifacts.artifact_type` CHECK to include `mcp_tool_list`; downgrade reverses. | complete |
+| `backend/app/services/mcp_ingestion.py` | `McpServerRunner` protocol; `SafeMcpServerRunner` production runner (subprocess + stdio JSON-RPC with hard time/byte caps and reliable termination); `McpIngestionService` orchestrator; spec resolver enforcing the argv allowlist + placeholder substitution; per-tool claim generator with auxiliary side-effect / destructive / deprecation emission and atlas-capture provenance. | complete |
+| `backend/app/api/routes_ingestion.py` | `POST /ingestion/mcp` and `POST /ingestion/mcp/publishers/{publisher}`; both return structured `MCP_INGESTION_FAILED` (422) on rejection. | complete |
+| `backend/tests/test_mcp_ingestion.py` | 30 adversarial cases covering contract gate, argv allowlist, placeholder substitution, missing sandbox / database URL, malformed initialize / tools/list, non-array tools, missing-name / non-dict tool entries, runner exceptions, per-tool cap, all four risk branches (read-only LOW, mutating HIGH, destructiveHint CRITICAL, destructive-name-prefix CRITICAL), deprecation, bulk-by-publisher, structured 422 from the API, and a sanity check that the production `SafeMcpServerRunner` rejects spawn commands outside `allowed_commands`. | complete |
+
+### Pass Case Audit
+
+| Pass case | Satisfied by |
+| --- | --- |
+| Only contract-listed servers can be spawned. | `resolve_mcp_server_spec()` refuses any `server_id` not in `mcp_ingestion_sources.v1.json`. Tests: `test_contract_rejects_unknown_server`, `test_api_rejects_unknown_server_with_structured_error`. |
+| Only `npx` / `uvx` may be invoked. | `_validate_mcp_sources` rejects any server whose command isn't in `allowed_commands`; `SafeMcpServerRunner.run` re-checks at runtime. Test: `test_safe_runner_rejects_command_not_in_allowed_commands`. |
+| Argv templates use only sanctioned placeholders. | The spec resolver substitutes only `{sandbox_dir}` / `{database_url}` and raises for any other `{...}` token. Tests: `test_sandbox_dir_placeholder_substitution`, `test_postgres_requires_database_url`, `test_postgres_substitutes_database_url`. |
+| Misbehaving servers cannot exhaust resources. | `SafeMcpServerRunner` enforces a wall-clock deadline (`spec.timeout_seconds`) on every `select`, a cumulative byte cap (`spec.max_bytes`) on stdout, and a guaranteed `_terminate` cleanup that closes pipes, terminates, waits, and kills as needed. |
+| Server output is treated as untrusted data. | Tool names / descriptions / annotations flow into claim statements via `' '.join(text.split())` then character cap; never executed, never substituted into shell commands. The full JSON-RPC log is stored as a `mcp_tool_list` artifact for byte-stable audit. |
+| Risk is set correctly per MCP tool annotation. | `readOnlyHint: true` → LOW; missing / false readOnlyHint → HIGH + `side_effect` claim; `destructiveHint: true` or destructive-prefix name → CRITICAL + `destructive_action` claim. Tests: `test_read_only_tool_is_low_risk_no_side_effect`, `test_non_readonly_tool_emits_side_effect_high`, `test_destructive_hint_emits_critical_and_destructive_claim`, `test_destructive_name_prefix_emits_critical_even_without_hint`. |
+| Malformed JSON-RPC replies do not produce claims. | The service guards both `initialize_result` and `tools_list_result` being dicts; `tools_list_result.tools` must be a JSON array; tools missing a `name` or that aren't JSON objects are skipped (not failed) and recorded in `skipped_tools`. Tests: `test_non_array_tools_field_rejected`, `test_tool_missing_name_is_skipped_not_failed`, `test_non_dict_tool_entry_is_skipped`. |
+| Raw evidence is recoverable. | `GET /ingestion/artifacts/{artifact_id}` returns the byte-stable `mcp_tool_list` artifact containing the spawn command, argv, both JSON-RPC results, and the raw stdout log. |
+
+### Quality Bar
+
+- The production runner closes stdin to signal shutdown, calls `terminate()`, waits up to 2 s, then `kill()` if still alive — no leaked processes even on hung servers.
+- Subprocess env is scrubbed: only `PATH` and `HOME` are inherited; `NO_UPDATE_NOTIFIER=1` and `NPM_CONFIG_UPDATE_NOTIFIER=false` are forced so npm noise doesn't pollute the JSON-RPC stream.
+- `select`-based read loop respects the wall-clock deadline at every iteration.
+- Cumulative byte cap on stdout aborts before exhausting memory.
+- JSON-RPC reply demultiplexing tolerates server-sent notifications and mismatched-id replies by skipping rather than failing.
+- Per-server cap on emitted tools (`max_tools_per_server`, default 200) — overflow goes into `skipped_tools`.
+- Test suite never invokes the real `SafeMcpServerRunner`; CI stays hermetic without `npx` / `uvx` installed.
+- Bulk endpoint groups by `publisher` (not by `tool_id`) so a single call can ingest all `anthropic` reference servers in one go.
+- Full backend validation currently reports `431 passed`; ruff is clean; alembic upgrade → downgrade → upgrade cycle clean through migration 0013.
+
+### Deferred
+
+- Live remote MCP servers over SSE / streamable HTTP (we ship only the stdio spawn path).
+- Introspection of MCP `resources/list` and `prompts/list` (this stage covers `tools/list` only — the highest-leverage surface for risk classification).
+- Auto-publication of accepted MCP claims into canonical `ToolSpec` documents.
+- Runtime sandbox verification and L3 promotion (Stage 8).
+- MCP server discovery from an external registry (we maintain the per-server allowlist by hand for now).
 
 ## Validation
 

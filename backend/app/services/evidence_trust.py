@@ -72,7 +72,10 @@ def _server_trust_cap(tool_id: str, evidence: Evidence) -> TrustLevel:
         EvidenceType.GRAPHQL_SCHEMA,
         EvidenceType.MCP_TOOL_SCHEMA,
     }:
-        if _host_allowed(hostname, _official_hosts(tool_id)):
+        allowed = _official_hosts(tool_id) | _aggregator_hosts_for_evidence_type(
+            evidence_type
+        )
+        if _host_allowed(hostname, allowed):
             return TrustLevel.HIGH
         if scheme in _atlas_capture_schemes():
             return TrustLevel.MEDIUM
@@ -139,6 +142,30 @@ def _local_capture_schemes() -> frozenset[str]:
 
 def _atlas_capture_schemes() -> frozenset[str]:
     return frozenset(_trust_sources()["atlas_capture_schemes"])
+
+
+_EVIDENCE_TYPE_AGGREGATOR_FAMILY: dict[EvidenceType, str] = {
+    EvidenceType.JSON_SCHEMA: "json_schema",
+    EvidenceType.GRAPHQL_SCHEMA: "graphql_schema",
+}
+
+
+def _aggregator_hosts_for_evidence_type(evidence_type: EvidenceType) -> frozenset[str]:
+    family = _EVIDENCE_TYPE_AGGREGATOR_FAMILY.get(evidence_type)
+    if not family:
+        return frozenset()
+    return schema_aggregator_hosts(family)
+
+
+def schema_aggregator_hosts(family: str) -> frozenset[str]:
+    """Return hosts trusted to aggregate machine-readable schemas of a given
+    family (e.g. `json_schema`). Aggregators are deliberately decoupled from
+    per-tool `official_hosts` so they cannot widen the trust surface of the
+    docs or openapi lanes; only services that opt in (e.g. JSON Schema
+    ingestion) union them with the tool's official_hosts."""
+    table = _trust_sources().get("schema_aggregator_hosts") or {}
+    hosts = table.get(family) or []
+    return frozenset(hosts)
 
 
 @cache

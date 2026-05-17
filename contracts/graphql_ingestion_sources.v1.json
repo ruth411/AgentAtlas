@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "default_timeout_seconds": 30,
+  "default_max_bytes": 8388608,
+  "default_cache_ttl_seconds": 86400,
+  "max_redirects": 3,
+  "max_root_fields_per_schema": 500,
+  "destructive_field_name_prefixes": [
+    "delete",
+    "destroy",
+    "drop",
+    "purge",
+    "remove",
+    "revoke",
+    "wipe"
+  ],
+  "allowed_content_types": [
+    "application/graphql",
+    "text/graphql",
+    "text/plain",
+    "application/octet-stream"
+  ],
+  "tools": {
+    "github-cli": {
+      "sources": [
+        {
+          "url": "https://docs.github.com/public/fpt/schema.docs.graphql",
+          "evidence_type": "graphql_schema",
+          "subject_prefix": "GitHub GraphQL API"
+        }
+      ]
+    }
+  }
+}

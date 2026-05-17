@@ -41,6 +41,21 @@ def test_stage_0_contract_locks_initial_tool_scope() -> None:
     ]
 
 
+def test_stage_0_contract_locks_mcp_server_tool_scope() -> None:
+    """Stage 7d deliberately expanded coverage to MCP-proxied tools. The
+    `mcp_server_tools` list is the locked scope for that expansion; keep it
+    here so any further widening is a deliberate, reviewed change."""
+    contract = _contract()
+
+    assert [tool["tool_id"] for tool in contract["mcp_server_tools"]] == [
+        "mcp-filesystem",
+        "mcp-fetch",
+        "mcp-git",
+        "mcp-slack",
+        "mcp-postgres",
+    ]
+
+
 def test_stage_0_contract_blocks_auto_execution_for_high_and_critical_risk() -> None:
     contract = _contract()
     policy_by_risk = {rule["risk_level"]: rule for rule in contract["safety_policy"]}

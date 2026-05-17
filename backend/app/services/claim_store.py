@@ -52,11 +52,19 @@ from app.services.evidence_trust import normalize_claim_evidence_trust
 
 @cache
 def _stage_0_tool_ids() -> frozenset[str]:
-    """Return the locked Stage 0 tool_id set, loaded once from the contract."""
+    """Return the union of locked Stage 0 tool_ids: the original MVP
+    `initial_tools` set, plus the Stage 7d `mcp_server_tools` expansion.
+
+    Both lists are loaded once from the Stage 0 contract. Keeping them as
+    separate arrays in the contract preserves the auditable distinction
+    between the original native-ingestion scope and the MCP-proxy scope while
+    allowing claims for either kind of tool to clear the gate."""
     path = Path(__file__).resolve().parents[3] / "contracts/agentatlas_stage_0.v1.json"
     with path.open() as handle:
         data = json.load(handle)
-    return frozenset(tool["tool_id"] for tool in data["initial_tools"])
+    native = {tool["tool_id"] for tool in data["initial_tools"]}
+    mcp = {tool["tool_id"] for tool in data.get("mcp_server_tools", [])}
+    return frozenset(native | mcp)
 
 
 class DuplicateClaimError(ValueError):
