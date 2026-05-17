@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 
 from app.api.errors import ERROR_RESPONSES, ErrorCode, raise_api_error
 from app.schemas.tool_spec import ToolSpec
@@ -48,8 +48,12 @@ def get_tool_spec(
 
 
 @router.get("/tools", response_model=list[ToolSpec], responses=ERROR_RESPONSES)
-def list_tool_specs(store: ClaimStore = Depends(get_claim_store)) -> list[ToolSpec]:
-    return store.list_canonical_tool_specs()
+def list_tool_specs(
+    limit: int = Query(default=100, ge=1, le=500),
+    offset: int = Query(default=0, ge=0),
+    store: ClaimStore = Depends(get_claim_store),
+) -> list[ToolSpec]:
+    return store.list_canonical_tool_specs(limit=limit, offset=offset)
 
 
 @router.post(
@@ -90,5 +94,9 @@ def get_workflow_spec(
 
 
 @router.get("/workflows", response_model=list[WorkflowSpec], responses=ERROR_RESPONSES)
-def list_workflow_specs(store: ClaimStore = Depends(get_claim_store)) -> list[WorkflowSpec]:
-    return store.list_canonical_workflow_specs()
+def list_workflow_specs(
+    limit: int = Query(default=100, ge=1, le=500),
+    offset: int = Query(default=0, ge=0),
+    store: ClaimStore = Depends(get_claim_store),
+) -> list[WorkflowSpec]:
+    return store.list_canonical_workflow_specs(limit=limit, offset=offset)

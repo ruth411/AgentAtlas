@@ -1,6 +1,6 @@
 # AgentAtlas Stage Report
 
-This report consolidates the completion status for Stages 0 through 6.
+This report consolidates the completion status for Stages 0 through 7a.
 
 It records what each stage proves, which artifacts satisfy the stage, what remains deferred, and which validation commands must pass.
 
@@ -15,6 +15,10 @@ It records what each stage proves, which artifacts satisfy the stage, what remai
 | Stage 4 | Evidence and Confidence Discipline | pass |
 | Stage 5 | Deterministic Risk Engine and Structural Prep | pass |
 | Stage 6 | Canonical Publication and Spec Compilation | pass |
+| Stage 7a | Safe CLI Ingestion Layer | pass |
+| Stage 7b | Safe Docs Ingestion Layer | pass |
+| Stage 7c | API schema ingestion (OpenAPI / JSON Schema / GraphQL) | not started |
+| Stage 7d | MCP metadata ingestion | not started |
 
 ## Stage 0: Product Lock and Trust Contract
 
@@ -360,7 +364,7 @@ Stage 5 is complete when risk classification is deterministic, explainable, cont
 - OpenAI API risk rules require an OpenAI/vendor token plus an action term; bare mentions of `api`, `model`, or `chat` do not fire `openai.model_call`.
 - `vercel.preview` explicitly does not fire on `vercel --prod`.
 - `understated_risk` cap is read from the confidence-model contract.
-- Full backend validation currently reports `161 passed`; ruff is clean.
+- Full backend validation currently reports `177 passed`; ruff is clean.
 
 ### Deferred
 
@@ -418,7 +422,7 @@ canonical `ToolSpec` and `WorkflowSpec` records without hand-written truth.
 - Same input plus same `compiled_at` produces identical spec JSON and hash.
 - `content_hash` remains stable when only publication timestamp/compiler metadata changes.
 - Re-publishing replaces the canonical record deterministically.
-- Full backend validation currently reports `162 passed`; ruff is clean.
+- Full backend validation currently reports `177 passed`; ruff is clean.
 
 ### Deferred
 
@@ -426,6 +430,119 @@ canonical `ToolSpec` and `WorkflowSpec` records without hand-written truth.
 - MCP/query UX for canonical specs.
 - Runtime promotion beyond existing verification levels.
 - Rich structured ingestion for failure modes, recovery steps, examples, inputs, and outputs.
+
+## Stage 7a: Safe CLI Ingestion Layer
+
+Verdict: pass.
+
+Stage 7a is complete when AgentAtlas can safely capture allowlisted CLI
+help/version output, persist raw artifacts for audit, convert captures into
+structured claims, and verify those claims without executing unsafe commands
+or auto-publishing canonical specs. Stage 7b (Docs), 7c (API schema), and 7d
+(MCP metadata) are tracked as separate sub-stages and are not part of this
+pass.
+
+### Required Artifacts
+
+| Artifact | Purpose | Status |
+| --- | --- | --- |
+| `contracts/cli_ingestion_sources.v1.json` | Versioned allowlist for safe `git` and GitHub CLI capture commands. | complete |
+| `backend/app/schemas/ingestion.py` | Typed Pydantic schemas for ingestion requests, responses, runs, raw artifacts, and the structured `CliIngestionSummary`. | complete |
+| `backend/alembic/versions/0007_create_ingestion_tables.py` | Adds ingestion run and raw artifact tables. | complete |
+| `backend/app/services/cli_ingestion.py` | Streamed safe runner with positive-shape argv allowlist, allowlist validation, artifact capture, statement derivation, claim creation, verification, and a bulk-ingest service method. | complete |
+| `backend/app/api/routes_ingestion.py` | CLI ingestion endpoints including `POST /ingestion/cli`, the bulk `POST /ingestion/cli/tools/{tool_id}`, run retrieval, and raw artifact retrieval. | complete |
+| `backend/tests/test_cli_ingestion.py` | Safety, prompt-injection boundary, adversarial argv guard regression, statement derivation, bulk ingest, real-binary smoke, API, artifact, and verification tests. | complete |
+
+### Pass Case Audit
+
+| Pass case | Satisfied by |
+| --- | --- |
+| At least `git` and `gh` can be ingested safely. | Allowlist covers `git --version`, `git status -h`, `git log -h`, `gh --version`, `gh repo delete --help`, and `gh repo view --help`. |
+| Ingestion produces structured claims, not loose summaries. | The service creates `tool_exists` or `cli_command_exists` claims from allowlist metadata; `claim.statement` is the first non-empty line of captured output, not invented boilerplate. |
+| Raw evidence can be inspected after the fact. | `raw_ingestion_artifacts` stores exact raw content, source URI, hash, and capture timestamp; `GET /ingestion/artifacts/{artifact_id}` retrieves it. |
+| Unsafe commands are not executed during ingestion. | Unknown commands are rejected before run creation; runner uses argv lists, `shell=False`, `/` cwd, empty env, hard timeouts, and a streaming byte-cap that kills the subprocess on overflow before reading 8 KB beyond the cap. |
+| Docs/CLI output are treated as data, not instructions. | Captured output is stored and excerpted as evidence only; no claims are derived from arbitrary output prose. |
+| Prompt-injection-like content is ignored as executable instruction. | Tests store malicious-looking help text and prove only the allowlisted capture command ran. |
+
+### Quality Bar
+
+- `POST /ingestion/cli` creates an ingestion run, raw artifact, structured claim, and verification result.
+- `POST /ingestion/cli/tools/{tool_id}` runs every allowlisted command for a tool in one call.
+- `GET /ingestion/runs`, `GET /ingestion/runs/{run_id}`, and `GET /ingestion/artifacts/{artifact_id}` are implemented.
+- `_assert_safe_capture_argv` is a positive-shape allowlist: argv must end with a read-only marker (`--help`, `-h`, `--version`, `help`); intermediate elements must be non-flag subcommands; the binary itself must not be one of the destructive binaries (`rm`, `dd`, `chmod`, etc.) whose first positional argument can be misread as a target.
+- The runner is `subprocess.Popen` with streamed reads, killing the subprocess and surfacing `CliIngestionError` on timeout or max-output overflow before the buffer can blow past the cap.
+- The CLI ingestion contract declares an explicit `binary` per tool; the validator enforces `argv[0] == binary` so contract edits cannot silently swap a binary.
+- `IngestionRun.summary` is a typed `CliIngestionSummary` model, not an opaque dict.
+- Evidence hashes are computed from the exact raw captured artifact (sha256).
+- Ingestion does not call canonical publish endpoints.
+- Failed captures persist failed runs and create no claims.
+- `ClaimStore.create` enforces `evidence_policy_violations` defensively so the policy applies to every path into the store, not just `POST /claims`.
+- The real CLI runner is exercised against the running Python interpreter in `test_safe_runner_actually_invokes_real_binary` (not just mocked).
+- Full backend validation currently reports `198 passed`; ruff is clean.
+
+### Deferred (Stages 7b / 7c / 7d)
+
+- API schema ingestion agent for OpenAPI, JSON Schema, and GraphQL sources (7c).
+- MCP metadata ingestion agent where applicable (7d).
+- LLM/prose extraction from captured artifacts.
+- Canonical auto-publication after ingestion.
+- Runtime sandbox verification and L3 promotion (Stage 8).
+
+## Stage 7b: Safe Docs Ingestion Layer
+
+Verdict: pass.
+
+Stage 7b is complete when AgentAtlas can safely fetch documentation URLs for
+the locked Stage 0 tools, sanitize the response into prose-only excerpts,
+persist raw bodies for audit, and verify the resulting claims through the
+orchestrator — without ever following a redirect to a non-allowlisted host
+or rendering executable HTML/JS as content.
+
+### Required Artifacts
+
+| Artifact | Purpose | Status |
+| --- | --- | --- |
+| `contracts/docs_ingestion_sources.v1.json` | Versioned per-tool allowlist of documentation URLs, plus default timeout, max-bytes, cache TTL, max-redirects, allowed-content-types. | complete |
+| `backend/app/schemas/ingestion.py` | Adds `DocsIngestionRequest`, `DocsIngestionResponse`, `DocsIngestionSummary`, `DocsFetchCacheEntry`. | complete |
+| `backend/alembic/versions/0009_create_docs_fetch_cache.py` | Adds the `docs_fetch_cache` table and extends the `raw_ingestion_artifacts.artifact_type` check constraint to include `docs_content`. | complete |
+| `backend/app/db/models.py` | Adds `DocsFetchCacheRecord`. | complete |
+| `backend/app/services/docs_ingestion.py` | SSRF-safe httpx fetcher, manual redirect re-validation, stdlib HTML sanitizer (`html.parser`), conditional revalidation via `If-None-Match` / `If-Modified-Since`, claim + artifact creation, bulk-ingest service method. | complete |
+| `backend/app/services/claim_store.py` | `save_docs_fetch_cache` / `get_docs_fetch_cache` round-trip. | complete |
+| `backend/app/api/routes_ingestion.py` | `POST /ingestion/docs` and `POST /ingestion/docs/tools/{tool_id}`; both return structured `DOCS_FETCH_FAILED` on rejection. | complete |
+| `backend/tests/test_docs_ingestion.py` | 37 adversarial cases covering contract gate, SSRF, redirects, sanitization, content-type, max-bytes, empty/scripts-only body, transport errors, cache hit/miss, bulk, and the API. | complete |
+
+### Pass Case Audit
+
+| Pass case | Satisfied by |
+| --- | --- |
+| Trusted docs for Stage 0 tools can be ingested without arbitrary URL fetching. | The `docs_fetch_spec()` lookup refuses any URL not in `docs_ingestion_sources.v1.json`; the contract validator at load time also enforces that every URL's hostname is in the per-tool `official_hosts` from `tool_trust_sources.v1.json`. |
+| Redirects to non-allowlisted hosts are rejected, not followed. | httpx auto-redirects are disabled (`follow_redirects=False`); the service follows redirects manually, re-running `_assert_url_is_safe` at every hop (scheme, host allowlist, IP class). Test: `test_redirect_to_disallowed_host_is_rejected`. |
+| Excerpts never contain executable HTML/JS. | `_sanitize_html_to_text` uses `html.parser` and drops the content of `script`, `style`, `iframe`, `object`, `embed`, `template`, `noscript`, and `svg` entirely. Attribute values (including `on*` event handlers) are never emitted. Tests: `test_sanitizer_strips_script_content`, `test_sanitizer_strips_inline_event_handler_html`, `test_response_with_only_script_content_rejected`. |
+| Ingestion produces structured claims with durable evidence. | Each fetch creates a `RawIngestionArtifact` (raw response body, sha256 hash, `agentatlas://` source URI, `docs_content` artifact type) plus a `KnowledgeClaim` whose `Evidence.source_uri` is the original public URL so `evidence_trust.py` resolves trust to `HIGH` for hosts in the per-tool allowlist. |
+| Raw evidence can be inspected after the fact. | `GET /ingestion/artifacts/{artifact_id}` returns the byte-stable raw body that the ingester saw. |
+| Docs are treated as data, not instructions. | The orchestrator runs `evidence_policy_violations` over every ingested claim's evidence (already enforced inside `ClaimStore.create`); sanitization strips executable content before the excerpt ever reaches the database. |
+
+### Quality Bar
+
+- Only `https://` is accepted; HTTP, FTP, file, and unknown schemes are rejected at the SSRF guard.
+- Hostname is resolved via `socket.getaddrinfo`, and every returned address must be public (not private, loopback, link-local, multicast, reserved, or unspecified). IP literals (`127.0.0.1`, `169.254.169.254`) are rejected at the literal-parse step before resolution.
+- Response body is read once with a `max_bytes` cap (default 1 MiB); oversized bodies are rejected.
+- `content-type` header must be in `allowed_content_types` (default: `text/html`, `text/plain`, `text/markdown`, `application/xhtml+xml`); any other type, including `application/javascript`, is rejected.
+- ETag and Last-Modified are persisted in `docs_fetch_cache`; on revalidation the service sends `If-None-Match` / `If-Modified-Since`, and a 304 reuses the cached artifact without creating a new raw row.
+- Cache reuse creates a *new* claim and verification result (so audit chronology reflects each ingest call) but does not duplicate the raw artifact.
+- The HTTP client is injected via `DocsHttpClient` Protocol so tests use a `FakeDocsClient` rather than hitting the network.
+- DNS lookup is also injectable via `socket.getaddrinfo` monkeypatching in tests so SSRF tests don't depend on real DNS.
+- `POST /ingestion/docs/tools/{tool_id}` ingests every URL allowlisted for a tool in one call.
+- Bulk and single endpoints both return `DOCS_FETCH_FAILED` (422) on rejection with `tool_id` / `url` in `details`.
+- Full backend validation currently reports `283 passed`; ruff is clean.
+
+### Deferred
+
+- API schema ingestion (Stage 7c).
+- MCP metadata ingestion (Stage 7d).
+- LLM/prose extraction from captured artifacts.
+- Canonical auto-publication after ingestion.
+- Runtime sandbox verification and L3 promotion (Stage 8).
 
 ## Validation
 

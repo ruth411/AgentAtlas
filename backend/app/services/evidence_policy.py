@@ -18,7 +18,32 @@ TRUSTED_SOURCE_EVIDENCE_TYPES = {
     EvidenceType.MAINTAINER_REVIEW,
 }
 
-REJECTED_URL_SCHEMES = {"llm", "maintainer-review", "memory", "sandbox"}
+# Positive allowlist of URL schemes. Anything else is rejected as evidence —
+# a blacklist will always miss the next dangerous scheme (javascript:, data:,
+# vbscript:, chrome-extension:, etc.). Add a scheme here only after auditing
+# that downstream consumers (Stage 9 query surface, Stage 12 dashboard) handle
+# it correctly without auto-fetching or rendering as a link.
+#
+# Notably excluded:
+# - `llm`, `memory` — LLM reasoning / agent memory are rejected primary evidence per Stage 0.
+# - `maintainer-review`, `sandbox` — these schemes are reserved for Stage 8 (real sandbox
+#   issuer) and Stage 13 (signed maintainer review). Until those layers exist, accepting
+#   the bare scheme would let any submitter self-assert maintainer or runtime trust.
+# - `javascript`, `data`, `vbscript`, `ftp`, `chrome-extension`, etc. — never appropriate
+#   for evidence and dangerous if any consumer renders the URI as a link.
+ALLOWED_URL_SCHEMES: frozenset[str] = frozenset(
+    {
+        "http",
+        "https",
+        "agentatlas",
+        "local",
+        "file",
+        "docs",
+    }
+)
+
+# Hosts excluded even within allowed schemes, because they encourage
+# low-quality or maintainer-unverifiable claims.
 REJECTED_HOST_SUFFIXES = (
     "stackoverflow.com",
     "gist.github.com",
@@ -37,12 +62,19 @@ def _hostname_labels(hostname: str) -> set[str]:
 def _is_rejected_source(source_uri: str) -> bool:
     parsed = urlparse(source_uri)
     scheme = (parsed.scheme or "").lower()
-    if scheme in REJECTED_URL_SCHEMES:
+    if not scheme or scheme not in ALLOWED_URL_SCHEMES:
         return True
+
+    # http/https URLs additionally undergo host-level checks; non-web allowed
+    # schemes (`agentatlas`, `local`, `file`, `docs`) carry no hostname and
+    # are accepted once the scheme passes.
+    if scheme not in {"http", "https"}:
+        return False
 
     hostname = (parsed.hostname or "").lower()
     if not hostname:
-        return False
+        # http/https URLs without a host are malformed — reject.
+        return True
 
     if any(hostname == suffix or hostname.endswith("." + suffix) for suffix in REJECTED_HOST_SUFFIXES):
         return True

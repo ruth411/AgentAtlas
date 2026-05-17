@@ -280,12 +280,16 @@ def test_workflow_compiler_orders_steps_and_reports_malformed_subject(store: Cla
             tool_id="git",
         ),
     )
+    # Step number 0 passes the schema-level regex (workflow_id::N::action)
+    # but the canonical compiler rejects it for step_number < 1, surfacing the
+    # invalid_workflow_subject issue. The schema-level regex now blocks the
+    # original "deploy-next::bad::broken" form entirely.
     _accept(
         store,
         _claim(
             claim_id="claim_bad",
             claim_type=ClaimType.WORKFLOW_STEP,
-            subject="deploy-next::bad::broken",
+            subject="deploy-next::0::broken",
             statement="bad",
             tool_id="git",
         ),

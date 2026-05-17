@@ -59,9 +59,9 @@ Input:
 python scripts/ingest_cli_help.py --tool git --command "git status"
 ```
 
-Current Stage 5 scope: this script is not implemented yet. The scenario is
-validated today through structured claim submission and deterministic risk
-classification tests; CLI capture/ingestion lands later.
+Current Stage 7 scope: CLI ingestion is implemented through
+`POST /ingestion/cli` with `{"tool_id": "git", "command": "git status"}`.
+The old script name above is a scenario shorthand, not the current interface.
 
 Expected behavior:
 

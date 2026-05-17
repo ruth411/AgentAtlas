@@ -7,6 +7,8 @@ from app.schemas.enums import (
     ClaimType,
     ConfidenceBand,
     EvidenceType,
+    IngestionArtifactType,
+    IngestionStatus,
     OrchestratorDecision,
     RiskLevel,
     TrustLevel,
@@ -183,3 +185,65 @@ class CanonicalWorkflowSpecRecord(Base):
     compiled_by: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
     source_claim_ids_json: Mapped[str] = mapped_column(Text, nullable=False)
     verification_level: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+
+
+class IngestionRunRecord(Base):
+    __tablename__ = "ingestion_runs"
+    __table_args__ = (
+        CheckConstraint(
+            _allowed_values_sql("status", [item.value for item in IngestionStatus]),
+            name="ck_ingestion_runs_status",
+        ),
+    )
+
+    run_id: Mapped[str] = mapped_column(String(128), primary_key=True)
+    tool_id: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
+    command: Mapped[str] = mapped_column(String(512), nullable=False, index=True)
+    status: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    submitted_by: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    summary_json: Mapped[str] = mapped_column(Text, nullable=False)
+
+    artifacts: Mapped[list["RawIngestionArtifactRecord"]] = relationship(
+        back_populates="run",
+        cascade="all, delete-orphan",
+        order_by="RawIngestionArtifactRecord.artifact_id",
+    )
+
+
+class RawIngestionArtifactRecord(Base):
+    __tablename__ = "raw_ingestion_artifacts"
+    __table_args__ = (
+        CheckConstraint(
+            _allowed_values_sql("artifact_type", [item.value for item in IngestionArtifactType]),
+            name="ck_raw_ingestion_artifacts_type",
+        ),
+    )
+
+    artifact_id: Mapped[str] = mapped_column(String(128), primary_key=True)
+    run_id: Mapped[str] = mapped_column(
+        ForeignKey("ingestion_runs.run_id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    artifact_type: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    source_uri: Mapped[str] = mapped_column(Text, nullable=False)
+    raw_content: Mapped[str] = mapped_column(Text, nullable=False)
+    hash: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
+    captured_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
+
+    run: Mapped[IngestionRunRecord] = relationship(back_populates="artifacts")
+
+
+class DocsFetchCacheRecord(Base):
+    __tablename__ = "docs_fetch_cache"
+
+    url: Mapped[str] = mapped_column(String(2048), primary_key=True)
+    etag: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    last_modified: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    body_hash: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
+    last_fetched_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, index=True
+    )
+    last_artifact_id: Mapped[str | None] = mapped_column(String(128), nullable=True)

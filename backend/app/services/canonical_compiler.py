@@ -423,6 +423,16 @@ def _add_tool_absence_issues(
                 source_claim_ids=source_claim_ids,
             )
         )
+    issues.append(
+        PublicationIssue(
+            code="interfaces_from_contract",
+            message=(
+                "Interfaces are taken from the Stage 0 tool contract, not from accepted "
+                "claims; no interface_exists claim type exists yet."
+            ),
+            source_claim_ids=source_claim_ids,
+        )
+    )
 
 
 def _parse_workflow_subject(subject: str) -> tuple[str, int, str] | None:

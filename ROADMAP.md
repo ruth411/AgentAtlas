@@ -237,30 +237,132 @@ This stage turns accepted claims into a usable knowledge layer.
 
 This stage makes the repo truly "agent-maintained," but only under strict limits.
 
-### Capabilities Built
+The original Stage 7 promised four ingestion agents (CLI, Docs, API schema, MCP).
+To keep each lane honest and independently auditable, Stage 7 is split into four
+sub-stages. Each sub-stage carries the same trust-contract requirements: structured
+claims with durable evidence, raw artifact capture, no execution of dangerous
+commands during discovery, and docs treated as data not instructions.
 
-- CLI ingestion agent for safe help, version, and read-only inspection
-- Docs ingestion agent for trusted documentation extraction
-- API schema ingestion agent for OpenAPI, JSON Schema, and GraphQL sources
-- MCP metadata ingestion agent where applicable
-- Evidence capture and hashing
-- Raw artifact storage for later audit
-- Allowlists for runtime inspection
+### Common Pass Cases (all sub-stages)
 
-### Pass Cases
+- The ingested lane produces structured claims, not loose summaries.
+- Raw evidence can be inspected after the fact (artifact retrieval endpoint).
+- No unsafe action is executed during ingestion.
+- Captured content is treated as data, not as executable instruction.
+- Tests prove that prompt-injection-like content cannot redirect the ingester.
 
-- At least `git` and `gh` can be ingested safely
-- Ingestion produces structured claims, not loose summaries
-- Raw evidence can be inspected after the fact
-- Unsafe commands are not executed during ingestion
-- Docs are treated as data, not instructions
-- Ingestion tests prove that prompt-injection-like content is ignored as executable instruction
+### Common Do Not Advance If
 
-### Do Not Advance If
+- Ingestion is broad but shallow within the lane.
+- Agents generate claims without durable evidence.
+- The system executes dangerous commands during discovery.
 
-- Ingestion is broad but shallow
-- Agents generate claims without durable evidence
-- The system executes dangerous commands during discovery
+---
+
+### Stage 7a: Safe CLI Ingestion
+
+#### Capabilities Built
+
+- CLI ingestion agent for safe help, version, and read-only inspection.
+- Streamed subprocess runner with positive-shape argv allowlist, byte-cap,
+  hard timeout, empty env, and no shell.
+- Allowlist contract per locked Stage 0 tool.
+- Raw `agentatlas://` artifact storage with content hash.
+- Claim creation from captured output and orchestrator verification.
+- Bulk-ingest endpoint to refresh every allowlisted command for a tool.
+
+#### Pass Cases
+
+- At least `git` and `gh` can be ingested safely.
+- Single-command and bulk-tool endpoints both work end to end.
+- Allowlist contract drift (e.g. argv that does not end in a read-only marker,
+  or whose binary is a destructive command) is rejected at contract load.
+
+---
+
+### Stage 7b: Docs Ingestion — SHIPPED
+
+#### Capabilities Built
+
+- Docs ingestion agent for trusted documentation extraction.
+- HTTPS-only httpx fetcher constrained to the per-tool `official_hosts` allowlist
+  defined in `contracts/tool_trust_sources.v1.json`, plus a separate
+  `contracts/docs_ingestion_sources.v1.json` listing the exact URLs per tool.
+- Full SSRF guard: rejects non-https, non-allowlisted hosts, private / loopback /
+  link-local / multicast / reserved IPs (literals and resolved hostnames).
+- Manual redirect handling: httpx auto-redirects disabled; every hop is
+  re-validated against the same scheme + host + IP rules; `max_redirects`
+  enforced.
+- Stdlib HTML sanitization (`html.parser`): drops `script`, `style`, `iframe`,
+  `object`, `embed`, `template`, `noscript`, `svg` content; emits text only;
+  HTML entities decoded; whitespace collapsed.
+- Content-type allowlist enforced (`text/html`, `text/plain`, `text/markdown`,
+  `application/xhtml+xml`); other types rejected.
+- Hard `max_bytes` cap and `timeout_seconds` cap per fetch.
+- Persistent `docs_fetch_cache` table with ETag + Last-Modified;
+  `If-None-Match` / `If-Modified-Since` revalidation reuses the prior artifact
+  on 304 without storing a new raw body.
+- Raw response stored as `raw_ingestion_artifacts` row with `docs_content`
+  artifact type, sha256 hash, and `agentatlas://` source URI for audit.
+- Redirect chain surfaced on `DocsIngestionResponse` for caller audit.
+- Bulk endpoint `POST /ingestion/docs/tools/{tool_id}` runs every allowlisted
+  URL for a tool.
+
+#### Pass Cases
+
+- Trusted docs for the locked Stage 0 tools can be ingested without arbitrary
+  URL fetching. ✓
+- Redirects to non-allowlisted hosts are rejected, not followed. ✓
+- Excerpts never contain executable HTML/JS. ✓
+
+#### Verification
+
+37 adversarial tests in `tests/test_docs_ingestion.py` covering: SSRF
+(scheme, host allowlist, private IP literals, private resolved IPs),
+redirect chain abuse (cross-host, missing Location, too many hops),
+sanitization (scripts, styles, iframes, event handlers, entity decode,
+whitespace collapse), content-type enforcement, max-bytes overflow,
+empty / scripts-only body, transport timeout, HTTP 5xx, cache hit/miss,
+cache entry orphaned by deleted artifact, bulk ingest happy/error paths,
+and structured 422 from the API.
+
+---
+
+### Stage 7c: API Schema Ingestion
+
+#### Capabilities Built
+
+- OpenAPI 3.x ingestion agent.
+- JSON Schema ingestion agent.
+- GraphQL schema ingestion agent.
+- Schema validation before claim generation (reject syntactically broken schemas).
+- Claim generation per endpoint / type / field, with provenance back to the
+  schema URI and the specific JSON pointer of the assertion.
+
+#### Pass Cases
+
+- A live OpenAPI document for `openai-api` produces `api_endpoint_exists` claims
+  with structured side-effect annotations.
+- Malformed schemas are rejected with structured errors and do not create claims.
+
+---
+
+### Stage 7d: MCP Metadata Ingestion
+
+#### Capabilities Built
+
+- MCP tool metadata ingestion where applicable.
+- Trust resolution from the MCP server identity, not from claim-side assertions.
+- Claim generation for `mcp_tool_exists`, including parameter schema and
+  side-effect declarations.
+
+#### Pass Cases
+
+- An MCP server's listed tools can be ingested into structured claims.
+- An MCP server that itself lacks signed identity does not promote its claims
+  past `L1_schema_valid`.
+
+---
 
 ## Stage 8: Runtime Verification Layer
 

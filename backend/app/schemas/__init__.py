@@ -4,6 +4,8 @@ from app.schemas.enums import (
     ClaimType,
     ConfidenceBand,
     EvidenceType,
+    IngestionArtifactType,
+    IngestionStatus,
     OrchestratorDecision,
     RiskLevel,
     TrustLevel,
@@ -11,6 +13,12 @@ from app.schemas.enums import (
     VerificationStatus,
 )
 from app.schemas.evidence import Evidence, EvidenceCreate
+from app.schemas.ingestion import (
+    CliIngestionRequest,
+    CliIngestionResponse,
+    IngestionRun,
+    RawIngestionArtifact,
+)
 from app.schemas.risk import RiskAssessment, RiskDimension, RiskMatch
 from app.schemas.safety_policy import SafetyPolicy, SafetyRule
 from app.schemas.tool_spec import (
@@ -36,6 +44,12 @@ __all__ = [
     "ConfidenceComponent",
     "Evidence",
     "EvidenceCreate",
+    "CliIngestionRequest",
+    "CliIngestionResponse",
+    "IngestionArtifactType",
+    "IngestionRun",
+    "IngestionStatus",
+    "RawIngestionArtifact",
     "EvidenceType",
     "FailureMode",
     "KnowledgeClaim",

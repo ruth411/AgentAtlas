@@ -30,6 +30,17 @@ class EvidenceType(StrEnum):
     MAINTAINER_REVIEW = "maintainer_review"
 
 
+class IngestionStatus(StrEnum):
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    FAILED = "failed"
+
+
+class IngestionArtifactType(StrEnum):
+    CLI_OUTPUT = "cli_output"
+    DOCS_CONTENT = "docs_content"
+
+
 class RiskLevel(StrEnum):
     NONE = "none"
     LOW = "low"

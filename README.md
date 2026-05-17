@@ -13,6 +13,10 @@ The project is currently in the backend trust-foundation phase. It can ingest st
 - Stage 4: pass. Confidence scorer with weighted evidence, diminishing returns, hard caps, conflict penalty, and an inspectable `ConfidenceBreakdown` attached to every verification result. Spam, duplicate, low-trust, single-type, and high-risk-thin-evidence cases cannot produce inflated acceptance.
 - Stage 5: pass. Risk classification is now deterministic, contract-backed, dimension-based, persisted as `risk_assessment`, copied to claims as `risk_level_classified` for query parity, and covered by word-boundary, aggregation, contract, migration, and replay-determinism tests.
 - Stage 6: pass. Accepted claims compile into persisted canonical `ToolSpec` and `WorkflowSpec` records with deterministic artifact/content hashes, provenance, publication issues, and publish/retrieve/list APIs.
+- Stage 7a (Safe CLI Ingestion): pass. Captures allowlisted `git` and GitHub CLI help/version output through a streamed, byte-capped runner, stores raw artifacts, derives claim statements from the captured output's first non-empty line, hashes evidence, and verifies via the orchestrator without auto-publishing canonical specs. Includes a positive-shape argv allowlist with adversarial regression tests, a bulk-ingest endpoint, and a real-binary smoke test.
+- Stage 7b (Docs ingestion): pass. Fetches allowlisted https-only documentation URLs for each Stage 0 tool via an `httpx` client with full SSRF guards (host allowlist, manual redirect re-validation, private/loopback/link-local IP rejection, public-DNS verification), strict HTML sanitization (drops script/style/iframe/object/embed/template/noscript content; emits text only), allowed content-type enforcement, max-bytes cap, hard timeout, ETag/Last-Modified conditional revalidation with persisted `docs_fetch_cache`, and a bulk-per-tool endpoint. 37 adversarial tests cover SSRF, redirect attacks, oversized responses, script-only pages, and cache-hit reuse.
+- Stage 7c (API schema ingestion — OpenAPI / JSON Schema / GraphQL): not started.
+- Stage 7d (MCP metadata ingestion): not started.
 
 ## Backend Setup
 
@@ -77,6 +81,10 @@ Migration parity with the SQLAlchemy models is enforced by
 - `POST /canonical/workflows/{workflow_id}/publish`
 - `GET /canonical/workflows`
 - `GET /canonical/workflows/{workflow_id}`
+- `POST /ingestion/cli`
+- `GET /ingestion/runs`
+- `GET /ingestion/runs/{run_id}`
+- `GET /ingestion/artifacts/{artifact_id}`
 
 ## What This Is Not Yet
 

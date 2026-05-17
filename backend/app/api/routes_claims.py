@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 
 from app.api.errors import ERROR_RESPONSES, ErrorCode, raise_api_error
 from app.schemas.claim import ClaimCreate, KnowledgeClaim
@@ -11,9 +11,10 @@ from app.services.claim_store import (
     ClaimStore,
     DuplicateClaimError,
     DuplicateEvidenceError,
+    EvidencePolicyError,
+    ToolNotAllowedError,
     get_claim_store,
 )
-from app.services.evidence_policy import evidence_policy_violations
 from app.services.evidence_trust import normalize_evidence_trust
 from app.services.ids import generate_claim_id, generate_evidence_id
 from app.services.orchestrator import CanonOrchestrator
@@ -41,15 +42,6 @@ def create_claim(
     ]
     evidence = [normalize_evidence_trust(claim.tool_id, item) for item in evidence]
 
-    policy_violations = evidence_policy_violations(evidence)
-    if policy_violations:
-        raise_api_error(
-            status.HTTP_422_UNPROCESSABLE_CONTENT,
-            code=ErrorCode.REJECTED_PRIMARY_EVIDENCE,
-            message="Submitted evidence violates the rejected-primary-evidence policy.",
-            details={"violations": policy_violations},
-        )
-
     normalized_claim = KnowledgeClaim(
         **claim.model_dump(exclude={"claim_id", "evidence"}),
         claim_id=claim_id,
@@ -61,6 +53,20 @@ def create_claim(
 
     try:
         return store.create(normalized_claim)
+    except ToolNotAllowedError as exc:
+        raise_api_error(
+            status.HTTP_422_UNPROCESSABLE_CONTENT,
+            code=ErrorCode.TOOL_NOT_ALLOWED,
+            message=str(exc),
+            details={"tool_id": exc.tool_id, "allowed": exc.allowed},
+        )
+    except EvidencePolicyError as exc:
+        raise_api_error(
+            status.HTTP_422_UNPROCESSABLE_CONTENT,
+            code=ErrorCode.REJECTED_PRIMARY_EVIDENCE,
+            message="Submitted evidence violates the rejected-primary-evidence policy.",
+            details={"violations": exc.violations},
+        )
     except DuplicateClaimError as exc:
         raise_api_error(
             status.HTTP_409_CONFLICT,
@@ -85,6 +91,8 @@ def list_claims(
     risk_level_classified: RiskLevel | None = None,
     claim_type: ClaimType | None = None,
     submitted_by: str | None = None,
+    limit: int = Query(default=100, ge=1, le=500),
+    offset: int = Query(default=0, ge=0),
     store: ClaimStore = Depends(get_claim_store),
 ) -> list[KnowledgeClaim]:
     return store.list(
@@ -94,6 +102,8 @@ def list_claims(
         risk_level_classified=risk_level_classified,
         claim_type=claim_type,
         submitted_by=submitted_by,
+        limit=limit,
+        offset=offset,
     )
 
 
@@ -120,6 +130,8 @@ def get_claim(
 )
 def list_claim_evidence(
     claim_id: str,
+    limit: int = Query(default=100, ge=1, le=500),
+    offset: int = Query(default=0, ge=0),
     store: ClaimStore = Depends(get_claim_store),
 ) -> list[Evidence]:
     if store.get(claim_id) is None:
@@ -129,7 +141,7 @@ def list_claim_evidence(
             message=f"Claim '{claim_id}' does not exist.",
             details={"claim_id": claim_id},
         )
-    return store.list_evidence(claim_id=claim_id)
+    return store.list_evidence(claim_id=claim_id, limit=limit, offset=offset)
 
 
 @router.post("/claims/{claim_id}/verify", response_model=VerificationResult, responses=ERROR_RESPONSES)
@@ -188,6 +200,8 @@ def list_verification_results(
     decision: OrchestratorDecision | None = None,
     verification_status: VerificationStatus | None = None,
     verification_level: VerificationLevel | None = None,
+    limit: int = Query(default=100, ge=1, le=500),
+    offset: int = Query(default=0, ge=0),
     store: ClaimStore = Depends(get_claim_store),
 ) -> list[VerificationResult]:
     return store.list_verification_results(
@@ -195,6 +209,8 @@ def list_verification_results(
         decision=decision,
         verification_status=verification_status,
         verification_level=verification_level,
+        limit=limit,
+        offset=offset,
     )
 
 
