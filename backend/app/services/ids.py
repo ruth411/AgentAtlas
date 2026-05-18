@@ -19,3 +19,11 @@ def generate_ingestion_run_id() -> str:
 
 def generate_ingestion_artifact_id() -> str:
     return f"art_{uuid4().hex}"
+
+
+def generate_audit_event_id() -> str:
+    return f"audit_{uuid4().hex}"
+
+
+def generate_human_review_id() -> str:
+    return f"review_{uuid4().hex}"

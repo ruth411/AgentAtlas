@@ -6,9 +6,11 @@ from starlette.requests import Request
 from starlette.types import ASGIApp
 
 from app.api.errors import ErrorCode, json_error_response
+from app.api.routes_audit import router as audit_router
 from app.api.routes_canonical import router as canonical_router
 from app.api.routes_claims import router as claims_router
 from app.api.routes_health import router as health_router
+from app.api.routes_human_review import router as human_review_router
 from app.api.routes_ingestion import router as ingestion_router
 from app.api.routes_query import router as query_router
 from app.api.routes_verification import router as verification_router
@@ -63,7 +65,9 @@ app.include_router(claims_router)
 app.include_router(canonical_router)
 app.include_router(ingestion_router)
 app.include_router(verification_router)
+app.include_router(human_review_router)
 app.include_router(query_router)
+app.include_router(audit_router)
 
 
 @app.exception_handler(RequestValidationError)

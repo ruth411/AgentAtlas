@@ -7,10 +7,10 @@
 Wikipedia tells humans what things are. AgentAtlas tells AI agents what tools can do, how to use them, and whether they're safe.
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/downloads/)
-[![Tests](https://img.shields.io/badge/tests-619%20passing-2EA44F)](#validation)
+[![Tests](https://img.shields.io/badge/tests-656%20passing-2EA44F)](#validation)
 [![Ruff](https://img.shields.io/badge/lint-ruff%20clean-FCC21B)](https://docs.astral.sh/ruff/)
 [![License](https://img.shields.io/badge/license-MIT-blue)](#license)
-[![Status](https://img.shields.io/badge/stage-12%20complete-7C3AED)](docs/stage_report.md)
+[![Status](https://img.shields.io/badge/stage-13%20complete-7C3AED)](docs/stage_report.md)
 
 [Quick Start](#quick-start) · [What's Built](#whats-built) · [MCP Integration](#mcp-integration) · [Architecture](#architecture) · [Roadmap](ROADMAP.md)
 
@@ -220,6 +220,7 @@ These are non-negotiable. They're tested.
 | 11a — Seed dataset | `scripts/seed_examples.py` replays pre-captured artifacts; ~47 claims across 5 tools | ✓ |
 | 11b — Demo dashboard | Minimal Next.js UI: landing + tools list + tool detail + query playground | ✓ |
 | 12 — CLI + Docker | One `agentatlas` binary on PATH; one-stage Dockerfile | ✓ |
+| 13 — Human review + audit | `L5_human_audited` promotion path; append-only audit log; review queue; per-claim history endpoint | ✓ |
 
 See [docs/stage_report.md](docs/stage_report.md) for the full per-stage report including required artifacts, pass-case audit, quality bar, audit log, and what each stage explicitly defers.
 
@@ -237,7 +238,7 @@ AgentAtlas/
 │   │   ├── cli.py           # Stage 12 — the `agentatlas` console script
 │   │   └── main.py          # FastAPI app + middleware (body size guard, structured errors)
 │   ├── alembic/             # Migrations (drift-locked against models)
-│   └── tests/               # 619 tests; ruff clean; hermetic
+│   └── tests/               # 656 tests; ruff clean; hermetic
 ├── frontend/                # Stage 11b — Next.js demo dashboard (4 pages)
 ├── data/seed_artifacts/     # Stage 11a — pre-captured artifacts for offline-safe seeding
 ├── scripts/                 # seed_examples.py and other operator tools
@@ -285,6 +286,14 @@ Every endpoint returns typed JSON; errors are structured.
 **Runtime Verification**
 - `POST /verification/runtime` — promote a claim to L3 via a safe check
 - `POST /verification/runtime/tools/{tool_id}` — bulk-verify all claims for a tool
+
+**Human Review** (Stage 13)
+- `POST /verification/human-review` — file an `APPROVED` / `REJECTED` / `NEEDS_CHANGES` decision; `APPROVED` against an L3+ claim promotes it to `L5_human_audited`.
+- `GET /verification/review-queue` — paginated list of claims awaiting a human decision (`verification_status=requires_human_review`).
+
+**Audit Log** (Stage 13 — append-only)
+- `GET /audit/events` — paginated query with filters by `entity_type`, `entity_id`, `event_type`, `actor`, and timestamp range.
+- `GET /audit/claims/{claim_id}` — full chronological history of every event recorded against one claim.
 
 **Agent Query Surface** (the agent-facing API)
 - `POST /query/validate-command` — *the headline endpoint.* Returns a structured `{safe_to_auto_execute, risk_level, requires_human_confirmation, reasons, evidence, verification_level, confidence}` verdict. Default-deny on no match.
@@ -385,7 +394,7 @@ curl -X POST http://localhost:8000/ingestion/docs \
 ```bash
 cd backend
 
-# Test suite (619 tests, hermetic, ~30s)
+# Test suite (656 tests, hermetic, ~30s)
 .venv/bin/python -m pytest -q
 
 # Lint

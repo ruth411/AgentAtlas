@@ -29,6 +29,7 @@ It records what each stage proves, which artifacts satisfy the stage, what remai
 | Stage 11a | Seed Dataset (offline-safe replay) | pass |
 | Stage 11b | Demo Dashboard (Next.js) | pass |
 | Stage 12 | CLI + Docker (one-command install) | pass |
+| Stage 13 | Human Review and Auditability | pass |
 
 ## Stage 0: Product Lock and Trust Contract
 
@@ -1332,7 +1333,115 @@ supported install paths are repo checkout and Docker, both of which
 work end-to-end; the README and "Deferred" section now state this
 explicitly.
 
-## Validation
+## Stage 13: Human Review and Auditability
+
+Verdict: pass.
+
+Stage 13 is what separates a clever prototype from something a team can
+trust. It introduces the human reviewer into the verification pipeline
+and gives every state-changing operation a traceable, append-only audit
+trail. After Stage 13 a maintainer can answer the four operator
+questions that matter:
+
+1. **Who decided X?** — every claim submission, verification result,
+   review decision, and spec publication is recorded with an actor,
+   timestamp, and structured details payload.
+2. **What changed when?** — `GET /audit/claims/{id}` returns the full
+   chronological history for any claim. Pagination across the whole log
+   lives at `GET /audit/events` with filters by entity, event type,
+   actor, and time range.
+3. **Can a human override the orchestrator?** — `POST /verification/human-review`
+   files an `APPROVED` / `REJECTED` / `NEEDS_CHANGES` decision against a
+   claim. Approval against an L3+ claim promotes it to
+   `L5_human_audited`; rejection flips `verification_status=REJECTED`
+   and the matcher excludes the claim immediately.
+4. **Can the audit trail be tampered with?** — the service layer has no
+   `update_audit_event` / `delete_audit_event`. The audit row lives or
+   dies with the state change that produced it (same SQL transaction).
+   A regression test introspects `ClaimStore`'s public surface and
+   asserts no mutator method exists.
+
+### Architecture
+
+Two new tables, one new migration (`0015_human_review_and_audit_log`),
+one new service module (`app/services/human_review.py`), two new route
+modules (`routes_human_review.py`, `routes_audit.py`). Audit recording
+is wired into `ClaimStore.create`, `save_verification_result`,
+`save_canonical_tool_spec`, `save_canonical_workflow_spec`, and
+`save_human_review` — every public write path emits exactly one audit
+row per touched entity, in the same transaction as the underlying state
+change.
+
+**L5 promotion rules** (enforced by `HumanReviewService`):
+
+| Prior level                | `APPROVED` outcome                                            |
+|----------------------------|---------------------------------------------------------------|
+| `L3_runtime_verified` or higher | Promote to `L5_human_audited`; new VerificationResult written |
+| `L0` / `L1` / `L2`              | Review row + audit event persist; promotion refused with an explanatory reason in the response |
+| no prior verification           | Same as below-L3: review persisted, promotion refused        |
+
+`REJECTED` decisions are always recorded and always flip
+`verification_status`. `NEEDS_CHANGES` is a soft hold — the review and
+its notes land in the audit log; the claim stays in the queue.
+
+### Required Artifacts
+
+| Artifact | Purpose | Status |
+| --- | --- | --- |
+| `backend/app/schemas/enums.py` | Adds `HumanReviewDecision`, `AuditEventType`, `AuditEntityType`. | complete |
+| `backend/app/schemas/human_review.py` | `HumanReviewRequest`, `HumanReview`, `HumanReviewResponse`, `ReviewQueueItem`, `ReviewQueueResponse`. | complete |
+| `backend/app/schemas/audit.py` | `AuditEvent`, `AuditEventQuery`, `AuditEventListResponse`, `ClaimHistoryResponse`. | complete |
+| `backend/app/db/models.py` | `HumanReviewRecord`, `AuditEventRecord` with CHECK constraints on enum-valued columns. | complete |
+| `backend/alembic/versions/0015_human_review_and_audit_log.py` | Creates both new tables with their indexes; downgrade tested. | complete |
+| `backend/app/services/claim_store.py` | New `save_human_review`, `list_human_reviews_for_claim`, `list_pending_review_claims`, `list_audit_events`, `get_audit_events_for_claim` methods. Audit emission wired into 4 existing write paths via `_add_audit_event`. `save_verification_result` gains an optional `actor` kwarg (default `"system"`). | complete |
+| `backend/app/services/human_review.py` | `HumanReviewService` with submit / list_pending / L5 promotion / rejection logic. | complete |
+| `backend/app/api/routes_human_review.py` | `POST /verification/human-review`, `GET /verification/review-queue`. | complete |
+| `backend/app/api/routes_audit.py` | `GET /audit/events`, `GET /audit/claims/{claim_id}`. | complete |
+| `backend/app/api/errors.py` | Adds `AUDIT_EVENT_QUERY_INVALID`, `HUMAN_REVIEW_FAILED`, `HUMAN_REVIEW_ALREADY_EXISTS` error codes. | complete |
+| `backend/tests/test_human_review_service.py` | 9 tests: L5 promotion, below-L3 approval downgrade, rejection, needs-changes, multiple-review idempotency, missing claim, queue filtering, full-lifecycle audit assertion. | complete |
+| `backend/tests/test_audit_log.py` | 13 tests: event emission per write, ordering, filter combinations, pagination, append-only invariant (no mutator method exists on `ClaimStore`), unchanged-after-subsequent-writes assertion. | complete |
+| `backend/tests/test_routes_human_review.py` | 7 HTTP-layer tests covering the decision endpoint and the queue endpoint. | complete |
+| `backend/tests/test_routes_audit.py` | 8 HTTP-layer tests covering `/audit/events` filters/pagination and `/audit/claims/{id}` happy path + 404 + 422. | complete |
+
+### Pass Cases
+
+| Pass case | Satisfied by |
+| --- | --- |
+| Human reviewer can approve a runtime-verified claim and the verdict surface immediately reflects the L5 promotion | `HumanReviewService._promote_to_l5` writes a new `VerificationResult` with level `L5_HUMAN_AUDITED`; the claim's `verification_level` on the queue / validate-command surfaces is recomputed from the latest result. Test: `test_approved_review_promotes_l3_claim_to_l5`. |
+| Approval against a claim still at L2 records the decision but refuses promotion | `_MIN_LEVEL_FOR_L5 = VerificationLevel.L3_RUNTIME_VERIFIED` and `submit_review` adds an explanatory reason to the response. Test: `test_approved_review_below_l3_does_not_promote`. |
+| Rejection flips `verification_status=REJECTED` so the matcher excludes the claim | `_record_rejection` writes a new `VerificationResult` with status REJECTED; the matcher already excludes claims with `verification_status in {REJECTED, CONFLICT_DETECTED}`. Test: `test_rejected_review_writes_rejection_verification`. |
+| Audit log captures the full lifecycle of a claim (submit → verify → review → promote) | `test_approval_lifecycle_writes_three_audit_events` asserts the exact `[CLAIM_SUBMITTED, VERIFICATION_RECORDED, HUMAN_REVIEW_RECORDED, VERIFICATION_RECORDED]` sequence. |
+| Audit log is append-only | `test_claim_store_exposes_no_audit_event_mutator` introspects `ClaimStore`'s public surface and fails if any `update_*`, `delete_*`, `modify_*`, `purge_*`, or `edit_*` audit-event method is added. `test_existing_audit_events_are_not_mutated_by_subsequent_writes` round-trips an event before and after a subsequent write and asserts the JSON dump is identical. |
+| `GET /audit/claims/{claim_id}` returns chronological events | `_claim_record_to_queue_item` + `get_audit_events_for_claim` order by `(created_at ASC, event_id ASC)`. Test: `test_claim_history_endpoint_returns_chronological_events`. |
+| Reviewers see a focused queue of pending work, not the whole claim table | `list_pending_review_claims` filters on `verification_status=requires_human_review` and supports `tool_id` / `risk_level` filters. Tests: `test_review_queue_filters_to_requires_human_review_status`, `test_review_queue_filter_by_tool_id`. |
+| 404 on missing claim is structured; 422 on bad enum values is structured | Reviews against missing claims surface as `CLAIM_NOT_FOUND` with `details.claim_id`; invalid enum values fall through FastAPI's validator and return the standard `INVALID_QUERY_PARAMETER` envelope. Tests: `test_review_for_missing_claim_returns_404`, `test_invalid_decision_returns_422`. |
+
+### Quality Bar
+
+- **Same-transaction audit writes.** `_add_audit_event` stages an INSERT inside the caller's session; the audit row commits with the state change or rolls back with it. No phantom log entries.
+- **Service-layer immutability.** No mutator path exists on `ClaimStore` for audit events. Enforced both by convention (no method written) AND by `test_claim_store_exposes_no_audit_event_mutator` so a future regression fails loudly.
+- **Monotonic verification levels.** L5 promotion refuses to skip levels — a claim still at L0/L1/L2 gets a clear "approval recorded but L5 requires L3+" reason in the response. The orchestrator's promotion rules stay the single source of truth for what each level means.
+- **Risk reclassification on review.** L5 promotion and rejection both re-classify the claim's risk through `classify_action` so the new `VerificationResult` carries a fresh `RiskAssessment` — matches the orchestrator's pattern and ensures risk metadata never goes stale across review cycles.
+- **Confidence bonus is explicit and bounded.** L5 promotion bumps the prior confidence by +0.05 (capped at 1.0) and records the adjustment as one explicit `ConfidenceComponent` with `source="human_review:approval"`. Auditable in the breakdown; capped so STRONG claims can't overflow.
+- **No new external dependencies.** Pure-stdlib + existing Pydantic / SQLAlchemy / FastAPI stack.
+- **37 new tests; full suite at 656 passing.** Every Stage 13 surface is exercised end-to-end including the HTTP layer.
+
+### Deferred (v1.1)
+
+- **Reviewer authentication.** `reviewer_id` is currently a free-form identifier — there is no signature, no SSO integration. v1.1 will add per-reviewer key registration so a HumanReview can be cryptographically attributed.
+- **Cross-agent verification (L4).** The verification taxonomy has L4 but no service path promotes claims to it. The natural design — multiple independent agents producing the same claim → L4 — is independently scoped from Stage 13 and lands later.
+- **Review threading / SLAs.** Today's queue is a flat list ordered by submission age. Adding per-claim review threads, SLA timers, and assignment is dashboard polish for v1.1.
+- **Bulk-review endpoints.** `POST /verification/human-review/bulk` for tagged-batch decisions (e.g. accept all `git status` variants) isn't shipped; reviewers act one claim at a time.
+- **Audit log retention policy.** The log grows unboundedly. v1.1 will introduce a configurable retention window + archival path for events older than N days.
+- **Frontend review UI.** The Stage 11b dashboard does not yet surface the review queue or claim-history pages. Wiring `/verification/review-queue` and `/audit/claims/{id}` into the dashboard is straightforward but deferred to keep Stage 13 scoped to the API + service layer.
+
+### Bugs found and fixed during Stage 13
+
+Two issues, both caught during implementation before any code shipped:
+
+- **Audit event details referenced spec fields that don't exist on `ToolSpec`/`WorkflowSpec`.** First draft of `save_canonical_tool_spec` accessed `spec.compiled_by`, `spec.spec_hash`, and `spec.source_claim_ids` directly — these live under `spec.provenance` and `spec.spec_hash` is computed by the record helper, not the spec. Caught when the full pytest suite surfaced 32 failures in the canonical-route tests; fixed by reading from `spec.provenance.*` and using `record.spec_hash` from the already-built record.
+- **`ConfidenceBreakdown.band` expects an enum, not a string.** `_band_for_score` initially returned `ConfidenceBand.NONE.value`; Pydantic's `model_copy` doesn't validate updates, which would have stored the string instead of the enum and silently broken downstream consumers. Caught while reading the schema; switched to returning the enum directly.
+
 
 The consolidated stage report is current only if these commands pass:
 
@@ -1350,9 +1459,9 @@ DATABASE_URL=sqlite:////tmp/agentatlas_smoke.db .venv/bin/alembic upgrade head
 
 ### Current results
 
-- **619 backend tests passing** (Stage 12 added 19 CLI tests; Stage 10+11 audit added 6 regression tests; Stage 11a added 10 tests; Stage 10 added 28 before that; Stage 9 added 96 before that; all audit fixes have regression coverage). Stage 11b adds frontend code only — no Python tests; `next build` verified to succeed.
+- **656 backend tests passing** (Stage 13 added 37 tests across 4 files: 9 in `test_human_review_service.py`, 13 in `test_audit_log.py`, 7 in `test_routes_human_review.py`, 8 in `test_routes_audit.py`; Stage 12 added 19 CLI tests; Stage 10+11 audit added 6 regression tests; Stage 11a added 10 tests; Stage 10 added 28 before that; Stage 9 added 96 before that; all audit fixes have regression coverage). Stage 11b adds frontend code only — no Python tests; `next build` verified to succeed.
 - ruff clean
-- alembic upgrade → downgrade → upgrade cycle clean through migration `0014_extend_artifact_type_for_sandbox` (Stages 9, 10, 11a, 11b, and 12 added no migrations — all are read/transport/scripting/UI/CLI layers over the existing graph)
+- alembic upgrade → downgrade → upgrade cycle clean through migration `0015_human_review_and_audit_log` (Stage 13 adds the only new migration since Stage 8; the down/up roundtrip was verified end-to-end).
 
 ### Audit log (one row per stage; most recent first)
 
@@ -1363,6 +1472,7 @@ subsection above.
 
 | Date | Stage | Bugs found and resolved |
 | --- | --- | --- |
+| 2026-05-18 | Stage 13 | **2 bugs.** (1) Audit-event details emitted from `save_canonical_tool_spec` / `save_canonical_workflow_spec` accessed `spec.compiled_by`, `spec.spec_hash`, and `spec.source_claim_ids` directly; these live under `spec.provenance` and `spec.spec_hash` is computed via `canonical_spec_hash` (already-built record). **Caught by 32 failing canonical-route tests immediately after wiring the audit calls.** Fixed by routing through `spec.provenance.*` and `record.spec_hash`. (2) `_band_for_score` initially returned the enum's `.value` string, which `ConfidenceBreakdown.model_copy(update={"band": ...})` would have stored as-is (Pydantic doesn't validate model_copy updates) — silent type confusion downstream. Caught while reading the schema; switched to returning the enum directly. 37 new tests; full suite 656 passing; alembic down/up roundtrip clean. |
 | 2026-05-18 | Stage 12 | **3 bugs + 1 scope correction.** (1) `SearchToolsResponse.matches` vs the draft's `tools` field name — caught while reading the schema before the first CLI test run. (2) `--database-url` not forwarded from `agentatlas seed` to the underlying script — caught by writing the forwarding test first. (3) `_load_seed_module`'s walk terminated at any `README.md`; adding `backend/README.md` silently broke the loader so `agentatlas seed` failed from a checkout. **Caught by `test_load_seed_module_finds_real_script` regressing after the smoke test forced the new `backend/README.md`.** Fixed by stopping the walk only at `.git`. (4) Scope correction: a clean-venv `pip install` revealed that 11 contract loaders use `parents[3]` paths that only resolve from a source-tree checkout — bundling contracts as package data is Stage 14's job, not Stage 12's. Honestly documented in README + "Deferred" block instead of papering over. 19 in-process CLI tests added; full suite 619 passing; end-to-end smoke verified for repo-checkout + Docker install paths. |
 | 2026-05-18 | Stages 10 + 11 (cross-stage audit) | **5 bugs.** (1) MCP dispatcher returned METHOD_NOT_FOUND for `notifications/*` methods sent with a stray `id` field; spec says these are notifications by method name regardless of id — fixed to silently ack. (2) `tools/call` with `arguments: []` (or other falsy non-dict) slipped through `or {}` and silently became an empty dict, crashing the tool handler downstream instead of returning a clean INVALID_PARAMS at the dispatcher. (3) `submit_claim`'s evidence-minimum pre-check fired before Pydantic validation, so a payload missing every required field returned the misleading "needs at least one piece of evidence" error instead of "missing required fields"; reordered. (4) Stage 11a: re-running `scripts/seed_examples.py` without `--reset` silently inserted duplicate claims AND degraded headline-scenario acceptance (orchestrator marks dups as PENDING/L1); the script now emits a loud warning when the DB already has rows. (5) Tool-handler return values weren't type-checked; a future handler returning a list / scalar / None would silently produce MCP `structuredContent` that violates the spec's "must be a JSON object" requirement; the dispatcher now rejects non-dict payloads with a clear `isError` message. **All five fixed; 6 regression tests added; 600 total passing. Frontend production build also verified (`next build` succeeds, all 5 pages compile, type-check passes).** |
 | 2026-05-18 | Stage 10 | **1 minor bug.** Documentation-vs-reality gap: `submit_claim`'s `inputSchema` declared `minItems: 1` for evidence but the handler didn't enforce it, so empty-evidence claims were accepted by the MCP boundary and only flagged PENDING downstream by the orchestrator's "no evidence" reason. **Fixed** with an explicit pre-check in the handler that matches the schema's declared minimum; regression test added. |
