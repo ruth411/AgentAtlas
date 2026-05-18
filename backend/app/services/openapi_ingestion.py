@@ -205,9 +205,6 @@ class OpenApiIngestionService:
             final_url = fetch.final_url
             redirect_chain = fetch.redirect_chain
             cache_hit = fetch.not_modified
-            info = fetch.spec.get("info") or {}
-            spec_title = str(info.get("title") or "")[:_SUBJECT_MAX_CHARS]
-            spec_version = str(info.get("version") or "")[:128]
 
             if fetch.not_modified and cache_entry is not None and cache_entry.last_artifact_id:
                 artifact = self._store.get_ingestion_artifact(cache_entry.last_artifact_id)
@@ -216,6 +213,33 @@ class OpenApiIngestionService:
                         "Cache hit but the prior artifact has been deleted; refetch required."
                     )
                 artifact_ids.append(artifact.artifact_id)
+                # 304 means the server confirmed the body hasn't changed since
+                # the cached artifact was captured; re-parse the cached body
+                # so we can emit a fresh claim chain at the current timestamp.
+                # Without this, `fetch.spec` is empty and the "no operations"
+                # guard below would silently mark the run FAILED.
+                try:
+                    spec_doc = json.loads(artifact.raw_content)
+                except json.JSONDecodeError as exc:
+                    raise OpenApiIngestionError(
+                        f"Cached OpenAPI artifact is not valid JSON: {exc}"
+                    ) from exc
+                if not isinstance(spec_doc, dict):
+                    raise OpenApiIngestionError(
+                        "Cached OpenAPI artifact must be a JSON object."
+                    )
+                fetch = OpenApiFetchResult(
+                    url=fetch.url,
+                    final_url=fetch.final_url,
+                    status_code=fetch.status_code,
+                    content_type=fetch.content_type,
+                    raw_body=artifact.raw_content,
+                    spec=spec_doc,
+                    etag=fetch.etag,
+                    last_modified=fetch.last_modified,
+                    redirect_chain=fetch.redirect_chain,
+                    not_modified=True,
+                )
             else:
                 captured_at = self._timestamp()
                 artifact = _artifact_from_fetch(
@@ -233,6 +257,10 @@ class OpenApiIngestionService:
                         last_artifact_id=artifact.artifact_id,
                     )
                 )
+
+            info = fetch.spec.get("info") or {}
+            spec_title = str(info.get("title") or "")[:_SUBJECT_MAX_CHARS]
+            spec_version = str(info.get("version") or "")[:128]
 
             # Generate one claim per operation, plus auxiliaries.
             operations = list(_iter_operations(fetch.spec, spec.max_endpoints_per_spec))

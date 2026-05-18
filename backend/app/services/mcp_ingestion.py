@@ -155,11 +155,18 @@ class SafeMcpServerRunner:
             "NPM_CONFIG_UPDATE_NOTIFIER": "false",
         }
         try:
+            # stderr -> DEVNULL on purpose. We do not read it, and well-behaved
+            # MCP servers (npx / uvx) emit progress + warning chatter on stderr;
+            # if we PIPE it without draining, the OS pipe buffer fills (~64 KiB
+            # on Linux/macOS), the server blocks on its next stderr write, and
+            # our select on stdout times out waiting for a response that the
+            # server is forever blocked from sending. The result is a fake
+            # "MCP server timed out" error and a leaked subprocess.
             proc = subprocess.Popen(  # noqa: S603 — argv comes from positive contract
                 argv,
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
                 env=env,
                 bufsize=0,
                 text=False,
@@ -310,7 +317,8 @@ def _terminate(proc: subprocess.Popen[bytes]) -> None:
         except (ProcessLookupError, subprocess.TimeoutExpired):
             pass
     finally:
-        for pipe in (proc.stdin, proc.stdout, proc.stderr):
+        # stderr is DEVNULL by design — only stdin/stdout are pipes we own.
+        for pipe in (proc.stdin, proc.stdout):
             if pipe and not pipe.closed:
                 try:
                     pipe.close()

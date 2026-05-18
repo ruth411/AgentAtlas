@@ -44,6 +44,7 @@ class IngestionArtifactType(StrEnum):
     JSON_SCHEMA_DOC = "json_schema_doc"
     GRAPHQL_SDL = "graphql_sdl"
     MCP_TOOL_LIST = "mcp_tool_list"
+    SANDBOX_EXECUTION_LOG = "sandbox_execution_log"
 
 
 class RiskLevel(StrEnum):

@@ -204,10 +204,6 @@ class JsonSchemaIngestionService:
             redirect_chain = fetch.redirect_chain
             cache_hit = fetch.not_modified
 
-            schema_id = str(fetch.document.get("$id") or "")[:512]
-            schema_title = str(fetch.document.get("title") or "")[:_SUBJECT_MAX_CHARS]
-            schema_dialect = str(fetch.document.get("$schema") or "")[:256]
-
             if fetch.not_modified and cache_entry is not None and cache_entry.last_artifact_id:
                 artifact = self._store.get_ingestion_artifact(cache_entry.last_artifact_id)
                 if artifact is None:
@@ -215,6 +211,32 @@ class JsonSchemaIngestionService:
                         "Cache hit but the prior artifact has been deleted; refetch required."
                     )
                 artifact_ids.append(artifact.artifact_id)
+                # 304 means the server confirmed the schema body hasn't changed;
+                # re-parse the cached body so we can emit a fresh claim chain at
+                # the current timestamp. Without this, `fetch.document` is empty
+                # and the "no top-level properties" guard silently fails the run.
+                try:
+                    document_doc = json.loads(artifact.raw_content)
+                except json.JSONDecodeError as exc:
+                    raise JsonSchemaIngestionError(
+                        f"Cached JSON Schema artifact is not valid JSON: {exc}"
+                    ) from exc
+                if not isinstance(document_doc, dict):
+                    raise JsonSchemaIngestionError(
+                        "Cached JSON Schema artifact must be a JSON object."
+                    )
+                fetch = JsonSchemaFetchResult(
+                    url=fetch.url,
+                    final_url=fetch.final_url,
+                    status_code=fetch.status_code,
+                    content_type=fetch.content_type,
+                    raw_body=artifact.raw_content,
+                    document=document_doc,
+                    etag=fetch.etag,
+                    last_modified=fetch.last_modified,
+                    redirect_chain=fetch.redirect_chain,
+                    not_modified=True,
+                )
             else:
                 captured_at = self._timestamp()
                 artifact = _artifact_from_fetch(
@@ -232,6 +254,10 @@ class JsonSchemaIngestionService:
                         last_artifact_id=artifact.artifact_id,
                     )
                 )
+
+            schema_id = str(fetch.document.get("$id") or "")[:512]
+            schema_title = str(fetch.document.get("title") or "")[:_SUBJECT_MAX_CHARS]
+            schema_dialect = str(fetch.document.get("$schema") or "")[:256]
 
             fields = list(_iter_top_level_fields(fetch.document, spec.max_fields_per_schema))
             if not fields:

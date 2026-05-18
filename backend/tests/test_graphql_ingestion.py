@@ -404,10 +404,14 @@ def test_304_not_modified_reuses_cached_artifact(store: ClaimStore) -> None:
     second = GraphqlIngestionService(
         store, client=revalidation, now=FIXED_TIME + timedelta(hours=1)
     ).ingest(tool_id="github-cli", url=GITHUB_SDL_URL)
+    assert second.status == IngestionStatus.COMPLETED
+    assert second.errors == []
     assert second.cache_hit is True
     assert second.artifact_ids == first.artifact_ids
     # Cache reuse still produces fresh claims so audit chronology is preserved.
+    assert second.created_claim_ids
     assert second.created_claim_ids != first.created_claim_ids
+    assert len(second.created_claim_ids) == len(first.created_claim_ids)
     assert revalidation.calls[0][1].get("If-None-Match") == '"v1"'
 
 

@@ -10,6 +10,7 @@ from app.api.routes_canonical import router as canonical_router
 from app.api.routes_claims import router as claims_router
 from app.api.routes_health import router as health_router
 from app.api.routes_ingestion import router as ingestion_router
+from app.api.routes_verification import router as verification_router
 
 
 # 1 MiB is well above the largest legitimate claim payload (claim + 50 evidence
@@ -60,6 +61,7 @@ app.include_router(health_router)
 app.include_router(claims_router)
 app.include_router(canonical_router)
 app.include_router(ingestion_router)
+app.include_router(verification_router)
 
 
 @app.exception_handler(RequestValidationError)

@@ -44,3 +44,46 @@ class VerificationResult(BaseModel):
     @classmethod
     def validate_identifier(cls, value: str) -> str:
         return _validate_identifier(value)
+
+
+# -------- Stage 8: Runtime Verification --------
+
+
+class RuntimeVerificationRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    claim_id: str = Field(min_length=1, max_length=128)
+    submitted_by: str = Field(
+        default="runtime-verifier-agent", min_length=1, max_length=128
+    )
+
+    @field_validator("claim_id")
+    @classmethod
+    def validate_claim_id(cls, value: str) -> str:
+        return _validate_identifier(value)
+
+
+class RuntimeVerificationResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    claim_id: str = Field(min_length=1, max_length=128)
+    verifier_kind: str = Field(default="", max_length=64)
+    runtime_check_passed: bool = False
+    promoted_to_l3: bool = False
+    new_verification_level: VerificationLevel
+    captured_artifact_id: str = Field(default="", max_length=128)
+    verification_id: str = Field(default="", max_length=128)
+    reasons: list[str] = Field(default_factory=list)
+    skipped: bool = False
+    skip_reason: str = Field(default="", max_length=256)
+
+
+class BulkRuntimeVerificationResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    tool_id: str = Field(min_length=1, max_length=128)
+    attempted: int = 0
+    promoted: int = 0
+    skipped: int = 0
+    failed: int = 0
+    results: list[RuntimeVerificationResponse] = Field(default_factory=list)

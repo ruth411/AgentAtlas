@@ -437,32 +437,70 @@ annotations and tool-name patterns.
 
 ---
 
-## Stage 8: Runtime Verification Layer
+## Stage 8: Runtime Verification Layer — SHIPPED
 
-This stage upgrades the system from source-aware to behavior-aware.
+Stage 8 is shipped. AgentAtlas can now promote claims from
+`L2_source_verified` to `L3_runtime_verified` by actually running a safe,
+deterministic check against the asserted behaviour and persisting the
+captured stdout / stderr / exit code as durable audit evidence. Dangerous
+claim types (`destructive_action`, `side_effect`, etc.) are deliberately
+skipped — we never invoke a destructive command to "verify" it.
 
 ### Capabilities Built
 
-- Sandbox execution framework
-- Runtime verification for allowlisted, deterministic, low-risk checks
-- Captured runtime evidence
-- Upgrade path from `L2_source_verified` to `L3_runtime_verified`
-- Cross-agent or multi-source agreement path toward `L4`
-- Strict execution policy boundaries
+- `SandboxRunner` protocol with a `SubprocessSandboxRunner` production
+  implementation: positive-shape argv allowlist (only `git` / `gh` /
+  `docker` / `vercel` / `npx` / `uvx`), scrubbed env (`PATH` + `HOME`),
+  wall-clock + byte caps, guaranteed terminate-then-kill cleanup. The
+  runner is injectable so future stages can swap in Docker / Firecracker /
+  Modal sandboxes without rewriting the verifier registry.
+- Five concrete verifiers: `tool_exists` and `cli_command_exists` spawn
+  `<tool> --version`; `cli_flag_exists` spawns help and greps for the
+  asserted flag token; `api_endpoint_exists` issues a single HTTP HEAD
+  through the shared SSRF guard with the tool's `official_hosts` as the
+  allowlist; `mcp_tool_exists` re-spawns the originating MCP server via
+  the Stage 7d runner and confirms the tool is still listed.
+- Deliberate skip-list for claim types whose verification would require
+  triggering a side effect; each emits `skipped=True` with a reason.
+- L3 promotion path: successful checks emit a new `VerificationResult`
+  with `verification_level=L3_runtime_verified`, `decision=ACCEPTED`,
+  `+0.10` confidence bonus, and a reference to the saved
+  `sandbox_execution_log` artifact. Failed checks emit
+  `REQUIRES_HUMAN_REVIEW` with `-0.20` penalty and the captured artifact
+  still saved.
+- Pre-check refuses claims below `L2_source_verified` (the
+  promotion-rule contract is enforced, not just trusted).
+- `POST /verification/runtime` + `POST /verification/runtime/tools/{tool_id}`
+  routes returning structured `RUNTIME_VERIFICATION_FAILED` (422) on
+  rejection. Bulk endpoint reports `attempted` / `promoted` / `skipped` /
+  `failed` counts.
+- 27 adversarial tests covering the precheck, all five verifier branches
+  (pass / fail / skip), the deliberate skip list (parametrised), bulk-by-
+  tool, sandbox allowlist enforcement, and the API surface. Hermetic via
+  fake sandbox / HTTP / MCP runners.
 
 ### Pass Cases
 
-- Safe runtime checks can confirm command existence, help output, or no-op behaviors
-- Runtime evidence is stored like any other evidence
-- Dangerous actions are never executed just to "verify" them
-- Verification levels are raised only when actual runtime proof exists
-- Tests cover successful runtime verification and blocked execution paths
+- A claim like `cli_command_exists` for `git status` (already at L2) can be
+  runtime-verified by spawning `git --version` and promotes to L3 with the
+  raw output as `sandbox_execution_log` audit evidence.
+- A claim like `destructive_action` for `gh repo delete` is deliberately
+  refused at the verifier-registry level, with a clear skip reason — we
+  never invoke a destructive command to "verify" it.
+- A failed runtime check (non-zero exit, timeout, HEAD 500, missing MCP
+  tool) does NOT promote the claim's level but DOES record the captured
+  output as audit evidence and emits a `REQUIRES_HUMAN_REVIEW` result.
 
 ### Do Not Advance If
 
-- Runtime verification can drift into unsafe execution
-- The system claims `L3` without a real runtime artifact
-- Sandbox policy is permissive enough to undermine the whole product
+- Runtime verification can drift into unsafe execution → blocked by the
+  positive-shape `allowed_commands` allowlist + the explicit skip list for
+  side-effecting claim types.
+- The system claims `L3` without a real runtime artifact → impossible:
+  every L3 result references a captured `sandbox_execution_log` artifact.
+- Sandbox policy is permissive enough to undermine the whole product →
+  the only commands the production runner can spawn are 6 well-known
+  developer tools, and each spawn is bounded by time and byte caps.
 
 ## Stage 9: Agent Query Surface
 

@@ -340,9 +340,15 @@ def test_304_not_modified_reuses_cached_artifact(store: ClaimStore) -> None:
     second = JsonSchemaIngestionService(
         store, client=revalidation, now=FIXED_TIME + timedelta(hours=1)
     ).ingest(tool_id="docker", url=DOCKER_COMPOSE_URL)
+    # The 304 path must succeed (status COMPLETED), not silently fail because
+    # an empty fetch.document would trip the "no top-level properties" guard.
+    assert second.status == IngestionStatus.COMPLETED
+    assert second.errors == []
     assert second.cache_hit is True
     assert second.artifact_ids == first.artifact_ids
+    assert second.created_claim_ids
     assert second.created_claim_ids != first.created_claim_ids
+    assert len(second.created_claim_ids) == len(first.created_claim_ids)
     assert revalidation.calls[0][1].get("If-None-Match") == '"v1"'
 
 
