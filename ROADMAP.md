@@ -502,34 +502,98 @@ skipped — we never invoke a destructive command to "verify" it.
   the only commands the production runner can spawn are 6 well-known
   developer tools, and each spawn is bounded by time and byte caps.
 
-## Stage 9: Agent Query Surface
+## Stage 9: Agent Query Surface — SHIPPED
 
-This stage makes AgentAtlas useful to another agent before any UI polish.
+Stage 9 is shipped. AgentAtlas now exposes a high-level agent-facing API
+that turns the raw `KnowledgeClaim` graph into structured, evidence-backed
+safety verdicts. The five endpoints under `/query/*` are the surface other
+agents (and the future MCP wrapper in Stage 10) will actually call.
 
 ### Capabilities Built
 
-- `search_tools`
-- `get_tool_spec`
-- `validate_command`
-- `get_safe_workflow`
-- `submit_claim`
-- `explain_risk`
-- Structured JSON-first responses
-- Environment-aware safe workflow recommendation
+- `POST /query/validate-command` — the headline endpoint. Strict exact +
+  prefix matching against accepted claims; three-tier verdict gating
+  (safety policy ∧ confidence ≥ 0.70 ∧ verification level ≥ L2); reasons
+  list explains every gate that fired; default-deny on no match
+  (`risk_level: null`, never an "unknown" magic string).
+- `GET /query/tools/{tool_id}` — canonical `ToolSpec` retrieval with regex
+  path validation; structured 404 if no spec is published.
+- `GET /query/search-tools` — tiered substring scoring (tool_id exact >
+  tool_id substring > name substring > capability substring), sorted
+  score-DESC then `tool_id`-ASC for deterministic order. Pagination clamped
+  to contract `max_search_limit`.
+- `POST /query/explain-risk` — deterministic risk classification plus six
+  boolean dimensions (destructive_action / mutates_remote_state /
+  reversible / requires_auth / may_cost_money / may_expose_secrets) plus
+  citing claim ids when a matching claim exists.
+- `POST /query/safe-workflow` — substring + token-overlap matching against
+  `WorkflowSpec.goal`, sorted safest-first (`aggregate_risk` ASC).
+- `contracts/query_policy.v1.json` — versioned policy (confidence +
+  verification thresholds, length caps, search limits, reason-text
+  templates). Validated on import, drift-locked to a test.
+- `command_matcher` module with strict longest-prefix-with-word-boundary
+  matching, ACCEPTED-only visibility, paginated through claims with a
+  10k hard cap, batched-window-function lookup of latest verifications
+  (one SQL per page instead of N).
+- 92 tests across 4 files; all hermetic. Suite total now 552 passing.
+
+Notably NOT included (deliberate v1.1 scope):
+
+- Fuzzy / LLM-assisted command matching (would re-introduce nondeterminism
+  in the safety path).
+- `submit_claim` exposed under `/query` (claims are still managed via the
+  existing `POST /claims` — no read endpoint mutates).
+- Bulk validate-command (one-at-a-time is sufficient for the demo).
+- SQL-side filtering for search-tools / safe-workflow (load-all-then-filter
+  in memory is fine at v1 scale; optimise at 10k+ specs).
 
 ### Pass Cases
 
-- Another agent can ask "can I run this command?" and get a structured answer
-- Risk, confirmation requirement, verification level, and rationale are returned explicitly
-- Safe alternatives can be suggested where appropriate
-- High-risk commands are clearly flagged as not auto-executable
-- Query API tests cover normal, risky, unknown, and conflicting cases
+- An agent asks `validate_command("github-cli", "gh repo delete ...")` and
+  gets `{safe_to_auto_execute: false, risk_level: "critical", reasons: [...]}`
+  with cited evidence and `verification_level=L3_runtime_verified`.
+- A no-match query returns the default-deny envelope with `risk_level: null`
+  and a clear reason — no false reassurance.
+- A low-risk claim with confidence below 0.70 is correctly gated to
+  `safe_to_auto_execute: false`, with the confidence threshold spelled
+  out in the response.
+- Risk classifier upgrades understated risk (claim was submitted as LOW
+  but the classifier rates it CRITICAL → verdict reflects CRITICAL, reasons
+  mention the upgrade).
+- Search-tools returns matches in deterministic score-DESC then tool_id-ASC
+  order; pagination is consistent across pages.
+- Path-param and body-supplied `tool_id` both reject the same garbage
+  with the same 422 envelope (post-audit consistency fix).
 
 ### Do Not Advance If
 
-- The response is mostly prose
-- Command validation does not reference verification state
-- Safe workflow recommendation is just a generic checklist
+- The response is mostly prose → **enforced:** every endpoint returns a
+  typed JSON model; `extra="forbid"` everywhere.
+- Command validation does not reference verification state → **enforced:**
+  every verdict carries `verification_level` and reasons.
+- Safe workflow recommendation is just a generic checklist → **enforced:**
+  responses include `aggregate_risk_level`, `verification_level`, and
+  `requires_confirmation` per workflow.
+
+### Audit Summary
+
+Nine real bugs were caught during Stage 9's audit and fixed before ship.
+See `docs/stage_report.md`'s Stage 9 detail block for the full per-bug
+breakdown. Pattern callouts:
+
+- One critical integration bug: the matcher's status filter hid most of
+  the ingestion pipeline's output (single-evidence claims that land at
+  status=PENDING were invisible to validate-command). Caught only by a
+  full end-to-end probe; per-component tests passed because they
+  synthesised ACCEPTED states directly.
+- Three contract-↔-code drift bugs (band threshold function duplicated,
+  contract validator gaps on reason-text keys, route/schema hardcoded
+  limits diverging from the contract). All now drift-locked by tests.
+- One API consistency bug (path-param vs body-param 404-vs-422 mismatch)
+  caught by deliberate cross-endpoint probing.
+- One pagination silent-drop bug (matcher capping at 500) and one
+  performance bug (N+1 verification lookup) caught by realistic-scale
+  probes.
 
 ## Stage 10: MCP Server and External Interoperability
 

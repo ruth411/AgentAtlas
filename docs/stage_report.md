@@ -24,6 +24,7 @@ It records what each stage proves, which artifacts satisfy the stage, what remai
 | Stage 7c.3 | GraphQL SDL ingestion | pass |
 | Stage 7d | MCP metadata ingestion | pass |
 | Stage 8 | Runtime Verification (L2 → L3) | pass |
+| Stage 9 | Agent Query Surface | pass |
 
 ## Stage 0: Product Lock and Trust Contract
 
@@ -896,6 +897,103 @@ Two bugs found and fixed in a full-pass code audit.
 - L5 human-audited promotion (requires the dashboard from Stage 8.5 / 9).
 - Scheduled re-verification (today verification is on-demand only).
 
+## Stage 9: Agent Query Surface
+
+Verdict: pass.
+
+Stage 9 is complete when an AI agent can ask AgentAtlas one high-level
+question and get a structured, evidence-backed safety verdict back — no
+raw CRUD acrobatics, no LLM in the safety path. The five endpoints under
+`/query/*` are the agent-facing API the rest of the project was built to
+support.
+
+### Architecture
+
+A `QueryEngine` sits on top of the existing `ClaimStore`, risk classifier,
+canonical specs, and confidence scorer. It owns the verdict-synthesis logic
+but creates no new persistence. The five endpoints are thin route handlers
+that pass typed request models into the engine and return typed response
+models verbatim. All paths are read-only.
+
+The matching algorithm is strict (no fuzzy / no LLM) — the user's earlier
+decision. Verdict gating is three-layered: safety policy (from the Stage 0
+contract) AND a confidence threshold (default 0.70) AND a verification-level
+threshold (default L2). All three must pass for `safe_to_auto_execute=True`;
+any one failing produces a default-deny verdict with the gate spelled out
+in the response's `reasons[]` list.
+
+### Required Artifacts
+
+| Artifact | Purpose | Status |
+| --- | --- | --- |
+| `contracts/query_policy.v1.json` | Versioned contract: confidence + verification level thresholds, command/query length caps, search limits, default-deny / unknown-tool / low-confidence / low-verification reason strings. Loaded once, validated on import, drift-locked. | complete |
+| `backend/app/schemas/query.py` | 10 Pydantic v2 models: request + response shapes for all 5 endpoints, plus `EvidenceCitation`, `RiskDimensions`, `ToolMatchSummary`, `WorkflowSummary`. `extra="forbid"` everywhere; nullable optionals explicit; `risk_level: RiskLevel \| None` (no magic sentinel). | complete |
+| `backend/app/services/command_matcher.py` | Strict exact + prefix matcher with word-boundary requirement, longest-prefix-wins, level/confidence/recency tie-break, ACCEPTED-only visibility. Paginates through claims with a hard cap (10k) so it can't be unbounded by a pathologically-large tool. | complete |
+| `backend/app/services/query_engine.py` | `QueryEngine` class with `validate_command`, `explain_risk`, `get_tool_spec`, `search_tools`, `find_safe_workflows`. Re-classifies matched-claim risk to defend against understated submissions. Reuses canonical `band_for_score` from `confidence_scorer` (no drift). | complete |
+| `backend/app/api/routes_query.py` | 5 endpoints: `POST /query/validate-command`, `GET /query/tools/{tool_id}` (regex-validated path param), `GET /query/search-tools`, `POST /query/explain-risk`, `POST /query/safe-workflow`. Structured 404 / 422 envelopes. | complete |
+| `backend/app/main.py` | Mounted `query_router` after `verification_router`. | complete |
+| `backend/tests/test_command_matcher.py` | **23 tests:** normalize, exact match, prefix-with-word-boundary, longest-prefix-wins, status / level visibility rules (PENDING + REQUIRES_HUMAN_REVIEW at L2+ visible; REJECTED / CONFLICT_DETECTED hidden; below L2 hidden), tie-breakers (level / confidence / recency), cross-tool isolation, pagination beyond 500 claims, batched-vs-N+1 parity. | complete |
+| `backend/tests/test_query_engine.py` | **23 tests:** default-deny, 3-gate logic (safety policy / confidence / verification level), evidence projection, classifier risk-upgrade, partial-acceptance status surfaced in reasons, explain_risk dimensions + citations, contract validator regressions, boundary tests at exact threshold (0.70, L2). | complete |
+| `backend/tests/test_query_engine_search.py` | **22 tests:** search-tools tier ordering, no-match exclusion, empty-query list-all, pagination, limit clamping, summary projection (commands + capabilities + risk profile fallback), safe-workflow safest-first sort, environment echo, aggregate-risk roll-up, validator regressions for non-positive / bool / default-greater-than-max limit values. | complete |
+| `backend/tests/test_routes_query.py` | **29 tests:** API-level integration for all 5 endpoints, 4 response-shape lock tests, drift-lock test for route/schema limits vs contract, path-param regex regression, safe ⇔ ¬requires_confirmation consistency invariant. | complete |
+
+### Pass Case Audit
+
+| Pass case | Satisfied by |
+| --- | --- |
+| `validate-command` returns the README's documented verdict shape verbatim | `ValidateCommandResponse` schema; `test_validate_command_response_has_no_extra_fields` locks the key set. |
+| Default-deny on no match | `_default_deny()` always returns `safe_to_auto_execute=False, risk_level=None`; tested at both engine and API layers. |
+| Critical-risk commands never auto-execute even at L3 + high confidence | `_safety_policy_by_risk()["critical"]["auto_execute_allowed"]=False`; verdict's `safe_to_auto_execute` is `(auto_allowed AND confidence_gate AND level_gate)`. Tests: `test_critical_risk_blocks_auto_execute_even_at_high_confidence`, `test_validate_command_critical_claim_blocks_auto_execute`. |
+| Low-confidence and low-verification-level claims independently gate auto-execute | Two separate gate checks in `_verdict_from_match`; each tested in isolation plus at boundary (0.70 confidence exactly, L2 exactly). |
+| Understated risk is detected and upgraded | `classified.risk_level` from the re-run risk classifier is compared to the claim's declared risk; max wins. Surfaces "Risk classifier upgraded risk from declared 'low' to 'critical'" in reasons. |
+| Evidence is correctly projected into the verdict | `EvidenceCitation` drops `excerpt` + `hash`; keeps `evidence_type` + `source_uri` + `trust_level`. Full evidence still recoverable via `/claims/{id}/evidence`. |
+| Best-verified claim wins on multi-match | Matcher's tie-breakers (level → confidence → recency) cover this; engine doesn't re-pick. |
+| `search-tools` ranks exact > tool_id substring > name substring > capability substring | `_score_tool_spec` returns 100 / 80 / 60 / 40 respectively; ties broken by `tool_id` ASC. |
+| `safe-workflow` returns safest-first | Sort key is `(RISK_ORDER[aggregate], -score, workflow_id)`. |
+| Path-param and body-supplied `tool_id` reject the same garbage | Both now use the same regex (`^[A-Za-z0-9_.-]{1,128}$`); the path-param gap was caught and fixed during the stage audit. |
+| Contract values and code-level limits stay in sync | `test_route_layer_limits_match_query_policy_contract` drift-locks them. |
+
+### Quality Bar
+
+- **No new persistence:** Stage 9 is a pure read API. No migrations, no new tables, no new artifact types.
+- **No new external dependencies.** Reuses `fastapi`, `pydantic`, `sqlalchemy`, `httpx` already pinned.
+- **Strict matching by design.** No fuzzy / no LLM in the safety path; agents always know whether they got a verified verdict or a default-deny. Fuzzy is a deliberate v1.1 opt-in.
+- **Three-tier gating:** safety policy ∧ confidence ≥ 0.70 ∧ verification level ≥ L2 must all pass for auto-execute. Each tier's failure surfaces an explicit reason in the response.
+- **Reasons explain every gate that fired.** Auditors can replay the decision without running the engine.
+- **Consistency invariant:** `safe_to_auto_execute == True ⇔ requires_human_confirmation == False`. Tested via API to prevent a future engine bug from emitting a contradiction.
+- **Default-deny on no match** uses `risk_level: null` (not a magic `"unknown"` sentinel — the audit caught the ergonomic regression and switched it).
+- **Drift-locked contract.** Route + schema literals are asserted to equal contract values; any future contract change without code update fails the drift-lock test.
+- **N+1 query killed in the matcher.** `ClaimStore.get_latest_verification_results(claim_ids)` does one batched window-function query per page instead of N per page.
+- **Pagination through claims hard-capped at 10,000.** Bounded memory; if a real tool ever exceeds this, the right fix is a SQL-side subject prefix filter, not growing the in-memory scan.
+- **Test suite: 96 new tests across 4 files** (matcher 23 + engine validate/explain 23 + engine search/spec/workflow 22 + API routes 29). All hermetic; no network or real subprocess required. 556 total passing.
+
+### Bugs found and fixed during Stage 9
+
+Nine real bugs were caught during the stage and fixed before ship. Each has a
+regression test locking the failure mode so it cannot recur.
+
+| Bug | Severity | Fix |
+| --- | --- | --- |
+| Matcher hid most ingestion-pipeline output: `verification_status=ACCEPTED` filter excluded PENDING + REQUIRES_HUMAN_REVIEW claims, which is the natural orchestrator output for single-evidence claims; end-to-end submit → verify → validate returned silent default-deny | **Critical** | Matcher now accepts L2+ claims with status not in {REJECTED, CONFLICT_DETECTED}; engine surfaces non-ACCEPTED status in verdict reasons |
+| Matcher silently dropped claims beyond the first page of 500 | Medium → High at scale | Pagination through all pages with a 10,000 hard cap |
+| N+1 lookup for `get_latest_verification_result` per matcher candidate | Performance | Batched `get_latest_verification_results` via window-function SQL |
+| `risk_level: Literal["unknown"]` sentinel was awkward at the API boundary | API ergonomics | Switched to `RiskLevel \| None` (standard JSON nullable) |
+| Contract validator did not require the reason-text keys the engine reads (`default_deny_reason`, etc.) | Medium (latent 500) | Validator now matches every key the engine reads |
+| `_band_for_score` duplicated `confidence_scorer.band_for_score` | Drift risk | Imported the canonical function; deleted the duplicate |
+| Contract validator did not enforce positive search-limit fields or `default ≤ max` | Medium (latent 500) | Validator now requires positive ints with sane ordering; rejects `bool` masquerading as `int` |
+| Path-param `tool_id` had no regex constraint; body and path returned inconsistent 422 vs 404 for the same garbage input | Medium (API consistency) | Added `Path(..., pattern=...)` matching the body validators |
+| Route + schema layers hardcoded numeric limits that also live in the contract | Medium (drift risk) | Added a drift-lock test asserting code values equal contract values |
+
+### Deferred (v1.1 territory)
+
+- **Fuzzy / token-based command matching.** Today's strict matcher is correct-by-design; an opt-in fuzzy lane with explicit confidence scoring can come later.
+- **Per-capability bonus scoring** in `search-tools` (currently cites the first matching capability, not all).
+- **Goal-aware workflow scoring** in `safe-workflow` (could bonus workflows whose `tool_ids` mention tokens in the goal).
+- **Bulk `validate-command`** (one-at-a-time is fine for the demo; bulk is an obvious follow-up).
+- **`ToolMatchSummary.publication_issues`** — currently a partial spec looks "complete" in search results.
+- **SQL-side filtering** for `search-tools` and `find_safe_workflows`. Currently load-all-then-filter in memory; fine at v1 scale (<200 tools), worth optimising at 10k+ specs.
+- **Re-verification freshness** in verdicts. Today's verdict has no "verified N days ago" decay; old L3 verdicts are treated as current.
+
 ## Validation
 
 The consolidated stage report is current only if these commands pass:
@@ -914,17 +1012,22 @@ DATABASE_URL=sqlite:////tmp/agentatlas_smoke.db .venv/bin/alembic upgrade head
 
 ### Current results
 
-- **460 tests passing** (was 458 pre-audit; +2 regression guards for the HEAD-redirects SSRF fix and the CLI subcommand-extraction fix)
+- **556 tests passing** (Stage 9 added 96 tests across 4 files; all audit fixes have regression coverage)
 - ruff clean
-- alembic upgrade → downgrade → upgrade cycle clean through migration `0014_extend_artifact_type_for_sandbox`
+- alembic upgrade → downgrade → upgrade cycle clean through migration `0014_extend_artifact_type_for_sandbox` (Stage 9 added no migrations)
 
-### Audit log (most recent first)
+### Audit log (one row per stage; most recent first)
 
-| Date | Stage(s) | Bugs found | Severity | Status |
-| --- | --- | --- | --- | --- |
-| 2026-05-17 | 7c.1 | 304 cache reuse silently FAILS | Critical | Fixed; test tightened |
-| 2026-05-17 | 7c.2 | 304 cache reuse silently FAILS (same pattern) | Critical | Fixed; test tightened |
-| 2026-05-17 | 7c.3 | None (cache path already correct) | — | Test tightened defensively |
-| 2026-05-17 | 7d | MCP runner deadlocks on stderr pipe full | High | Fixed (stderr → DEVNULL) |
-| 2026-05-17 | 8 | HEAD verifier follows redirects, bypassing SSRF guard | High | Fixed; regression test added |
-| 2026-05-17 | 8 | CLI flag verifier picked binary name as subcommand | Medium | Fixed; regression test added |
+Bugs are consolidated by stage. Each row summarises every bug caught during
+that stage's audit pass and what changed to prevent recurrence. The full
+per-bug breakdown lives in each stage's "Bugs found and fixed during Stage X"
+subsection above.
+
+| Date | Stage | Bugs found and resolved |
+| --- | --- | --- |
+| 2026-05-18 | Stage 9 | **9 bugs.** Critical: matcher hid most ingestion-pipeline output (single-evidence PENDING / REQUIRES_HUMAN_REVIEW claims were invisible to validate-command). Medium: three contract-↔-code drift risks (band thresholds, reason-text keys, route/schema hardcoded limits); contract validator gap on positive search-limit values; path-param vs body-param 422 vs 404 inconsistency; 500-claim silent-drop in matcher pagination. Performance: N+1 verification lookup. API ergonomics: `Literal["unknown"]` sentinel replaced with `null`. **All fixed with regression tests.** |
+| 2026-05-17 | Stage 8 | **2 bugs.** High: HEAD verifier followed redirects without re-checking the SSRF guard (an allowlisted host could redirect to a private IP). Medium: CLI flag verifier picked the binary name as the subcommand (`gh status --short` → spawned `gh gh --help`, silent fail on every runtime check). **Both fixed; regression tests added.** |
+| 2026-05-17 | Stage 7d | **1 bug.** High: MCP runner deadlocked on stderr pipe full (`stderr=PIPE` was never drained; cumulative stderr above the OS pipe buffer blocked the server's response on stdout, surfacing as a fake "timed out" error). **Fixed by routing stderr to `DEVNULL`** (the runner only reads stdout for JSON-RPC frames). |
+| 2026-05-17 | Stage 7c.3 | **0 bugs.** Cache-reuse path was already correct because it re-parsed the cached SDL on a 304. The 304 test was tightened defensively to match the assertion style of 7c.1 and 7c.2. |
+| 2026-05-17 | Stage 7c.2 | **1 bug.** Critical: 304 cache reuse silently FAILED (same pattern as Stage 7c.1) — `fetch.document = {}` triggered the "no top-level properties" guard, marking the run FAILED while reporting `cache_hit=True`. The original 304 test passed by accident because it asserted only `cache_hit` and `created_claim_ids != first`. **Fixed by re-parsing the cached body**; test now asserts `status == COMPLETED`. |
+| 2026-05-17 | Stage 7c.1 | **1 bug.** Critical: 304 cache reuse silently FAILED — `fetch.spec = {}` triggered the "no operations to ingest" guard, marking the run FAILED while reporting `cache_hit=True`. **Fixed by re-parsing the cached body**; test tightened to assert `status == COMPLETED` and matching claim counts. |

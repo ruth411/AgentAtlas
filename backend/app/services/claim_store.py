@@ -336,6 +336,65 @@ class ClaimStore:
             ).one_or_none()
             return _record_to_verification_result(record) if record else None
 
+    def get_latest_verification_results(
+        self, claim_ids: list[str]
+    ) -> dict[str, VerificationResult]:
+        """Batched equivalent of `get_latest_verification_result`.
+
+        Returns the most recent `VerificationResult` for each claim_id in
+        the input list, keyed by claim_id. Claims with no verification
+        result are simply absent from the returned dict. Uses one SQL query
+        regardless of how many claim_ids are passed in (vs. N queries for
+        the single-claim version).
+
+        Order-disambiguation matches the single-claim method exactly:
+        `verified_at DESC, verification_id DESC` per claim_id.
+        """
+        if not claim_ids:
+            return {}
+        # Window-function approach: rank verification results per claim_id
+        # by (verified_at DESC, verification_id DESC), take rank 1.
+        # SQLite 3.25+ supports ROW_NUMBER() OVER (...); all modern Python
+        # installs ship a recent-enough SQLite for this.
+        from sqlalchemy import func
+
+        ranked = (
+            select(
+                VerificationResultRecord,
+                func.row_number()
+                .over(
+                    partition_by=VerificationResultRecord.claim_id,
+                    order_by=(
+                        VerificationResultRecord.verified_at.desc(),
+                        VerificationResultRecord.verification_id.desc(),
+                    ),
+                )
+                .label("_rn"),
+            )
+            .where(VerificationResultRecord.claim_id.in_(claim_ids))
+            .subquery()
+        )
+        latest_alias = ranked.alias("latest")
+        # Rebuild a proper ORM-mapped result by joining the subquery back
+        # to the record table on the primary key. This keeps the row mapper
+        # happy without us having to hand-construct the record from columns.
+        with self._session_factory() as session:
+            records = session.scalars(
+                select(VerificationResultRecord)
+                .join(
+                    latest_alias,
+                    (
+                        VerificationResultRecord.verification_id
+                        == latest_alias.c.verification_id
+                    )
+                    & (latest_alias.c._rn == 1),
+                )
+            ).all()
+            return {
+                record.claim_id: _record_to_verification_result(record)
+                for record in records
+            }
+
     def save_canonical_tool_spec(self, spec: ToolSpec) -> ToolSpec:
         # Retry once on IntegrityError so a TOCTOU race between get() and
         # add() (two concurrent publish requests for the same tool_id) does

@@ -7,10 +7,10 @@
 *Wikipedia tells humans what things are. AgentAtlas tells AI agents what tools can do, how to use them, and whether they're safe.*
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
-[![Tests](https://img.shields.io/badge/tests-460%20passing-brightgreen.svg)](#validation)
+[![Tests](https://img.shields.io/badge/tests-556%20passing-brightgreen.svg)](#validation)
 [![Ruff](https://img.shields.io/badge/lint-ruff%20clean-success.svg)](https://docs.astral.sh/ruff/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
-[![Stage](https://img.shields.io/badge/stage-8%20complete-blueviolet.svg)](docs/stage_report.md)
+[![Stage](https://img.shields.io/badge/stage-9%20complete-blueviolet.svg)](docs/stage_report.md)
 
 </div>
 
@@ -193,7 +193,7 @@ These are non-negotiable. They're tested.
 | 7c.3 — GraphQL SDL | Per-root-field claims with destructive detection | ✓ |
 | 7d — MCP metadata | Local stdio spawn + `tools/list` capture | ✓ |
 | 8 — Runtime verification | L2 → L3 promotion via safe sandboxed checks | ✓ |
-| 9 — Agent query surface | `validate_command`, `search_tools`, `explain_risk` | planned |
+| 9 — Agent query surface | `validate_command`, `search_tools`, `explain_risk`, `safe_workflow`, `get_tool_spec` | ✓ |
 | 10 — MCP server wrapper | Expose AgentAtlas to Claude Desktop / Cursor | planned |
 | 11 — Seed dataset + dashboard | Pre-populated graph + minimal demo UI | planned |
 
@@ -211,7 +211,7 @@ agentatlas/
 │   │   ├── db/              # SQLAlchemy 2.0 models + session
 │   │   └── main.py          # FastAPI app + middleware (body size guard, structured errors)
 │   ├── alembic/             # Migrations (drift-locked against models)
-│   └── tests/               # 460 tests; ruff clean; hermetic
+│   └── tests/               # 556 tests; ruff clean; hermetic
 ├── contracts/               # Versioned JSON contracts (trust sources, ingestion allowlists, risk taxonomy)
 └── docs/                    # Architecture, stage report, claim schema, safety policy
 ```
@@ -255,6 +255,13 @@ Core endpoints. Every endpoint returns typed JSON; errors are structured.
 - `POST /verification/runtime` — promote a claim to L3 by running a safe check
 - `POST /verification/runtime/tools/{tool_id}` — bulk-verify all claims for a tool
 
+**Agent Query Surface** (Stage 9 — the agent-facing API)
+- `POST /query/validate-command` — *the headline endpoint.* Returns a structured `{safe_to_auto_execute, risk_level, requires_human_confirmation, reasons, evidence, verification_level, confidence}` verdict. Default-deny on no-match.
+- `GET /query/tools/{tool_id}` — canonical `ToolSpec` retrieval; 404 if no spec published.
+- `GET /query/search-tools?q=&limit=&offset=` — tiered substring search across published tools (tool_id exact > tool_id substring > name substring > capability substring).
+- `POST /query/explain-risk` — deterministic risk classification with dimensions (`destructive_action`, `mutates_remote_state`, `reversible`, `requires_auth`, `may_cost_money`, `may_expose_secrets`) plus citing claim ids.
+- `POST /query/safe-workflow` — published workflows matching a goal, sorted safest-first.
+
 Live interactive docs at `http://localhost:8000/docs` when the server is running.
 
 ## Validation
@@ -262,7 +269,7 @@ Live interactive docs at `http://localhost:8000/docs` when the server is running
 ```bash
 cd backend
 
-# Test suite (460 tests, hermetic, ~12s)
+# Test suite (556 tests, hermetic, ~15s)
 .venv/bin/python -m pytest -q
 
 # Lint
