@@ -7,10 +7,10 @@
 *Wikipedia tells humans what things are. AgentAtlas tells AI agents what tools can do, how to use them, and whether they're safe.*
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
-[![Tests](https://img.shields.io/badge/tests-556%20passing-brightgreen.svg)](#validation)
+[![Tests](https://img.shields.io/badge/tests-600%20passing-brightgreen.svg)](#validation)
 [![Ruff](https://img.shields.io/badge/lint-ruff%20clean-success.svg)](https://docs.astral.sh/ruff/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
-[![Stage](https://img.shields.io/badge/stage-9%20complete-blueviolet.svg)](docs/stage_report.md)
+[![Stage](https://img.shields.io/badge/stage-10%20complete-blueviolet.svg)](docs/stage_report.md)
 
 </div>
 
@@ -118,18 +118,51 @@ Six ingestion lanes pull evidence from trusted sources. A deterministic orchestr
 ```bash
 # 1. Clone and set up
 git clone https://github.com/<your-username>/agentatlas.git
-cd agentatlas/backend
-python3.12 -m venv .venv
-.venv/bin/python -m pip install -e '.[dev]'
+cd agentatlas
+python3.12 -m venv backend/.venv
+backend/.venv/bin/python -m pip install -e 'backend[dev]'
 
-# 2. Initialise the database
-.venv/bin/alembic upgrade head
+# 2. Seed the demo graph (one command, ~5 seconds, offline-safe)
+backend/.venv/bin/python scripts/seed_examples.py --reset
 
 # 3. Start the API
-.venv/bin/uvicorn app.main:app --reload
+cd backend && .venv/bin/uvicorn app.main:app --reload
 ```
 
 API is live at `http://localhost:8000` with OpenAPI docs at `/docs`.
+
+A fresh checkout is now populated with **47 claims** spanning 5 tools (`git`,
+`github-cli`, `docker`, `vercel-cli`, `openai-api`). The demo's headline
+queries work immediately:
+
+```bash
+curl -s -X POST http://localhost:8000/query/validate-command \
+  -H 'Content-Type: application/json' \
+  -d '{"tool_id": "github-cli", "command": "gh repo delete my-org/x --yes"}' \
+  | python -m json.tool
+```
+
+Returns `safe_to_auto_execute: false`, `risk_level: "critical"`, with cited
+evidence from `docs.github.com`.
+
+### Run the dashboard (optional)
+
+Stage 11b ships a minimal Next.js dashboard for visual exploration and the
+demo video. Requires Node.js 18+:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Open <http://localhost:3000>. The dashboard proxies `/api/*` to the FastAPI
+backend on `localhost:8000` (configurable via `AGENTATLAS_API_URL`), so the
+browser only ever talks to its own origin and no CORS configuration is needed.
+Four pages: landing with a try-a-query section, `/tools`, `/tools/[id]`, and
+the standalone `/query` playground.
+
+### Other ways to interact
 
 Submit a claim:
 
@@ -194,8 +227,9 @@ These are non-negotiable. They're tested.
 | 7d — MCP metadata | Local stdio spawn + `tools/list` capture | ✓ |
 | 8 — Runtime verification | L2 → L3 promotion via safe sandboxed checks | ✓ |
 | 9 — Agent query surface | `validate_command`, `search_tools`, `explain_risk`, `safe_workflow`, `get_tool_spec` | ✓ |
-| 10 — MCP server wrapper | Expose AgentAtlas to Claude Desktop / Cursor | planned |
-| 11 — Seed dataset + dashboard | Pre-populated graph + minimal demo UI | planned |
+| 10 — MCP server wrapper | Expose all 6 query / write tools to Claude Desktop / Cursor over stdio JSON-RPC | ✓ |
+| 11a — Seed dataset | `scripts/seed_examples.py` replays pre-captured artifacts; ~47 claims across 5 tools | ✓ |
+| 11b — Demo dashboard | Minimal Next.js UI: landing + tools list + tool detail + query playground | ✓ |
 
 See [docs/stage_report.md](docs/stage_report.md) for the full per-stage report including required artifacts, pass-case audit, quality bar, audit log, and what each stage explicitly defers.
 
@@ -205,13 +239,17 @@ See [docs/stage_report.md](docs/stage_report.md) for the full per-stage report i
 agentatlas/
 ├── backend/
 │   ├── app/
-│   │   ├── api/             # FastAPI routes (claims, canonical, ingestion, verification)
+│   │   ├── api/             # FastAPI routes (claims, canonical, ingestion, verification, query)
+│   │   ├── mcp_server/      # Stage 10: stdio JSON-RPC MCP server (6 tools)
 │   │   ├── schemas/         # Pydantic v2 typed models
-│   │   ├── services/        # Orchestrator, risk engine, ingestion lanes, runtime verifier
+│   │   ├── services/        # Orchestrator, risk engine, ingestion lanes, runtime verifier, query engine
 │   │   ├── db/              # SQLAlchemy 2.0 models + session
 │   │   └── main.py          # FastAPI app + middleware (body size guard, structured errors)
 │   ├── alembic/             # Migrations (drift-locked against models)
-│   └── tests/               # 556 tests; ruff clean; hermetic
+│   └── tests/               # 600 tests; ruff clean; hermetic
+├── frontend/                # Stage 11b: Next.js demo dashboard (4 pages)
+├── data/seed_artifacts/     # Stage 11a: pre-captured artifacts for offline-safe seeding
+├── scripts/                 # seed_examples.py and other operator tools
 ├── contracts/               # Versioned JSON contracts (trust sources, ingestion allowlists, risk taxonomy)
 └── docs/                    # Architecture, stage report, claim schema, safety policy
 ```
@@ -264,12 +302,66 @@ Core endpoints. Every endpoint returns typed JSON; errors are structured.
 
 Live interactive docs at `http://localhost:8000/docs` when the server is running.
 
+## MCP Integration (Stage 10)
+
+AgentAtlas ships with a built-in MCP server that exposes the query surface plus claim submission to any MCP-aware agent client (Claude Desktop, Cursor, Cline, Continue, etc.). One config block in the client and the agent can ask AgentAtlas about safety before acting.
+
+**The MCP tools exposed**
+
+| Tool | What it does |
+|---|---|
+| `validate_command` | Safety verdict for `{tool_id, command}`. Default-deny on no match. |
+| `get_tool_spec` | Full canonical `ToolSpec` for a known tool. |
+| `search_tools` | Tiered substring search across published tools. |
+| `explain_risk` | Deterministic risk classification + six dimensions + citing claims. |
+| `get_safe_workflow` | Goal-matched workflows, safest-first. |
+| `submit_claim` | The only write tool — submits a `KnowledgeClaim` with evidence and runs it through the orchestrator. |
+
+**Run the MCP server directly**
+
+```bash
+cd backend
+.venv/bin/python -m app.mcp_server
+```
+
+It speaks JSON-RPC over stdio. Closing stdin (Ctrl-D) exits cleanly.
+
+**Wire it into Claude Desktop**
+
+Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) — adjust paths for your machine:
+
+```json
+{
+  "mcpServers": {
+    "agentatlas": {
+      "command": "/absolute/path/to/AgentAtlas/backend/.venv/bin/python",
+      "args": ["-m", "app.mcp_server"],
+      "env": {
+        "PYTHONPATH": "/absolute/path/to/AgentAtlas/backend",
+        "AGENTATLAS_DATABASE_URL": "sqlite:////absolute/path/to/agentatlas.db"
+      }
+    }
+  }
+}
+```
+
+Restart Claude Desktop. The 6 AgentAtlas tools will appear in the tool list. Ask Claude `"Is it safe to run gh repo delete?"` and the verdict comes back inline with cited evidence.
+
+**Cursor / other MCP clients** — the config shape is the same; consult the client's docs for where to register MCP servers.
+
+**Design notes**
+
+- Server is hand-rolled (no `mcp` SDK dependency). The codebase is sync-throughout; the SDK is async. Stage 7d already implemented the inverse (an MCP *client*) so the protocol is well-understood. If protocol nuances bite later, the tool implementations don't change — only the transport wrapper does.
+- Every tool's `inputSchema` declares `additionalProperties: false` so client typos surface as clean rejections instead of silently dropping fields.
+- Tool execution failures surface as MCP `isError: True` content blocks (per the MCP spec). Protocol-level failures (parse error, unknown method, unknown tool) surface as JSON-RPC `error` responses. The two paths are kept distinct so clients can write defensive code that treats them differently.
+- The server returns both a `content[]` text block (for older clients that string-parse) AND a `structuredContent` object (for newer clients that natively understand structured tool results).
+
 ## Validation
 
 ```bash
 cd backend
 
-# Test suite (556 tests, hermetic, ~15s)
+# Test suite (600 tests, hermetic, ~30s)
 .venv/bin/python -m pytest -q
 
 # Lint
@@ -293,7 +385,7 @@ DATABASE_URL=sqlite:////tmp/agentatlas-smoke.db .venv/bin/alembic upgrade head
 
 Being honest about the gaps:
 
-- **Not yet exposed as an MCP server** — the *outbound* direction. AgentAtlas can *read* MCP servers (Stage 7d); we don't yet *expose* AgentAtlas itself as an MCP server. That's planned for Stage 10.
+- **Now exposed as an MCP server (Stage 10 shipped).** AgentAtlas can both *read* MCP servers (Stage 7d) AND *be* an MCP server (Stage 10). See the MCP Integration section above for Claude Desktop / Cursor setup.
 - **No dashboard yet.** All interaction is via REST API. Demo UI is planned for Stage 11.
 - **No seed dataset.** A fresh install is empty until you ingest. A `scripts/seed_examples.py` is planned.
 - **Stage 0 scope is narrow.** Initial tool coverage: `git`, `github-cli`, `docker`, `vercel-cli`, `openai-api` plus 5 MCP servers. Adding tools is a contract change, not code.

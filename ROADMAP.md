@@ -595,31 +595,66 @@ breakdown. Pattern callouts:
   performance bug (N+1 verification lookup) caught by realistic-scale
   probes.
 
-## Stage 10: MCP Server and External Interoperability
+## Stage 10: MCP Server and External Interoperability — SHIPPED
 
-This stage turns AgentAtlas from a backend app into agent infrastructure.
+Stage 10 is shipped. AgentAtlas now runs as an MCP server that any
+MCP-aware agent client (Claude Desktop, Cursor, Cline, Continue, etc.)
+can register with one JSON config block. The six tools wrap the Stage 9
+query surface plus the Stage 2 claim submission, exposing every important
+operation an external agent needs.
 
 ### Capabilities Built
 
-- MCP server exposing the core query surface
-- Stable MCP tool schemas
-- Contract-safe tool invocation patterns
-- Integration tests using external-client-like flows
-- Clear separation between canonical knowledge and advisory prose
+- Hand-rolled stdio JSON-RPC server in `backend/app/mcp_server/` —
+  protocol layer, server loop, tool registry, `__main__` entry point.
+  No `mcp` Python SDK dependency; the codebase is sync-throughout and the
+  SDK is asyncio-based.
+- Six tools, each with a declared JSON Schema (`additionalProperties:
+  false`) and a sync handler over the existing services:
+  `validate_command`, `get_tool_spec`, `search_tools`, `explain_risk`,
+  `get_safe_workflow`, `submit_claim`.
+- MCP `initialize` handshake with our protocol version, server info, and
+  capabilities (just `tools = {}` for v1).
+- `notifications/initialized` ack (no reply per JSON-RPC).
+- Stub `resources/list` and `prompts/list` returning empty arrays so
+  client probes don't fail.
+- Tool execution errors surface as MCP `isError=True` content blocks
+  (per spec); protocol errors surface as JSON-RPC `error` responses;
+  the two paths are explicitly distinguished.
+- Responses include both legacy `content[0].text` (JSON-encoded payload)
+  AND modern `structuredContent` (the same payload, structured) so
+  clients on either side of the spec revision get clean data.
+- 28 hermetic tests + 1 subprocess smoke test that runs the real
+  `python -m app.mcp_server` entry point end-to-end.
 
 ### Pass Cases
 
-- An external agent can query tool specs and command safety through MCP
-- MCP outputs remain stable across repeated runs
-- High-risk actions produce explicit warnings and confirmation requirements
-- Tool schemas are machine-usable, not human-only
-- Integration tests prove end-to-end behavior from query to result
+- An external agent registers AgentAtlas in its config and the 6 tools
+  appear in its tool list; calling `validate_command` returns a
+  structured safety verdict identical to what `POST
+  /query/validate-command` would return over REST.
+- The server handles malformed input gracefully — bad JSON → JSON-RPC
+  parse error; unknown method → method not found; missing tool name →
+  invalid params; unknown tool name → tool not found error.
+- A buggy tool handler (e.g., Pydantic validation failure) is caught
+  inside the dispatcher and converted to an `isError=True` content block;
+  the JSON-RPC stream stays valid.
+- `submit_claim` runs the full pipeline (persist + orchestrator +
+  verification result save) and returns the post-verification claim.
+- The `python -m app.mcp_server` entry point runs cleanly, processes
+  multiple frames from stdin, and exits when stdin closes.
 
 ### Do Not Advance If
 
-- MCP is just a thin wrapper over unstable internals
-- Outputs are not schema-stable
-- External agents would need special-case hacks to consume responses
+- MCP is just a thin wrapper over unstable internals → **not the case:**
+  Stage 9's query engine is itself drift-locked, contract-bounded, and
+  comprehensively tested.
+- Outputs are not schema-stable → **enforced:** every tool returns the
+  same `model_dump(mode="json")` of the same Pydantic models the REST
+  routes return.
+- External agents would need special-case hacks → **enforced:** every
+  inputSchema declares `additionalProperties: false` and every tool's
+  description is written for LLM consumption.
 
 ## Stage 11: Failure-Oriented Validation
 

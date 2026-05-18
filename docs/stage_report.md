@@ -25,6 +25,9 @@ It records what each stage proves, which artifacts satisfy the stage, what remai
 | Stage 7d | MCP metadata ingestion | pass |
 | Stage 8 | Runtime Verification (L2 → L3) | pass |
 | Stage 9 | Agent Query Surface | pass |
+| Stage 10 | MCP Server (outbound) | pass |
+| Stage 11a | Seed Dataset (offline-safe replay) | pass |
+| Stage 11b | Demo Dashboard (Next.js) | pass |
 
 ## Stage 0: Product Lock and Trust Contract
 
@@ -994,6 +997,233 @@ regression test locking the failure mode so it cannot recur.
 - **SQL-side filtering** for `search-tools` and `find_safe_workflows`. Currently load-all-then-filter in memory; fine at v1 scale (<200 tools), worth optimising at 10k+ specs.
 - **Re-verification freshness** in verdicts. Today's verdict has no "verified N days ago" decay; old L3 verdicts are treated as current.
 
+## Stage 10: MCP Server (outbound)
+
+Verdict: pass.
+
+Stage 10 is complete when AgentAtlas can be **registered as an MCP server**
+in any MCP-aware agent client (Claude Desktop, Cursor, Cline, Continue, etc.)
+with a single JSON config block, and the six query / write tools
+(`validate_command`, `get_tool_spec`, `search_tools`, `explain_risk`,
+`get_safe_workflow`, `submit_claim`) work end-to-end over stdio JSON-RPC.
+
+### Architecture
+
+A hand-rolled stdio JSON-RPC server lives in `backend/app/mcp_server/`.
+The package has four files:
+
+- `protocol.py` — Pydantic models + helpers for JSON-RPC framing
+  (`JsonRpcRequest`, `JsonRpcNotification`, `JsonRpcResponse`,
+  `JsonRpcError`), parse + encode functions, and the standard JSON-RPC +
+  application-specific error codes.
+- `tools.py` — registry of six `McpTool` records, each carrying its `name`,
+  LLM-readable `description`, JSON Schema `input_schema`, and a sync
+  `handler(arguments, store) -> dict`.
+- `server.py` — `McpServer` class with two public surfaces:
+  `handle_frame(line)` for in-process unit tests, and `serve(stdin, stdout)`
+  for the production blocking loop. Dispatches `initialize`,
+  `notifications/initialized`, `tools/list`, `tools/call`, plus stub
+  `resources/list` / `prompts/list` that return empty arrays.
+- `__main__.py` — `python -m app.mcp_server` entry point.
+
+We deliberately did not pull in the official `mcp` Python SDK. Three
+reasons: (1) the codebase is sync-throughout and the SDK is asyncio-based;
+bridging async/sync per tool call is overhead with no payoff at v1 scale;
+(2) Stage 7d already implemented an MCP *client* over the same stdio
+JSON-RPC protocol, so we have first-hand familiarity with the framing
+concerns; (3) the test surface is tighter — every tool is a plain function
+we can unit-test in-process without spawning subprocesses for every
+behaviour. If protocol nuances ever bite us, the tool implementations don't
+change; only the transport wrapper does.
+
+### Required Artifacts
+
+| Artifact | Purpose | Status |
+| --- | --- | --- |
+| `backend/app/mcp_server/protocol.py` | JSON-RPC 2.0 framing + Pydantic models + parse/encode helpers + standard error codes. | complete |
+| `backend/app/mcp_server/tools.py` | Six `McpTool` records with `name`, `description`, `inputSchema` (each `additionalProperties: false`), and sync handlers wrapping the existing `QueryEngine` and `ClaimStore` / `CanonOrchestrator` services. | complete |
+| `backend/app/mcp_server/server.py` | `McpServer` class. `handle_frame` for in-process testing; `serve(stdin, stdout)` for the blocking stdio loop. Dispatches every MCP method this server supports + stubs unsupported ones with empty results. Every tool-handler exception is caught and converted into an `isError=True` content block. | complete |
+| `backend/app/mcp_server/__main__.py` | `python -m app.mcp_server` entry point used by Claude Desktop / Cursor. | complete |
+| `README.md` "MCP Integration" section | Tool table, run instructions, copy-paste Claude Desktop `claude_desktop_config.json` block, design notes. | complete |
+| `backend/tests/test_mcp_server.py` | **28 adversarial tests:** handshake, notification ack, blank-line and bad-JSON handling, unknown method, every tool's happy path + at least one failure path, `tools/call` protocol edges (missing name, non-object arguments, unknown tool name), tool-handler exception wrapping, response shape invariants (`structuredContent` + `content[0].text` parity), and a subprocess smoke test that runs `python -m app.mcp_server` end-to-end. | complete |
+
+### Pass Case Audit
+
+| Pass case | Satisfied by |
+| --- | --- |
+| `initialize` returns the protocol version and server info Claude Desktop / Cursor expect | `_handle_initialize` returns `protocolVersion=2024-11-05`, `serverInfo={name, version}`, `capabilities={tools: {}}`. Tested. |
+| `notifications/initialized` gets no reply | `handle_frame` returns `None` for any `JsonRpcNotification`. Tested. |
+| `tools/list` enumerates exactly the six tools with their JSON schemas | Iterates `list_tools()` registry. Test asserts the name set + that every tool's schema has `additionalProperties: false`. |
+| Each of the six tools dispatches to the matching service | `find_tool(name).handler(arguments, store)`. Each tool has a happy-path test that confirms the dispatch end-to-end. |
+| Tool-handler exceptions don't crash the JSON-RPC stream | `_handle_tools_call` wraps the handler call in a try/except that converts any exception to an `isError=True` content block. Tested with a Pydantic-ValidationError-triggering input. |
+| Unknown tool name returns a structured JSON-RPC error (not isError) | Tested. Returns `TOOL_NOT_FOUND` (-32001). |
+| Malformed `tools/call` params return `INVALID_PARAMS` | Tested with missing `name` and non-object `arguments`. |
+| Bad JSON returns `PARSE_ERROR` (-32700) | Tested. |
+| `python -m app.mcp_server` runs cleanly end-to-end via subprocess + closes on stdin EOF | One focused integration smoke test runs the real entry point, sends initialize + initialized + tools/list, asserts both replies are well-formed JSON-RPC, and confirms `returncode == 0`. |
+| Responses carry both legacy `content[0].text` (JSON-encoded) AND modern `structuredContent` | `_success_content` builds both; one test asserts they decode to the same payload. |
+| The single write tool (`submit_claim`) runs the orchestrator and returns the verified claim | Handler builds a `KnowledgeClaim`, persists it via `ClaimStore.create`, runs `CanonOrchestrator.verify_claim`, saves the result, returns the post-verification claim. Tested for happy path + unknown tool_id + empty evidence rejection. |
+
+### Quality Bar
+
+- **No new external dependencies.** Reuses `pydantic`, `sqlalchemy`, `fastapi` (for Pydantic compatibility — FastAPI isn't loaded by the MCP server entry point).
+- **No new persistence.** No migrations. The MCP server is a transport wrapper; it never invents new state.
+- **`additionalProperties: false` on every tool's input schema.** A client typo (wrong field name, extra param) surfaces as a clean rejection at the boundary instead of being silently dropped.
+- **Tool execution errors vs protocol errors are kept distinct.** Tool errors → `isError=True` content (MCP-spec). Protocol errors → JSON-RPC `error` response. Clients can write defensive code that treats them differently.
+- **Sync-throughout.** No asyncio bridge; tool handlers call existing sync services directly.
+- **Hermetic test suite.** 27 of 28 tests use the in-process `handle_frame` API. One subprocess test covers the real `python -m` entry point. CI doesn't need any MCP SDK installed.
+- **Documented design choice.** The "we didn't use the official SDK" decision is captured in-source (in `__init__.py`) so a future maintainer doesn't have to guess.
+- **`structuredContent` AND text-block JSON parity.** Older MCP clients that string-parse `content[0].text` get the same payload as newer clients that read `structuredContent` directly.
+- **Full backend validation currently reports `594 passed`**; ruff is clean; migrations unchanged.
+
+### Deferred (v1.1 territory)
+
+- **Remote transports.** Today's server is stdio-only. SSE / streamable HTTP transports for hosted deployments are deferred.
+- **`resources/list` and `prompts/list`.** Currently stubbed to return empty arrays. MCP supports surfacing arbitrary resources (e.g., raw evidence artifacts) and prompts; we don't expose those yet.
+- **MCP capability negotiation refinements.** We advertise `capabilities.tools = {}` (the simplest valid form). MCP's spec allows finer-grained capabilities; not needed for v1.
+- **Logging / progress notifications.** MCP supports server-initiated logging messages and progress updates for long-running tools. Our tools all complete in milliseconds so we skip these.
+- **Schema-driven argument validation.** Today the inputSchema is documentation; tool handlers re-validate via Pydantic. Validating against the inputSchema directly (e.g., with `jsonschema`) would shave a small amount of duplicated validation logic. Deferred.
+- **An `mcp` SDK swap-in path.** Documented in-source but not implemented. If we ever need features only the SDK provides (resource subscriptions, prompts, multi-transport), the transport wrapper is the only thing that changes.
+
+## Stage 11a: Seed Dataset (offline-safe replay)
+
+Verdict: pass.
+
+Stage 11a is complete when a fresh checkout populates a useful demo graph
+in under five seconds with a single command, without depending on any
+external host being reachable. The seed strategy is "replay pre-captured
+artifacts" — the live ingestion lanes' Protocols (`OpenApiHttpClient`,
+`JsonSchemaHttpClient`) accept a fake client that returns committed-on-disk
+response bodies. Identical code path to production; deterministic input.
+
+### Required Artifacts
+
+| Artifact | Purpose | Status |
+| --- | --- | --- |
+| `data/seed_artifacts/openapi/openai_api.json` | Small valid OpenAPI 3.0.3 subset for `openai-api` (12 operations: chat / embeddings / models / files / audio / images). Same lane that parses the live spec accepts this verbatim. | complete |
+| `data/seed_artifacts/json_schema/docker_compose.json` | Small valid Draft-07 JSON Schema subset for `docker-compose.yml` (8 top-level properties + 1 `deprecated: true` annotation). | complete |
+| `data/seed_artifacts/claims/headline_scenarios.json` | 6 hand-crafted multi-evidence claims that the demo's headline queries hit: `gh repo delete`, `git status`, `git log`, `vercel --prod`, `gh repo list`, `docker rm`. Each carries 2-3 trusted-source evidence pieces with realistic excerpts so the orchestrator's confidence scoring produces meaningful (not 0.0) scores. | complete |
+| `scripts/seed_examples.py` | Replay orchestrator. Injects committed bodies into the real Stage 7c.1 / 7c.2 ingestion services via a single-response stub client; directly submits headline-scenario claims via `ClaimStore.create` + `CanonOrchestrator.verify_claim`. `--reset` drops + re-applies all migrations via alembic before seeding. | complete |
+| `backend/tests/test_seed_script.py` | 10 hermetic tests: subprocess invocation against tmp SQLite, claim-count floor (≥30), per-tool coverage (every Stage 0 tool gets ≥1 claim), parametrised verification of all 6 headline scenarios against `validate_command`, the headline `gh repo delete` invariant (blocks auto-execute with cited evidence + critical risk + safety-policy reason), and the unknown-command default-deny path. | complete |
+
+### Pass Case Audit
+
+| Pass case | Satisfied by |
+| --- | --- |
+| One command populates the graph from a fresh DB | `python scripts/seed_examples.py --reset` runs in ~5s end-to-end, including drop + alembic upgrade + replay. |
+| Useful claim count (≥30) | OpenAPI replay produces 32 claims (12 operations × auxiliary side-effect / destructive / auth claims); JSON Schema replay produces 9 claims (8 fields + 1 deprecation); headline scenarios contribute 6 more. **Total: 47.** |
+| Demo's headline command is auto-execute-blocked | `validate-command("github-cli", "gh repo delete my-org/x --yes")` returns `safe_to_auto_execute=false, risk_level="critical"` with cited evidence from `docs.github.com`. Test pins this. |
+| Every Stage 0 tool is represented in search results | After seeding, each of `git`, `github-cli`, `docker`, `vercel-cli`, `openai-api` has at least one queryable claim. |
+| Offline-safe | The script never makes a real HTTP request; the fake client raises if called twice (guard against accidental re-fetch). CI / a maintainer on a plane / Codespaces with no network can all seed cleanly. |
+| Deterministic | Evidence hashes are computed from `(source_uri, excerpt)` so identical artifacts produce identical hashes across runs. Idempotent enough that two fresh seeds produce the same canonical fingerprint of the graph. |
+| Replay path mirrors production | OpenAPI / JSON Schema lanes use their real services with a stub `Client`; the orchestrator, evidence trust resolver, risk classifier, and confidence scorer all run normally. The seed exercises the same code path that ingestion at runtime would. |
+
+### Quality Bar
+
+- **No new dependencies.** Reuses existing services; alembic is invoked programmatically for `--reset`.
+- **No migrations.** Stage 11a only writes data through existing tables.
+- **Single-response fake client** raises on a second `.get()` call so a misbehaving service can't quietly re-fetch and skew counts.
+- **Headline-scenario JSON ships with hashes computed from `(source_uri, excerpt)`** so the seed is reproducible and identical artifacts produce identical evidence rows across machines.
+- **Risk-level matching to classifier output.** The headline claim for `gh repo list` is declared MEDIUM (not LOW) because the deterministic risk classifier defaults to MEDIUM for commands without a specific rule — submitting LOW would trigger the orchestrator's understated-risk demotion to L1 and make the claim invisible to the matcher. The seed authors had to align with the real classifier behavior, not pretend it didn't exist.
+- **The seed test is one focused subprocess invocation, not 50 fragile per-lane assertions.** One run, then 10 in-process queries against the resulting DB.
+- **Full backend validation currently reports `594 passed`**; ruff is clean; migrations unchanged.
+
+### Deferred (Stage 11b and v1.1)
+
+- **CLI ingestion replay artifacts.** Today CLI ingestion isn't part of the seed (the 6 headline claims cover the CLI surface directly). Adding live-style `--help` capture replay is a v1.1 nice-to-have.
+- **GraphQL + MCP replay** in the seed. The demo doesn't need them; the Stage 7c.3 and Stage 7d test suites already prove those lanes work.
+- **Refresh-from-upstream script.** A `--refresh-from-live` flag that re-captures every artifact from real hosts and updates the committed files. v1.1.
+- **Multi-evidence ingestion path.** Today's headline claims are submitted directly because the single-evidence ingestion lanes naturally produce PENDING-not-ACCEPTED claims (single source → confidence ~0.45). A future lane that merges evidence across sources for the same subject would let ingested claims reach ACCEPTED naturally.
+
+## Stage 11b: Demo Dashboard (Next.js)
+
+Verdict: pass.
+
+Stage 11b is complete when a developer can clone the repo, run two commands
+(`pip install -e backend[dev]` + `npm install` in `frontend/`), and have a
+visual UI that lets them poke at the seeded knowledge graph from a browser.
+The dashboard exists to make the demo video possible — not to be a product
+in its own right.
+
+### Architecture
+
+Next.js 14 App Router + TypeScript + Tailwind. **No** shadcn CLI scaffold;
+the project ships two hand-written components (`RiskBadge`, `VerdictCard`)
+plus Tailwind utility classes everywhere else. Aesthetic is "developer
+tool, not consumer app" — clean typography, distinct sections, monospaced
+data fields, colour-coded risk pills.
+
+**API proxy.** `next.config.mjs` rewrites `/api/*` requests to the FastAPI
+backend at `localhost:8000` (override via `AGENTATLAS_API_URL`). Browser
+requests are therefore same-origin; FastAPI doesn't need CORS configured.
+Server components (`/tools` and `/tools/[tool_id]`) talk to the backend
+directly through an absolute URL; client components (`/`'s playground and
+`/query`) go through `/api/*`. The same `lib/api.ts` exports both `server.*`
+and `client.*` helpers so it's obvious from the call site which side
+each call originates from.
+
+**Typed API client.** Hand-mirrored from the Pydantic response models in
+`backend/app/schemas/query.py` and `backend/app/schemas/tool_spec.py`.
+Codegen from the OpenAPI doc would be tidier but isn't worth the build-
+time dependency on the backend running at install time.
+
+### Pages
+
+| Route | What it does | Server / client |
+|---|---|---|
+| `/` | Hero + "Try a query" with three one-click examples (`gh repo delete`, `git status`, `vercel --prod`). The headline demo lives here. | Mixed — hero is RSC, try-a-query is `"use client"` |
+| `/tools` | Lists every published `ToolSpec` with verification level + risk pills. Tap a row → tool detail. | RSC |
+| `/tools/[tool_id]` | Full spec view: capabilities, commands (with per-command risk badges), auth, risk profile, provenance. 404 page when no spec is published. | RSC |
+| `/query` | Standalone playground with form input + collapsible "show raw JSON" of the verdict. | `"use client"` |
+
+### Required Artifacts
+
+| Artifact | Purpose | Status |
+| --- | --- | --- |
+| `frontend/package.json` | Pinned versions of Next 14.2.18, React 18.3.1, TS 5.5.3, Tailwind 3.4.6. No runtime deps beyond Next + React. | complete |
+| `frontend/tsconfig.json` + `next.config.mjs` + `tailwind.config.ts` + `postcss.config.mjs` | Boilerplate Next.js + Tailwind config; `next.config.mjs` defines the `/api/*` rewrite. | complete |
+| `frontend/.gitignore` | Standard Next.js gitignore (excludes `node_modules`, `.next`, `out`). | complete |
+| `frontend/lib/api.ts` | Typed fetch client; `ApiError` class; server/client helper split. ~200 lines. | complete |
+| `frontend/components/risk-badge.tsx` + `verdict-card.tsx` | Two reusable display components. Card border colour changes based on the verdict's headline answer. | complete |
+| `frontend/app/layout.tsx` | Root layout with header (nav links) + footer. | complete |
+| `frontend/app/page.tsx` + `_try-query.tsx` | Landing page + the embedded client component. | complete |
+| `frontend/app/tools/page.tsx` | All-tools list with error + empty states. | complete |
+| `frontend/app/tools/[tool_id]/page.tsx` + `not-found.tsx` | Single-tool spec view + 404 page. | complete |
+| `frontend/app/query/page.tsx` | Standalone playground. | complete |
+| `frontend/README.md` | Local setup, design choices, deferred items. | complete |
+
+### Pass Cases
+
+| Pass case | Satisfied by |
+| --- | --- |
+| `npm install && npm run dev` produces a working dashboard on a fresh checkout | Next 14 stable; no exotic dependencies; documented in `frontend/README.md`. |
+| The headline demo (`gh repo delete`) renders a coloured "critical" verdict | Landing page's "Try a query" calls `validate_command` and renders `VerdictCard` with a red-border + critical risk badge + cited evidence list. |
+| The `/tools` page lists every seeded tool with chips | Server component calls `/query/search-tools?q=` with limit=200; renders one row per tool with risk + verification chips. |
+| Each `ToolSpec` is browseable | `/tools/[tool_id]` server component fetches the spec and renders capabilities, commands, auth, risk profile, and provenance in distinct sections. |
+| Backend down → clear error message | All three error paths (landing, `/tools`, `/query`) display a red banner with the actual error message and the `uvicorn` command to start the backend. |
+| No-spec case → clean 404 | `/tools/[tool_id]/not-found.tsx` renders when the API returns 404; suggests adding claims and publishing a spec. |
+| Mobile-responsive for the demo video | Tailwind responsive prefixes on every grid (`sm:`, `md:`); checked at 375px and 1280px. |
+| No CORS required on the backend | `/api/*` rewrite proxies through Next; client never makes a cross-origin request. |
+
+### Quality Bar
+
+- **No design system, no shadcn CLI.** Two components, Tailwind utility classes everywhere. Visual budget stays small.
+- **Server components by default**, client components only where interaction is required. Cuts the JS bundle and means most pages render in one round-trip.
+- **Typed API client** mirrors backend Pydantic models. If the backend changes a response shape, TypeScript points at the right call site.
+- **`ApiError` class** carries the HTTP status + the structured error envelope; UI shows the user-friendly error message AND the backend-supplied error code.
+- **No telemetry, no analytics, no images.** `poweredByHeader: false`. Build stays minimal.
+- **No frontend tests in this stage.** Visual review covers v1; the project owner is planning a separate E2E repo for end-to-end coverage. Documented in `frontend/README.md`.
+- **Same dev-server-port story as every other Next.js project.** No surprises.
+
+### Deferred (v1.1)
+
+- **End-to-end tests.** Per the project owner's roadmap, E2E coverage lives in a separate repo. The dashboard is the system-under-test for that future repo.
+- **Static export served from FastAPI.** Stage 12 (one-command install) can serve the built `out/` directory from the same Python process so users don't need Node.js to use the dashboard.
+- **Authentication / multi-user UI.** Out of scope for v1; the dashboard is a local-dev demo surface.
+- **Search-tools search input on `/tools`.** Currently the API supports `?q=` but the UI lists all. A search box is a one-state-variable add when needed.
+- **Dark mode.** Not needed for the demo video; trivial to add via Tailwind's `dark:` prefix later.
+- **Workflow browse + `safe-workflow` results display.** The API supports it; the demo flow doesn't need it yet.
+- **Live results-as-you-type in `/query`**. Currently submit-on-click. A debounced live mode would be a polish pass.
+
 ## Validation
 
 The consolidated stage report is current only if these commands pass:
@@ -1012,9 +1242,9 @@ DATABASE_URL=sqlite:////tmp/agentatlas_smoke.db .venv/bin/alembic upgrade head
 
 ### Current results
 
-- **556 tests passing** (Stage 9 added 96 tests across 4 files; all audit fixes have regression coverage)
+- **600 backend tests passing** (Stage 10+11 audit added 6 regression tests; Stage 11a added 10 tests; Stage 10 added 28 before that; Stage 9 added 96 before that; all audit fixes have regression coverage). Stage 11b adds frontend code only — no Python tests; `next build` verified to succeed.
 - ruff clean
-- alembic upgrade → downgrade → upgrade cycle clean through migration `0014_extend_artifact_type_for_sandbox` (Stage 9 added no migrations)
+- alembic upgrade → downgrade → upgrade cycle clean through migration `0014_extend_artifact_type_for_sandbox` (Stages 9, 10, 11a, and 11b added no migrations — all are read/transport/scripting/UI layers over the existing graph)
 
 ### Audit log (one row per stage; most recent first)
 
@@ -1025,6 +1255,8 @@ subsection above.
 
 | Date | Stage | Bugs found and resolved |
 | --- | --- | --- |
+| 2026-05-18 | Stages 10 + 11 (cross-stage audit) | **5 bugs.** (1) MCP dispatcher returned METHOD_NOT_FOUND for `notifications/*` methods sent with a stray `id` field; spec says these are notifications by method name regardless of id — fixed to silently ack. (2) `tools/call` with `arguments: []` (or other falsy non-dict) slipped through `or {}` and silently became an empty dict, crashing the tool handler downstream instead of returning a clean INVALID_PARAMS at the dispatcher. (3) `submit_claim`'s evidence-minimum pre-check fired before Pydantic validation, so a payload missing every required field returned the misleading "needs at least one piece of evidence" error instead of "missing required fields"; reordered. (4) Stage 11a: re-running `scripts/seed_examples.py` without `--reset` silently inserted duplicate claims AND degraded headline-scenario acceptance (orchestrator marks dups as PENDING/L1); the script now emits a loud warning when the DB already has rows. (5) Tool-handler return values weren't type-checked; a future handler returning a list / scalar / None would silently produce MCP `structuredContent` that violates the spec's "must be a JSON object" requirement; the dispatcher now rejects non-dict payloads with a clear `isError` message. **All five fixed; 6 regression tests added; 600 total passing. Frontend production build also verified (`next build` succeeds, all 5 pages compile, type-check passes).** |
+| 2026-05-18 | Stage 10 | **1 minor bug.** Documentation-vs-reality gap: `submit_claim`'s `inputSchema` declared `minItems: 1` for evidence but the handler didn't enforce it, so empty-evidence claims were accepted by the MCP boundary and only flagged PENDING downstream by the orchestrator's "no evidence" reason. **Fixed** with an explicit pre-check in the handler that matches the schema's declared minimum; regression test added. |
 | 2026-05-18 | Stage 9 | **9 bugs.** Critical: matcher hid most ingestion-pipeline output (single-evidence PENDING / REQUIRES_HUMAN_REVIEW claims were invisible to validate-command). Medium: three contract-↔-code drift risks (band thresholds, reason-text keys, route/schema hardcoded limits); contract validator gap on positive search-limit values; path-param vs body-param 422 vs 404 inconsistency; 500-claim silent-drop in matcher pagination. Performance: N+1 verification lookup. API ergonomics: `Literal["unknown"]` sentinel replaced with `null`. **All fixed with regression tests.** |
 | 2026-05-17 | Stage 8 | **2 bugs.** High: HEAD verifier followed redirects without re-checking the SSRF guard (an allowlisted host could redirect to a private IP). Medium: CLI flag verifier picked the binary name as the subcommand (`gh status --short` → spawned `gh gh --help`, silent fail on every runtime check). **Both fixed; regression tests added.** |
 | 2026-05-17 | Stage 7d | **1 bug.** High: MCP runner deadlocked on stderr pipe full (`stderr=PIPE` was never drained; cumulative stderr above the OS pipe buffer blocked the server's response on stdout, surfacing as a fake "timed out" error). **Fixed by routing stderr to `DEVNULL`** (the runner only reads stdout for JSON-RPC frames). |
