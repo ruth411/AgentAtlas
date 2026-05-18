@@ -1,0 +1,26 @@
+# Keep `docker build` context small and reproducible.
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/.ruff_cache
+**/.mypy_cache
+
+# Local virtualenvs and editor state.
+**/.venv
+**/.env
+**/.env.*
+.vscode/
+.idea/
+
+# Frontend artifacts — the image only ships the backend + CLI.
+frontend/node_modules/
+frontend/.next/
+
+# Local SQLite databases (re-seed inside the container instead).
+**/*.db
+**/*.db-journal
+
+# Build outputs.
+backend/**/*.egg-info/
+dist/
+build/

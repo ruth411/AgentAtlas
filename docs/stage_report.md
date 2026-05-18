@@ -28,6 +28,7 @@ It records what each stage proves, which artifacts satisfy the stage, what remai
 | Stage 10 | MCP Server (outbound) | pass |
 | Stage 11a | Seed Dataset (offline-safe replay) | pass |
 | Stage 11b | Demo Dashboard (Next.js) | pass |
+| Stage 12 | CLI + Docker (one-command install) | pass |
 
 ## Stage 0: Product Lock and Trust Contract
 
@@ -1224,6 +1225,113 @@ time dependency on the backend running at install time.
 - **Workflow browse + `safe-workflow` results display.** The API supports it; the demo flow doesn't need it yet.
 - **Live results-as-you-type in `/query`**. Currently submit-on-click. A debounced live mode would be a polish pass.
 
+## Stage 12: CLI + Docker (one-command install)
+
+Verdict: pass.
+
+Stage 12 is complete when a developer can `pip install` AgentAtlas and get
+one `agentatlas` binary on PATH that exposes the entire system — the API
+server, the MCP stdio bridge, seed/migrate, and the headline query — without
+remembering module paths or `uvicorn` flags. The same image runs unchanged
+under Docker. The CLI is intentionally a thin shell over the existing
+service layer; it ships zero new business logic.
+
+### Architecture
+
+Single-file argparse dispatcher at `backend/app/cli.py`. Heavy imports
+(`uvicorn`, `alembic`, the orchestrator stack) are local to each
+subcommand so `agentatlas --version` and `--help` start cold in a few
+hundred ms instead of pulling FastAPI's entire graph up front. `pyproject.toml`'s
+`[project.scripts]` table maps `agentatlas` → `app.cli:main`, so a `pip
+install` of the backend package drops the binary on PATH.
+
+Docker is a one-stage `python:3.11-slim` image with `agentatlas` as the
+entrypoint and `serve --host 0.0.0.0 --port 8000` as the default command;
+`docker run --rm -p 8000:8000 agentatlas` produces a working API, and
+`docker run --rm -i agentatlas mcp` switches the same image to MCP stdio
+mode for IDE integration. The build context is constrained by a
+`.dockerignore` that excludes virtualenvs, frontend artifacts, and local
+SQLite files.
+
+### Subcommand matrix
+
+| Subcommand | Wraps | Exit-code semantics |
+|---|---|---|
+| `serve` | `uvicorn.run("app.main:app", ...)` | 0 on clean shutdown |
+| `mcp` | `app.mcp_server.build_default_server().serve()` | 0 on EOF |
+| `seed` | `scripts/seed_examples.main(argv)` (loaded by path so the wheel doesn't need to bundle demo data) | 0 on success |
+| `migrate` | `alembic.command.upgrade(cfg, "head")` (locates `alembic.ini` by walking up from the package; override via `AGENTATLAS_ALEMBIC_INI`) | 0 on success; 1 if `alembic.ini` missing |
+| `query` | `QueryEngine.validate_command(...)` then pretty-prints `ALLOW`/`BLOCK` (or raw JSON with `--json`) | **0 on ALLOW, 2 on BLOCK** so shell pipelines can chain `agentatlas query ... && <act>` |
+| `verify` | `RuntimeVerificationService.verify(...)` | 0 if the runtime check passed (or was skipped); 1 if the claim id is unknown; 2 on runtime-check failure |
+| `tools` | `QueryEngine.search_tools(query="", limit=100)` | 0 |
+| `--version` | `argparse` action="version" | 0 |
+
+### Required Artifacts
+
+| Artifact | Purpose | Status |
+| --- | --- | --- |
+| `backend/app/cli.py` | argparse dispatcher with all seven subcommands; helpers (`_load_seed_module`, `_alembic_ini_path`) walk the source tree from the installed package. | complete |
+| `backend/pyproject.toml` (`[project.scripts]`) | Maps `agentatlas` → `app.cli:main`; project metadata bumped to MIT-licensed, classifiers + URLs added, `uvicorn[standard]` promoted from `[dev]` to runtime so `agentatlas serve` works after a plain `pip install`. | complete |
+| `Dockerfile` | Single-stage `python:3.11-slim`; copies `backend/`, `contracts/`, `data/`, `scripts/`, and `README.md`; installs the backend wheel; entrypoint is `agentatlas`; default cmd is `serve`. | complete |
+| `.dockerignore` | Trims build context: excludes `__pycache__`, `.venv`, frontend `node_modules`/`.next`, local SQLite files, egg-info. | complete |
+| `backend/tests/test_cli.py` | 19 tests covering every subcommand. Heavy entrypoints (`uvicorn.run`, `McpServer.serve`, `RuntimeVerificationService`, `alembic.command.upgrade`, the seed module) are stubbed at their import sites; CLI is exercised in-process via `main(argv=...)`. | complete |
+
+### Pass Cases
+
+| Pass case | Satisfied by |
+| --- | --- |
+| `agentatlas --version` prints the package version | `argparse` `action="version"` + `PACKAGE_VERSION` constant; `test_version_prints_and_exits_zero`. |
+| `agentatlas serve --host 0.0.0.0 --port 9999 --reload` wires all three flags through to uvicorn | `_cmd_serve` calls `uvicorn.run("app.main:app", host=..., port=..., reload=...)`; `test_serve_wires_uvicorn_arguments` verifies. |
+| `agentatlas mcp` runs the same stdio loop as `python -m app.mcp_server` | `_cmd_mcp` calls `build_default_server().serve()`; `test_mcp_subcommand_invokes_build_default_server`. |
+| `agentatlas seed --reset --database-url URL` produces a usable demo graph | `_cmd_seed` forwards both flags verbatim into `scripts/seed_examples.main`; `test_seed_forwards_reset_and_database_url`; smoke-tested end-to-end against a tmp SQLite DB. |
+| `agentatlas migrate` runs `alembic upgrade head` regardless of CWD | `_cmd_migrate` walks the source tree from `app/cli.py` to find `alembic.ini`, then `chdir`s into its directory so the ini's relative `script_location = alembic` keeps working. `test_migrate_invokes_alembic_upgrade_head`. |
+| `agentatlas query --tool ... --command ...` exits non-zero on BLOCK | `_cmd_query` returns 2 when `safe_to_auto_execute=False`; `test_query_block_returns_exit_code_two` + `test_query_allow_returns_exit_code_zero`. Smoke-tested against the seeded DB: `agentatlas query --tool github-cli --command 'gh repo delete my-org/x --yes'` returns `BLOCK risk=critical` with the matched claim id, verification level, and reasons. |
+| `agentatlas verify` returns non-zero when the runtime check failed | `_cmd_verify` returns 2 unless `runtime_check_passed or skipped`; 1 on `RuntimeVerificationError`; covered by three tests. |
+| `agentatlas tools` lists every published spec in a width-aligned table | `_cmd_tools` calls `search_tools(query="")` (empty query → list-all surface) and renders `tool_id  verification_level  name`; `test_tools_table_renders_published_specs`. |
+| `docker build -t agentatlas .` produces an image that runs `serve` by default | Dockerfile copies the runtime dependencies (backend, contracts, data, scripts, README), installs the wheel, and sets `ENTRYPOINT ["agentatlas"]` + `CMD ["serve", "--host", "0.0.0.0", "--port", "8000"]`. |
+
+### Quality Bar
+
+- **Zero new runtime dependencies.** `argparse` is in the stdlib. No `click`, no `typer`. The only new runtime dependency is `uvicorn[standard]` being promoted from `[dev]` so `serve` works after a plain install — it was already in the dev extras and is genuinely needed for `serve` to be useful.
+- **Lazy imports.** Each subcommand imports its heavy dependencies inside its handler. `--help` and `--version` don't load FastAPI/SQLAlchemy/etc.
+- **Shell-friendly exit codes.** `query` exits 0 on ALLOW, 2 on BLOCK so pipelines like `agentatlas query --tool ... --command 'rm -rf /' && do-thing` are safe by default. `verify` similarly distinguishes "runtime check failed" (2) from "claim id unknown" (1).
+- **Path-walking helpers, not hardcoded paths.** `_load_seed_module` and `_alembic_ini_path` walk up from `app/cli.py` looking for the source tree, and accept env-var overrides (`AGENTATLAS_SEED_SCRIPT`, `AGENTATLAS_ALEMBIC_INI`). Lets the CLI run from `pip install -e`, from a wheel, or from a Docker image regardless of CWD.
+- **In-process tests.** 19 CLI tests run in ~0.5s because every external dependency is stubbed at the import site. No subprocess-spawning for the unit tests; the seed-via-subprocess smoke is still covered by `test_seed_script.py`.
+- **No business logic moved into the CLI.** Every subcommand wraps an existing service class — `QueryEngine`, `RuntimeVerificationService`, `McpServer`, etc. — so the CLI can never disagree with the REST or MCP surfaces.
+
+### Deferred (Stage 14 and v1.1)
+
+- **Standalone `pip install agentatlas`.** The wheel currently bundles only the `app/` package. The 11 contract loaders in `app/services/*` resolve their JSON files relative to the source tree (`parents[3] / "contracts/..."`); the seed script reads `data/seed_artifacts/`. From a clean PyPI install neither of those directories exists. Bundling them as package data (and updating every loader to fall back to `importlib.resources`) is Stage 14's responsibility — it lands alongside the actual PyPI release. v1.0's two supported install paths are repo checkout + Docker, both of which work fully.
+- **PyPI publication.** The package is shaped for PyPI (name, classifiers, URLs, MIT license, console_script) but no upload pipeline is wired yet. Stage 14 ships that on top of the contract-bundling fix above.
+- **`agentatlas shell` REPL.** A multi-command interactive shell would be nicer for demos than per-subcommand invocations, but it's polish — not a v1 blocker.
+- **Native packaging.** Homebrew formula / `brew install agentatlas` is a Stage 14+ goal once a tagged release exists.
+- **Watch mode for `seed`.** Reseeding on artifact changes would help when the maintainer is editing `data/seed_artifacts/`. Not needed for end users.
+- **Auto-init schema on `serve`.** Today `agentatlas serve` against a fresh database fails on the first write because tables don't exist. Running `agentatlas migrate` first is required. An idempotent "create schema on first start" path would smooth the ergonomics; deferred to keep deployment behaviour predictable.
+
+### Bugs found and fixed during Stage 12
+
+Three real issues, plus one scope-correction triggered by the clean-venv
+smoke test:
+
+- **`SearchToolsResponse.matches` vs the draft's `tools`.** Initial draft of `_cmd_tools` would have crashed on first invocation. Caught while reading the schema; smoke test against the seeded DB confirmed the fix.
+- **`--database-url` not forwarded from `agentatlas seed` to the underlying script.** Initial draft only forwarded `--reset`. Caught by writing `test_seed_forwards_reset_and_database_url` first; the flag is now passed verbatim.
+- **`_load_seed_module`'s walk terminated at `README.md`** so adding `backend/README.md` (required for `pip install backend` to find a wheel-local README) silently broke the loader: the walk stopped at `backend/`, never found `scripts/seed_examples.py`, and the CLI's `seed` subcommand started failing from a checkout. Caught by `test_load_seed_module_finds_real_script` regressing after adding `backend/README.md`. Fixed by stopping the walk only at `.git` (the unambiguous repo-root signal).
+
+The clean-venv smoke also revealed a scope-level issue that v1.0 does
+**not** fix: 11 contract loaders in `app/services/*` resolve their JSON
+files via `Path(__file__).resolve().parents[3] / "contracts/..."`, which
+only works from a source-tree checkout. From a wheel install
+(`pip install /path/to/backend` into a fresh venv) the entire query
+engine crashes on first call with `FileNotFoundError` for
+`contracts/query_policy.v1.json`. **Fixing this requires bundling the
+contracts as package data and routing every loader through
+`importlib.resources` with a source-tree fallback** — substantial
+mechanical surgery across 11 services + tests + docs. Deferred to
+Stage 14 (where it lands alongside the actual PyPI release). v1.0's
+supported install paths are repo checkout and Docker, both of which
+work end-to-end; the README and "Deferred" section now state this
+explicitly.
+
 ## Validation
 
 The consolidated stage report is current only if these commands pass:
@@ -1242,9 +1350,9 @@ DATABASE_URL=sqlite:////tmp/agentatlas_smoke.db .venv/bin/alembic upgrade head
 
 ### Current results
 
-- **600 backend tests passing** (Stage 10+11 audit added 6 regression tests; Stage 11a added 10 tests; Stage 10 added 28 before that; Stage 9 added 96 before that; all audit fixes have regression coverage). Stage 11b adds frontend code only — no Python tests; `next build` verified to succeed.
+- **619 backend tests passing** (Stage 12 added 19 CLI tests; Stage 10+11 audit added 6 regression tests; Stage 11a added 10 tests; Stage 10 added 28 before that; Stage 9 added 96 before that; all audit fixes have regression coverage). Stage 11b adds frontend code only — no Python tests; `next build` verified to succeed.
 - ruff clean
-- alembic upgrade → downgrade → upgrade cycle clean through migration `0014_extend_artifact_type_for_sandbox` (Stages 9, 10, 11a, and 11b added no migrations — all are read/transport/scripting/UI layers over the existing graph)
+- alembic upgrade → downgrade → upgrade cycle clean through migration `0014_extend_artifact_type_for_sandbox` (Stages 9, 10, 11a, 11b, and 12 added no migrations — all are read/transport/scripting/UI/CLI layers over the existing graph)
 
 ### Audit log (one row per stage; most recent first)
 
@@ -1255,6 +1363,7 @@ subsection above.
 
 | Date | Stage | Bugs found and resolved |
 | --- | --- | --- |
+| 2026-05-18 | Stage 12 | **3 bugs + 1 scope correction.** (1) `SearchToolsResponse.matches` vs the draft's `tools` field name — caught while reading the schema before the first CLI test run. (2) `--database-url` not forwarded from `agentatlas seed` to the underlying script — caught by writing the forwarding test first. (3) `_load_seed_module`'s walk terminated at any `README.md`; adding `backend/README.md` silently broke the loader so `agentatlas seed` failed from a checkout. **Caught by `test_load_seed_module_finds_real_script` regressing after the smoke test forced the new `backend/README.md`.** Fixed by stopping the walk only at `.git`. (4) Scope correction: a clean-venv `pip install` revealed that 11 contract loaders use `parents[3]` paths that only resolve from a source-tree checkout — bundling contracts as package data is Stage 14's job, not Stage 12's. Honestly documented in README + "Deferred" block instead of papering over. 19 in-process CLI tests added; full suite 619 passing; end-to-end smoke verified for repo-checkout + Docker install paths. |
 | 2026-05-18 | Stages 10 + 11 (cross-stage audit) | **5 bugs.** (1) MCP dispatcher returned METHOD_NOT_FOUND for `notifications/*` methods sent with a stray `id` field; spec says these are notifications by method name regardless of id — fixed to silently ack. (2) `tools/call` with `arguments: []` (or other falsy non-dict) slipped through `or {}` and silently became an empty dict, crashing the tool handler downstream instead of returning a clean INVALID_PARAMS at the dispatcher. (3) `submit_claim`'s evidence-minimum pre-check fired before Pydantic validation, so a payload missing every required field returned the misleading "needs at least one piece of evidence" error instead of "missing required fields"; reordered. (4) Stage 11a: re-running `scripts/seed_examples.py` without `--reset` silently inserted duplicate claims AND degraded headline-scenario acceptance (orchestrator marks dups as PENDING/L1); the script now emits a loud warning when the DB already has rows. (5) Tool-handler return values weren't type-checked; a future handler returning a list / scalar / None would silently produce MCP `structuredContent` that violates the spec's "must be a JSON object" requirement; the dispatcher now rejects non-dict payloads with a clear `isError` message. **All five fixed; 6 regression tests added; 600 total passing. Frontend production build also verified (`next build` succeeds, all 5 pages compile, type-check passes).** |
 | 2026-05-18 | Stage 10 | **1 minor bug.** Documentation-vs-reality gap: `submit_claim`'s `inputSchema` declared `minItems: 1` for evidence but the handler didn't enforce it, so empty-evidence claims were accepted by the MCP boundary and only flagged PENDING downstream by the orchestrator's "no evidence" reason. **Fixed** with an explicit pre-check in the handler that matches the schema's declared minimum; regression test added. |
 | 2026-05-18 | Stage 9 | **9 bugs.** Critical: matcher hid most ingestion-pipeline output (single-evidence PENDING / REQUIRES_HUMAN_REVIEW claims were invisible to validate-command). Medium: three contract-↔-code drift risks (band thresholds, reason-text keys, route/schema hardcoded limits); contract validator gap on positive search-limit values; path-param vs body-param 422 vs 404 inconsistency; 500-claim silent-drop in matcher pagination. Performance: N+1 verification lookup. API ergonomics: `Literal["unknown"]` sentinel replaced with `null`. **All fixed with regression tests.** |

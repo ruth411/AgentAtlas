@@ -7,10 +7,10 @@
 *Wikipedia tells humans what things are. AgentAtlas tells AI agents what tools can do, how to use them, and whether they're safe.*
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
-[![Tests](https://img.shields.io/badge/tests-600%20passing-brightgreen.svg)](#validation)
+[![Tests](https://img.shields.io/badge/tests-619%20passing-brightgreen.svg)](#validation)
 [![Ruff](https://img.shields.io/badge/lint-ruff%20clean-success.svg)](https://docs.astral.sh/ruff/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
-[![Stage](https://img.shields.io/badge/stage-10%20complete-blueviolet.svg)](docs/stage_report.md)
+[![Stage](https://img.shields.io/badge/stage-12%20complete-blueviolet.svg)](docs/stage_report.md)
 
 </div>
 
@@ -115,21 +115,55 @@ Six ingestion lanes pull evidence from trusted sources. A deterministic orchestr
 
 ## Quick Start
 
+Two supported install paths for v1.0: a repo checkout (recommended for
+development and the demo), and a Docker image (bundles everything,
+recommended for running the API in front of an MCP client).
+
+**From a checkout:**
+
 ```bash
-# 1. Clone and set up
+# 1. Clone and install — drops an `agentatlas` binary on PATH
 git clone https://github.com/<your-username>/agentatlas.git
 cd agentatlas
 python3.12 -m venv backend/.venv
-backend/.venv/bin/python -m pip install -e 'backend[dev]'
+source backend/.venv/bin/activate
+pip install -e 'backend[dev]'
 
 # 2. Seed the demo graph (one command, ~5 seconds, offline-safe)
-backend/.venv/bin/python scripts/seed_examples.py --reset
+agentatlas seed --reset
 
 # 3. Start the API
-cd backend && .venv/bin/uvicorn app.main:app --reload
+agentatlas serve --reload
 ```
 
 API is live at `http://localhost:8000` with OpenAPI docs at `/docs`.
+
+**With Docker** (image bundles the seed data, contracts, and CLI):
+
+```bash
+docker build -t agentatlas .
+docker run --rm -p 8000:8000 agentatlas              # serve the API
+docker run --rm -i agentatlas mcp                    # MCP stdio bridge
+```
+
+> **Note:** A standalone `pip install agentatlas` from PyPI is not yet
+> supported — the contracts (`contracts/*.v1.json`) and seed data
+> (`data/seed_artifacts/`) live in the repo, not the wheel. Bundling
+> them as package data lands with Stage 14 alongside the first PyPI
+> release.
+
+### CLI quick reference
+
+| Command | Purpose |
+|---|---|
+| `agentatlas serve [--host --port --reload]` | Run the FastAPI app under uvicorn |
+| `agentatlas mcp` | Speak MCP/JSON-RPC over stdio (for Claude Desktop) |
+| `agentatlas seed [--reset --database-url URL]` | Replay `data/seed_artifacts/` into the DB |
+| `agentatlas migrate [--database-url URL]` | `alembic upgrade head` |
+| `agentatlas query --tool ID --command STR [--json]` | Ask the engine if a command is safe (exits 0 on ALLOW, 2 on BLOCK) |
+| `agentatlas verify --claim-id ID` | Run the runtime verifier; promote L2 → L3 when it passes |
+| `agentatlas tools [--json]` | List every published tool spec |
+| `agentatlas --version` | Print the package version |
 
 A fresh checkout is now populated with **47 claims** spanning 5 tools (`git`,
 `github-cli`, `docker`, `vercel-cli`, `openai-api`). The demo's headline
@@ -230,6 +264,7 @@ These are non-negotiable. They're tested.
 | 10 — MCP server wrapper | Expose all 6 query / write tools to Claude Desktop / Cursor over stdio JSON-RPC | ✓ |
 | 11a — Seed dataset | `scripts/seed_examples.py` replays pre-captured artifacts; ~47 claims across 5 tools | ✓ |
 | 11b — Demo dashboard | Minimal Next.js UI: landing + tools list + tool detail + query playground | ✓ |
+| 12 — CLI + Docker | One `agentatlas` binary on PATH (`serve`, `mcp`, `seed`, `migrate`, `query`, `verify`, `tools`) plus a one-stage Dockerfile | ✓ |
 
 See [docs/stage_report.md](docs/stage_report.md) for the full per-stage report including required artifacts, pass-case audit, quality bar, audit log, and what each stage explicitly defers.
 
@@ -246,7 +281,7 @@ agentatlas/
 │   │   ├── db/              # SQLAlchemy 2.0 models + session
 │   │   └── main.py          # FastAPI app + middleware (body size guard, structured errors)
 │   ├── alembic/             # Migrations (drift-locked against models)
-│   └── tests/               # 600 tests; ruff clean; hermetic
+│   └── tests/               # 619 tests; ruff clean; hermetic
 ├── frontend/                # Stage 11b: Next.js demo dashboard (4 pages)
 ├── data/seed_artifacts/     # Stage 11a: pre-captured artifacts for offline-safe seeding
 ├── scripts/                 # seed_examples.py and other operator tools
@@ -320,30 +355,30 @@ AgentAtlas ships with a built-in MCP server that exposes the query surface plus 
 **Run the MCP server directly**
 
 ```bash
-cd backend
-.venv/bin/python -m app.mcp_server
+agentatlas mcp
 ```
 
 It speaks JSON-RPC over stdio. Closing stdin (Ctrl-D) exits cleanly.
 
 **Wire it into Claude Desktop**
 
-Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) — adjust paths for your machine:
+Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS):
 
 ```json
 {
   "mcpServers": {
     "agentatlas": {
-      "command": "/absolute/path/to/AgentAtlas/backend/.venv/bin/python",
-      "args": ["-m", "app.mcp_server"],
+      "command": "/absolute/path/to/agentatlas",
+      "args": ["mcp"],
       "env": {
-        "PYTHONPATH": "/absolute/path/to/AgentAtlas/backend",
         "AGENTATLAS_DATABASE_URL": "sqlite:////absolute/path/to/agentatlas.db"
       }
     }
   }
 }
 ```
+
+(Run `which agentatlas` inside the activated venv to get the absolute path.)
 
 Restart Claude Desktop. The 6 AgentAtlas tools will appear in the tool list. Ask Claude `"Is it safe to run gh repo delete?"` and the verdict comes back inline with cited evidence.
 
@@ -361,7 +396,7 @@ Restart Claude Desktop. The 6 AgentAtlas tools will appear in the tool list. Ask
 ```bash
 cd backend
 
-# Test suite (600 tests, hermetic, ~30s)
+# Test suite (619 tests, hermetic, ~30s)
 .venv/bin/python -m pytest -q
 
 # Lint
@@ -385,12 +420,9 @@ DATABASE_URL=sqlite:////tmp/agentatlas-smoke.db .venv/bin/alembic upgrade head
 
 Being honest about the gaps:
 
-- **Now exposed as an MCP server (Stage 10 shipped).** AgentAtlas can both *read* MCP servers (Stage 7d) AND *be* an MCP server (Stage 10). See the MCP Integration section above for Claude Desktop / Cursor setup.
-- **No dashboard yet.** All interaction is via REST API. Demo UI is planned for Stage 11.
-- **No seed dataset.** A fresh install is empty until you ingest. A `scripts/seed_examples.py` is planned.
 - **Stage 0 scope is narrow.** Initial tool coverage: `git`, `github-cli`, `docker`, `vercel-cli`, `openai-api` plus 5 MCP servers. Adding tools is a contract change, not code.
-
-The v1.0 plan is in [docs/v1_plan.md](docs/v1_plan.md) (coming next).
+- **No published PyPI release yet.** Install from source (`pip install -e backend`) or Docker. Wheel bundling for contracts + seed data + the PyPI release itself land with Stage 14.
+- **No CI workflow yet.** Tests + lint run locally; GitHub Actions wiring is part of Stage 14.
 
 ## Documentation
 
