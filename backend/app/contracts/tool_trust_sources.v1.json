@@ -1,0 +1,180 @@
+{
+  "version": 1,
+  "package_registry_hosts": [
+    "pkg.go.dev",
+    "pypi.org",
+    "registry.npmjs.org",
+    "rubygems.org",
+    "www.npmjs.com"
+  ],
+  "local_capture_schemes": [
+    "file",
+    "local"
+  ],
+  "atlas_capture_schemes": [
+    "agentatlas"
+  ],
+  "schema_aggregator_hosts": {
+    "json_schema": [
+      "json.schemastore.org",
+      "schemastore.org",
+      "www.schemastore.org"
+    ]
+  },
+  "tools": {
+    "docker": {
+      "official_hosts": [
+        "docs.docker.com"
+      ],
+      "source_repositories": [
+        {
+          "host": "github.com",
+          "path": "/docker/cli"
+        },
+        {
+          "host": "github.com",
+          "path": "/moby/moby"
+        }
+      ]
+    },
+    "gh": {
+      "official_hosts": [
+        "cli.github.com",
+        "docs.github.com"
+      ],
+      "source_repositories": [
+        {
+          "host": "github.com",
+          "path": "/cli/cli"
+        }
+      ]
+    },
+    "git": {
+      "official_hosts": [
+        "git-scm.com",
+        "kernel.org",
+        "www.kernel.org"
+      ],
+      "source_repositories": [
+        {
+          "host": "github.com",
+          "path": "/git/git"
+        }
+      ]
+    },
+    "github-cli": {
+      "official_hosts": [
+        "cli.github.com",
+        "docs.github.com"
+      ],
+      "source_repositories": [
+        {
+          "host": "github.com",
+          "path": "/cli/cli"
+        }
+      ]
+    },
+    "openai-api": {
+      "official_hosts": [
+        "api.openai.com",
+        "platform.openai.com"
+      ],
+      "source_repositories": [
+        {
+          "host": "github.com",
+          "path": "/openai/openai-openapi"
+        }
+      ]
+    },
+    "vercel": {
+      "official_hosts": [
+        "vercel.com"
+      ],
+      "source_repositories": [
+        {
+          "host": "github.com",
+          "path": "/vercel/vercel"
+        }
+      ]
+    },
+    "vercel-cli": {
+      "official_hosts": [
+        "vercel.com"
+      ],
+      "source_repositories": [
+        {
+          "host": "github.com",
+          "path": "/vercel/vercel"
+        }
+      ]
+    },
+    "mcp-filesystem": {
+      "official_hosts": [
+        "raw.githubusercontent.com",
+        "github.com",
+        "modelcontextprotocol.io"
+      ],
+      "source_repositories": [
+        {
+          "host": "github.com",
+          "path": "/modelcontextprotocol/servers"
+        }
+      ],
+      "mcp_publisher": "anthropic"
+    },
+    "mcp-fetch": {
+      "official_hosts": [
+        "raw.githubusercontent.com",
+        "github.com",
+        "modelcontextprotocol.io"
+      ],
+      "source_repositories": [
+        {
+          "host": "github.com",
+          "path": "/modelcontextprotocol/servers"
+        }
+      ],
+      "mcp_publisher": "anthropic"
+    },
+    "mcp-git": {
+      "official_hosts": [
+        "raw.githubusercontent.com",
+        "github.com",
+        "modelcontextprotocol.io"
+      ],
+      "source_repositories": [
+        {
+          "host": "github.com",
+          "path": "/modelcontextprotocol/servers"
+        }
+      ],
+      "mcp_publisher": "anthropic"
+    },
+    "mcp-slack": {
+      "official_hosts": [
+        "raw.githubusercontent.com",
+        "github.com"
+      ],
+      "source_repositories": [
+        {
+          "host": "github.com",
+          "path": "/modelcontextprotocol/servers-archived"
+        }
+      ],
+      "mcp_publisher": "third-party"
+    },
+    "mcp-postgres": {
+      "official_hosts": [
+        "raw.githubusercontent.com",
+        "github.com"
+      ],
+      "source_repositories": [
+        {
+          "host": "github.com",
+          "path": "/modelcontextprotocol/servers-archived"
+        }
+      ],
+      "mcp_publisher": "third-party"
+    }
+  }
+}

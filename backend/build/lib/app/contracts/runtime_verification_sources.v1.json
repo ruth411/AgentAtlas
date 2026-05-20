@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "default_timeout_seconds": 10,
+  "default_max_bytes": 65536,
+  "max_concurrent_runs": 1,
+  "allowed_commands": [
+    "git",
+    "gh",
+    "docker",
+    "vercel",
+    "npx",
+    "uvx"
+  ],
+  "tool_existence_check": {
+    "git": {"command": "git", "argv": ["--version"]},
+    "github-cli": {"command": "gh", "argv": ["--version"]},
+    "docker": {"command": "docker", "argv": ["--version"]},
+    "vercel-cli": {"command": "vercel", "argv": ["--version"]}
+  },
+  "cli_command_help_check": {
+    "git": {"command": "git", "argv_template": ["help", "{subcommand}"]},
+    "github-cli": {"command": "gh", "argv_template": ["{subcommand}", "--help"]},
+    "docker": {"command": "docker", "argv_template": ["{subcommand}", "--help"]},
+    "vercel-cli": {"command": "vercel", "argv_template": ["{subcommand}", "--help"]}
+  },
+  "api_endpoint_check": {
+    "method": "HEAD",
+    "timeout_seconds": 5,
+    "max_redirects": 3,
+    "accepted_status_codes": [200, 204, 301, 302, 307, 308, 401, 403, 404, 405, 415]
+  },
+  "mcp_tool_check": {
+    "reuse_mcp_ingestion_contract": true
+  },
+  "supported_claim_types": [
+    "tool_exists",
+    "cli_command_exists",
+    "cli_flag_exists",
+    "api_endpoint_exists",
+    "mcp_tool_exists"
+  ]
+}

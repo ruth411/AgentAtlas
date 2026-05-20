@@ -5,7 +5,6 @@ from datetime import datetime, timezone
 from functools import cache
 from hashlib import sha256
 import json
-from pathlib import Path
 from typing import Any
 
 from sqlalchemy import Engine, Select, delete, select
@@ -53,6 +52,7 @@ from app.schemas.risk import RiskAssessment
 from app.schemas.tool_spec import ToolSpec
 from app.schemas.verification import VerificationResult
 from app.schemas.workflow_spec import WorkflowSpec
+from app.services.contract_paths import contract_path
 from app.services.evidence_policy import evidence_policy_violations
 from app.services.evidence_trust import normalize_claim_evidence_trust
 
@@ -66,7 +66,7 @@ def _stage_0_tool_ids() -> frozenset[str]:
     separate arrays in the contract preserves the auditable distinction
     between the original native-ingestion scope and the MCP-proxy scope while
     allowing claims for either kind of tool to clear the gate."""
-    path = Path(__file__).resolve().parents[3] / "contracts/agentatlas_stage_0.v1.json"
+    path = contract_path("agentatlas_stage_0.v1.json")
     with path.open() as handle:
         data = json.load(handle)
     native = {tool["tool_id"] for tool in data["initial_tools"]}

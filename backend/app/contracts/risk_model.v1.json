@@ -1,0 +1,199 @@
+{
+  "version": 1,
+  "dimensions": [
+    "read_only",
+    "local_mutation",
+    "remote_mutation",
+    "destructive",
+    "auth_sensitive",
+    "secret_exposure",
+    "cost_incurring",
+    "production",
+    "filesystem",
+    "unknown"
+  ],
+  "fallback": {
+    "risk_level": "medium",
+    "dimensions": ["unknown"],
+    "reason": "No explicit risk rule matched; require confirmation until the action is classified."
+  },
+  "universal": [
+    {
+      "id": "u.rm_rf",
+      "pattern": "(?i)(?:^|\\s)rm(?:\\s+-[^\\s]+)*\\s+(?:-[^\\s]*r[^\\s]*f[^\\s]*|-[^\\s]*f[^\\s]*r[^\\s]*|-r\\s+-f|-f\\s+-r)\\b",
+      "risk": "critical",
+      "dimensions": ["destructive", "filesystem"],
+      "reason": "Recursive force removal can irreversibly delete local files."
+    },
+    {
+      "id": "u.drop_table_or_db",
+      "pattern": "(?i)\\bdrop\\s+(?:database|table)\\b",
+      "risk": "critical",
+      "dimensions": ["destructive", "remote_mutation"],
+      "reason": "Dropping databases or tables can irreversibly destroy persisted data."
+    },
+    {
+      "id": "u.terraform_destroy",
+      "pattern": "(?i)(?:^|\\s)terraform\\s+destroy\\b",
+      "risk": "critical",
+      "dimensions": ["destructive", "remote_mutation", "cost_incurring"],
+      "reason": "Terraform destroy tears down managed infrastructure."
+    },
+    {
+      "id": "u.kubectl_delete",
+      "pattern": "(?i)(?:^|\\s)kubectl\\s+delete\\b",
+      "risk": "critical",
+      "dimensions": ["destructive", "remote_mutation", "production"],
+      "reason": "kubectl delete removes Kubernetes resources and can affect production workloads."
+    },
+    {
+      "id": "u.force_flag",
+      "pattern": "(?i)(?:^|\\s)--force(?:\\s|$)|\\bforce-with-lease\\b",
+      "risk": "critical",
+      "dimensions": ["destructive"],
+      "reason": "Force flags bypass normal safety checks."
+    },
+    {
+      "id": "u.secret_or_token",
+      "pattern": "(?i)\\b(?:secret|secrets|token|tokens|api[_-]?key)\\b",
+      "risk": "high",
+      "dimensions": ["auth_sensitive", "secret_exposure"],
+      "reason": "The action references secrets, tokens, or API keys."
+    }
+  ],
+  "tools": {
+    "git": [
+      {
+        "id": "git.status",
+        "pattern": "(?i)(?:^|\\s)git\\s+status\\b",
+        "risk": "low",
+        "dimensions": ["read_only"],
+        "reason": "git status is read-only working tree inspection."
+      },
+      {
+        "id": "git.log",
+        "pattern": "(?i)(?:^|\\s)git\\s+log\\b",
+        "risk": "low",
+        "dimensions": ["read_only"],
+        "reason": "git log is read-only repository history inspection."
+      },
+      {
+        "id": "git.branch_list",
+        "pattern": "(?i)(?:^|\\s)git\\s+branch(?:\\s+(?:--list|-a|--all))?(?:\\s|$)",
+        "risk": "low",
+        "dimensions": ["read_only"],
+        "reason": "Listing branches is read-only."
+      },
+      {
+        "id": "git.checkout_new_branch",
+        "pattern": "(?i)(?:^|\\s)git\\s+checkout\\s+-b\\b",
+        "risk": "medium",
+        "dimensions": ["local_mutation"],
+        "reason": "Creating or switching branches mutates local repository state."
+      },
+      {
+        "id": "git.push",
+        "pattern": "(?i)(?:^|\\s)git\\s+push\\b",
+        "risk": "high",
+        "dimensions": ["remote_mutation", "auth_sensitive"],
+        "reason": "git push mutates a remote repository."
+      },
+      {
+        "id": "git.reset_hard",
+        "pattern": "(?i)(?:^|\\s)git\\s+reset\\s+--hard\\b",
+        "risk": "critical",
+        "dimensions": ["destructive", "filesystem"],
+        "reason": "git reset --hard discards local working tree changes."
+      }
+    ],
+    "github-cli": [
+      {
+        "id": "gh.repo_delete",
+        "pattern": "(?i)(?:^|\\s)gh\\s+repo\\s+delete\\b",
+        "risk": "critical",
+        "dimensions": ["destructive", "remote_mutation", "auth_sensitive"],
+        "reason": "Deleting a GitHub repository is an irreversible remote mutation."
+      },
+      {
+        "id": "gh.repo_create",
+        "pattern": "(?i)(?:^|\\s)gh\\s+repo\\s+create\\b",
+        "risk": "high",
+        "dimensions": ["remote_mutation", "auth_sensitive"],
+        "reason": "Creating a GitHub repository mutates remote account state."
+      },
+      {
+        "id": "gh.help",
+        "pattern": "(?i)(?:^|\\s)gh(?:\\s+[^\\n]*)?\\s+(?:--help|help)\\b",
+        "risk": "low",
+        "dimensions": ["read_only"],
+        "reason": "GitHub CLI help output is read-only."
+      }
+    ],
+    "gh": [
+      {
+        "id": "gh.alias_repo_delete",
+        "pattern": "(?i)(?:^|\\s)gh\\s+repo\\s+delete\\b",
+        "risk": "critical",
+        "dimensions": ["destructive", "remote_mutation", "auth_sensitive"],
+        "reason": "Deleting a GitHub repository is an irreversible remote mutation."
+      }
+    ],
+    "docker": [
+      {
+        "id": "docker.system_prune",
+        "pattern": "(?i)(?:^|\\s)docker\\s+system\\s+prune\\b",
+        "risk": "critical",
+        "dimensions": ["destructive", "local_mutation"],
+        "reason": "Docker system prune deletes local containers, images, networks, and cache."
+      },
+      {
+        "id": "docker.run_help",
+        "pattern": "(?i)(?:^|\\s)docker\\s+run\\s+--help\\b",
+        "risk": "low",
+        "dimensions": ["read_only"],
+        "reason": "docker run --help reads CLI documentation only."
+      },
+      {
+        "id": "docker.run",
+        "pattern": "(?i)(?:^|\\s)docker\\s+run\\b(?![^\\n]*--help\\b)",
+        "risk": "medium",
+        "dimensions": ["local_mutation"],
+        "reason": "docker run creates a local container process."
+      }
+    ],
+    "vercel-cli": [
+      {
+        "id": "vercel.prod",
+        "pattern": "(?i)(?:^|\\s)vercel(?:\\s+deploy)?(?:\\s+[^\\n]*)?\\s+--prod(?:\\s|$)",
+        "risk": "high",
+        "dimensions": ["remote_mutation", "production", "cost_incurring"],
+        "reason": "A production deployment mutates remote production state and may incur cost."
+      },
+      {
+        "id": "vercel.preview",
+        "pattern": "(?i)(?:^|\\s)vercel(?![^\\n]*\\s--prod(?:\\s|$))(?:\\s+deploy)?(?:\\s|$)",
+        "risk": "medium",
+        "dimensions": ["remote_mutation", "cost_incurring"],
+        "reason": "A preview deployment mutates remote deployment state and may incur cost."
+      }
+    ],
+    "vercel": [
+      {
+        "id": "vercel.alias_prod",
+        "pattern": "(?i)(?:^|\\s)vercel(?:\\s+deploy)?(?:\\s+[^\\n]*)?\\s+--prod(?:\\s|$)",
+        "risk": "high",
+        "dimensions": ["remote_mutation", "production", "cost_incurring"],
+        "reason": "A production deployment mutates remote production state and may incur cost."
+      }
+    ],
+    "openai-api": [
+      {
+        "id": "openai.model_call",
+        "pattern": "(?i)(?:\\b(?:openai|api\\.openai\\.com|chat\\.completions|responses?)\\b[^\\n]*\\b(?:call|invoke|request|completion|model|endpoint)\\b|\\b(?:call|invoke|request|completion)\\b[^\\n]*\\b(?:openai|api\\.openai\\.com|chat\\.completions|responses?)\\b)",
+        "risk": "medium",
+        "dimensions": ["auth_sensitive", "cost_incurring"],
+        "reason": "OpenAI API calls require credentials and may incur usage cost."
+      }
+    ]
+  }
+}

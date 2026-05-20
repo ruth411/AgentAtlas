@@ -49,6 +49,8 @@ class ApiErrorResponse(BaseModel):
 
 
 ERROR_RESPONSES = {
+    401: {"model": ApiErrorResponse},
+    403: {"model": ApiErrorResponse},
     404: {"model": ApiErrorResponse},
     409: {"model": ApiErrorResponse},
     413: {"model": ApiErrorResponse},

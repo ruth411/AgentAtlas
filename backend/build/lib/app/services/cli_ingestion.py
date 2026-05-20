@@ -25,6 +25,7 @@ from app.schemas.ingestion import (
     IngestionRun,
     RawIngestionArtifact,
 )
+from app.services.contract_paths import contract_path
 from app.services.claim_store import (
     ClaimStore,
     DuplicateClaimError,
@@ -42,7 +43,7 @@ from app.services.orchestrator import CanonOrchestrator
 from app.services.risk_classifier import classify_action
 
 
-_INGESTION_CONTRACT = Path(__file__).resolve().parents[3] / "contracts/cli_ingestion_sources.v1.json"
+_INGESTION_CONTRACT = contract_path("cli_ingestion_sources.v1.json")
 _READ_ONLY_MARKERS = frozenset({"--help", "-h", "--version", "help"})
 # Shell metacharacters and control bytes that must never appear inside any argv element.
 # Matching is element-wise substring containment because a single argv string of the form

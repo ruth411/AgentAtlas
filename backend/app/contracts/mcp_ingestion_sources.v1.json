@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "default_timeout_seconds": 30,
+  "default_max_bytes": 1048576,
+  "default_cache_ttl_seconds": 3600,
+  "max_tools_per_server": 200,
+  "protocol_version": "2024-11-05",
+  "destructive_tool_name_prefixes": [
+    "delete",
+    "destroy",
+    "drop",
+    "purge",
+    "remove",
+    "revoke",
+    "wipe"
+  ],
+  "servers": {
+    "mcp-filesystem": {
+      "tool_id": "mcp-filesystem",
+      "command": "npx",
+      "argv": ["-y", "@modelcontextprotocol/server-filesystem", "{sandbox_dir}"],
+      "publisher": "anthropic",
+      "package_uri": "npm:@modelcontextprotocol/server-filesystem",
+      "default_sandbox_dir": "/tmp/agentatlas-mcp-filesystem"
+    },
+    "mcp-fetch": {
+      "tool_id": "mcp-fetch",
+      "command": "uvx",
+      "argv": ["mcp-server-fetch"],
+      "publisher": "anthropic",
+      "package_uri": "pypi:mcp-server-fetch"
+    },
+    "mcp-git": {
+      "tool_id": "mcp-git",
+      "command": "uvx",
+      "argv": ["mcp-server-git", "--repository", "{sandbox_dir}"],
+      "publisher": "anthropic",
+      "package_uri": "pypi:mcp-server-git",
+      "default_sandbox_dir": "/tmp/agentatlas-mcp-git"
+    },
+    "mcp-slack": {
+      "tool_id": "mcp-slack",
+      "command": "npx",
+      "argv": ["-y", "@modelcontextprotocol/server-slack"],
+      "publisher": "third-party",
+      "package_uri": "npm:@modelcontextprotocol/server-slack"
+    },
+    "mcp-postgres": {
+      "tool_id": "mcp-postgres",
+      "command": "npx",
+      "argv": ["-y", "@modelcontextprotocol/server-postgres", "{database_url}"],
+      "publisher": "third-party",
+      "package_uri": "npm:@modelcontextprotocol/server-postgres"
+    }
+  },
+  "allowed_commands": ["npx", "uvx"],
+  "allowed_template_placeholders": ["{sandbox_dir}", "{database_url}"]
+}

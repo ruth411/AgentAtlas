@@ -77,13 +77,11 @@ from app.services.ids import (
     generate_ingestion_artifact_id,
     generate_ingestion_run_id,
 )
+from app.services.contract_paths import contract_path
 from app.services.orchestrator import CanonOrchestrator
 
 
-_GRAPHQL_CONTRACT = (
-    Path(__file__).resolve().parents[3]
-    / "contracts/graphql_ingestion_sources.v1.json"
-)
+_GRAPHQL_CONTRACT = contract_path("graphql_ingestion_sources.v1.json")
 
 _STATEMENT_MAX_CHARS = 480
 _SUBJECT_MAX_CHARS = 512

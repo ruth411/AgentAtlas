@@ -30,6 +30,7 @@ It records what each stage proves, which artifacts satisfy the stage, what remai
 | Stage 11b | Demo Dashboard (Next.js) | pass |
 | Stage 12 | CLI + Docker (one-command install) | pass |
 | Stage 13 | Human Review and Auditability | pass |
+| Stage 14 | Hardening (wheel-bundling, versioning, observability, auth, CI) | pass |
 
 ## Stage 0: Product Lock and Trust Contract
 
@@ -1442,6 +1443,134 @@ Two issues, both caught during implementation before any code shipped:
 - **Audit event details referenced spec fields that don't exist on `ToolSpec`/`WorkflowSpec`.** First draft of `save_canonical_tool_spec` accessed `spec.compiled_by`, `spec.spec_hash`, and `spec.source_claim_ids` directly — these live under `spec.provenance` and `spec.spec_hash` is computed by the record helper, not the spec. Caught when the full pytest suite surfaced 32 failures in the canonical-route tests; fixed by reading from `spec.provenance.*` and using `record.spec_hash` from the already-built record.
 - **`ConfidenceBreakdown.band` expects an enum, not a string.** `_band_for_score` initially returned `ConfidenceBand.NONE.value`; Pydantic's `model_copy` doesn't validate updates, which would have stored the string instead of the enum and silently broken downstream consumers. Caught while reading the schema; switched to returning the enum directly.
 
+## Stage 14: Hardening
+
+Verdict: pass.
+
+Stage 14 is the durability pass. It closes every gap that stood between
+"works on the maintainer's machine" and "a stranger can `pip install`
+and run it in production." Concretely it ships:
+
+- **Wheel-bundled core data.** Trust contracts (`contracts/*.v1.json`),
+  seed artifacts (`data/seed_artifacts/`), and alembic migrations all
+  ship inside the wheel as package data. Loaders use a two-step
+  strategy — source-tree first (devs see live edits), package-bundled
+  fallback (wheel installs work standalone). A `make_alembic_config()`
+  resolver builds the config programmatically when no `alembic.ini` is
+  visible. Lockstep tests (`test_bundled_contracts_in_sync.py`,
+  `test_bundled_seed_in_sync.py`, `test_bundled_alembic_in_sync.py`)
+  fail when the bundled copy drifts from the canonical files.
+- **API versioning.** Every router is dual-mounted: canonical paths at
+  `/v1/<route>`, legacy paths at `<route>` for one transition release.
+  A `LegacyDeprecationHeaderMiddleware` stamps `Deprecation: true`,
+  `Sunset`, and `Link: …; rel="successor-version"` headers on every
+  legacy response (RFC 8594). Health endpoints stay un-versioned.
+- **Observability.** `RequestObservabilityMiddleware` mints an
+  `X-Request-ID` per request (or echoes the client-supplied one),
+  emits one structured JSON log line per request on the
+  `agentatlas.request` logger (`{event, request_id, method, path,
+  status_code, duration_ms, client_host}`), and tags 5xx responses
+  with the exception type for triage. `current_request_id()` is
+  exposed as a contextvar so deeper layers can attach the same id to
+  audit events or error reports.
+- **Optional API-key auth.** `AGENTATLAS_API_KEY` env var. Off by
+  default. When set: writes (POST / PUT / PATCH / DELETE) require
+  `Authorization: Bearer <key>`; reads stay public; health stays
+  public; token comparison is timing-safe via `hmac.compare_digest`.
+- **Reviewer registry.** `AGENTATLAS_REVIEWER_REGISTRY` (comma-separated)
+  gates `POST /verification/human-review` to listed `reviewer_id`s.
+  Unset = open (dev default).
+- **Auto-migrate on serve.** `agentatlas serve` runs
+  `alembic upgrade head` before booting uvicorn; idempotent against
+  already-up-to-date DBs. `--no-migrate` opts out for production
+  deployments that manage migrations out of band.
+- **Publication isolation.** A dedicated test
+  (`test_publication_isolation.py`) pins the invariant that a failing
+  ingestion lane never corrupts the store: the store stays queryable,
+  no orphan claims persist, and a subsequent lane invocation against
+  the same store succeeds cleanly.
+- **Postgres dialect smoke.** `test_postgres_dialect_smoke.py` asserts
+  every table's DDL compiles under the postgresql dialect AND that
+  the full alembic migration chain renders cleanly in offline mode
+  against `postgresql+psycopg://noop`. No live Postgres required.
+- **CI workflow.** `.github/workflows/ci.yml` runs pytest + ruff on
+  Python 3.11 and 3.12, the migration up/down/up roundtrip, the
+  clean-venv wheel install smoke, AND `next build` for the frontend.
+- **Release artifacts.** `LICENSE` (MIT, full text), `CONTRIBUTING.md`
+  (ground rules, PR checklist, code style), `SECURITY.md` (RFC-style
+  disclosure path, 72h ack / 7d update / 30d fix targets).
+- **Alembic logging compatibility fix.** `env.py` now calls
+  `fileConfig(..., disable_existing_loggers=False)` so the
+  `agentatlas.request` logger stays usable in test suites that
+  exercise migrations before exercising the FastAPI app.
+
+### Required Artifacts
+
+| Artifact | Purpose | Status |
+| --- | --- | --- |
+| `backend/app/contracts/*.json` | Wheel-bundled copy of every locked trust contract. | complete |
+| `backend/app/services/contract_paths.py` | Source-tree-first / package-bundled fallback resolver used by all 11 service loaders. | complete |
+| `backend/app/seed_data/__init__.py` + `runner.py` + `artifacts/**/*.json` | In-package seed runner that ships with the wheel; `scripts/seed_examples.py` becomes a thin shim. | complete |
+| `backend/app/_alembic/` (env.py + versions/) + `backend/app/services/alembic_config.py` | Bundled migrations + unified `make_alembic_config()` resolver shared by `agentatlas migrate`, `seed --reset`, and `serve` auto-init. | complete |
+| `backend/pyproject.toml` `[tool.setuptools.package-data]` | Includes `app.contracts`, `app.seed_data`, and `app._alembic` in the wheel. | complete |
+| `backend/app/observability.py` | Request-id middleware + structured-log emitter + `current_request_id()` contextvar. | complete |
+| `backend/app/auth.py` | `ApiKeyAuthMiddleware` + `reviewer_allowed()` helper + `configured_api_key()` / `configured_reviewers()`. | complete |
+| `backend/app/main.py` middleware stack | Adds `LegacyDeprecationHeaderMiddleware`, `ApiKeyAuthMiddleware`, `RequestObservabilityMiddleware`; dual-mounts every router under `/v1/` and at root. | complete |
+| `backend/app/cli.py` `_cmd_serve` + `_auto_migrate` | Auto-applies migrations on startup; `--no-migrate` opts out. | complete |
+| `.github/workflows/ci.yml` | pytest + ruff on Python 3.11 / 3.12, migration roundtrip, clean-venv wheel install smoke, `next build` for the frontend. | complete |
+| `LICENSE` | MIT, full text, year 2026, "AgentAtlas contributors" copyright holder. | complete |
+| `CONTRIBUTING.md` | Ground rules (safety policy never weakens, contracts versioned, etc.), local dev setup, PR checklist. | complete |
+| `SECURITY.md` | Disclosure path, supported versions, what counts as a vuln, 90-day coordinated disclosure. | complete |
+| `backend/tests/test_bundled_contracts_in_sync.py` | Lockstep — bundled = canonical, byte-for-byte. | complete |
+| `backend/tests/test_bundled_seed_in_sync.py` | Same lockstep for seed artifacts. | complete |
+| `backend/tests/test_bundled_alembic_in_sync.py` | Same lockstep for migration scripts. | complete |
+| `backend/tests/test_api_versioning.py` | 6 tests: dual-mount, deprecation header on legacy, `/v1` clean, health un-versioned. | complete |
+| `backend/tests/test_auth_middleware.py` | 14 tests: disabled by default, header schemes, reviewer registry, public-prefix carve-outs. | complete |
+| `backend/tests/test_observability_middleware.py` | 5 tests: minted vs echoed request id, structured log shape, path captured. | complete |
+| `backend/tests/test_publication_isolation.py` | Cross-lane isolation invariant. | complete |
+| `backend/tests/test_postgres_dialect_smoke.py` | DDL + offline-migration smoke under postgresql dialect. | complete |
+
+### Pass Cases
+
+| Pass case | Satisfied by |
+| --- | --- |
+| Clean-venv `pip install` produces a working `agentatlas` binary | Wheel install smoke: `python3 -m venv /tmp/v && /tmp/v/bin/pip install backend && /tmp/v/bin/agentatlas seed --reset && /tmp/v/bin/agentatlas query ...` returns the expected critical-block verdict. Verified end-to-end during Stage 14 validation. |
+| Trust contracts resolve in both checkout and wheel contexts | `contract_paths.contract_path()` tries source-tree → `importlib.resources("app.contracts")`. Tested implicitly by the 11 service-layer call sites; the wheel smoke exercises the fallback path. |
+| Alembic migrations apply from a wheel install | `make_alembic_config()` returns a fully-configured `Config` from env-var override, source-tree ini, or bundled `app/_alembic/`. Used by `agentatlas migrate`, `seed --reset`, and `serve` auto-init. |
+| API versioning is in place | `/v1/<route>` exists for every router; legacy responses carry the RFC 8594 `Deprecation` / `Sunset` / `Link` headers. |
+| Failing ingestion lane doesn't poison the graph | `test_publication_isolation.py::test_failing_lane_does_not_block_subsequent_lane` exercises the invariant end-to-end. |
+| Operational behaviour is observable | Every request emits a JSON log line with `request_id`, method, path, status code, duration, and 5xx error type. `X-Request-ID` is round-trippable from clients. |
+| API contracts are stable enough to support real clients | The `/v1/` prefix is the documented contract surface; the legacy paths carry an explicit deprecation header pointing at the successor URL so external clients can plan their migration. |
+| Auth and rate limiting if externalized | Optional `AGENTATLAS_API_KEY` gates writes; rate limiting is delegated to the reverse proxy (documented in SECURITY.md and the README's "What This Isn't" section). |
+| Migration discipline | The CI workflow runs the up/down/up roundtrip on every PR. The lockstep test ensures bundled migrations don't drift from the canonical tree. |
+
+### Quality Bar
+
+- **No new runtime dependencies.** Every Stage 14 surface uses stdlib + the existing FastAPI / Pydantic / SQLAlchemy / Alembic stack. No introduction of `structlog`, `python-jose`, `slowapi`, etc.
+- **Auth defaults to off.** Setting `AGENTATLAS_API_KEY` is an opt-in for non-localhost deployments. The dev experience stays one-command (`agentatlas serve`), no credentials required.
+- **Reviewer registry is configuration, not data.** Listed by env var rather than persisted in the DB so dropping a reviewer is a config change, not a migration.
+- **Bundled data is lockstep-enforced.** Three sync tests fail loudly if anyone edits a contract / seed artifact / migration in one tree without mirroring the other.
+- **Observability is JSON, not Python `repr()`.** Log aggregators (Loki, Datadog, CloudWatch) can index without parsing.
+- **Postgres portability is proven offline.** The dialect smoke + the offline migration chain catch dialect-specific column types or SQLite-only `op.execute()` strings well before a live Postgres deployment is involved.
+- **CI matrix is real.** Python 3.11 + 3.12; pytest + ruff + alembic roundtrip + clean-venv smoke + frontend build. Every pull request is gated by all five.
+
+### Deferred (v1.1)
+
+- **Live Postgres test matrix.** The offline smoke proves portability; an integration matrix using `testcontainers` exercises the actual SQL on a running PG. Deferred because it triples CI runtime.
+- **Per-reviewer cryptographic identity.** Today `reviewer_id` is a string allowlist. Ed25519 keypairs (one private key per reviewer; signed reviews) are a v1.1 hardening.
+- **Rate limiting native to the API.** Today users deploy behind nginx / Caddy for rate-limit enforcement. A `slowapi`-style native middleware is a v1.1 add.
+- **OAuth / OIDC integration.** API-key auth covers a single-key deployment. Multi-tenant or SSO requires identity federation — out of scope for v1.0.
+- **PyPI upload.** The wheel works; the actual `twine upload` happens with the v1.0 release tag.
+- **Brew / native packaging.** Homebrew formula, Debian package — v1.1+ once a stable release exists.
+
+### Bugs found and fixed during Stage 14
+
+Three real issues, all caught by the clean-venv wheel smoke or by the
+full pytest run during Stage 14 work:
+
+- **Alembic disabled the `agentatlas.request` logger after every migration test.** Alembic's `fileConfig(config.config_file_name)` defaults to `disable_existing_loggers=True`, which silently set `.disabled=True` on every pre-existing logger including our request log. In isolation the observability tests passed; once any migration-touching test ran first, `caplog` couldn't capture our log lines. **Fixed** at the source in `backend/alembic/env.py`: pass `disable_existing_loggers=False`. Caught by the full-suite run that surfaced 3 observability failures after the per-module passes succeeded.
+- **The wheel smoke surfaced that alembic.ini and the `alembic/` directory weren't bundled.** `agentatlas migrate` and `seed --reset` failed from a clean pip install because the migrations themselves shipped only at `backend/alembic/`, outside the package. **Fixed** by copying the alembic directory into `app/_alembic/` (with a lockstep test) and routing all alembic-config construction through a single `make_alembic_config()` resolver that returns a programmatically-configured `Config` when no source-tree ini is visible.
+- **Setuptools refused `readme = "../README.md"` in Stage 12 — and this carried forward into Stage 14.** The fix that landed in Stage 12 (a wheel-local `backend/README.md`) is now joined by a stage-report note documenting why two READMEs exist: the repo-root README is the project front door, the backend-local README is what setuptools requires for the wheel's long_description. (Not a new bug — a re-documentation of existing intent so future maintainers don't try to dedupe.)
 
 The consolidated stage report is current only if these commands pass:
 
@@ -1459,9 +1588,11 @@ DATABASE_URL=sqlite:////tmp/agentatlas_smoke.db .venv/bin/alembic upgrade head
 
 ### Current results
 
-- **656 backend tests passing** (Stage 13 added 37 tests across 4 files: 9 in `test_human_review_service.py`, 13 in `test_audit_log.py`, 7 in `test_routes_human_review.py`, 8 in `test_routes_audit.py`; Stage 12 added 19 CLI tests; Stage 10+11 audit added 6 regression tests; Stage 11a added 10 tests; Stage 10 added 28 before that; Stage 9 added 96 before that; all audit fixes have regression coverage). Stage 11b adds frontend code only — no Python tests; `next build` verified to succeed.
+- **693 backend tests passing** (Stage 14 added 37 tests across 7 files: 6 in `test_api_versioning.py`, 14 in `test_auth_middleware.py`, 5 in `test_observability_middleware.py`, 4 in CLI auto-migrate + seed-env-override + in-package-runner, 1 in `test_publication_isolation.py`, 3 in `test_postgres_dialect_smoke.py`, 2 in `test_bundled_contracts_in_sync.py`, 2 in `test_bundled_seed_in_sync.py`, 2 in `test_bundled_alembic_in_sync.py`; Stage 13 added 37; Stage 12 added 19; Stage 10+11 audit added 6; Stage 11a added 10; Stage 10 added 28; Stage 9 added 96). Stage 11b is frontend-only (no Python tests; `next build` verified).
 - ruff clean
-- alembic upgrade → downgrade → upgrade cycle clean through migration `0015_human_review_and_audit_log` (Stage 13 adds the only new migration since Stage 8; the down/up roundtrip was verified end-to-end).
+- alembic upgrade → downgrade → upgrade cycle clean through migration `0015_human_review_and_audit_log` (no new migrations in Stage 14; the down/up roundtrip is part of the CI workflow).
+- Clean-venv `pip install /path/to/backend` end-to-end smoke verified: `agentatlas seed --reset` populates 47 claims, `agentatlas query` returns the expected critical-block verdict against the bundled contracts.
+- Postgres dialect offline smoke clean: `Base.metadata` + the full alembic chain render against `postgresql+psycopg://noop` without raising.
 
 ### Audit log (one row per stage; most recent first)
 
@@ -1472,6 +1603,7 @@ subsection above.
 
 | Date | Stage | Bugs found and resolved |
 | --- | --- | --- |
+| 2026-05-19 | Stage 14 | **3 bugs.** (1) Alembic's default `disable_existing_loggers=True` in `env.py` silently disabled the `agentatlas.request` logger for every test that ran after a migration test; observability tests passed in isolation but failed in the full suite. **Caught by a full-suite run** after per-module passes succeeded. Fixed by passing `disable_existing_loggers=False`. (2) Stage 12 documented "PyPI standalone install not yet supported"; the clean-venv smoke during Stage 14 surfaced that alembic.ini + the `alembic/` migrations directory weren't in the wheel either (in addition to contracts + seed data). **Fixed** by mirroring migrations into `app/_alembic/` with a lockstep test and centralising config construction through `make_alembic_config()`. (3) Initial draft of `_cmd_migrate` returned 1 with the stale "could not locate alembic.ini" message — pre-Stage-14 wording. Updated to surface `RuntimeError` from the new resolver instead, with the test rewritten to assert the actual error path. Found while updating the migrate tests. **All three fixed. 37 new tests; full suite 693 passing; clean-venv wheel install verified end-to-end; offline postgresql dialect smoke clean.** |
 | 2026-05-18 | Stage 13 | **2 bugs.** (1) Audit-event details emitted from `save_canonical_tool_spec` / `save_canonical_workflow_spec` accessed `spec.compiled_by`, `spec.spec_hash`, and `spec.source_claim_ids` directly; these live under `spec.provenance` and `spec.spec_hash` is computed via `canonical_spec_hash` (already-built record). **Caught by 32 failing canonical-route tests immediately after wiring the audit calls.** Fixed by routing through `spec.provenance.*` and `record.spec_hash`. (2) `_band_for_score` initially returned the enum's `.value` string, which `ConfidenceBreakdown.model_copy(update={"band": ...})` would have stored as-is (Pydantic doesn't validate model_copy updates) — silent type confusion downstream. Caught while reading the schema; switched to returning the enum directly. 37 new tests; full suite 656 passing; alembic down/up roundtrip clean. |
 | 2026-05-18 | Stage 12 | **3 bugs + 1 scope correction.** (1) `SearchToolsResponse.matches` vs the draft's `tools` field name — caught while reading the schema before the first CLI test run. (2) `--database-url` not forwarded from `agentatlas seed` to the underlying script — caught by writing the forwarding test first. (3) `_load_seed_module`'s walk terminated at any `README.md`; adding `backend/README.md` silently broke the loader so `agentatlas seed` failed from a checkout. **Caught by `test_load_seed_module_finds_real_script` regressing after the smoke test forced the new `backend/README.md`.** Fixed by stopping the walk only at `.git`. (4) Scope correction: a clean-venv `pip install` revealed that 11 contract loaders use `parents[3]` paths that only resolve from a source-tree checkout — bundling contracts as package data is Stage 14's job, not Stage 12's. Honestly documented in README + "Deferred" block instead of papering over. 19 in-process CLI tests added; full suite 619 passing; end-to-end smoke verified for repo-checkout + Docker install paths. |
 | 2026-05-18 | Stages 10 + 11 (cross-stage audit) | **5 bugs.** (1) MCP dispatcher returned METHOD_NOT_FOUND for `notifications/*` methods sent with a stray `id` field; spec says these are notifications by method name regardless of id — fixed to silently ack. (2) `tools/call` with `arguments: []` (or other falsy non-dict) slipped through `or {}` and silently became an empty dict, crashing the tool handler downstream instead of returning a clean INVALID_PARAMS at the dispatcher. (3) `submit_claim`'s evidence-minimum pre-check fired before Pydantic validation, so a payload missing every required field returned the misleading "needs at least one piece of evidence" error instead of "missing required fields"; reordered. (4) Stage 11a: re-running `scripts/seed_examples.py` without `--reset` silently inserted duplicate claims AND degraded headline-scenario acceptance (orchestrator marks dups as PENDING/L1); the script now emits a loud warning when the DB already has rows. (5) Tool-handler return values weren't type-checked; a future handler returning a list / scalar / None would silently produce MCP `structuredContent` that violates the spec's "must be a JSON object" requirement; the dispatcher now rejects non-dict payloads with a clear `isError` message. **All five fixed; 6 regression tests added; 600 total passing. Frontend production build also verified (`next build` succeeds, all 5 pages compile, type-check passes).** |

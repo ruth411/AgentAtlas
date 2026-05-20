@@ -3,14 +3,14 @@ from __future__ import annotations
 import json
 import re
 from functools import cache
-from pathlib import Path
 from typing import Any
 
 from app.schemas.enums import RISK_ORDER, RiskLevel
 from app.schemas.risk import RiskAssessment, RiskDimension, RiskMatch
+from app.services.contract_paths import contract_path
 
 
-_RISK_MODEL_CONTRACT = Path(__file__).resolve().parents[3] / "contracts/risk_model.v1.json"
+_RISK_MODEL_CONTRACT = contract_path("risk_model.v1.json")
 _DIMENSION_ORDER = {dimension: index for index, dimension in enumerate(RiskDimension)}
 
 

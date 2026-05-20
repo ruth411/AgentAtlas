@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 from app.schemas.claim import KnowledgeClaim
 from app.schemas.enums import EvidenceType, TrustLevel
 from app.schemas.evidence import Evidence
+from app.services.contract_paths import contract_path
 
 
 _TRUST_RANK: dict[TrustLevel, int] = {
@@ -16,7 +17,7 @@ _TRUST_RANK: dict[TrustLevel, int] = {
     TrustLevel.HIGH: 2,
 }
 
-_TRUST_SOURCE_CONTRACT = Path(__file__).resolve().parents[3] / "contracts/tool_trust_sources.v1.json"
+_TRUST_SOURCE_CONTRACT = contract_path("tool_trust_sources.v1.json")
 
 
 def resolve_evidence_trust_level(tool_id: str, evidence: Evidence) -> TrustLevel:

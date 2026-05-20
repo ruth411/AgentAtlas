@@ -72,12 +72,11 @@ from app.services.ids import (
     generate_ingestion_artifact_id,
     generate_ingestion_run_id,
 )
+from app.services.contract_paths import contract_path
 from app.services.orchestrator import CanonOrchestrator
 
 
-_OPENAPI_CONTRACT = (
-    Path(__file__).resolve().parents[3] / "contracts/openapi_ingestion_sources.v1.json"
-)
+_OPENAPI_CONTRACT = contract_path("openapi_ingestion_sources.v1.json")
 
 # HTTP methods recognised by OpenAPI 3.x.
 _OPENAPI_METHODS: frozenset[str] = frozenset(

@@ -1,0 +1,146 @@
+[
+  {
+    "claim_type": "destructive_action",
+    "subject": "gh repo delete",
+    "statement": "`gh repo delete` permanently deletes a GitHub repository. The action is irreversible; once a repository is deleted, its issues, pull requests, and history cannot be recovered without a paid GitHub-side restore.",
+    "tool_id": "github-cli",
+    "submitted_by": "agentatlas-seed",
+    "risk_level": "critical",
+    "evidence": [
+      {
+        "evidence_type": "official_docs",
+        "source_uri": "https://docs.github.com/en/github-cli/github-cli/github-cli-reference",
+        "excerpt": "gh repo delete — delete a repository. This action is irreversible.",
+        "trust_level": "high"
+      },
+      {
+        "evidence_type": "cli_help_output",
+        "source_uri": "local://gh-repo-delete-help.txt",
+        "excerpt": "Delete a GitHub repository. With no argument, deletes the current repository.\n\nDeletion requires confirmation. The --yes flag bypasses the prompt.",
+        "trust_level": "medium"
+      }
+    ]
+  },
+  {
+    "claim_type": "cli_command_exists",
+    "subject": "git status",
+    "statement": "`git status` shows the working tree status: files staged for commit, files modified but not yet staged, and untracked files. Read-only; does not mutate the working tree, the index, or the repository.",
+    "tool_id": "git",
+    "submitted_by": "agentatlas-seed",
+    "risk_level": "low",
+    "evidence": [
+      {
+        "evidence_type": "official_docs",
+        "source_uri": "https://git-scm.com/docs/git-status",
+        "excerpt": "Displays paths that have differences between the index file and the current HEAD commit, paths that have differences between the working tree and the index file, and paths in the working tree that are not tracked by Git.",
+        "trust_level": "high"
+      },
+      {
+        "evidence_type": "man_page",
+        "source_uri": "https://git-scm.com/docs/git-status",
+        "excerpt": "git-status(1) — Show the working tree status. Displays paths with differences between the index and the current HEAD, between the working tree and the index, and untracked paths.",
+        "trust_level": "high"
+      },
+      {
+        "evidence_type": "cli_help_output",
+        "source_uri": "local://git-status-help.txt",
+        "excerpt": "usage: git status [<options>] [--] [<pathspec>...]\n\nShow the working tree status.",
+        "trust_level": "medium"
+      }
+    ]
+  },
+  {
+    "claim_type": "cli_command_exists",
+    "subject": "git log",
+    "statement": "`git log` shows the commit history for the current branch. Read-only; does not mutate the working tree, the index, or the repository.",
+    "tool_id": "git",
+    "submitted_by": "agentatlas-seed",
+    "risk_level": "low",
+    "evidence": [
+      {
+        "evidence_type": "official_docs",
+        "source_uri": "https://git-scm.com/docs/git-log",
+        "excerpt": "Shows the commit logs. List commits that are reachable by following the parent links from the given commit(s).",
+        "trust_level": "high"
+      },
+      {
+        "evidence_type": "man_page",
+        "source_uri": "https://git-scm.com/docs/git-log",
+        "excerpt": "git-log(1) — Show commit logs. Read-only inspection of repository history.",
+        "trust_level": "high"
+      },
+      {
+        "evidence_type": "cli_help_output",
+        "source_uri": "local://git-log-help.txt",
+        "excerpt": "usage: git log [<options>] [<revision-range>] [[--] <path>...]\n\nShow commit logs.",
+        "trust_level": "medium"
+      }
+    ]
+  },
+  {
+    "claim_type": "side_effect",
+    "subject": "vercel --prod",
+    "statement": "`vercel --prod` creates a production deployment on Vercel from the current project directory. Mutates remote state, may incur cost, and exposes a public URL.",
+    "tool_id": "vercel-cli",
+    "submitted_by": "agentatlas-seed",
+    "risk_level": "high",
+    "evidence": [
+      {
+        "evidence_type": "official_docs",
+        "source_uri": "https://vercel.com/docs/cli/deploying-from-cli",
+        "excerpt": "By default, the deployment is a Preview. Run vercel --prod to deploy to the Production environment, which serves the canonical URL of your project.",
+        "trust_level": "high"
+      },
+      {
+        "evidence_type": "cli_help_output",
+        "source_uri": "local://vercel-help.txt",
+        "excerpt": "Deploy a project. Use --prod for production deployments.",
+        "trust_level": "medium"
+      }
+    ]
+  },
+  {
+    "claim_type": "cli_command_exists",
+    "subject": "gh repo list",
+    "statement": "`gh repo list` lists repositories owned by the current user or a specified owner. Read-only over the GitHub API; does not mutate state.",
+    "tool_id": "github-cli",
+    "submitted_by": "agentatlas-seed",
+    "risk_level": "medium",
+    "evidence": [
+      {
+        "evidence_type": "official_docs",
+        "source_uri": "https://docs.github.com/en/github-cli/github-cli/github-cli-reference#gh-repo-list",
+        "excerpt": "gh repo list [<owner>] [flags] — list repositories owned by user or organization.",
+        "trust_level": "high"
+      },
+      {
+        "evidence_type": "cli_help_output",
+        "source_uri": "local://gh-repo-list-help.txt",
+        "excerpt": "List repositories owned by user or organization.",
+        "trust_level": "medium"
+      }
+    ]
+  },
+  {
+    "claim_type": "destructive_action",
+    "subject": "docker rm",
+    "statement": "`docker rm` removes one or more containers. By default, only stopped containers can be removed; `-f` (force) will SIGKILL and remove a running container. Removed containers' filesystem changes are unrecoverable unless previously committed to an image.",
+    "tool_id": "docker",
+    "submitted_by": "agentatlas-seed",
+    "risk_level": "critical",
+    "evidence": [
+      {
+        "evidence_type": "official_docs",
+        "source_uri": "https://docs.docker.com/reference/cli/docker/container/rm/",
+        "excerpt": "docker rm — Remove one or more containers. By default you can't remove a running container; use -f to force.",
+        "trust_level": "high"
+      },
+      {
+        "evidence_type": "cli_help_output",
+        "source_uri": "local://docker-rm-help.txt",
+        "excerpt": "Usage: docker rm [OPTIONS] CONTAINER [CONTAINER...]\n\nRemove one or more containers.",
+        "trust_level": "medium"
+      }
+    ]
+  }
+]

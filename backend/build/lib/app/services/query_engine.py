@@ -53,15 +53,12 @@ from app.schemas.workflow_spec import WorkflowSpec
 from app.services.claim_store import ClaimStore
 from app.services.command_matcher import CommandMatch, match_command
 from app.services.confidence_scorer import band_for_score
+from app.services.contract_paths import contract_path
 from app.services.risk_classifier import classify_action
 
 
-_QUERY_POLICY_CONTRACT = (
-    Path(__file__).resolve().parents[3] / "contracts/query_policy.v1.json"
-)
-_STAGE_0_CONTRACT = (
-    Path(__file__).resolve().parents[3] / "contracts/agentatlas_stage_0.v1.json"
-)
+_QUERY_POLICY_CONTRACT = contract_path("query_policy.v1.json")
+_STAGE_0_CONTRACT = contract_path("agentatlas_stage_0.v1.json")
 
 
 class QueryEngine:

@@ -4,9 +4,12 @@ from sqlalchemy import CheckConstraint, DateTime, Float, ForeignKey, String, Tex
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 from app.schemas.enums import (
+    AuditEntityType,
+    AuditEventType,
     ClaimType,
     ConfidenceBand,
     EvidenceType,
+    HumanReviewDecision,
     IngestionArtifactType,
     IngestionStatus,
     OrchestratorDecision,
@@ -234,6 +237,68 @@ class RawIngestionArtifactRecord(Base):
     captured_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
 
     run: Mapped[IngestionRunRecord] = relationship(back_populates="artifacts")
+
+
+class HumanReviewRecord(Base):
+    """Stage 13: persisted human-review decision.
+
+    Append-only: once a row is written, the service layer never updates
+    or deletes it. A correction is filed as a new review for the same
+    claim with notes that reference the prior `review_id`."""
+
+    __tablename__ = "human_reviews"
+    __table_args__ = (
+        CheckConstraint(
+            _allowed_values_sql("decision", [item.value for item in HumanReviewDecision]),
+            name="ck_human_reviews_decision",
+        ),
+    )
+
+    review_id: Mapped[str] = mapped_column(String(128), primary_key=True)
+    claim_id: Mapped[str] = mapped_column(
+        ForeignKey("knowledge_claims.claim_id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    reviewer_id: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
+    decision: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    notes: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    reviewed_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, index=True
+    )
+
+
+class AuditEventRecord(Base):
+    """Stage 13: append-only audit log.
+
+    Every state-changing operation in AgentAtlas (claim submission,
+    verification results, human reviews, spec publication) emits one row.
+    The service layer must only INSERT; there are no `update` or
+    `delete` methods on the `AuditLogger`. The schema enforces no
+    additional constraint, but `tests/test_audit_log.py` exercises the
+    invariant that the service layer never mutates an existing event."""
+
+    __tablename__ = "audit_events"
+    __table_args__ = (
+        CheckConstraint(
+            _allowed_values_sql("event_type", [item.value for item in AuditEventType]),
+            name="ck_audit_events_event_type",
+        ),
+        CheckConstraint(
+            _allowed_values_sql("entity_type", [item.value for item in AuditEntityType]),
+            name="ck_audit_events_entity_type",
+        ),
+    )
+
+    event_id: Mapped[str] = mapped_column(String(128), primary_key=True)
+    event_type: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    entity_type: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    entity_id: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
+    actor: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
+    details_json: Mapped[str] = mapped_column(Text, nullable=False, default="{}")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, index=True
+    )
 
 
 class DocsFetchCacheRecord(Base):

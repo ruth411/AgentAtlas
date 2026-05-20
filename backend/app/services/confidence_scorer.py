@@ -26,19 +26,17 @@ from __future__ import annotations
 
 import json
 from functools import cache
-from pathlib import Path
 from typing import Any
 
 from app.schemas.claim import KnowledgeClaim
 from app.schemas.confidence import ConfidenceBreakdown, ConfidenceComponent
 from app.schemas.enums import ConfidenceBand, EvidenceType, RiskLevel, TrustLevel
 from app.schemas.evidence import Evidence
+from app.services.contract_paths import contract_path
 from app.services.evidence_trust import normalize_claim_evidence_trust
 
 
-_CONFIDENCE_MODEL_CONTRACT = (
-    Path(__file__).resolve().parents[3] / "contracts/confidence_model.v1.json"
-)
+_CONFIDENCE_MODEL_CONTRACT = contract_path("confidence_model.v1.json")
 
 
 def band_for_score(score: float) -> ConfidenceBand:

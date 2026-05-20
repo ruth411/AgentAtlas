@@ -89,11 +89,73 @@ def test_serve_defaults_to_localhost_no_reload(
     fake_module = type(sys)("uvicorn")
     fake_module.run = fake_run  # type: ignore[attr-defined]
     monkeypatch.setitem(sys.modules, "uvicorn", fake_module)
+    # Stub the auto-migrate so the test doesn't actually invoke alembic.
+    monkeypatch.setattr(cli_module, "_auto_migrate", lambda: None)
 
     assert main(["serve"]) == 0
     assert captured["host"] == "127.0.0.1"
     assert captured["port"] == 8000
     assert captured["reload"] is False
+
+
+def test_serve_runs_auto_migrate_by_default(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Stage 14: a fresh-install user running `agentatlas serve` against
+    an empty DB shouldn't have to know to run `migrate` first. The
+    serve subcommand auto-applies pending migrations on startup."""
+    migrate_calls: list[bool] = []
+
+    def fake_migrate() -> None:
+        migrate_calls.append(True)
+
+    fake_uvicorn = type(sys)("uvicorn")
+    fake_uvicorn.run = lambda *args, **kwargs: None  # type: ignore[attr-defined]
+    monkeypatch.setitem(sys.modules, "uvicorn", fake_uvicorn)
+    monkeypatch.setattr(cli_module, "_auto_migrate", fake_migrate)
+
+    assert main(["serve"]) == 0
+    assert migrate_calls == [True]
+
+
+def test_serve_no_migrate_flag_skips_auto_migration(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Operators who manage migrations out of band pass --no-migrate."""
+    migrate_calls: list[bool] = []
+
+    def fake_migrate() -> None:
+        migrate_calls.append(True)
+
+    fake_uvicorn = type(sys)("uvicorn")
+    fake_uvicorn.run = lambda *args, **kwargs: None  # type: ignore[attr-defined]
+    monkeypatch.setitem(sys.modules, "uvicorn", fake_uvicorn)
+    monkeypatch.setattr(cli_module, "_auto_migrate", fake_migrate)
+
+    assert main(["serve", "--no-migrate"]) == 0
+    assert migrate_calls == []
+
+
+def test_serve_continues_when_auto_migrate_raises(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Auto-migration failures shouldn't prevent the server from
+    starting (e.g. operator already migrated manually with a custom
+    URL). The CLI surfaces a clear warning on stderr but proceeds."""
+    def boom() -> None:
+        raise RuntimeError("no alembic.ini visible")
+
+    uvicorn_called: list[bool] = []
+    fake_uvicorn = type(sys)("uvicorn")
+    fake_uvicorn.run = lambda *args, **kwargs: uvicorn_called.append(True)  # type: ignore[attr-defined]
+    monkeypatch.setitem(sys.modules, "uvicorn", fake_uvicorn)
+    monkeypatch.setattr(cli_module, "_auto_migrate", boom)
+
+    assert main(["serve"]) == 0
+    assert uvicorn_called == [True]
+    err = capsys.readouterr().err
+    assert "skipping auto-migration" in err
 
 
 # ---------------------------------------------------------------------------
@@ -459,19 +521,16 @@ def test_seed_forwards_reset_and_database_url(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """The CLI should forward `--reset` and `--database-url` verbatim to
-    `scripts/seed_examples.main`, not silently drop them."""
+    `app.seed_data.runner.main`, not silently drop them."""
 
     captured: dict[str, list[str] | None] = {"argv": None}
-
-    fake_module = type(sys)("fake_seed_examples")
 
     def fake_main(argv: list[str] | None = None) -> int:
         captured["argv"] = argv
         return 0
 
-    fake_module.main = fake_main  # type: ignore[attr-defined]
-
-    monkeypatch.setattr(cli_module, "_load_seed_module", lambda: fake_module)
+    monkeypatch.setattr("app.seed_data.runner.main", fake_main)
+    monkeypatch.delenv("AGENTATLAS_SEED_SCRIPT", raising=False)
 
     rc = main(
         [
@@ -494,24 +553,45 @@ def test_seed_without_flags_passes_empty_argv(
 ) -> None:
     captured: dict[str, list[str] | None] = {"argv": None}
 
-    fake_module = type(sys)("fake_seed_examples")
-
     def fake_main(argv: list[str] | None = None) -> int:
         captured["argv"] = argv
         return 0
 
-    fake_module.main = fake_main  # type: ignore[attr-defined]
-    monkeypatch.setattr(cli_module, "_load_seed_module", lambda: fake_module)
+    monkeypatch.setattr("app.seed_data.runner.main", fake_main)
+    monkeypatch.delenv("AGENTATLAS_SEED_SCRIPT", raising=False)
 
     main(["seed"])
     assert captured["argv"] == []
 
 
-def test_load_seed_module_finds_real_script() -> None:
-    """End-to-end: from the installed-package path, the loader should
-    walk up the source tree and find `scripts/seed_examples.py`."""
-    module = cli_module._load_seed_module()
-    assert callable(getattr(module, "main", None))
+def test_seed_env_var_override_loads_external_script(
+    monkeypatch: pytest.MonkeyPatch, tmp_path
+) -> None:
+    """`AGENTATLAS_SEED_SCRIPT` lets advanced users point the CLI at a
+    fork of `scripts/seed_examples.py` without modifying the install."""
+    script_path = tmp_path / "fake_seed.py"
+    script_path.write_text(
+        "def main(argv=None):\n"
+        "    import os\n"
+        "    os.environ['_AGENTATLAS_FAKE_SEED_RAN'] = ','.join(argv or [])\n"
+        "    return 0\n"
+    )
+    monkeypatch.setenv("AGENTATLAS_SEED_SCRIPT", str(script_path))
+    monkeypatch.delenv("_AGENTATLAS_FAKE_SEED_RAN", raising=False)
+
+    rc = main(["seed", "--reset"])
+    assert rc == 0
+    import os as _os
+
+    assert _os.environ["_AGENTATLAS_FAKE_SEED_RAN"] == "--reset"
+
+
+def test_in_package_seed_runner_is_importable() -> None:
+    """Stage 14: the wheel-bundled seed runner must be importable
+    directly. This is the path `agentatlas seed` uses by default."""
+    from app.seed_data import runner
+
+    assert callable(getattr(runner, "main", None))
 
 
 # ---------------------------------------------------------------------------
@@ -522,67 +602,68 @@ def test_load_seed_module_finds_real_script() -> None:
 def test_migrate_invokes_alembic_upgrade_head(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    """`agentatlas migrate` runs `alembic upgrade head` against the
+    config returned by `make_alembic_config`, passing the requested DB
+    URL through."""
     captured: dict[str, Any] = {}
 
-    fake_command = type(sys)("alembic.command")
-
-    def fake_upgrade(cfg: Any, target: str) -> None:
-        captured["cfg"] = cfg
-        captured["target"] = target
-
-    fake_command.upgrade = fake_upgrade  # type: ignore[attr-defined]
-
     class FakeConfig:
-        def __init__(self, path: str) -> None:
-            captured["ini_path"] = path
+        def __init__(self) -> None:
             self._options: dict[str, str] = {}
 
         def set_main_option(self, key: str, value: str) -> None:
             self._options[key] = value
 
-    fake_config_mod = type(sys)("alembic.config")
-    fake_config_mod.Config = FakeConfig  # type: ignore[attr-defined]
+    fake_cfg = FakeConfig()
+    fake_cfg.set_main_option("script_location", "/fake/_alembic")
 
+    def fake_make(database_url: str | None = None) -> Any:
+        if database_url is not None:
+            fake_cfg.set_main_option("sqlalchemy.url", database_url)
+        return fake_cfg
+
+    monkeypatch.setattr(
+        "app.services.alembic_config.make_alembic_config", fake_make
+    )
+
+    fake_command = type(sys)("alembic.command")
+    def fake_upgrade(cfg: Any, target: str) -> None:
+        captured["cfg"] = cfg
+        captured["target"] = target
+    fake_command.upgrade = fake_upgrade  # type: ignore[attr-defined]
     fake_alembic = type(sys)("alembic")
     fake_alembic.command = fake_command  # type: ignore[attr-defined]
-    fake_alembic.config = fake_config_mod  # type: ignore[attr-defined]
-
     monkeypatch.setitem(sys.modules, "alembic", fake_alembic)
     monkeypatch.setitem(sys.modules, "alembic.command", fake_command)
-    monkeypatch.setitem(sys.modules, "alembic.config", fake_config_mod)
 
     rc = main(["migrate", "--database-url", "sqlite:///tmp/m.db"])
     assert rc == 0
     assert captured["target"] == "head"
-    assert captured["ini_path"].endswith("alembic.ini")
     assert captured["cfg"]._options["sqlalchemy.url"] == "sqlite:///tmp/m.db"
 
 
-def test_migrate_without_alembic_ini_reports_clean_error(
+def test_migrate_surfaces_clean_error_when_config_resolver_fails(
     monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
-    monkeypatch.setenv("AGENTATLAS_ALEMBIC_INI", "/definitely/missing/alembic.ini")
+    """If `make_alembic_config` raises (e.g. wheel install with
+    corrupt package data and no env-var override), the CLI surfaces
+    the message on stderr and exits 1 — no traceback dumped on the
+    user."""
+    def boom(database_url: str | None = None) -> Any:
+        raise RuntimeError("bundled migrations missing")
 
-    fake_command = type(sys)("alembic.command")
-    fake_command.upgrade = lambda *a, **k: None  # type: ignore[attr-defined]
-    fake_config_mod = type(sys)("alembic.config")
+    monkeypatch.setattr(
+        "app.services.alembic_config.make_alembic_config", boom
+    )
 
-    class _NoConfig:
-        def __init__(self, *a: Any, **k: Any) -> None:
-            raise AssertionError(
-                "Config() must not be constructed when the ini is missing."
-            )
-
-    fake_config_mod.Config = _NoConfig  # type: ignore[attr-defined]
     fake_alembic = type(sys)("alembic")
-    fake_alembic.command = fake_command  # type: ignore[attr-defined]
-    fake_alembic.config = fake_config_mod  # type: ignore[attr-defined]
+    fake_alembic.command = type(sys)("alembic.command")  # type: ignore[attr-defined]
+    fake_alembic.command.upgrade = lambda *a, **k: None  # type: ignore[attr-defined]
     monkeypatch.setitem(sys.modules, "alembic", fake_alembic)
-    monkeypatch.setitem(sys.modules, "alembic.command", fake_command)
-    monkeypatch.setitem(sys.modules, "alembic.config", fake_config_mod)
+    monkeypatch.setitem(sys.modules, "alembic.command", fake_alembic.command)
 
     rc = main(["migrate"])
     err = capsys.readouterr().err
     assert rc == 1
-    assert "could not locate alembic.ini" in err
+    assert "bundled migrations missing" in err

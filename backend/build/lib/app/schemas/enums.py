@@ -114,3 +114,49 @@ class ConfidenceBand(StrEnum):
     MODERATE = "moderate"  # 0.55 <= score < 0.75
     HIGH = "high"          # 0.75 <= score < 0.90
     STRONG = "strong"      # 0.90 <= score <= 1.00
+
+
+# -------- Stage 13: Human Review + Audit --------
+
+
+class HumanReviewDecision(StrEnum):
+    """The verdict a human reviewer renders on a claim.
+
+    `APPROVED` promotes the claim to `L5_HUMAN_AUDITED` (if it has already
+    cleared L3 — the orchestrator refuses to skip levels). `REJECTED`
+    flips the claim's `verification_status` to `REJECTED` so the matcher
+    excludes it. `NEEDS_CHANGES` records the reviewer's notes without
+    changing level or status; the claim stays in the queue until the
+    submitter addresses the notes and a follow-up review fires.
+    """
+
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    NEEDS_CHANGES = "needs_changes"
+
+
+class AuditEventType(StrEnum):
+    """Every state-changing operation in AgentAtlas emits one event.
+
+    The audit log is append-only by contract: services may only INSERT
+    rows, never UPDATE or DELETE. The event payload captures everything
+    needed to replay decisions later (actor, entity, structured details).
+    """
+
+    CLAIM_SUBMITTED = "claim_submitted"
+    VERIFICATION_RECORDED = "verification_recorded"
+    HUMAN_REVIEW_RECORDED = "human_review_recorded"
+    TOOL_SPEC_PUBLISHED = "tool_spec_published"
+    WORKFLOW_SPEC_PUBLISHED = "workflow_spec_published"
+
+
+class AuditEntityType(StrEnum):
+    """Kind of object an audit event refers to.
+
+    Indexed alongside `entity_id` so queries like "every event for claim
+    X" do a single index lookup instead of a full scan.
+    """
+
+    CLAIM = "claim"
+    TOOL_SPEC = "tool_spec"
+    WORKFLOW_SPEC = "workflow_spec"

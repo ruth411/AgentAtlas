@@ -30,7 +30,6 @@ from hashlib import sha256
 import html
 from html.parser import HTMLParser
 import json
-from pathlib import Path
 from typing import Any, Protocol
 from urllib.parse import urlparse
 
@@ -70,13 +69,12 @@ from app.services.ids import (
     generate_ingestion_artifact_id,
     generate_ingestion_run_id,
 )
+from app.services.contract_paths import contract_path
 from app.services.orchestrator import CanonOrchestrator
 from app.services.risk_classifier import classify_action
 
 
-_DOCS_INGESTION_CONTRACT = (
-    Path(__file__).resolve().parents[3] / "contracts/docs_ingestion_sources.v1.json"
-)
+_DOCS_INGESTION_CONTRACT = contract_path("docs_ingestion_sources.v1.json")
 _EXCERPT_MAX_CHARS = 8000
 _SAFE_TAGS_DROP_TEXT = frozenset(
     {"script", "style", "iframe", "object", "embed", "template", "noscript", "svg"}

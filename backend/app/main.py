@@ -6,6 +6,8 @@ from starlette.requests import Request
 from starlette.types import ASGIApp
 
 from app.api.errors import ErrorCode, json_error_response
+from app.auth import ApiKeyAuthMiddleware
+from app.observability import RequestObservabilityMiddleware
 from app.api.routes_audit import router as audit_router
 from app.api.routes_canonical import router as canonical_router
 from app.api.routes_claims import router as claims_router
@@ -58,16 +60,71 @@ class RequestBodySizeLimitMiddleware(BaseHTTPMiddleware):
         )
 
 
+class LegacyDeprecationHeaderMiddleware(BaseHTTPMiddleware):
+    """Stage 14: stamp a `Deprecation` header on un-versioned responses.
+
+    The canonical API surface lives under `/v1/`. The un-versioned routes
+    are kept for one release so existing dashboards, scripts, and the
+    MCP server's in-process callers don't break overnight. Any client
+    receiving a `Deprecation: true` header is reading from the legacy
+    mount and should switch to the `/v1/`-prefixed equivalent before the
+    next release (which removes the legacy paths).
+    """
+
+    _LEGACY_PREFIXES = (
+        "/claims",
+        "/canonical",
+        "/ingestion",
+        "/verification",
+        "/query",
+        "/audit",
+    )
+    _SUNSET_DATE = "Wed, 31 Dec 2026 00:00:00 GMT"
+
+    async def dispatch(self, request: Request, call_next):  # type: ignore[override]
+        response = await call_next(request)
+        path = request.url.path
+        if any(path.startswith(prefix) for prefix in self._LEGACY_PREFIXES):
+            response.headers["Deprecation"] = "true"
+            response.headers["Sunset"] = self._SUNSET_DATE
+            # Per RFC 8594 — point clients at the replacement.
+            response.headers["Link"] = (
+                f'</v1{path}>; rel="successor-version"'
+            )
+        return response
+
+
+_API_ROUTERS = (
+    claims_router,
+    canonical_router,
+    ingestion_router,
+    verification_router,
+    human_review_router,
+    query_router,
+    audit_router,
+)
+
+
 app = FastAPI(title="AgentAtlas", version="0.1.0")
 app.add_middleware(RequestBodySizeLimitMiddleware)
+app.add_middleware(LegacyDeprecationHeaderMiddleware)
+# Auth gate. No-op when `AGENTATLAS_API_KEY` is unset (dev default).
+app.add_middleware(ApiKeyAuthMiddleware)
+# Observability is registered last so it wraps every other middleware
+# layer — request IDs cover body-size, deprecation, and auth paths too.
+app.add_middleware(RequestObservabilityMiddleware)
+
+# Health is universal; never versioned.
 app.include_router(health_router)
-app.include_router(claims_router)
-app.include_router(canonical_router)
-app.include_router(ingestion_router)
-app.include_router(verification_router)
-app.include_router(human_review_router)
-app.include_router(query_router)
-app.include_router(audit_router)
+
+# Canonical /v1 mount — the contract clients should target.
+for router in _API_ROUTERS:
+    app.include_router(router, prefix="/v1")
+
+# Legacy mount (un-versioned, deprecated). Removed in 0.2.0; transition
+# window documented in CONTRIBUTING.md and the Stage 14 stage_report.
+for router in _API_ROUTERS:
+    app.include_router(router)
 
 
 @app.exception_handler(RequestValidationError)

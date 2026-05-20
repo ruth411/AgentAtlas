@@ -69,6 +69,15 @@ def _build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Enable uvicorn autoreload (development only).",
     )
+    p_serve.add_argument(
+        "--no-migrate",
+        action="store_true",
+        help=(
+            "Skip the idempotent `alembic upgrade head` that runs before "
+            "the server starts. Useful in production deployments that "
+            "manage migrations out of band."
+        ),
+    )
     p_serve.set_defaults(func=_cmd_serve)
 
     # mcp
@@ -168,6 +177,21 @@ def main(argv: list[str] | None = None) -> int:
 def _cmd_serve(args: argparse.Namespace) -> int:
     import uvicorn
 
+    # Stage 14: run `alembic upgrade head` before booting so a fresh
+    # install with an empty DB doesn't fail on the first write. Alembic
+    # is idempotent — already-applied migrations are skipped. Operators
+    # who manage migrations out of band pass `--no-migrate`.
+    if not getattr(args, "no_migrate", False):
+        try:
+            _auto_migrate()
+        except Exception as exc:  # pragma: no cover - defensive
+            print(
+                f"agentatlas serve: skipping auto-migration ({exc}). "
+                "Run `agentatlas migrate` manually or pass --no-migrate "
+                "to silence this warning.",
+                file=sys.stderr,
+            )
+
     uvicorn.run(
         "app.main:app",
         host=args.host,
@@ -175,6 +199,26 @@ def _cmd_serve(args: argparse.Namespace) -> int:
         reload=args.reload,
     )
     return 0
+
+
+def _auto_migrate() -> None:
+    """Apply pending alembic migrations against the configured DB.
+
+    Works from a checkout (source-tree ini), a wheel install (bundled
+    migrations + programmatic config), and a custom layout
+    (`AGENTATLAS_ALEMBIC_INI`). Idempotent — re-running against an
+    up-to-date DB is a no-op.
+    """
+    from alembic import command
+
+    from app.services.alembic_config import make_alembic_config
+
+    prior_cwd = os.getcwd()
+    try:
+        cfg = make_alembic_config()
+        command.upgrade(cfg, "head")
+    finally:
+        os.chdir(prior_cwd)
 
 
 def _cmd_mcp(_args: argparse.Namespace) -> int:
@@ -185,41 +229,38 @@ def _cmd_mcp(_args: argparse.Namespace) -> int:
 
 
 def _cmd_seed(args: argparse.Namespace) -> int:
-    # The seed script lives outside the installed package (in `scripts/`)
-    # so we load it by path. This keeps the script importable when running
-    # from a checkout and avoids shipping demo data inside the wheel.
-    seed_module = _load_seed_module()
+    # Stage 14: the seed logic moved into `app.seed_data.runner`, which
+    # ships inside the wheel along with the artifacts themselves. The
+    # `AGENTATLAS_SEED_SCRIPT` env-var override still works for users who
+    # want to point at a fork of `scripts/seed_examples.py`.
+    override = os.environ.get("AGENTATLAS_SEED_SCRIPT")
     seed_argv: list[str] = []
     if args.reset:
         seed_argv.append("--reset")
     if args.database_url:
         seed_argv += ["--database-url", args.database_url]
-    return int(seed_module.main(seed_argv))
+    if override:
+        seed_module = _import_module_from_path(
+            "agentatlas_seed_examples_override", Path(override)
+        )
+        return int(seed_module.main(seed_argv))
+    from app.seed_data.runner import main as seed_main
+
+    return int(seed_main(seed_argv))
 
 
 def _cmd_migrate(args: argparse.Namespace) -> int:
     from alembic import command
-    from alembic.config import Config
 
-    cfg_path = _alembic_ini_path()
-    if cfg_path is None:
-        print(
-            "agentatlas migrate: could not locate alembic.ini. Run from a "
-            "checkout (backend/alembic.ini) or set AGENTATLAS_ALEMBIC_INI.",
-            file=sys.stderr,
-        )
-        return 1
+    from app.services.alembic_config import make_alembic_config
 
-    cfg = Config(str(cfg_path))
-    # alembic resolves script_location relative to the ini's directory;
-    # set the working CWD so its relative `script_location = alembic`
-    # entry continues to work no matter where the user invoked us.
     prior_cwd = os.getcwd()
-    os.chdir(cfg_path.parent)
     try:
-        if args.database_url:
-            cfg.set_main_option("sqlalchemy.url", args.database_url)
+        cfg = make_alembic_config(args.database_url)
         command.upgrade(cfg, "head")
+    except RuntimeError as exc:
+        print(f"agentatlas migrate: {exc}", file=sys.stderr)
+        return 1
     finally:
         os.chdir(prior_cwd)
     return 0
@@ -305,44 +346,6 @@ def _print_verdict(payload: dict[str, Any]) -> None:
         print(f"  - {reason}")
 
 
-def _load_seed_module() -> Any:
-    """Import `scripts/seed_examples.py` by path.
-
-    Walks up from this file looking for `<repo>/scripts/seed_examples.py`.
-    Stops at the first `.git` directory (the repo root) so we don't keep
-    climbing into the user's filesystem indefinitely. Falls back to
-    `$AGENTATLAS_SEED_SCRIPT` if the wheel was installed somewhere that
-    doesn't sit next to the repo tree.
-
-    NOTE: `data/seed_artifacts/` and `scripts/seed_examples.py` are
-    deliberately not packaged inside the wheel — they're demo data, not
-    core functionality. `pip install agentatlas` users who want the
-    seeded demo graph need a git checkout (or to set the env var to a
-    seed_examples.py somewhere on disk).
-    """
-    override = os.environ.get("AGENTATLAS_SEED_SCRIPT")
-    candidate_paths: list[Path] = []
-    if override:
-        candidate_paths.append(Path(override))
-    here = Path(__file__).resolve()
-    for parent in here.parents:
-        candidate_paths.append(parent / "scripts" / "seed_examples.py")
-        if (parent / ".git").exists():
-            break
-
-    for path in candidate_paths:
-        if path.is_file():
-            return _import_module_from_path("agentatlas_seed_examples", path)
-
-    raise RuntimeError(
-        "agentatlas seed: could not locate scripts/seed_examples.py. The "
-        "demo seed data ships in the git repo, not the PyPI wheel. Either "
-        "run from a checkout (https://github.com/ruth411/AgentAtlas), or "
-        "set AGENTATLAS_SEED_SCRIPT to the absolute path of a "
-        "seed_examples.py on disk."
-    )
-
-
 def _import_module_from_path(name: str, path: Path) -> Any:
     import importlib.util
 
@@ -353,22 +356,6 @@ def _import_module_from_path(name: str, path: Path) -> Any:
     sys.modules[name] = module
     spec.loader.exec_module(module)
     return module
-
-
-def _alembic_ini_path() -> Path | None:
-    override = os.environ.get("AGENTATLAS_ALEMBIC_INI")
-    if override:
-        candidate = Path(override)
-        return candidate if candidate.is_file() else None
-
-    here = Path(__file__).resolve()
-    for parent in here.parents:
-        candidate = parent / "alembic.ini"
-        if candidate.is_file():
-            return candidate
-        if (parent / ".git").exists():
-            break
-    return None
 
 
 if __name__ == "__main__":

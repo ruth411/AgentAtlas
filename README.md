@@ -7,10 +7,10 @@
 Wikipedia tells humans what things are. AgentAtlas tells AI agents what tools can do, how to use them, and whether they're safe.
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/downloads/)
-[![Tests](https://img.shields.io/badge/tests-656%20passing-2EA44F)](#validation)
+[![Tests](https://img.shields.io/badge/tests-693%20passing-2EA44F)](#validation)
 [![Ruff](https://img.shields.io/badge/lint-ruff%20clean-FCC21B)](https://docs.astral.sh/ruff/)
-[![License](https://img.shields.io/badge/license-MIT-blue)](#license)
-[![Status](https://img.shields.io/badge/stage-13%20complete-7C3AED)](docs/stage_report.md)
+[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![Status](https://img.shields.io/badge/stage-14%20complete-7C3AED)](docs/stage_report.md)
 
 [Quick Start](#quick-start) · [What's Built](#whats-built) · [MCP Integration](#mcp-integration) · [Architecture](#architecture) · [Roadmap](ROADMAP.md)
 
@@ -119,9 +119,9 @@ Six ingestion lanes pull evidence from trusted sources. A deterministic orchestr
 
 ## Quick Start
 
-Two supported install paths for v1.0: a **repo checkout** (recommended for development and the demo), and a **Docker image** (bundles everything, recommended for running the API behind an MCP client).
+Stage 14 ships three supported install paths, all of which produce a working `agentatlas` binary with no manual setup.
 
-### From a checkout
+### From a checkout (recommended for development)
 
 ```bash
 git clone https://github.com/ruth411/AgentAtlas.git
@@ -136,7 +136,7 @@ agentatlas serve --reload     # API on http://localhost:8000
 
 OpenAPI docs at <http://localhost:8000/docs>.
 
-A fresh checkout is now populated with **47 claims** spanning 5 tools (`git`, `github-cli`, `docker`, `vercel-cli`, `openai-api`). The headline demo works immediately:
+A fresh checkout is populated with **47 claims** spanning 5 tools (`git`, `github-cli`, `docker`, `vercel-cli`, `openai-api`). The headline demo works immediately:
 
 ```bash
 agentatlas query --tool github-cli --command 'gh repo delete my-org/x --yes'
@@ -147,6 +147,19 @@ agentatlas query --tool github-cli --command 'gh repo delete my-org/x --yes'
 #   - Deleting a GitHub repository is an irreversible remote mutation.
 ```
 
+### Standalone wheel install (Stage 14)
+
+The wheel bundles the trust contracts, seed artifacts, and alembic migrations, so an isolated `pip install` produces a fully-functional package — no checkout required.
+
+```bash
+python3.12 -m venv ~/venv-agentatlas
+~/venv-agentatlas/bin/pip install agentatlas    # once published to PyPI
+agentatlas seed --reset                         # uses the bundled demo data
+agentatlas serve                                # auto-migrates the schema first
+```
+
+> v1.0 ships the wheel from a local source build (`pip install /path/to/AgentAtlas/backend`). The PyPI upload itself lands with v1.0's release tag.
+
 ### With Docker
 
 ```bash
@@ -155,15 +168,13 @@ docker run --rm -p 8000:8000 agentatlas         # serve the API
 docker run --rm -i agentatlas mcp               # MCP stdio bridge
 ```
 
-The image bundles the seed data, contracts, and the `agentatlas` binary as its entrypoint.
-
-> **Note:** A standalone `pip install agentatlas` from PyPI is not supported in v1.0 — the trust contracts (`contracts/*.v1.json`) and seed data live in the repo, not the wheel. Bundling them as package data is on the Stage 14 release-prep punch list.
+The image bundles the same seed + contracts as the wheel and ships the `agentatlas` binary as its entrypoint.
 
 ### CLI reference
 
 | Command | Purpose |
 |---|---|
-| `agentatlas serve [--host --port --reload]` | Run the FastAPI app under uvicorn |
+| `agentatlas serve [--host --port --reload --no-migrate]` | Run the FastAPI app under uvicorn; auto-migrates the schema on first start unless `--no-migrate` is passed |
 | `agentatlas mcp` | Speak MCP/JSON-RPC over stdio (for Claude Desktop, Cursor, …) |
 | `agentatlas seed [--reset --database-url URL]` | Replay `data/seed_artifacts/` into the DB |
 | `agentatlas migrate [--database-url URL]` | `alembic upgrade head` |
@@ -221,6 +232,7 @@ These are non-negotiable. They're tested.
 | 11b — Demo dashboard | Minimal Next.js UI: landing + tools list + tool detail + query playground | ✓ |
 | 12 — CLI + Docker | One `agentatlas` binary on PATH; one-stage Dockerfile | ✓ |
 | 13 — Human review + audit | `L5_human_audited` promotion path; append-only audit log; review queue; per-claim history endpoint | ✓ |
+| 14 — Hardening | Wheel bundles contracts + seed + migrations; `/v1/` API versioning; observability + request ids; optional API-key auth + reviewer registry; auto-init on serve; Postgres dialect smoke; GitHub Actions CI; LICENSE / CONTRIBUTING / SECURITY | ✓ |
 
 See [docs/stage_report.md](docs/stage_report.md) for the full per-stage report including required artifacts, pass-case audit, quality bar, audit log, and what each stage explicitly defers.
 
@@ -238,7 +250,7 @@ AgentAtlas/
 │   │   ├── cli.py           # Stage 12 — the `agentatlas` console script
 │   │   └── main.py          # FastAPI app + middleware (body size guard, structured errors)
 │   ├── alembic/             # Migrations (drift-locked against models)
-│   └── tests/               # 656 tests; ruff clean; hermetic
+│   └── tests/               # 693 tests; ruff clean; hermetic
 ├── frontend/                # Stage 11b — Next.js demo dashboard (4 pages)
 ├── data/seed_artifacts/     # Stage 11a — pre-captured artifacts for offline-safe seeding
 ├── scripts/                 # seed_examples.py and other operator tools
@@ -394,7 +406,7 @@ curl -X POST http://localhost:8000/ingestion/docs \
 ```bash
 cd backend
 
-# Test suite (656 tests, hermetic, ~30s)
+# Test suite (693 tests, hermetic, ~30s)
 .venv/bin/python -m pytest -q
 
 # Lint
@@ -411,20 +423,23 @@ DATABASE_URL=sqlite:////tmp/agentatlas-smoke.db .venv/bin/alembic upgrade head
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `AGENTATLAS_DATABASE_URL` | `sqlite:///./agentatlas.db` | SQLAlchemy URL. SQLite is the only database covered by the test suite in v1.0. |
-| `AGENTATLAS_ALEMBIC_INI` | autodetected | Path to `alembic.ini`. Useful when running `agentatlas migrate` from outside a checkout. |
-| `AGENTATLAS_SEED_SCRIPT` | autodetected | Path to `scripts/seed_examples.py`. Set this when running `agentatlas seed` outside a checkout. |
+| `AGENTATLAS_DATABASE_URL` | `sqlite:///./agentatlas.db` | SQLAlchemy URL. SQLite is the test-matrix dialect; Stage 14 verified the schema also compiles cleanly under the Postgres dialect (no live Postgres in CI yet). |
+| `AGENTATLAS_ALEMBIC_INI` | autodetected | Optional override path to `alembic.ini`. The CLI resolver tries env-var → source-tree `backend/alembic.ini` → bundled `app/_alembic/` (wheel install) in order. |
+| `AGENTATLAS_SEED_SCRIPT` | autodetected | Optional override path to a `seed_examples.py` fork. Without it, `agentatlas seed` uses the in-package `app.seed_data.runner`. |
+| `AGENTATLAS_API_KEY` | unset (auth off) | When set, Stage 14 enables Bearer-token auth on every state-changing endpoint. Read endpoints stay public regardless. Health endpoints stay public. |
+| `AGENTATLAS_REVIEWER_REGISTRY` | unset (open) | Comma-separated allowlist of `reviewer_id` values for `POST /verification/human-review`. When set, unlisted reviewers receive a structured 403. |
 | `AGENTATLAS_API_URL` (frontend) | `http://localhost:8000` | Where the dashboard's `/api/*` rewrite points. |
 
 ## What This Isn't (Yet)
 
-Being honest about the gaps:
+Being honest about the gaps that remain after Stage 14:
 
 - **Stage 0 scope is narrow.** Initial tool coverage: `git`, `github-cli`, `docker`, `vercel-cli`, `openai-api` plus 5 MCP servers. Adding tools is a contract change, not code.
-- **No PyPI release yet.** Install from a checkout or Docker. Bundling contracts + seed data as package data — and the PyPI upload itself — land with Stage 14.
-- **SQLite-only in v1.0.** SQLAlchemy can target other backends but the test matrix is SQLite. Postgres support is a Stage 14+ goal.
-- **No CI yet.** Tests + lint run locally. GitHub Actions wiring is part of Stage 14.
-- **No external auth on the API.** Local-dev surface; pairing the API with an auth proxy is a deployment concern, not a v1 product feature.
+- **No PyPI upload yet.** The wheel works (Stage 14 bundled everything), but the `pip install agentatlas` invocation still points at a local build. The tagged release lands as part of v1.0.
+- **SQLite is the only tested backend.** SQLAlchemy targets Postgres + the schema is dialect-portable (Stage 14 added an offline DDL smoke), but no `testcontainers`-style live Postgres tests run in CI. v1.1 adds them.
+- **No external auth provider integration.** Stage 14 ships an optional API-key gate via env var — solid for protecting a deployment behind a reverse proxy, not a substitute for SSO. OAuth / OIDC integration is v1.1.
+- **No rate limiting.** Deploy behind a reverse proxy (nginx, Caddy) that enforces rate limits. Native rate-limiting is v1.1.
+- **Reviewer auth is identity-by-string.** `AGENTATLAS_REVIEWER_REGISTRY` is a name allowlist; per-reviewer cryptographic identity (Ed25519 keys, signed reviews) is v1.1.
 
 ## Documentation
 
@@ -433,6 +448,8 @@ Being honest about the gaps:
 - [Product lock](docs/product_lock.md) — what AgentAtlas is, what it isn't, and the principles that hold for v1
 - [Trust contract](docs/trust_contract.md) — claim taxonomy, evidence taxonomy, verification rules, risk semantics
 - [Demo scenarios](docs/demo_scenarios.md) — the headline queries the project promises to answer correctly
+- [Contributing](CONTRIBUTING.md) — local setup, PR checklist, code style
+- [Security policy](SECURITY.md) — vulnerability reporting, what we treat as a vuln, disclosure timeline
 
 ## Contributing
 
@@ -456,11 +473,11 @@ Non-negotiables for any PR:
 - Contract changes are versioned (`*.v1.json` is locked; new versions get a new file).
 - Safety rules never weaken — never expand `allowed_commands`, never widen SSRF guards, never demote evidence-trust requirements.
 
-A full `CONTRIBUTING.md` + `SECURITY.md` land with Stage 14 polish.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full PR checklist and [SECURITY.md](SECURITY.md) for the vulnerability-reporting path.
 
 ## License
 
-MIT. A standalone `LICENSE` file ships with the Stage 14 release-prep pass.
+MIT — see [LICENSE](LICENSE).
 
 ## Acknowledgements
 

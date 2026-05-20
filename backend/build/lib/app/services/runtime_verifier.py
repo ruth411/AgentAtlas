@@ -92,13 +92,11 @@ from app.services.mcp_ingestion import (
     SafeMcpServerRunner,
     resolve_mcp_server_spec,
 )
+from app.services.contract_paths import contract_path
 from app.services.risk_classifier import classify_action
 
 
-_RUNTIME_CONTRACT = (
-    Path(__file__).resolve().parents[3]
-    / "contracts/runtime_verification_sources.v1.json"
-)
+_RUNTIME_CONTRACT = contract_path("runtime_verification_sources.v1.json")
 
 _RUNTIME_PROMOTION_BONUS = 0.10
 _RUNTIME_FAIL_PENALTY = 0.20

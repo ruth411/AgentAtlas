@@ -56,6 +56,17 @@ testpaths = ["tests"]
 [tool.setuptools.packages.find]
 include = ["app*"]
 
+[tool.setuptools.package-data]
+# Stage 14: bundle the versioned trust contracts, the seed artifacts,
+# and the alembic migration scripts into the wheel so a plain
+# `pip install agentatlas` produces a fully-functional package.
+# `contract_paths.contract_path()`, the seed loader, and the alembic
+# config resolver all prefer the source-tree copies during development
+# and fall back to these bundled paths when the source tree is absent.
+"app.contracts" = ["*.json"]
+"app.seed_data" = ["**/*.json", "main.py"]
+"app._alembic" = ["*.py", "**/*.py"]
+
 [tool.ruff]
 line-length = 100
 target-version = "py311"

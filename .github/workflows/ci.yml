@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancel in-progress runs for the same PR / branch when a new commit lands —
+# saves CI minutes and prevents stale runs from masking newer failures.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: backend/pyproject.toml
+
+      - name: Install backend (with dev extras)
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e 'backend[dev]'
+
+      - name: Lint (ruff)
+        working-directory: backend
+        run: ruff check app tests
+
+      - name: Test (pytest, hermetic)
+        working-directory: backend
+        run: pytest -q
+
+      - name: Migration roundtrip smoke
+        working-directory: backend
+        run: |
+          rm -f /tmp/agentatlas-ci.db
+          AGENTATLAS_DATABASE_URL=sqlite:////tmp/agentatlas-ci.db alembic upgrade head
+          AGENTATLAS_DATABASE_URL=sqlite:////tmp/agentatlas-ci.db alembic downgrade -5
+          AGENTATLAS_DATABASE_URL=sqlite:////tmp/agentatlas-ci.db alembic upgrade head
+
+      - name: Clean-venv install smoke
+        # Build the wheel and install it into a throwaway interpreter to
+        # catch packaging regressions (missing package_data, broken
+        # entry points, etc.) before they hit PyPI.
+        run: |
+          python -m pip install --upgrade build
+          python -m build backend
+          python -m venv /tmp/smoke-venv
+          /tmp/smoke-venv/bin/pip install --upgrade pip
+          /tmp/smoke-venv/bin/pip install backend/dist/agentatlas-*.whl
+          /tmp/smoke-venv/bin/agentatlas --version
+          /tmp/smoke-venv/bin/agentatlas --help
+
+  frontend-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install
+        working-directory: frontend
+        run: npm ci || npm install
+
+      - name: Build
+        working-directory: frontend
+        # No frontend tests in v1.0 (see stage_report.md). `next build`
+        # is the type-check + bundle smoke.
+        run: npx next build

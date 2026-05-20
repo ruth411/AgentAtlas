@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "default_timeout_seconds": 30,
+  "default_max_bytes": 8388608,
+  "default_cache_ttl_seconds": 86400,
+  "max_redirects": 3,
+  "max_endpoints_per_spec": 500,
+  "allowed_content_types": [
+    "application/json",
+    "application/vnd.oai.openapi+json",
+    "text/json"
+  ],
+  "tools": {
+    "openai-api": {
+      "sources": [
+        {
+          "url": "https://api.openai.com/v1/openapi.json",
+          "evidence_type": "openapi_schema"
+        }
+      ]
+    }
+  }
+}

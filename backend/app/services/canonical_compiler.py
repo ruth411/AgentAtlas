@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 import json
 from functools import cache
-from pathlib import Path
 import re
 
 from app.schemas.claim import KnowledgeClaim
@@ -33,9 +32,10 @@ from app.services.claim_store import (
     canonical_spec_hash,
     canonical_spec_json,
 )
+from app.services.contract_paths import contract_path
 
 
-_STAGE_0_CONTRACT = Path(__file__).resolve().parents[3] / "contracts/agentatlas_stage_0.v1.json"
+_STAGE_0_CONTRACT = contract_path("agentatlas_stage_0.v1.json")
 _WORKFLOW_SUBJECT = re.compile(r"^(?P<workflow_id>[^:]+)::(?P<step_number>[0-9]+)::(?P<action>.+)$")
 
 class CanonicalPublicationError(ValueError):
