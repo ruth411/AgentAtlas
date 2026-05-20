@@ -33,7 +33,7 @@ FIXED_TIME = datetime(2026, 5, 14, tzinfo=timezone.utc)
 
 @pytest.fixture
 def store(tmp_path) -> ClaimStore:
-    return ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    return ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
 
 
 @pytest.fixture
@@ -104,7 +104,7 @@ def test_dangerous_or_unknown_url_schemes_are_rejected(source_uri: str) -> None:
     [
         "https://docs.github.com/cli/manual/gh_repo_delete",
         "http://example.com/path",
-        "agentatlas://ingestion/run_x/artifacts/a_y",
+        "ayiru://ingestion/run_x/artifacts/a_y",
         "local://help.txt",
         "file:///var/log/x.txt",
         "docs://vercel-cli/deploy",

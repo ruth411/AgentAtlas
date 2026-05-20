@@ -1,2 +1,2 @@
-"""AgentAtlas backend package."""
+"""Ayiru backend package."""
 

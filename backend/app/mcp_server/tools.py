@@ -1,4 +1,4 @@
-"""MCP tool registry for AgentAtlas.
+"""MCP tool registry for Ayiru.
 
 Each `McpTool` carries the metadata MCP clients need to discover and
 invoke it (`name`, `description`, `inputSchema`) plus a sync `handler`

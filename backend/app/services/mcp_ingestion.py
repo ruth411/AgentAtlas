@@ -22,7 +22,7 @@ Per tool we emit:
                                        annotations carry an explicit
                                        `deprecated: true`.
 
-Provenance: the evidence `source_uri` is `agentatlas://mcp/<server_id>/tools/
+Provenance: the evidence `source_uri` is `ayiru://mcp/<server_id>/tools/
 <tool_name>` (this is local-captured evidence, mirrored by the durable raw
 `MCP_TOOL_LIST` artifact which stores the full JSON-RPC reply for audit).
 
@@ -255,7 +255,7 @@ def _drive_protocol(
             "protocolVersion": spec.protocol_version,
             "capabilities": {},
             "clientInfo": {
-                "name": "AgentAtlas-McpIngestion",
+                "name": "Ayiru-McpIngestion",
                 "version": "1.0",
             },
         },
@@ -800,7 +800,7 @@ def _build_claim(
 ) -> KnowledgeClaim:
     # Evidence source URI is the atlas-captured artifact, with a fragment
     # naming the specific tool the claim describes.
-    source_uri = f"agentatlas://mcp/{spec.server_id}/{pointer}"
+    source_uri = f"ayiru://mcp/{spec.server_id}/{pointer}"
     excerpt = (statement or subject)[:8000]
     evidence = Evidence(
         evidence_id=generate_evidence_id(),
@@ -832,7 +832,7 @@ def _artifact_from_result(
     captured_at: datetime,
 ) -> RawIngestionArtifact:
     artifact_id = generate_ingestion_artifact_id()
-    source_uri = f"agentatlas://ingestion/{run_id}/artifacts/{artifact_id}"
+    source_uri = f"ayiru://ingestion/{run_id}/artifacts/{artifact_id}"
     payload = {
         "server_id": spec.server_id,
         "command": spec.command,

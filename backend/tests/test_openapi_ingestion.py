@@ -48,7 +48,7 @@ OPENAI_URL = "https://api.openai.com/v1/openapi.json"
 
 @pytest.fixture
 def store(tmp_path) -> ClaimStore:
-    return ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    return ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
 
 
 def _minimal_spec(

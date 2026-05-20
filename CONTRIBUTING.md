@@ -1,6 +1,6 @@
-# Contributing to AgentAtlas
+# Contributing to Ayiru
 
-Thanks for your interest. AgentAtlas is an early-stage open-source project; a small amount of process makes it easier for maintainers to merge your contribution quickly.
+Thanks for your interest. Ayiru is an early-stage open-source project; a small amount of process makes it easier for maintainers to merge your contribution quickly.
 
 ## Ground rules
 
@@ -15,14 +15,14 @@ These rules are non-negotiable because the project's trust story depends on them
 ## Getting set up
 
 ```bash
-git clone https://github.com/ruth411/AgentAtlas.git
-cd AgentAtlas
+git clone https://github.com/ruth411/ayiru.git
+cd Ayiru
 python3.12 -m venv backend/.venv
 source backend/.venv/bin/activate
 pip install -e 'backend[dev]'
 
-agentatlas seed --reset
-agentatlas serve --reload
+ayiru seed --reset
+ayiru serve --reload
 ```
 
 Before opening a PR:
@@ -46,7 +46,7 @@ cd backend
 
 Good first contributions:
 
-- Add a new tool to `contracts/agentatlas_stage_0.v1.json`'s `initial_tools` list, then submit seed claims for it.
+- Add a new tool to `contracts/ayiru_stage_0.v1.json`'s `initial_tools` list, then submit seed claims for it.
 - Add a runtime verifier for a new claim type in `app/services/runtime_verifier.py`.
 - Expand the headline scenarios in `data/seed_artifacts/claims/headline_scenarios.json`.
 - Improve the demo dashboard (`frontend/`) — error states, dark mode, search-as-you-type.

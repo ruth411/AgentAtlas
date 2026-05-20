@@ -1,4 +1,4 @@
-"""Stage 10: AgentAtlas MCP server adversarial tests.
+"""Stage 10: Ayiru MCP server adversarial tests.
 
 These tests pin every wire-level contract of the server:
 
@@ -72,7 +72,7 @@ FIXED_TIME = datetime(2026, 5, 18, tzinfo=timezone.utc)
 
 @pytest.fixture
 def store(tmp_path) -> ClaimStore:
-    return ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    return ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
 
 
 @pytest.fixture
@@ -723,7 +723,7 @@ def test_subprocess_entry_point_runs_handshake_cleanly(tmp_path) -> None:
     app.mcp_server` entry point + stdio framing the way Claude Desktop /
     Cursor will. Other tests cover everything else in-process.
 
-    Uses AGENTATLAS_DATABASE_URL to point at a throwaway SQLite file so the
+    Uses AYIRU_DATABASE_URL to point at a throwaway SQLite file so the
     spawned process doesn't write into the dev DB."""
     db_path = tmp_path / "mcp_smoke.db"
     # Initialise the schema before spawning so the server doesn't have to
@@ -743,7 +743,7 @@ def test_subprocess_entry_point_runs_handshake_cleanly(tmp_path) -> None:
         env={
             "PATH": __import__("os").environ.get("PATH", ""),
             "HOME": __import__("os").environ.get("HOME", "/tmp"),
-            "AGENTATLAS_DATABASE_URL": f"sqlite:///{db_path}",
+            "AYIRU_DATABASE_URL": f"sqlite:///{db_path}",
             # Force Python to find the `app` package by including the
             # backend dir on sys.path (cwd alone isn't enough on every OS).
             "PYTHONPATH": str(backend_dir),

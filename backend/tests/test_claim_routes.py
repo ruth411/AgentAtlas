@@ -10,7 +10,7 @@ from tests.helpers import valid_sha256
 
 @pytest.fixture
 def client(tmp_path):
-    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas-test.db'}")
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru-test.db'}")
 
     app.dependency_overrides[get_claim_store] = lambda: store
     with TestClient(app) as test_client:

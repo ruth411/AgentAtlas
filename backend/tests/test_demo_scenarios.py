@@ -1,7 +1,7 @@
 """End-to-end tests for the Stage 0 demo scenarios.
 
 These tests prove that the Stage 3 services correctly classify the five
-canonical demo commands defined in `contracts/agentatlas_stage_0.v1.json`.
+canonical demo commands defined in `contracts/ayiru_stage_0.v1.json`.
 They are intentionally service-level (risk classifier + orchestrator) rather
 than dependent on the Stage 9 query surface, which does not yet exist.
 """
@@ -26,7 +26,7 @@ from tests.helpers import valid_sha256
 
 
 def _store(tmp_path) -> ClaimStore:
-    return ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    return ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
 
 
 def _claim(

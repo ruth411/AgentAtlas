@@ -1,6 +1,6 @@
 """Stage 13: append-only audit event schema.
 
-Every state-changing operation in AgentAtlas emits one `AuditEvent` —
+Every state-changing operation in Ayiru emits one `AuditEvent` —
 claim submissions, verification results (including L3/L5 promotions),
 human reviews, canonical spec publications. The audit log is the source
 of truth for "what happened, when, and at whose direction".

@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAI API (seed subset)",
     "version": "1.0.0",
-    "description": "A small but representative subset of the OpenAI REST API used to seed AgentAtlas with multiple endpoint claims for the demo. Schema is valid OpenAPI 3.0.3 so the same Stage 7c.1 ingestion lane that runs against the live spec accepts this verbatim."
+    "description": "A small but representative subset of the OpenAI REST API used to seed Ayiru with multiple endpoint claims for the demo. Schema is valid OpenAPI 3.0.3 so the same Stage 7c.1 ingestion lane that runs against the live spec accepts this verbatim."
   },
   "servers": [{"url": "https://api.openai.com/v1"}],
   "security": [{"bearerAuth": []}],

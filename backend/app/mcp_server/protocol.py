@@ -1,4 +1,4 @@
-"""JSON-RPC 2.0 framing for the AgentAtlas MCP server.
+"""JSON-RPC 2.0 framing for the Ayiru MCP server.
 
 Thin wrapper. Every message is a single line of JSON. We hand-roll this
 because the MCP protocol surface we need (`initialize`, `tools/list`,
@@ -30,7 +30,7 @@ TOOL_EXECUTION_ERROR = -32002
 # Protocol version we advertise on initialize. Matches the MCP spec
 # revision Claude Desktop / Cursor ship as of this release.
 PROTOCOL_VERSION = "2024-11-05"
-SERVER_NAME = "AgentAtlas"
+SERVER_NAME = "Ayiru"
 SERVER_VERSION = "0.1.0"
 
 

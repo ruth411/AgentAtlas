@@ -7,7 +7,7 @@ from app.schemas.risk import RiskDimension
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 RISK_MODEL = REPO_ROOT / "contracts/risk_model.v1.json"
-STAGE_0_CONTRACT = REPO_ROOT / "contracts/agentatlas_stage_0.v1.json"
+STAGE_0_CONTRACT = REPO_ROOT / "contracts/ayiru_stage_0.v1.json"
 
 
 def _risk_model() -> dict:

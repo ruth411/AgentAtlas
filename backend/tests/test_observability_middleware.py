@@ -6,7 +6,7 @@ Two pinned behaviours:
   one, the server echoes it back; otherwise the server mints a fresh
   uuid4 hex string.
 - Each request produces exactly one structured log line on the
-  `agentatlas.request` logger, with `event=http_request`, the
+  `ayiru.request` logger, with `event=http_request`, the
   request id, method, path, status_code, duration_ms, and (on 5xx) an
   `error_type` field.
 """
@@ -52,12 +52,12 @@ def test_request_id_is_echoed_from_client_header(client) -> None:
 
 
 def test_structured_log_line_emitted_per_request(client, caplog) -> None:
-    caplog.set_level(logging.INFO, logger="agentatlas.request")
+    caplog.set_level(logging.INFO, logger="ayiru.request")
     client.get("/health")
 
     matching = [
         record for record in caplog.records
-        if record.name == "agentatlas.request"
+        if record.name == "ayiru.request"
     ]
     assert len(matching) == 1, (
         f"expected exactly one log line; got {len(matching)}"
@@ -73,12 +73,12 @@ def test_structured_log_line_emitted_per_request(client, caplog) -> None:
 
 
 def test_log_line_includes_v1_path(client, caplog) -> None:
-    caplog.set_level(logging.INFO, logger="agentatlas.request")
+    caplog.set_level(logging.INFO, logger="ayiru.request")
     client.get("/v1/claims")
 
     matching = [
         record for record in caplog.records
-        if record.name == "agentatlas.request"
+        if record.name == "ayiru.request"
     ]
     payload = json.loads(matching[0].getMessage())
     assert payload["path"] == "/v1/claims"
@@ -89,12 +89,12 @@ def test_legacy_path_log_line_records_legacy_url(client, caplog) -> None:
     """Even though the legacy mount adds a Deprecation header, the log
     line records the actual URL the client hit so ops can grep for
     legacy usage."""
-    caplog.set_level(logging.INFO, logger="agentatlas.request")
+    caplog.set_level(logging.INFO, logger="ayiru.request")
     client.get("/claims")
 
     matching = [
         record for record in caplog.records
-        if record.name == "agentatlas.request"
+        if record.name == "ayiru.request"
     ]
     payload = json.loads(matching[0].getMessage())
     assert payload["path"] == "/claims"

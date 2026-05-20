@@ -5,5 +5,13 @@ __pycache__/
 .ruff_cache/
 .venv/
 *.egg-info/
-agentatlas.db
+build/
+dist/
+ayiru.db
 *.db
+# Frontend
+node_modules/
+.next/
+out/
+# Phase 0 results (per-run, never committed)
+phase0_results.json

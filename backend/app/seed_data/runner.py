@@ -2,7 +2,7 @@
 
 This is the wheel-friendly successor to `scripts/seed_examples.py`. The
 script at `scripts/seed_examples.py` now imports `main` from here and
-delegates; the CLI's `agentatlas seed` calls into this module directly.
+delegates; the CLI's `ayiru seed` calls into this module directly.
 
 Artifact lookup mirrors `contract_paths.contract_path`: source-tree
 first (`<repo>/data/seed_artifacts/...`) so dev edits are visible
@@ -11,8 +11,8 @@ immediately, falling back to the bundled copy at
 
 The reset path also auto-detects `alembic.ini`: source-tree
 `<repo>/backend/alembic.ini` first, then the env-var override
-`AGENTATLAS_ALEMBIC_INI`. Both modes work; from a clean PyPI install
-the user passes `AGENTATLAS_ALEMBIC_INI` (or the CLI's `migrate`
+`AYIRU_ALEMBIC_INI`. Both modes work; from a clean PyPI install
+the user passes `AYIRU_ALEMBIC_INI` (or the CLI's `migrate`
 subcommand is used instead).
 """
 
@@ -105,7 +105,7 @@ def _seed_openapi(store: ClaimStore) -> dict[str, Any]:
     response = OpenApiIngestionService(store, client=client).ingest(
         tool_id="openai-api",
         url="https://api.openai.com/v1/openapi.json",
-        submitted_by="agentatlas-seed",
+        submitted_by="ayiru-seed",
     )
     return {
         "artifact": "openapi/openai_api.json",
@@ -121,7 +121,7 @@ def _seed_json_schema(store: ClaimStore) -> dict[str, Any]:
     response = JsonSchemaIngestionService(store, client=client).ingest(
         tool_id="docker",
         url="https://json.schemastore.org/docker-compose.json",
-        submitted_by="agentatlas-seed",
+        submitted_by="ayiru-seed",
     )
     return {
         "artifact": "json_schema/docker_compose.json",
@@ -169,7 +169,7 @@ def _seed_headline_scenarios(store: ClaimStore) -> dict[str, Any]:
         store.create(claim)
         submitted.append(claim.claim_id)
         result = orchestrator.verify_claim(claim)
-        store.save_verification_result(result, actor="agentatlas-seed")
+        store.save_verification_result(result, actor="ayiru-seed")
         if result.verification_status.value == "accepted":
             accepted.append(claim.claim_id)
     return {
@@ -208,26 +208,26 @@ def _reset_database(database_url: str) -> None:
 
 
 def _default_database_url() -> str:
-    override = os.environ.get("AGENTATLAS_DATABASE_URL")
+    override = os.environ.get("AYIRU_DATABASE_URL")
     if override:
         return override
-    # If running from a checkout, default to backend/agentatlas.db; the
+    # If running from a checkout, default to backend/ayiru.db; the
     # SessionLocal default points there too, so behaviour matches.
     here = Path(__file__).resolve()
     for parent in here.parents:
         if (parent / "alembic.ini").is_file():
-            return f"sqlite:///{parent / 'agentatlas.db'}"
+            return f"sqlite:///{parent / 'ayiru.db'}"
         if (parent / ".git").exists():
             break
-    return "sqlite:///./agentatlas.db"
+    return "sqlite:///./ayiru.db"
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Seed AgentAtlas with demo data.")
+    parser = argparse.ArgumentParser(description="Seed Ayiru with demo data.")
     parser.add_argument(
         "--database-url",
         default=None,
-        help="SQLAlchemy database URL (defaults to $AGENTATLAS_DATABASE_URL or backend/agentatlas.db).",
+        help="SQLAlchemy database URL (defaults to $AYIRU_DATABASE_URL or backend/ayiru.db).",
     )
     parser.add_argument(
         "--reset",
@@ -237,7 +237,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     database_url = args.database_url or _default_database_url()
 
-    print(f"AgentAtlas seed → {database_url}")
+    print(f"Ayiru seed → {database_url}")
     if args.reset:
         print("  --reset: dropping tables and re-applying migrations...")
         _reset_database(database_url)

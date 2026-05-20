@@ -1,6 +1,6 @@
 # Demo Scenarios
 
-These scenarios define the minimum proof cases for the first credible AgentAtlas demo.
+These scenarios define the minimum proof cases for the first credible Ayiru demo.
 
 ## Scenario 1: Validate Risky GitHub Command
 

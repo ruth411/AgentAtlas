@@ -8,7 +8,7 @@ from tests.helpers import valid_sha256
 
 
 ROOT = Path(__file__).resolve().parents[2]
-STAGE_0_CONTRACT = ROOT / "contracts/agentatlas_stage_0.v1.json"
+STAGE_0_CONTRACT = ROOT / "contracts/ayiru_stage_0.v1.json"
 TRUST_SOURCES_CONTRACT = ROOT / "contracts/tool_trust_sources.v1.json"
 
 

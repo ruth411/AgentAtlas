@@ -1,0 +1,96 @@
+name: Bug report
+description: Something behaves differently from how it's documented.
+title: "[bug] "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for filing a bug. The more concrete this is — exact command,
+        exact error, exact version — the faster it gets fixed. Vague reports
+        get vague responses.
+
+        **Security issues:** do NOT file here. Use the Security Advisory link
+        on the new-issue page (see `SECURITY.md` for the policy).
+
+  - type: input
+    id: version
+    attributes:
+      label: Ayiru version
+      description: Output of `ayiru --version`.
+      placeholder: "ayiru 0.1.0"
+    validations:
+      required: true
+
+  - type: input
+    id: install_path
+    attributes:
+      label: How did you install?
+      placeholder: "pip install ayiru / repo checkout / Docker image"
+    validations:
+      required: true
+
+  - type: input
+    id: python_version
+    attributes:
+      label: Python version
+      description: Output of `python --version`.
+      placeholder: "Python 3.12.3"
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: OS
+      placeholder: "macOS 14.5 / Ubuntu 24.04 / Windows 11"
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: |
+        The exact commands you ran. Copy-paste, don't paraphrase. Include
+        the env vars you had set (`AYIRU_DATABASE_URL`, `AYIRU_API_KEY`,
+        etc.) if any.
+      placeholder: |
+        1. `ayiru seed --reset --database-url sqlite:///tmp/test.db`
+        2. `ayiru query --tool github-cli --command 'gh repo delete x --yes'`
+        3. Got back: …
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+      description: One sentence is fine.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: What actually happened?
+      description: |
+        Full output / stack trace / API response. If the bug is in the
+        FastAPI surface, include the `X-Request-ID` header from the
+        response — it ties to a structured log line on the server.
+      render: shell
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Pre-flight checks
+      options:
+        - label: I searched existing issues and discussions before filing.
+          required: true
+        - label: I'm on the latest release (or main).
+          required: true
+        - label: This is not a security issue (would use the Security Advisory link instead).
+          required: true

@@ -56,7 +56,7 @@ def _claim(
 
 
 def test_claims_and_evidence_survive_store_reinitialization(tmp_path) -> None:
-    database_url = f"sqlite:///{tmp_path / 'agentatlas.db'}"
+    database_url = f"sqlite:///{tmp_path / 'ayiru.db'}"
     first_store = ClaimStore(database_url=database_url)
     expected = first_store.create(_claim())
     second_store = ClaimStore(database_url=database_url)
@@ -67,7 +67,7 @@ def test_claims_and_evidence_survive_store_reinitialization(tmp_path) -> None:
 
 
 def test_evidence_records_are_queryable_independently(tmp_path) -> None:
-    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
     store.create(_claim())
 
     evidence = store.list_evidence(claim_id="claim_123")
@@ -78,7 +78,7 @@ def test_evidence_records_are_queryable_independently(tmp_path) -> None:
 
 
 def test_store_normalizes_evidence_trust_before_persistence(tmp_path) -> None:
-    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
 
     created = store.create(_claim())
 
@@ -87,7 +87,7 @@ def test_store_normalizes_evidence_trust_before_persistence(tmp_path) -> None:
 
 
 def test_claims_can_be_filtered_by_tool_status_risk_and_submitter(tmp_path) -> None:
-    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
     store.create(_claim(claim_id="claim_123", tool_id="github-cli"))
     store.create(_claim(claim_id="claim_456", tool_id="git"))
 
@@ -103,7 +103,7 @@ def test_claims_can_be_filtered_by_tool_status_risk_and_submitter(tmp_path) -> N
 
 
 def test_claims_can_be_filtered_by_classified_risk_after_verification(tmp_path) -> None:
-    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
     store.create(_claim(claim_id="claim_123", tool_id="github-cli"))
     result = VerificationResult(
         verification_id="ver_123",
@@ -129,7 +129,7 @@ def test_claims_can_be_filtered_by_classified_risk_after_verification(tmp_path) 
 
 
 def test_clear_removes_claims_and_attached_evidence(tmp_path) -> None:
-    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
     store.create(_claim())
 
     store.clear()
@@ -139,7 +139,7 @@ def test_clear_removes_claims_and_attached_evidence(tmp_path) -> None:
 
 
 def test_duplicate_evidence_id_rolls_back_entire_claim_insert(tmp_path) -> None:
-    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
     store.create(_claim(claim_id="claim_123"))
 
     duplicate_evidence_claim = _claim(claim_id="claim_456")
@@ -153,7 +153,7 @@ def test_duplicate_evidence_id_rolls_back_entire_claim_insert(tmp_path) -> None:
 
 
 def test_store_finds_semantic_duplicates_without_requiring_same_id(tmp_path) -> None:
-    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
     existing = _claim(claim_id="claim_123")
     incoming = _claim(claim_id="claim_456")
     store.create(existing)
@@ -164,7 +164,7 @@ def test_store_finds_semantic_duplicates_without_requiring_same_id(tmp_path) -> 
 
 
 def test_store_finds_semantic_duplicates_case_and_whitespace_insensitive(tmp_path) -> None:
-    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
     existing = _claim(claim_id="claim_123")
     incoming = _claim(claim_id="claim_456")
     incoming.subject = "  GH   REPO   DELETE  "
@@ -176,7 +176,7 @@ def test_store_finds_semantic_duplicates_case_and_whitespace_insensitive(tmp_pat
 
 
 def test_store_finds_conflicts_for_same_subject_with_different_risk_or_statement(tmp_path) -> None:
-    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
     existing = _claim(claim_id="claim_123")
     incoming = _claim(
         claim_id="claim_456",
@@ -191,7 +191,7 @@ def test_store_finds_conflicts_for_same_subject_with_different_risk_or_statement
 
 
 def test_store_gets_evidence_by_id(tmp_path) -> None:
-    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
     store.create(_claim())
 
     evidence = store.get_evidence("ev_claim_123")
@@ -201,7 +201,7 @@ def test_store_gets_evidence_by_id(tmp_path) -> None:
 
 
 def test_store_persists_verification_result_and_updates_claim(tmp_path) -> None:
-    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
     store.create(_claim())
     result = VerificationResult(
         verification_id="ver_123",
@@ -233,7 +233,7 @@ def test_store_persists_verification_result_and_updates_claim(tmp_path) -> None:
 
 
 def test_store_lists_verification_results_with_filters(tmp_path) -> None:
-    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
     store.create(_claim())
     result = VerificationResult(
         verification_id="ver_123",

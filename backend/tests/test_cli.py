@@ -1,4 +1,4 @@
-"""Stage 12: `agentatlas` CLI tests.
+"""Stage 12: `ayiru` CLI tests.
 
 Exercise every subcommand in-process where we can — calling `app.cli.main`
 directly with an explicit argv keeps the test suite fast and avoids the
@@ -24,7 +24,7 @@ from app.cli import main
 
 
 # ---------------------------------------------------------------------------
-# `agentatlas --version` / `--help`
+# `ayiru --version` / `--help`
 # ---------------------------------------------------------------------------
 
 
@@ -33,7 +33,7 @@ def test_version_prints_and_exits_zero(capsys: pytest.CaptureFixture[str]) -> No
         main(["--version"])
     assert exc.value.code == 0
     out = capsys.readouterr().out
-    assert out.strip() == f"agentatlas {cli_module.PACKAGE_VERSION}"
+    assert out.strip() == f"ayiru {cli_module.PACKAGE_VERSION}"
 
 
 def test_no_subcommand_exits_with_usage_error(
@@ -52,7 +52,7 @@ def test_unknown_subcommand_exits_with_usage_error() -> None:
 
 
 # ---------------------------------------------------------------------------
-# `agentatlas serve` — uvicorn entry point
+# `ayiru serve` — uvicorn entry point
 # ---------------------------------------------------------------------------
 
 
@@ -101,7 +101,7 @@ def test_serve_defaults_to_localhost_no_reload(
 def test_serve_runs_auto_migrate_by_default(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Stage 14: a fresh-install user running `agentatlas serve` against
+    """Stage 14: a fresh-install user running `ayiru serve` against
     an empty DB shouldn't have to know to run `migrate` first. The
     serve subcommand auto-applies pending migrations on startup."""
     migrate_calls: list[bool] = []
@@ -159,7 +159,7 @@ def test_serve_continues_when_auto_migrate_raises(
 
 
 # ---------------------------------------------------------------------------
-# `agentatlas mcp` — stdio bridge
+# `ayiru mcp` — stdio bridge
 # ---------------------------------------------------------------------------
 
 
@@ -181,7 +181,7 @@ def test_mcp_subcommand_invokes_build_default_server(
 
 
 # ---------------------------------------------------------------------------
-# `agentatlas query` — wraps QueryEngine.validate_command
+# `ayiru query` — wraps QueryEngine.validate_command
 # ---------------------------------------------------------------------------
 
 
@@ -329,7 +329,7 @@ def test_query_json_flag_emits_parseable_payload(
 
 
 # ---------------------------------------------------------------------------
-# `agentatlas tools`
+# `ayiru tools`
 # ---------------------------------------------------------------------------
 
 
@@ -415,7 +415,7 @@ def test_tools_table_renders_published_specs(
 
 
 # ---------------------------------------------------------------------------
-# `agentatlas verify`
+# `ayiru verify`
 # ---------------------------------------------------------------------------
 
 
@@ -513,7 +513,7 @@ def test_verify_unknown_claim_prints_error_to_stderr(
 
 
 # ---------------------------------------------------------------------------
-# `agentatlas seed`
+# `ayiru seed`
 # ---------------------------------------------------------------------------
 
 
@@ -530,7 +530,7 @@ def test_seed_forwards_reset_and_database_url(
         return 0
 
     monkeypatch.setattr("app.seed_data.runner.main", fake_main)
-    monkeypatch.delenv("AGENTATLAS_SEED_SCRIPT", raising=False)
+    monkeypatch.delenv("AYIRU_SEED_SCRIPT", raising=False)
 
     rc = main(
         [
@@ -558,7 +558,7 @@ def test_seed_without_flags_passes_empty_argv(
         return 0
 
     monkeypatch.setattr("app.seed_data.runner.main", fake_main)
-    monkeypatch.delenv("AGENTATLAS_SEED_SCRIPT", raising=False)
+    monkeypatch.delenv("AYIRU_SEED_SCRIPT", raising=False)
 
     main(["seed"])
     assert captured["argv"] == []
@@ -567,42 +567,42 @@ def test_seed_without_flags_passes_empty_argv(
 def test_seed_env_var_override_loads_external_script(
     monkeypatch: pytest.MonkeyPatch, tmp_path
 ) -> None:
-    """`AGENTATLAS_SEED_SCRIPT` lets advanced users point the CLI at a
+    """`AYIRU_SEED_SCRIPT` lets advanced users point the CLI at a
     fork of `scripts/seed_examples.py` without modifying the install."""
     script_path = tmp_path / "fake_seed.py"
     script_path.write_text(
         "def main(argv=None):\n"
         "    import os\n"
-        "    os.environ['_AGENTATLAS_FAKE_SEED_RAN'] = ','.join(argv or [])\n"
+        "    os.environ['_AYIRU_FAKE_SEED_RAN'] = ','.join(argv or [])\n"
         "    return 0\n"
     )
-    monkeypatch.setenv("AGENTATLAS_SEED_SCRIPT", str(script_path))
-    monkeypatch.delenv("_AGENTATLAS_FAKE_SEED_RAN", raising=False)
+    monkeypatch.setenv("AYIRU_SEED_SCRIPT", str(script_path))
+    monkeypatch.delenv("_AYIRU_FAKE_SEED_RAN", raising=False)
 
     rc = main(["seed", "--reset"])
     assert rc == 0
     import os as _os
 
-    assert _os.environ["_AGENTATLAS_FAKE_SEED_RAN"] == "--reset"
+    assert _os.environ["_AYIRU_FAKE_SEED_RAN"] == "--reset"
 
 
 def test_in_package_seed_runner_is_importable() -> None:
     """Stage 14: the wheel-bundled seed runner must be importable
-    directly. This is the path `agentatlas seed` uses by default."""
+    directly. This is the path `ayiru seed` uses by default."""
     from app.seed_data import runner
 
     assert callable(getattr(runner, "main", None))
 
 
 # ---------------------------------------------------------------------------
-# `agentatlas migrate`
+# `ayiru migrate`
 # ---------------------------------------------------------------------------
 
 
 def test_migrate_invokes_alembic_upgrade_head(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """`agentatlas migrate` runs `alembic upgrade head` against the
+    """`ayiru migrate` runs `alembic upgrade head` against the
     config returned by `make_alembic_config`, passing the requested DB
     URL through."""
     captured: dict[str, Any] = {}

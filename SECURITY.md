@@ -1,6 +1,6 @@
 # Security Policy
 
-AgentAtlas exists to help AI agents act more safely. Its own security posture is therefore taken seriously.
+Ayiru exists to help AI agents act more safely. Its own security posture is therefore taken seriously.
 
 ## Supported versions
 
@@ -12,7 +12,7 @@ AgentAtlas exists to help AI agents act more safely. Its own security posture is
 
 **Please do not open a public GitHub issue for security vulnerabilities.**
 
-Instead, email **security@agentatlas.dev** (or the maintainer listed in the repo's `pyproject.toml`) with:
+Instead, email **security@ayiru.dev** (or the maintainer listed in the repo's `pyproject.toml`) with:
 
 1. A description of the issue and the threat model it breaks.
 2. Steps to reproduce — minimal repro is appreciated.
@@ -33,10 +33,10 @@ You will receive an acknowledgement within **72 hours** and a status update with
 
 ## What we do *not* treat as a vulnerability
 
-- Hallucinated content from a *consumer* LLM acting on AgentAtlas verdicts. AgentAtlas serves structured, cited verdicts; what the consumer agent does with them is its problem.
+- Hallucinated content from a *consumer* LLM acting on Ayiru verdicts. Ayiru serves structured, cited verdicts; what the consumer agent does with them is its problem.
 - Unverified-but-claimed-true output. The system surfaces `verification_level=L0_unverified` for unverified claims by design.
 - Demo data being out of date. Seed artifacts are pre-captured; rerun the live ingestion lanes for fresh data.
-- Anything that requires `AGENTATLAS_DATABASE_URL` pointing at an attacker-controlled database. The system trusts its own database.
+- Anything that requires `AYIRU_DATABASE_URL` pointing at an attacker-controlled database. The system trusts its own database.
 
 ## Defense-in-depth measures already in place
 
@@ -52,4 +52,4 @@ You will receive an acknowledgement within **72 hours** and a status update with
 
 We follow the 90-day disclosure window. If we have not shipped a fix and coordinated a public advisory within 90 days of your report, you are free to disclose. We will work with you to extend if more time is genuinely needed.
 
-Thank you for helping keep AgentAtlas safe.
+Thank you for helping keep Ayiru safe.

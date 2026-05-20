@@ -1,6 +1,6 @@
-# AgentAtlas Stage Report
+# Ayiru Stage Report
 
-This report consolidates the completion status for every shipped stage of AgentAtlas (currently 0 through 8).
+This report consolidates the completion status for every shipped stage of Ayiru (currently 0 through 8).
 
 It records what each stage proves, which artifacts satisfy the stage, what remains deferred, and which validation commands must pass.
 
@@ -45,18 +45,18 @@ Stage 0 is complete when the product lock and trust contract are explicit, testa
 | `docs/product_lock.md` | Defines product identity, thesis, initial scope, principles, and anti-goals. | complete |
 | `docs/trust_contract.md` | Defines vocabulary, claim taxonomy, evidence taxonomy, verification rules, risk semantics, decisions, and publication rules. | complete |
 | `docs/demo_scenarios.md` | Defines proof scenarios for the five initial tools. | complete |
-| `contracts/agentatlas_stage_0.v1.json` | Machine-readable source for Stage 0 taxonomies, safety policy, rules, and scenarios. | complete |
+| `contracts/ayiru_stage_0.v1.json` | Machine-readable source for Stage 0 taxonomies, safety policy, rules, and scenarios. | complete |
 | `backend/tests/test_stage_0_contract.py` | Prevents backend taxonomy and policy drift from the Stage 0 contract. | complete |
 
 ### Pass Case Audit
 
 | Pass case | Satisfied by |
 | --- | --- |
-| There is zero ambiguity about what counts as a claim. | `docs/trust_contract.md` claim taxonomy and `contracts/agentatlas_stage_0.v1.json` `claim_types`. |
-| There is zero ambiguity about what counts as evidence. | `docs/trust_contract.md` evidence taxonomy and `contracts/agentatlas_stage_0.v1.json` `evidence_types` plus `rejected_primary_evidence`. |
-| "Verified" has a strict meaning, not a vibe. | `docs/trust_contract.md` verification rules and `contracts/agentatlas_stage_0.v1.json` `verification_level_rules` plus `verification_promotion_rules`. |
-| "Accepted", "rejected", "pending", and "requires human review" are contractually defined. | `docs/trust_contract.md` orchestrator decisions and `contracts/agentatlas_stage_0.v1.json` `orchestrator_decision_rules`. |
-| The team can explain why a claim is valid or invalid without inventing new rules midstream. | `docs/trust_contract.md`, `contracts/agentatlas_stage_0.v1.json`, and `backend/tests/test_stage_0_contract.py`. |
+| There is zero ambiguity about what counts as a claim. | `docs/trust_contract.md` claim taxonomy and `contracts/ayiru_stage_0.v1.json` `claim_types`. |
+| There is zero ambiguity about what counts as evidence. | `docs/trust_contract.md` evidence taxonomy and `contracts/ayiru_stage_0.v1.json` `evidence_types` plus `rejected_primary_evidence`. |
+| "Verified" has a strict meaning, not a vibe. | `docs/trust_contract.md` verification rules and `contracts/ayiru_stage_0.v1.json` `verification_level_rules` plus `verification_promotion_rules`. |
+| "Accepted", "rejected", "pending", and "requires human review" are contractually defined. | `docs/trust_contract.md` orchestrator decisions and `contracts/ayiru_stage_0.v1.json` `orchestrator_decision_rules`. |
+| The team can explain why a claim is valid or invalid without inventing new rules midstream. | `docs/trust_contract.md`, `contracts/ayiru_stage_0.v1.json`, and `backend/tests/test_stage_0_contract.py`. |
 
 ### Quality Bar
 
@@ -87,7 +87,7 @@ Stage 0 is complete when the product lock and trust contract are explicit, testa
 
 Verdict: pass.
 
-Stage 1 is complete when AgentAtlas has a real domain and persistence foundation that later orchestration, scoring, and publication code can rely on.
+Stage 1 is complete when Ayiru has a real domain and persistence foundation that later orchestration, scoring, and publication code can rely on.
 
 ### Required Artifacts
 
@@ -447,7 +447,7 @@ canonical `ToolSpec` and `WorkflowSpec` records without hand-written truth.
 
 Verdict: pass.
 
-Stage 7a is complete when AgentAtlas can safely capture allowlisted CLI
+Stage 7a is complete when Ayiru can safely capture allowlisted CLI
 help/version output, persist raw artifacts for audit, convert captures into
 structured claims, and verify those claims without executing unsafe commands
 or auto-publishing canonical specs. Stage 7b (Docs), 7c (API schema), and 7d
@@ -504,7 +504,7 @@ pass.
 
 Verdict: pass.
 
-Stage 7b is complete when AgentAtlas can safely fetch documentation URLs for
+Stage 7b is complete when Ayiru can safely fetch documentation URLs for
 the locked Stage 0 tools, sanitize the response into prose-only excerpts,
 persist raw bodies for audit, and verify the resulting claims through the
 orchestrator — without ever following a redirect to a non-allowlisted host
@@ -530,7 +530,7 @@ or rendering executable HTML/JS as content.
 | Trusted docs for Stage 0 tools can be ingested without arbitrary URL fetching. | The `docs_fetch_spec()` lookup refuses any URL not in `docs_ingestion_sources.v1.json`; the contract validator at load time also enforces that every URL's hostname is in the per-tool `official_hosts` from `tool_trust_sources.v1.json`. |
 | Redirects to non-allowlisted hosts are rejected, not followed. | httpx auto-redirects are disabled (`follow_redirects=False`); the service follows redirects manually, re-running `_assert_url_is_safe` at every hop (scheme, host allowlist, IP class). Test: `test_redirect_to_disallowed_host_is_rejected`. |
 | Excerpts never contain executable HTML/JS. | `_sanitize_html_to_text` uses `html.parser` and drops the content of `script`, `style`, `iframe`, `object`, `embed`, `template`, `noscript`, and `svg` entirely. Attribute values (including `on*` event handlers) are never emitted. Tests: `test_sanitizer_strips_script_content`, `test_sanitizer_strips_inline_event_handler_html`, `test_response_with_only_script_content_rejected`. |
-| Ingestion produces structured claims with durable evidence. | Each fetch creates a `RawIngestionArtifact` (raw response body, sha256 hash, `agentatlas://` source URI, `docs_content` artifact type) plus a `KnowledgeClaim` whose `Evidence.source_uri` is the original public URL so `evidence_trust.py` resolves trust to `HIGH` for hosts in the per-tool allowlist. |
+| Ingestion produces structured claims with durable evidence. | Each fetch creates a `RawIngestionArtifact` (raw response body, sha256 hash, `ayiru://` source URI, `docs_content` artifact type) plus a `KnowledgeClaim` whose `Evidence.source_uri` is the original public URL so `evidence_trust.py` resolves trust to `HIGH` for hosts in the per-tool allowlist. |
 | Raw evidence can be inspected after the fact. | `GET /ingestion/artifacts/{artifact_id}` returns the byte-stable raw body that the ingester saw. |
 | Docs are treated as data, not instructions. | The orchestrator runs `evidence_policy_violations` over every ingested claim's evidence (already enforced inside `ClaimStore.create`); sanitization strips executable content before the excerpt ever reaches the database. |
 
@@ -561,7 +561,7 @@ or rendering executable HTML/JS as content.
 
 Verdict: pass.
 
-Stage 7c.1 is complete when AgentAtlas can safely fetch an allowlisted
+Stage 7c.1 is complete when Ayiru can safely fetch an allowlisted
 OpenAPI 3.x specification for a gated tool, validate it against the OpenAPI
 meta-schema, persist the raw body for audit, and derive structured per-operation
 claims whose evidence carries byte-level provenance — without ever following a
@@ -628,7 +628,7 @@ spec the meta-schema rejects.
 
 Verdict: pass.
 
-Stage 7c.2 is complete when AgentAtlas can safely fetch an allowlisted JSON
+Stage 7c.2 is complete when Ayiru can safely fetch an allowlisted JSON
 Schema document for a gated tool, validate it against the dialect declared by
 its own `$schema` keyword, persist the raw body for audit, and derive a
 structured claim per top-level configuration field with byte-level provenance
@@ -694,7 +694,7 @@ back to the originating schema node.
 
 Verdict: pass.
 
-Stage 7c.3 is complete when AgentAtlas can safely fetch an allowlisted
+Stage 7c.3 is complete when Ayiru can safely fetch an allowlisted
 GraphQL Schema Definition Language (SDL) document from a gated tool's own
 official host, parse and type-system-validate it via `graphql-core`, persist
 the raw body for audit, and derive a structured claim per root operation
@@ -756,7 +756,7 @@ accepting a non-SDL body, or trusting an SDL the parser rejects.
 
 Verdict: pass.
 
-Stage 7d is complete when AgentAtlas can safely spawn an allowlisted Model
+Stage 7d is complete when Ayiru can safely spawn an allowlisted Model
 Context Protocol (MCP) server as a local subprocess, drive the standard
 JSON-RPC `initialize` + `tools/list` handshake, persist the full JSON-RPC
 payload as a durable audit artifact, and derive a structured claim per
@@ -783,7 +783,7 @@ expansion to its current five so any further widening is deliberate.
 
 | Artifact | Purpose | Status |
 | --- | --- | --- |
-| `contracts/agentatlas_stage_0.v1.json` | Adds `mcp_server_tools[]` array (5 entries) as a deliberate Stage 7d scope expansion. | complete |
+| `contracts/ayiru_stage_0.v1.json` | Adds `mcp_server_tools[]` array (5 entries) as a deliberate Stage 7d scope expansion. | complete |
 | `contracts/tool_trust_sources.v1.json` | Adds 5 MCP server tools with `mcp_publisher` field marking each as `anthropic` or `third-party`. | complete |
 | `contracts/mcp_ingestion_sources.v1.json` | Per-server spawn metadata: `command`, positive-shape `argv` template (placeholders limited to `{sandbox_dir}` / `{database_url}`), publisher, package URI, plus contract-wide `protocol_version`, `default_timeout_seconds`, `default_max_bytes`, `max_tools_per_server`, `destructive_tool_name_prefixes`, `allowed_commands` (only `npx` / `uvx`), `allowed_template_placeholders`. | complete |
 | `backend/app/services/claim_store.py` | `_stage_0_tool_ids()` now unions `initial_tools` ∪ `mcp_server_tools`, comment-documents the architectural distinction. | complete |
@@ -837,7 +837,7 @@ expansion to its current five so any further widening is deliberate.
 
 Verdict: pass.
 
-Stage 8 is complete when AgentAtlas can take a claim that has already
+Stage 8 is complete when Ayiru can take a claim that has already
 reached `L2_source_verified` and promote it to `L3_runtime_verified` by
 running a safe, deterministic check against the asserted behaviour — with
 the captured stdout / stderr / exit code persisted as a durable
@@ -907,7 +907,7 @@ Two bugs found and fixed in a full-pass code audit.
 
 Verdict: pass.
 
-Stage 9 is complete when an AI agent can ask AgentAtlas one high-level
+Stage 9 is complete when an AI agent can ask Ayiru one high-level
 question and get a structured, evidence-backed safety verdict back — no
 raw CRUD acrobatics, no LLM in the safety path. The five endpoints under
 `/query/*` are the agent-facing API the rest of the project was built to
@@ -1004,7 +1004,7 @@ regression test locking the failure mode so it cannot recur.
 
 Verdict: pass.
 
-Stage 10 is complete when AgentAtlas can be **registered as an MCP server**
+Stage 10 is complete when Ayiru can be **registered as an MCP server**
 in any MCP-aware agent client (Claude Desktop, Cursor, Cline, Continue, etc.)
 with a single JSON config block, and the six query / write tools
 (`validate_command`, `get_tool_spec`, `search_tools`, `explain_risk`,
@@ -1156,7 +1156,7 @@ tool, not consumer app" — clean typography, distinct sections, monospaced
 data fields, colour-coded risk pills.
 
 **API proxy.** `next.config.mjs` rewrites `/api/*` requests to the FastAPI
-backend at `localhost:8000` (override via `AGENTATLAS_API_URL`). Browser
+backend at `localhost:8000` (override via `AYIRU_API_URL`). Browser
 requests are therefore same-origin; FastAPI doesn't need CORS configured.
 Server components (`/tools` and `/tools/[tool_id]`) talk to the backend
 directly through an absolute URL; client components (`/`'s playground and
@@ -1231,8 +1231,8 @@ time dependency on the backend running at install time.
 
 Verdict: pass.
 
-Stage 12 is complete when a developer can `pip install` AgentAtlas and get
-one `agentatlas` binary on PATH that exposes the entire system — the API
+Stage 12 is complete when a developer can `pip install` Ayiru and get
+one `ayiru` binary on PATH that exposes the entire system — the API
 server, the MCP stdio bridge, seed/migrate, and the headline query — without
 remembering module paths or `uvicorn` flags. The same image runs unchanged
 under Docker. The CLI is intentionally a thin shell over the existing
@@ -1242,15 +1242,15 @@ service layer; it ships zero new business logic.
 
 Single-file argparse dispatcher at `backend/app/cli.py`. Heavy imports
 (`uvicorn`, `alembic`, the orchestrator stack) are local to each
-subcommand so `agentatlas --version` and `--help` start cold in a few
+subcommand so `ayiru --version` and `--help` start cold in a few
 hundred ms instead of pulling FastAPI's entire graph up front. `pyproject.toml`'s
-`[project.scripts]` table maps `agentatlas` → `app.cli:main`, so a `pip
+`[project.scripts]` table maps `ayiru` → `app.cli:main`, so a `pip
 install` of the backend package drops the binary on PATH.
 
-Docker is a one-stage `python:3.11-slim` image with `agentatlas` as the
+Docker is a one-stage `python:3.11-slim` image with `ayiru` as the
 entrypoint and `serve --host 0.0.0.0 --port 8000` as the default command;
-`docker run --rm -p 8000:8000 agentatlas` produces a working API, and
-`docker run --rm -i agentatlas mcp` switches the same image to MCP stdio
+`docker run --rm -p 8000:8000 ayiru` produces a working API, and
+`docker run --rm -i ayiru mcp` switches the same image to MCP stdio
 mode for IDE integration. The build context is constrained by a
 `.dockerignore` that excludes virtualenvs, frontend artifacts, and local
 SQLite files.
@@ -1262,8 +1262,8 @@ SQLite files.
 | `serve` | `uvicorn.run("app.main:app", ...)` | 0 on clean shutdown |
 | `mcp` | `app.mcp_server.build_default_server().serve()` | 0 on EOF |
 | `seed` | `scripts/seed_examples.main(argv)` (loaded by path so the wheel doesn't need to bundle demo data) | 0 on success |
-| `migrate` | `alembic.command.upgrade(cfg, "head")` (locates `alembic.ini` by walking up from the package; override via `AGENTATLAS_ALEMBIC_INI`) | 0 on success; 1 if `alembic.ini` missing |
-| `query` | `QueryEngine.validate_command(...)` then pretty-prints `ALLOW`/`BLOCK` (or raw JSON with `--json`) | **0 on ALLOW, 2 on BLOCK** so shell pipelines can chain `agentatlas query ... && <act>` |
+| `migrate` | `alembic.command.upgrade(cfg, "head")` (locates `alembic.ini` by walking up from the package; override via `AYIRU_ALEMBIC_INI`) | 0 on success; 1 if `alembic.ini` missing |
+| `query` | `QueryEngine.validate_command(...)` then pretty-prints `ALLOW`/`BLOCK` (or raw JSON with `--json`) | **0 on ALLOW, 2 on BLOCK** so shell pipelines can chain `ayiru query ... && <act>` |
 | `verify` | `RuntimeVerificationService.verify(...)` | 0 if the runtime check passed (or was skipped); 1 if the claim id is unknown; 2 on runtime-check failure |
 | `tools` | `QueryEngine.search_tools(query="", limit=100)` | 0 |
 | `--version` | `argparse` action="version" | 0 |
@@ -1273,8 +1273,8 @@ SQLite files.
 | Artifact | Purpose | Status |
 | --- | --- | --- |
 | `backend/app/cli.py` | argparse dispatcher with all seven subcommands; helpers (`_load_seed_module`, `_alembic_ini_path`) walk the source tree from the installed package. | complete |
-| `backend/pyproject.toml` (`[project.scripts]`) | Maps `agentatlas` → `app.cli:main`; project metadata bumped to MIT-licensed, classifiers + URLs added, `uvicorn[standard]` promoted from `[dev]` to runtime so `agentatlas serve` works after a plain `pip install`. | complete |
-| `Dockerfile` | Single-stage `python:3.11-slim`; copies `backend/`, `contracts/`, `data/`, `scripts/`, and `README.md`; installs the backend wheel; entrypoint is `agentatlas`; default cmd is `serve`. | complete |
+| `backend/pyproject.toml` (`[project.scripts]`) | Maps `ayiru` → `app.cli:main`; project metadata bumped to MIT-licensed, classifiers + URLs added, `uvicorn[standard]` promoted from `[dev]` to runtime so `ayiru serve` works after a plain `pip install`. | complete |
+| `Dockerfile` | Single-stage `python:3.11-slim`; copies `backend/`, `contracts/`, `data/`, `scripts/`, and `README.md`; installs the backend wheel; entrypoint is `ayiru`; default cmd is `serve`. | complete |
 | `.dockerignore` | Trims build context: excludes `__pycache__`, `.venv`, frontend `node_modules`/`.next`, local SQLite files, egg-info. | complete |
 | `backend/tests/test_cli.py` | 19 tests covering every subcommand. Heavy entrypoints (`uvicorn.run`, `McpServer.serve`, `RuntimeVerificationService`, `alembic.command.upgrade`, the seed module) are stubbed at their import sites; CLI is exercised in-process via `main(argv=...)`. | complete |
 
@@ -1282,33 +1282,33 @@ SQLite files.
 
 | Pass case | Satisfied by |
 | --- | --- |
-| `agentatlas --version` prints the package version | `argparse` `action="version"` + `PACKAGE_VERSION` constant; `test_version_prints_and_exits_zero`. |
-| `agentatlas serve --host 0.0.0.0 --port 9999 --reload` wires all three flags through to uvicorn | `_cmd_serve` calls `uvicorn.run("app.main:app", host=..., port=..., reload=...)`; `test_serve_wires_uvicorn_arguments` verifies. |
-| `agentatlas mcp` runs the same stdio loop as `python -m app.mcp_server` | `_cmd_mcp` calls `build_default_server().serve()`; `test_mcp_subcommand_invokes_build_default_server`. |
-| `agentatlas seed --reset --database-url URL` produces a usable demo graph | `_cmd_seed` forwards both flags verbatim into `scripts/seed_examples.main`; `test_seed_forwards_reset_and_database_url`; smoke-tested end-to-end against a tmp SQLite DB. |
-| `agentatlas migrate` runs `alembic upgrade head` regardless of CWD | `_cmd_migrate` walks the source tree from `app/cli.py` to find `alembic.ini`, then `chdir`s into its directory so the ini's relative `script_location = alembic` keeps working. `test_migrate_invokes_alembic_upgrade_head`. |
-| `agentatlas query --tool ... --command ...` exits non-zero on BLOCK | `_cmd_query` returns 2 when `safe_to_auto_execute=False`; `test_query_block_returns_exit_code_two` + `test_query_allow_returns_exit_code_zero`. Smoke-tested against the seeded DB: `agentatlas query --tool github-cli --command 'gh repo delete my-org/x --yes'` returns `BLOCK risk=critical` with the matched claim id, verification level, and reasons. |
-| `agentatlas verify` returns non-zero when the runtime check failed | `_cmd_verify` returns 2 unless `runtime_check_passed or skipped`; 1 on `RuntimeVerificationError`; covered by three tests. |
-| `agentatlas tools` lists every published spec in a width-aligned table | `_cmd_tools` calls `search_tools(query="")` (empty query → list-all surface) and renders `tool_id  verification_level  name`; `test_tools_table_renders_published_specs`. |
-| `docker build -t agentatlas .` produces an image that runs `serve` by default | Dockerfile copies the runtime dependencies (backend, contracts, data, scripts, README), installs the wheel, and sets `ENTRYPOINT ["agentatlas"]` + `CMD ["serve", "--host", "0.0.0.0", "--port", "8000"]`. |
+| `ayiru --version` prints the package version | `argparse` `action="version"` + `PACKAGE_VERSION` constant; `test_version_prints_and_exits_zero`. |
+| `ayiru serve --host 0.0.0.0 --port 9999 --reload` wires all three flags through to uvicorn | `_cmd_serve` calls `uvicorn.run("app.main:app", host=..., port=..., reload=...)`; `test_serve_wires_uvicorn_arguments` verifies. |
+| `ayiru mcp` runs the same stdio loop as `python -m app.mcp_server` | `_cmd_mcp` calls `build_default_server().serve()`; `test_mcp_subcommand_invokes_build_default_server`. |
+| `ayiru seed --reset --database-url URL` produces a usable demo graph | `_cmd_seed` forwards both flags verbatim into `scripts/seed_examples.main`; `test_seed_forwards_reset_and_database_url`; smoke-tested end-to-end against a tmp SQLite DB. |
+| `ayiru migrate` runs `alembic upgrade head` regardless of CWD | `_cmd_migrate` walks the source tree from `app/cli.py` to find `alembic.ini`, then `chdir`s into its directory so the ini's relative `script_location = alembic` keeps working. `test_migrate_invokes_alembic_upgrade_head`. |
+| `ayiru query --tool ... --command ...` exits non-zero on BLOCK | `_cmd_query` returns 2 when `safe_to_auto_execute=False`; `test_query_block_returns_exit_code_two` + `test_query_allow_returns_exit_code_zero`. Smoke-tested against the seeded DB: `ayiru query --tool github-cli --command 'gh repo delete my-org/x --yes'` returns `BLOCK risk=critical` with the matched claim id, verification level, and reasons. |
+| `ayiru verify` returns non-zero when the runtime check failed | `_cmd_verify` returns 2 unless `runtime_check_passed or skipped`; 1 on `RuntimeVerificationError`; covered by three tests. |
+| `ayiru tools` lists every published spec in a width-aligned table | `_cmd_tools` calls `search_tools(query="")` (empty query → list-all surface) and renders `tool_id  verification_level  name`; `test_tools_table_renders_published_specs`. |
+| `docker build -t ayiru .` produces an image that runs `serve` by default | Dockerfile copies the runtime dependencies (backend, contracts, data, scripts, README), installs the wheel, and sets `ENTRYPOINT ["ayiru"]` + `CMD ["serve", "--host", "0.0.0.0", "--port", "8000"]`. |
 
 ### Quality Bar
 
 - **Zero new runtime dependencies.** `argparse` is in the stdlib. No `click`, no `typer`. The only new runtime dependency is `uvicorn[standard]` being promoted from `[dev]` so `serve` works after a plain install — it was already in the dev extras and is genuinely needed for `serve` to be useful.
 - **Lazy imports.** Each subcommand imports its heavy dependencies inside its handler. `--help` and `--version` don't load FastAPI/SQLAlchemy/etc.
-- **Shell-friendly exit codes.** `query` exits 0 on ALLOW, 2 on BLOCK so pipelines like `agentatlas query --tool ... --command 'rm -rf /' && do-thing` are safe by default. `verify` similarly distinguishes "runtime check failed" (2) from "claim id unknown" (1).
-- **Path-walking helpers, not hardcoded paths.** `_load_seed_module` and `_alembic_ini_path` walk up from `app/cli.py` looking for the source tree, and accept env-var overrides (`AGENTATLAS_SEED_SCRIPT`, `AGENTATLAS_ALEMBIC_INI`). Lets the CLI run from `pip install -e`, from a wheel, or from a Docker image regardless of CWD.
+- **Shell-friendly exit codes.** `query` exits 0 on ALLOW, 2 on BLOCK so pipelines like `ayiru query --tool ... --command 'rm -rf /' && do-thing` are safe by default. `verify` similarly distinguishes "runtime check failed" (2) from "claim id unknown" (1).
+- **Path-walking helpers, not hardcoded paths.** `_load_seed_module` and `_alembic_ini_path` walk up from `app/cli.py` looking for the source tree, and accept env-var overrides (`AYIRU_SEED_SCRIPT`, `AYIRU_ALEMBIC_INI`). Lets the CLI run from `pip install -e`, from a wheel, or from a Docker image regardless of CWD.
 - **In-process tests.** 19 CLI tests run in ~0.5s because every external dependency is stubbed at the import site. No subprocess-spawning for the unit tests; the seed-via-subprocess smoke is still covered by `test_seed_script.py`.
 - **No business logic moved into the CLI.** Every subcommand wraps an existing service class — `QueryEngine`, `RuntimeVerificationService`, `McpServer`, etc. — so the CLI can never disagree with the REST or MCP surfaces.
 
 ### Deferred (Stage 14 and v1.1)
 
-- **Standalone `pip install agentatlas`.** The wheel currently bundles only the `app/` package. The 11 contract loaders in `app/services/*` resolve their JSON files relative to the source tree (`parents[3] / "contracts/..."`); the seed script reads `data/seed_artifacts/`. From a clean PyPI install neither of those directories exists. Bundling them as package data (and updating every loader to fall back to `importlib.resources`) is Stage 14's responsibility — it lands alongside the actual PyPI release. v1.0's two supported install paths are repo checkout + Docker, both of which work fully.
+- **Standalone `pip install ayiru`.** The wheel currently bundles only the `app/` package. The 11 contract loaders in `app/services/*` resolve their JSON files relative to the source tree (`parents[3] / "contracts/..."`); the seed script reads `data/seed_artifacts/`. From a clean PyPI install neither of those directories exists. Bundling them as package data (and updating every loader to fall back to `importlib.resources`) is Stage 14's responsibility — it lands alongside the actual PyPI release. v1.0's two supported install paths are repo checkout + Docker, both of which work fully.
 - **PyPI publication.** The package is shaped for PyPI (name, classifiers, URLs, MIT license, console_script) but no upload pipeline is wired yet. Stage 14 ships that on top of the contract-bundling fix above.
-- **`agentatlas shell` REPL.** A multi-command interactive shell would be nicer for demos than per-subcommand invocations, but it's polish — not a v1 blocker.
-- **Native packaging.** Homebrew formula / `brew install agentatlas` is a Stage 14+ goal once a tagged release exists.
+- **`ayiru shell` REPL.** A multi-command interactive shell would be nicer for demos than per-subcommand invocations, but it's polish — not a v1 blocker.
+- **Native packaging.** Homebrew formula / `brew install ayiru` is a Stage 14+ goal once a tagged release exists.
 - **Watch mode for `seed`.** Reseeding on artifact changes would help when the maintainer is editing `data/seed_artifacts/`. Not needed for end users.
-- **Auto-init schema on `serve`.** Today `agentatlas serve` against a fresh database fails on the first write because tables don't exist. Running `agentatlas migrate` first is required. An idempotent "create schema on first start" path would smooth the ergonomics; deferred to keep deployment behaviour predictable.
+- **Auto-init schema on `serve`.** Today `ayiru serve` against a fresh database fails on the first write because tables don't exist. Running `ayiru migrate` first is required. An idempotent "create schema on first start" path would smooth the ergonomics; deferred to keep deployment behaviour predictable.
 
 ### Bugs found and fixed during Stage 12
 
@@ -1316,7 +1316,7 @@ Three real issues, plus one scope-correction triggered by the clean-venv
 smoke test:
 
 - **`SearchToolsResponse.matches` vs the draft's `tools`.** Initial draft of `_cmd_tools` would have crashed on first invocation. Caught while reading the schema; smoke test against the seeded DB confirmed the fix.
-- **`--database-url` not forwarded from `agentatlas seed` to the underlying script.** Initial draft only forwarded `--reset`. Caught by writing `test_seed_forwards_reset_and_database_url` first; the flag is now passed verbatim.
+- **`--database-url` not forwarded from `ayiru seed` to the underlying script.** Initial draft only forwarded `--reset`. Caught by writing `test_seed_forwards_reset_and_database_url` first; the flag is now passed verbatim.
 - **`_load_seed_module`'s walk terminated at `README.md`** so adding `backend/README.md` (required for `pip install backend` to find a wheel-local README) silently broke the loader: the walk stopped at `backend/`, never found `scripts/seed_examples.py`, and the CLI's `seed` subcommand started failing from a checkout. Caught by `test_load_seed_module_finds_real_script` regressing after adding `backend/README.md`. Fixed by stopping the walk only at `.git` (the unambiguous repo-root signal).
 
 The clean-venv smoke also revealed a scope-level issue that v1.0 does
@@ -1468,19 +1468,19 @@ and run it in production." Concretely it ships:
 - **Observability.** `RequestObservabilityMiddleware` mints an
   `X-Request-ID` per request (or echoes the client-supplied one),
   emits one structured JSON log line per request on the
-  `agentatlas.request` logger (`{event, request_id, method, path,
+  `ayiru.request` logger (`{event, request_id, method, path,
   status_code, duration_ms, client_host}`), and tags 5xx responses
   with the exception type for triage. `current_request_id()` is
   exposed as a contextvar so deeper layers can attach the same id to
   audit events or error reports.
-- **Optional API-key auth.** `AGENTATLAS_API_KEY` env var. Off by
+- **Optional API-key auth.** `AYIRU_API_KEY` env var. Off by
   default. When set: writes (POST / PUT / PATCH / DELETE) require
   `Authorization: Bearer <key>`; reads stay public; health stays
   public; token comparison is timing-safe via `hmac.compare_digest`.
-- **Reviewer registry.** `AGENTATLAS_REVIEWER_REGISTRY` (comma-separated)
+- **Reviewer registry.** `AYIRU_REVIEWER_REGISTRY` (comma-separated)
   gates `POST /verification/human-review` to listed `reviewer_id`s.
   Unset = open (dev default).
-- **Auto-migrate on serve.** `agentatlas serve` runs
+- **Auto-migrate on serve.** `ayiru serve` runs
   `alembic upgrade head` before booting uvicorn; idempotent against
   already-up-to-date DBs. `--no-migrate` opts out for production
   deployments that manage migrations out of band.
@@ -1501,7 +1501,7 @@ and run it in production." Concretely it ships:
   disclosure path, 72h ack / 7d update / 30d fix targets).
 - **Alembic logging compatibility fix.** `env.py` now calls
   `fileConfig(..., disable_existing_loggers=False)` so the
-  `agentatlas.request` logger stays usable in test suites that
+  `ayiru.request` logger stays usable in test suites that
   exercise migrations before exercising the FastAPI app.
 
 ### Required Artifacts
@@ -1511,14 +1511,14 @@ and run it in production." Concretely it ships:
 | `backend/app/contracts/*.json` | Wheel-bundled copy of every locked trust contract. | complete |
 | `backend/app/services/contract_paths.py` | Source-tree-first / package-bundled fallback resolver used by all 11 service loaders. | complete |
 | `backend/app/seed_data/__init__.py` + `runner.py` + `artifacts/**/*.json` | In-package seed runner that ships with the wheel; `scripts/seed_examples.py` becomes a thin shim. | complete |
-| `backend/app/_alembic/` (env.py + versions/) + `backend/app/services/alembic_config.py` | Bundled migrations + unified `make_alembic_config()` resolver shared by `agentatlas migrate`, `seed --reset`, and `serve` auto-init. | complete |
+| `backend/app/_alembic/` (env.py + versions/) + `backend/app/services/alembic_config.py` | Bundled migrations + unified `make_alembic_config()` resolver shared by `ayiru migrate`, `seed --reset`, and `serve` auto-init. | complete |
 | `backend/pyproject.toml` `[tool.setuptools.package-data]` | Includes `app.contracts`, `app.seed_data`, and `app._alembic` in the wheel. | complete |
 | `backend/app/observability.py` | Request-id middleware + structured-log emitter + `current_request_id()` contextvar. | complete |
 | `backend/app/auth.py` | `ApiKeyAuthMiddleware` + `reviewer_allowed()` helper + `configured_api_key()` / `configured_reviewers()`. | complete |
 | `backend/app/main.py` middleware stack | Adds `LegacyDeprecationHeaderMiddleware`, `ApiKeyAuthMiddleware`, `RequestObservabilityMiddleware`; dual-mounts every router under `/v1/` and at root. | complete |
 | `backend/app/cli.py` `_cmd_serve` + `_auto_migrate` | Auto-applies migrations on startup; `--no-migrate` opts out. | complete |
 | `.github/workflows/ci.yml` | pytest + ruff on Python 3.11 / 3.12, migration roundtrip, clean-venv wheel install smoke, `next build` for the frontend. | complete |
-| `LICENSE` | MIT, full text, year 2026, "AgentAtlas contributors" copyright holder. | complete |
+| `LICENSE` | MIT, full text, year 2026, "Ayiru contributors" copyright holder. | complete |
 | `CONTRIBUTING.md` | Ground rules (safety policy never weakens, contracts versioned, etc.), local dev setup, PR checklist. | complete |
 | `SECURITY.md` | Disclosure path, supported versions, what counts as a vuln, 90-day coordinated disclosure. | complete |
 | `backend/tests/test_bundled_contracts_in_sync.py` | Lockstep — bundled = canonical, byte-for-byte. | complete |
@@ -1534,20 +1534,20 @@ and run it in production." Concretely it ships:
 
 | Pass case | Satisfied by |
 | --- | --- |
-| Clean-venv `pip install` produces a working `agentatlas` binary | Wheel install smoke: `python3 -m venv /tmp/v && /tmp/v/bin/pip install backend && /tmp/v/bin/agentatlas seed --reset && /tmp/v/bin/agentatlas query ...` returns the expected critical-block verdict. Verified end-to-end during Stage 14 validation. |
+| Clean-venv `pip install` produces a working `ayiru` binary | Wheel install smoke: `python3 -m venv /tmp/v && /tmp/v/bin/pip install backend && /tmp/v/bin/ayiru seed --reset && /tmp/v/bin/ayiru query ...` returns the expected critical-block verdict. Verified end-to-end during Stage 14 validation. |
 | Trust contracts resolve in both checkout and wheel contexts | `contract_paths.contract_path()` tries source-tree → `importlib.resources("app.contracts")`. Tested implicitly by the 11 service-layer call sites; the wheel smoke exercises the fallback path. |
-| Alembic migrations apply from a wheel install | `make_alembic_config()` returns a fully-configured `Config` from env-var override, source-tree ini, or bundled `app/_alembic/`. Used by `agentatlas migrate`, `seed --reset`, and `serve` auto-init. |
+| Alembic migrations apply from a wheel install | `make_alembic_config()` returns a fully-configured `Config` from env-var override, source-tree ini, or bundled `app/_alembic/`. Used by `ayiru migrate`, `seed --reset`, and `serve` auto-init. |
 | API versioning is in place | `/v1/<route>` exists for every router; legacy responses carry the RFC 8594 `Deprecation` / `Sunset` / `Link` headers. |
 | Failing ingestion lane doesn't poison the graph | `test_publication_isolation.py::test_failing_lane_does_not_block_subsequent_lane` exercises the invariant end-to-end. |
 | Operational behaviour is observable | Every request emits a JSON log line with `request_id`, method, path, status code, duration, and 5xx error type. `X-Request-ID` is round-trippable from clients. |
 | API contracts are stable enough to support real clients | The `/v1/` prefix is the documented contract surface; the legacy paths carry an explicit deprecation header pointing at the successor URL so external clients can plan their migration. |
-| Auth and rate limiting if externalized | Optional `AGENTATLAS_API_KEY` gates writes; rate limiting is delegated to the reverse proxy (documented in SECURITY.md and the README's "What This Isn't" section). |
+| Auth and rate limiting if externalized | Optional `AYIRU_API_KEY` gates writes; rate limiting is delegated to the reverse proxy (documented in SECURITY.md and the README's "What This Isn't" section). |
 | Migration discipline | The CI workflow runs the up/down/up roundtrip on every PR. The lockstep test ensures bundled migrations don't drift from the canonical tree. |
 
 ### Quality Bar
 
 - **No new runtime dependencies.** Every Stage 14 surface uses stdlib + the existing FastAPI / Pydantic / SQLAlchemy / Alembic stack. No introduction of `structlog`, `python-jose`, `slowapi`, etc.
-- **Auth defaults to off.** Setting `AGENTATLAS_API_KEY` is an opt-in for non-localhost deployments. The dev experience stays one-command (`agentatlas serve`), no credentials required.
+- **Auth defaults to off.** Setting `AYIRU_API_KEY` is an opt-in for non-localhost deployments. The dev experience stays one-command (`ayiru serve`), no credentials required.
 - **Reviewer registry is configuration, not data.** Listed by env var rather than persisted in the DB so dropping a reviewer is a config change, not a migration.
 - **Bundled data is lockstep-enforced.** Three sync tests fail loudly if anyone edits a contract / seed artifact / migration in one tree without mirroring the other.
 - **Observability is JSON, not Python `repr()`.** Log aggregators (Loki, Datadog, CloudWatch) can index without parsing.
@@ -1568,8 +1568,8 @@ and run it in production." Concretely it ships:
 Three real issues, all caught by the clean-venv wheel smoke or by the
 full pytest run during Stage 14 work:
 
-- **Alembic disabled the `agentatlas.request` logger after every migration test.** Alembic's `fileConfig(config.config_file_name)` defaults to `disable_existing_loggers=True`, which silently set `.disabled=True` on every pre-existing logger including our request log. In isolation the observability tests passed; once any migration-touching test ran first, `caplog` couldn't capture our log lines. **Fixed** at the source in `backend/alembic/env.py`: pass `disable_existing_loggers=False`. Caught by the full-suite run that surfaced 3 observability failures after the per-module passes succeeded.
-- **The wheel smoke surfaced that alembic.ini and the `alembic/` directory weren't bundled.** `agentatlas migrate` and `seed --reset` failed from a clean pip install because the migrations themselves shipped only at `backend/alembic/`, outside the package. **Fixed** by copying the alembic directory into `app/_alembic/` (with a lockstep test) and routing all alembic-config construction through a single `make_alembic_config()` resolver that returns a programmatically-configured `Config` when no source-tree ini is visible.
+- **Alembic disabled the `ayiru.request` logger after every migration test.** Alembic's `fileConfig(config.config_file_name)` defaults to `disable_existing_loggers=True`, which silently set `.disabled=True` on every pre-existing logger including our request log. In isolation the observability tests passed; once any migration-touching test ran first, `caplog` couldn't capture our log lines. **Fixed** at the source in `backend/alembic/env.py`: pass `disable_existing_loggers=False`. Caught by the full-suite run that surfaced 3 observability failures after the per-module passes succeeded.
+- **The wheel smoke surfaced that alembic.ini and the `alembic/` directory weren't bundled.** `ayiru migrate` and `seed --reset` failed from a clean pip install because the migrations themselves shipped only at `backend/alembic/`, outside the package. **Fixed** by copying the alembic directory into `app/_alembic/` (with a lockstep test) and routing all alembic-config construction through a single `make_alembic_config()` resolver that returns a programmatically-configured `Config` when no source-tree ini is visible.
 - **Setuptools refused `readme = "../README.md"` in Stage 12 — and this carried forward into Stage 14.** The fix that landed in Stage 12 (a wheel-local `backend/README.md`) is now joined by a stage-report note documenting why two READMEs exist: the repo-root README is the project front door, the backend-local README is what setuptools requires for the wheel's long_description. (Not a new bug — a re-documentation of existing intent so future maintainers don't try to dedupe.)
 
 The consolidated stage report is current only if these commands pass:
@@ -1580,10 +1580,10 @@ cd backend
 .venv/bin/ruff check app tests
 
 # Migration upgrade / downgrade / upgrade smoke (full chain reversibility)
-rm -f /tmp/agentatlas_smoke.db
-DATABASE_URL=sqlite:////tmp/agentatlas_smoke.db .venv/bin/alembic upgrade head
-DATABASE_URL=sqlite:////tmp/agentatlas_smoke.db .venv/bin/alembic downgrade -5
-DATABASE_URL=sqlite:////tmp/agentatlas_smoke.db .venv/bin/alembic upgrade head
+rm -f /tmp/ayiru_smoke.db
+DATABASE_URL=sqlite:////tmp/ayiru_smoke.db .venv/bin/alembic upgrade head
+DATABASE_URL=sqlite:////tmp/ayiru_smoke.db .venv/bin/alembic downgrade -5
+DATABASE_URL=sqlite:////tmp/ayiru_smoke.db .venv/bin/alembic upgrade head
 ```
 
 ### Current results
@@ -1591,7 +1591,7 @@ DATABASE_URL=sqlite:////tmp/agentatlas_smoke.db .venv/bin/alembic upgrade head
 - **693 backend tests passing** (Stage 14 added 37 tests across 7 files: 6 in `test_api_versioning.py`, 14 in `test_auth_middleware.py`, 5 in `test_observability_middleware.py`, 4 in CLI auto-migrate + seed-env-override + in-package-runner, 1 in `test_publication_isolation.py`, 3 in `test_postgres_dialect_smoke.py`, 2 in `test_bundled_contracts_in_sync.py`, 2 in `test_bundled_seed_in_sync.py`, 2 in `test_bundled_alembic_in_sync.py`; Stage 13 added 37; Stage 12 added 19; Stage 10+11 audit added 6; Stage 11a added 10; Stage 10 added 28; Stage 9 added 96). Stage 11b is frontend-only (no Python tests; `next build` verified).
 - ruff clean
 - alembic upgrade → downgrade → upgrade cycle clean through migration `0015_human_review_and_audit_log` (no new migrations in Stage 14; the down/up roundtrip is part of the CI workflow).
-- Clean-venv `pip install /path/to/backend` end-to-end smoke verified: `agentatlas seed --reset` populates 47 claims, `agentatlas query` returns the expected critical-block verdict against the bundled contracts.
+- Clean-venv `pip install /path/to/backend` end-to-end smoke verified: `ayiru seed --reset` populates 47 claims, `ayiru query` returns the expected critical-block verdict against the bundled contracts.
 - Postgres dialect offline smoke clean: `Base.metadata` + the full alembic chain render against `postgresql+psycopg://noop` without raising.
 
 ### Audit log (one row per stage; most recent first)
@@ -1603,9 +1603,9 @@ subsection above.
 
 | Date | Stage | Bugs found and resolved |
 | --- | --- | --- |
-| 2026-05-19 | Stage 14 | **3 bugs.** (1) Alembic's default `disable_existing_loggers=True` in `env.py` silently disabled the `agentatlas.request` logger for every test that ran after a migration test; observability tests passed in isolation but failed in the full suite. **Caught by a full-suite run** after per-module passes succeeded. Fixed by passing `disable_existing_loggers=False`. (2) Stage 12 documented "PyPI standalone install not yet supported"; the clean-venv smoke during Stage 14 surfaced that alembic.ini + the `alembic/` migrations directory weren't in the wheel either (in addition to contracts + seed data). **Fixed** by mirroring migrations into `app/_alembic/` with a lockstep test and centralising config construction through `make_alembic_config()`. (3) Initial draft of `_cmd_migrate` returned 1 with the stale "could not locate alembic.ini" message — pre-Stage-14 wording. Updated to surface `RuntimeError` from the new resolver instead, with the test rewritten to assert the actual error path. Found while updating the migrate tests. **All three fixed. 37 new tests; full suite 693 passing; clean-venv wheel install verified end-to-end; offline postgresql dialect smoke clean.** |
+| 2026-05-19 | Stage 14 | **3 bugs.** (1) Alembic's default `disable_existing_loggers=True` in `env.py` silently disabled the `ayiru.request` logger for every test that ran after a migration test; observability tests passed in isolation but failed in the full suite. **Caught by a full-suite run** after per-module passes succeeded. Fixed by passing `disable_existing_loggers=False`. (2) Stage 12 documented "PyPI standalone install not yet supported"; the clean-venv smoke during Stage 14 surfaced that alembic.ini + the `alembic/` migrations directory weren't in the wheel either (in addition to contracts + seed data). **Fixed** by mirroring migrations into `app/_alembic/` with a lockstep test and centralising config construction through `make_alembic_config()`. (3) Initial draft of `_cmd_migrate` returned 1 with the stale "could not locate alembic.ini" message — pre-Stage-14 wording. Updated to surface `RuntimeError` from the new resolver instead, with the test rewritten to assert the actual error path. Found while updating the migrate tests. **All three fixed. 37 new tests; full suite 693 passing; clean-venv wheel install verified end-to-end; offline postgresql dialect smoke clean.** |
 | 2026-05-18 | Stage 13 | **2 bugs.** (1) Audit-event details emitted from `save_canonical_tool_spec` / `save_canonical_workflow_spec` accessed `spec.compiled_by`, `spec.spec_hash`, and `spec.source_claim_ids` directly; these live under `spec.provenance` and `spec.spec_hash` is computed via `canonical_spec_hash` (already-built record). **Caught by 32 failing canonical-route tests immediately after wiring the audit calls.** Fixed by routing through `spec.provenance.*` and `record.spec_hash`. (2) `_band_for_score` initially returned the enum's `.value` string, which `ConfidenceBreakdown.model_copy(update={"band": ...})` would have stored as-is (Pydantic doesn't validate model_copy updates) — silent type confusion downstream. Caught while reading the schema; switched to returning the enum directly. 37 new tests; full suite 656 passing; alembic down/up roundtrip clean. |
-| 2026-05-18 | Stage 12 | **3 bugs + 1 scope correction.** (1) `SearchToolsResponse.matches` vs the draft's `tools` field name — caught while reading the schema before the first CLI test run. (2) `--database-url` not forwarded from `agentatlas seed` to the underlying script — caught by writing the forwarding test first. (3) `_load_seed_module`'s walk terminated at any `README.md`; adding `backend/README.md` silently broke the loader so `agentatlas seed` failed from a checkout. **Caught by `test_load_seed_module_finds_real_script` regressing after the smoke test forced the new `backend/README.md`.** Fixed by stopping the walk only at `.git`. (4) Scope correction: a clean-venv `pip install` revealed that 11 contract loaders use `parents[3]` paths that only resolve from a source-tree checkout — bundling contracts as package data is Stage 14's job, not Stage 12's. Honestly documented in README + "Deferred" block instead of papering over. 19 in-process CLI tests added; full suite 619 passing; end-to-end smoke verified for repo-checkout + Docker install paths. |
+| 2026-05-18 | Stage 12 | **3 bugs + 1 scope correction.** (1) `SearchToolsResponse.matches` vs the draft's `tools` field name — caught while reading the schema before the first CLI test run. (2) `--database-url` not forwarded from `ayiru seed` to the underlying script — caught by writing the forwarding test first. (3) `_load_seed_module`'s walk terminated at any `README.md`; adding `backend/README.md` silently broke the loader so `ayiru seed` failed from a checkout. **Caught by `test_load_seed_module_finds_real_script` regressing after the smoke test forced the new `backend/README.md`.** Fixed by stopping the walk only at `.git`. (4) Scope correction: a clean-venv `pip install` revealed that 11 contract loaders use `parents[3]` paths that only resolve from a source-tree checkout — bundling contracts as package data is Stage 14's job, not Stage 12's. Honestly documented in README + "Deferred" block instead of papering over. 19 in-process CLI tests added; full suite 619 passing; end-to-end smoke verified for repo-checkout + Docker install paths. |
 | 2026-05-18 | Stages 10 + 11 (cross-stage audit) | **5 bugs.** (1) MCP dispatcher returned METHOD_NOT_FOUND for `notifications/*` methods sent with a stray `id` field; spec says these are notifications by method name regardless of id — fixed to silently ack. (2) `tools/call` with `arguments: []` (or other falsy non-dict) slipped through `or {}` and silently became an empty dict, crashing the tool handler downstream instead of returning a clean INVALID_PARAMS at the dispatcher. (3) `submit_claim`'s evidence-minimum pre-check fired before Pydantic validation, so a payload missing every required field returned the misleading "needs at least one piece of evidence" error instead of "missing required fields"; reordered. (4) Stage 11a: re-running `scripts/seed_examples.py` without `--reset` silently inserted duplicate claims AND degraded headline-scenario acceptance (orchestrator marks dups as PENDING/L1); the script now emits a loud warning when the DB already has rows. (5) Tool-handler return values weren't type-checked; a future handler returning a list / scalar / None would silently produce MCP `structuredContent` that violates the spec's "must be a JSON object" requirement; the dispatcher now rejects non-dict payloads with a clear `isError` message. **All five fixed; 6 regression tests added; 600 total passing. Frontend production build also verified (`next build` succeeds, all 5 pages compile, type-check passes).** |
 | 2026-05-18 | Stage 10 | **1 minor bug.** Documentation-vs-reality gap: `submit_claim`'s `inputSchema` declared `minItems: 1` for evidence but the handler didn't enforce it, so empty-evidence claims were accepted by the MCP boundary and only flagged PENDING downstream by the orchestrator's "no evidence" reason. **Fixed** with an explicit pre-check in the handler that matches the schema's declared minimum; regression test added. |
 | 2026-05-18 | Stage 9 | **9 bugs.** Critical: matcher hid most ingestion-pipeline output (single-evidence PENDING / REQUIRES_HUMAN_REVIEW claims were invisible to validate-command). Medium: three contract-↔-code drift risks (band thresholds, reason-text keys, route/schema hardcoded limits); contract validator gap on positive search-limit values; path-param vs body-param 422 vs 404 inconsistency; 500-claim silent-drop in matcher pagination. Performance: N+1 verification lookup. API ergonomics: `Literal["unknown"]` sentinel replaced with `null`. **All fixed with regression tests.** |

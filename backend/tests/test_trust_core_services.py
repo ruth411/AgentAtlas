@@ -70,7 +70,7 @@ def test_confidence_scoring_caps_high_risk_single_source_claims() -> None:
 
 
 def test_orchestrator_accepts_low_risk_source_verified_claim(tmp_path) -> None:
-    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
     claim = _claim()
     claim.evidence.append(
         Evidence(
@@ -96,7 +96,7 @@ def test_orchestrator_accepts_low_risk_source_verified_claim(tmp_path) -> None:
 
 
 def test_orchestrator_does_not_accept_low_band_claim(tmp_path) -> None:
-    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
     claim = _claim()
 
     result = CanonOrchestrator(store).verify_claim(claim)
@@ -107,7 +107,7 @@ def test_orchestrator_does_not_accept_low_band_claim(tmp_path) -> None:
 
 
 def test_orchestrator_requires_more_evidence_when_claim_has_no_evidence(tmp_path) -> None:
-    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
     claim = _claim()
     claim.evidence = []
 
@@ -118,7 +118,7 @@ def test_orchestrator_requires_more_evidence_when_claim_has_no_evidence(tmp_path
 
 
 def test_orchestrator_rejects_weak_primary_evidence(tmp_path) -> None:
-    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
     claim = _claim(source_uri="llm://memory")
 
     result = CanonOrchestrator(store).verify_claim(claim)
@@ -127,7 +127,7 @@ def test_orchestrator_rejects_weak_primary_evidence(tmp_path) -> None:
 
 
 def test_orchestrator_detects_duplicate_claims(tmp_path) -> None:
-    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
     existing = _claim(claim_id="claim_123")
     incoming = _claim(claim_id="claim_456")
     store.create(existing)
@@ -138,7 +138,7 @@ def test_orchestrator_detects_duplicate_claims(tmp_path) -> None:
 
 
 def test_orchestrator_detects_conflicting_claims(tmp_path) -> None:
-    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
     existing = _claim(claim_id="claim_123")
     incoming = _claim(
         claim_id="claim_456",
@@ -154,7 +154,7 @@ def test_orchestrator_detects_conflicting_claims(tmp_path) -> None:
 
 
 def test_orchestrator_challenges_understated_risk(tmp_path) -> None:
-    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
     claim = _claim(
         subject="gh repo delete",
         statement="Deletes a GitHub repository.",
@@ -170,7 +170,7 @@ def test_orchestrator_challenges_understated_risk(tmp_path) -> None:
 
 
 def test_understated_risk_breakdown_components_reconcile_to_capped_score(tmp_path) -> None:
-    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
     claim = _claim(
         subject="gh repo delete",
         statement="Deletes a GitHub repository.",

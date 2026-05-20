@@ -1,7 +1,7 @@
 """Entry point: `python -m app.mcp_server`.
 
 Wires the production `McpServer` and runs the blocking stdio loop. Used by
-Claude Desktop / Cursor when AgentAtlas is registered as an MCP server in
+Claude Desktop / Cursor when Ayiru is registered as an MCP server in
 their config file.
 """
 

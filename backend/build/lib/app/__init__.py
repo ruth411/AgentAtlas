@@ -1,2 +1,0 @@
-"""AgentAtlas backend package."""
-

@@ -32,10 +32,10 @@ from starlette.responses import Response
 
 
 _request_id_var: contextvars.ContextVar[str] = contextvars.ContextVar(
-    "agentatlas_request_id", default=""
+    "ayiru_request_id", default=""
 )
 
-_logger = logging.getLogger("agentatlas.request")
+_logger = logging.getLogger("ayiru.request")
 
 
 def current_request_id() -> str:

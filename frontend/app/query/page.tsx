@@ -42,7 +42,7 @@ export default function QueryPage() {
           validate_command playground
         </h1>
         <p className="mt-2 text-zinc-600">
-          Ask AgentAtlas about any command. The matcher uses strict
+          Ask Ayiru about any command. The matcher uses strict
           exact-or-prefix matching against verified claims; no LLM in the
           safety path; no fuzzy fallback.
         </p>

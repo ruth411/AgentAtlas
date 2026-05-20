@@ -10,7 +10,7 @@ config = context.config
 
 if config.config_file_name is not None:
     # `disable_existing_loggers=False` keeps the application's own
-    # loggers (notably `agentatlas.request`) usable after alembic
+    # loggers (notably `ayiru.request`) usable after alembic
     # configures its own. The default `True` would otherwise mark
     # every pre-existing logger as `disabled=True`, silently dropping
     # request log lines in any test that runs migrations before
@@ -19,7 +19,7 @@ if config.config_file_name is not None:
 
 target_metadata = Base.metadata
 
-database_url = environ.get("AGENTATLAS_DATABASE_URL")
+database_url = environ.get("AYIRU_DATABASE_URL")
 if database_url:
     config.set_main_option("sqlalchemy.url", database_url)
 

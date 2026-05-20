@@ -364,7 +364,7 @@ class JsonSchemaIngestionService:
                 raise JsonSchemaIngestionError(str(exc)) from exc
 
             headers: dict[str, str] = {
-                "User-Agent": "AgentAtlas-JsonSchemaIngestion/1.0",
+                "User-Agent": "Ayiru-JsonSchemaIngestion/1.0",
                 "Accept": ", ".join(spec.allowed_content_types),
             }
             if cache_entry is not None and url == spec.url:
@@ -752,7 +752,7 @@ def _artifact_from_fetch(
     captured_at: datetime,
 ) -> RawIngestionArtifact:
     artifact_id = generate_ingestion_artifact_id()
-    source_uri = f"agentatlas://ingestion/{run_id}/artifacts/{artifact_id}"
+    source_uri = f"ayiru://ingestion/{run_id}/artifacts/{artifact_id}"
     return RawIngestionArtifact(
         artifact_id=artifact_id,
         run_id=run_id,

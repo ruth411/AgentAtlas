@@ -1,4 +1,4 @@
-# AgentAtlas Roadmap
+# Ayiru Roadmap
 
 This roadmap is optimized for one thing: not building a polished fraud.
 
@@ -22,7 +22,7 @@ Stage 0 artifacts:
 - [Trust Contract](docs/trust_contract.md)
 - [Demo Scenarios](docs/demo_scenarios.md)
 - [Stage Report](docs/stage_report.md)
-- [Machine-Readable Stage 0 Contract](contracts/agentatlas_stage_0.v1.json)
+- [Machine-Readable Stage 0 Contract](contracts/ayiru_stage_0.v1.json)
 
 ### Capabilities Built
 
@@ -267,7 +267,7 @@ commands during discovery, and docs treated as data not instructions.
 - Streamed subprocess runner with positive-shape argv allowlist, byte-cap,
   hard timeout, empty env, and no shell.
 - Allowlist contract per locked Stage 0 tool.
-- Raw `agentatlas://` artifact storage with content hash.
+- Raw `ayiru://` artifact storage with content hash.
 - Claim creation from captured output and orchestrator verification.
 - Bulk-ingest endpoint to refresh every allowlisted command for a tool.
 
@@ -303,7 +303,7 @@ commands during discovery, and docs treated as data not instructions.
   `If-None-Match` / `If-Modified-Since` revalidation reuses the prior artifact
   on 304 without storing a new raw body.
 - Raw response stored as `raw_ingestion_artifacts` row with `docs_content`
-  artifact type, sha256 hash, and `agentatlas://` source URI for audit.
+  artifact type, sha256 hash, and `ayiru://` source URI for audit.
 - Redirect chain surfaced on `DocsIngestionResponse` for caller audit.
 - Bulk endpoint `POST /ingestion/docs/tools/{tool_id}` runs every allowlisted
   URL for a tool.
@@ -393,7 +393,7 @@ and audited on its own merits:
 
 ### Stage 7d: MCP Metadata Ingestion — SHIPPED
 
-Stage 7d is shipped. AgentAtlas can now spawn allowlisted MCP servers
+Stage 7d is shipped. Ayiru can now spawn allowlisted MCP servers
 locally over stdio, drive the standard JSON-RPC `initialize` + `tools/list`
 handshake, capture the full reply as a durable audit artifact, and emit
 structured claims per advertised tool with risk hints derived from
@@ -439,7 +439,7 @@ annotations and tool-name patterns.
 
 ## Stage 8: Runtime Verification Layer — SHIPPED
 
-Stage 8 is shipped. AgentAtlas can now promote claims from
+Stage 8 is shipped. Ayiru can now promote claims from
 `L2_source_verified` to `L3_runtime_verified` by actually running a safe,
 deterministic check against the asserted behaviour and persisting the
 captured stdout / stderr / exit code as durable audit evidence. Dangerous
@@ -504,7 +504,7 @@ skipped — we never invoke a destructive command to "verify" it.
 
 ## Stage 9: Agent Query Surface — SHIPPED
 
-Stage 9 is shipped. AgentAtlas now exposes a high-level agent-facing API
+Stage 9 is shipped. Ayiru now exposes a high-level agent-facing API
 that turns the raw `KnowledgeClaim` graph into structured, evidence-backed
 safety verdicts. The five endpoints under `/query/*` are the surface other
 agents (and the future MCP wrapper in Stage 10) will actually call.
@@ -597,7 +597,7 @@ breakdown. Pattern callouts:
 
 ## Stage 10: MCP Server and External Interoperability — SHIPPED
 
-Stage 10 is shipped. AgentAtlas now runs as an MCP server that any
+Stage 10 is shipped. Ayiru now runs as an MCP server that any
 MCP-aware agent client (Claude Desktop, Cursor, Cline, Continue, etc.)
 can register with one JSON config block. The six tools wrap the Stage 9
 query surface plus the Stage 2 claim submission, exposing every important
@@ -629,7 +629,7 @@ operation an external agent needs.
 
 ### Pass Cases
 
-- An external agent registers AgentAtlas in its config and the 6 tools
+- An external agent registers Ayiru in its config and the 6 tools
   appear in its tool list; calling `validate_command` returns a
   structured safety verdict identical to what `POST
   /query/validate-command` would return over REST.
@@ -779,7 +779,7 @@ Do not build these early:
 
 ## Real Pass Condition for the Whole Project
 
-AgentAtlas is only credible when another AI agent can ask:
+Ayiru is only credible when another AI agent can ask:
 
 - Does this command exist?
 - What does it do?

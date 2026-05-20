@@ -46,10 +46,10 @@ jobs:
       - name: Migration roundtrip smoke
         working-directory: backend
         run: |
-          rm -f /tmp/agentatlas-ci.db
-          AGENTATLAS_DATABASE_URL=sqlite:////tmp/agentatlas-ci.db alembic upgrade head
-          AGENTATLAS_DATABASE_URL=sqlite:////tmp/agentatlas-ci.db alembic downgrade -5
-          AGENTATLAS_DATABASE_URL=sqlite:////tmp/agentatlas-ci.db alembic upgrade head
+          rm -f /tmp/ayiru-ci.db
+          AYIRU_DATABASE_URL=sqlite:////tmp/ayiru-ci.db alembic upgrade head
+          AYIRU_DATABASE_URL=sqlite:////tmp/ayiru-ci.db alembic downgrade -5
+          AYIRU_DATABASE_URL=sqlite:////tmp/ayiru-ci.db alembic upgrade head
 
       - name: Clean-venv install smoke
         # Build the wheel and install it into a throwaway interpreter to
@@ -60,9 +60,9 @@ jobs:
           python -m build backend
           python -m venv /tmp/smoke-venv
           /tmp/smoke-venv/bin/pip install --upgrade pip
-          /tmp/smoke-venv/bin/pip install backend/dist/agentatlas-*.whl
-          /tmp/smoke-venv/bin/agentatlas --version
-          /tmp/smoke-venv/bin/agentatlas --help
+          /tmp/smoke-venv/bin/pip install backend/dist/ayiru-*.whl
+          /tmp/smoke-venv/bin/ayiru --version
+          /tmp/smoke-venv/bin/ayiru --help
 
   frontend-build:
     runs-on: ubuntu-latest

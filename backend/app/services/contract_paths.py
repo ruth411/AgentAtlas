@@ -13,7 +13,7 @@ This helper centralises the lookup with a two-step strategy:
    `<repo>/contracts/<name>.json` (devs editing contracts see their
    changes immediately, no rebuild needed).
 2. Package-bundled fallback — `app/contracts/<name>.json` ships inside
-   the wheel as package data, so `pip install agentatlas` followed by
+   the wheel as package data, so `pip install ayiru` followed by
    any service call resolves contracts cleanly.
 
 A `FileNotFoundError` is raised when neither location has the file;
@@ -69,7 +69,7 @@ def _bundled_resource_root() -> Path | None:
     (e.g. someone hand-deleted the directory after install)."""
     try:
         # `as_file` would be needed for zip-imported wheels, but
-        # AgentAtlas is shipped as a regular wheel that pip extracts
+        # Ayiru is shipped as a regular wheel that pip extracts
         # to disk, so `files(...)` returns a concrete Path-like that
         # already lives on the filesystem.
         return Path(str(resources.files("app.contracts")))

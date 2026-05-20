@@ -117,7 +117,7 @@ def test_seed_headline_query_resolves_correctly(
 def test_seed_gh_repo_delete_blocks_auto_execute(
     seeded_store: ClaimStore,
 ) -> None:
-    """The single most important demo invariant: AgentAtlas MUST refuse to
+    """The single most important demo invariant: Ayiru MUST refuse to
     auto-execute `gh repo delete`, with cited evidence in the verdict."""
     response = QueryEngine(seeded_store).validate_command(
         tool_id="github-cli",

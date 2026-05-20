@@ -374,7 +374,7 @@ def test_l1_to_l2_promotion_blocked_for_none_band(tmp_path) -> None:
         )
     ]
     claim = _claim(evidence=weak_low_trust)
-    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
 
     result = CanonOrchestrator(store).verify_claim(claim)
 
@@ -387,7 +387,7 @@ def test_l1_to_l2_promotion_blocked_for_none_band(tmp_path) -> None:
 
 def test_orchestrator_attaches_breakdown_to_verification_result(tmp_path) -> None:
     claim = _claim()
-    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
 
     result = CanonOrchestrator(store).verify_claim(claim)
 
@@ -417,7 +417,7 @@ def test_high_risk_with_two_strong_streams_reaches_strong_band(tmp_path) -> None
         risk_level=RiskLevel.CRITICAL,
         evidence=evidence,
     )
-    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
 
     result = CanonOrchestrator(store).verify_claim(claim)
 
@@ -468,7 +468,7 @@ def test_unknown_high_trust_sources_cannot_accept_high_risk_claim(tmp_path) -> N
         risk_level=RiskLevel.CRITICAL,
         evidence=evidence,
     )
-    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
 
     result = CanonOrchestrator(store).verify_claim(claim)
 
@@ -501,7 +501,7 @@ def test_pre_stage_runtime_and_maintainer_evidence_cannot_self_assert_high_trust
         risk_level=RiskLevel.CRITICAL,
         evidence=evidence,
     )
-    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
 
     result = CanonOrchestrator(store).verify_claim(claim)
 
@@ -545,7 +545,7 @@ def test_orchestrator_persists_breakdown_through_store(tmp_path) -> None:
             )
         ],
     )
-    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
     store.create(claim)
 
     result = CanonOrchestrator(store).verify_claim(claim)

@@ -1,14 +1,14 @@
 """Stage 14: unified alembic-config resolver.
 
-`agentatlas migrate`, `agentatlas seed --reset`, and the auto-migration
-hook on `agentatlas serve` all need an `alembic.Config` pointing at a
+`ayiru migrate`, `ayiru seed --reset`, and the auto-migration
+hook on `ayiru serve` all need an `alembic.Config` pointing at a
 real migration script directory. Three install paths exist:
 
 1. **Source-tree checkout** — `backend/alembic.ini` + `backend/alembic/`.
 2. **Wheel install** — neither exists at the wheel's runtime path; the
    bundled copy at `app/_alembic/` is what ships.
 3. **Custom config** — operators with their own alembic layout point
-   `AGENTATLAS_ALEMBIC_INI` at their ini.
+   `AYIRU_ALEMBIC_INI` at their ini.
 
 `make_alembic_config(database_url)` returns a fully-configured `Config`
 that works in all three modes. Callers never need to know which path
@@ -54,7 +54,7 @@ def make_alembic_config(database_url: str | None = None) -> "Config":
 
     Lookup order:
 
-    1. `AGENTATLAS_ALEMBIC_INI` env var (operator override).
+    1. `AYIRU_ALEMBIC_INI` env var (operator override).
     2. Source-tree `backend/alembic.ini` (developer checkout).
     3. Programmatic config pointing at the bundled `app/_alembic/`
        directory (wheel install).
@@ -64,12 +64,12 @@ def make_alembic_config(database_url: str | None = None) -> "Config":
     """
     from alembic.config import Config
 
-    override = os.environ.get("AGENTATLAS_ALEMBIC_INI", "").strip()
+    override = os.environ.get("AYIRU_ALEMBIC_INI", "").strip()
     if override:
         ini_path = Path(override)
         if not ini_path.is_file():
             raise RuntimeError(
-                f"AGENTATLAS_ALEMBIC_INI points to '{ini_path}', which does not exist."
+                f"AYIRU_ALEMBIC_INI points to '{ini_path}', which does not exist."
             )
         cfg = Config(str(ini_path))
         # `script_location` is interpreted relative to the ini's

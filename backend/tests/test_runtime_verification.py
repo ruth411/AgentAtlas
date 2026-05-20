@@ -63,7 +63,7 @@ FIXED_TIME = datetime(2026, 5, 17, tzinfo=timezone.utc)
 
 @pytest.fixture
 def store(tmp_path) -> ClaimStore:
-    return ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    return ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
 
 
 def _evidence(
@@ -613,7 +613,7 @@ def test_api_endpoint_exists_skips_when_no_http_evidence(store: ClaimStore) -> N
         subject="POST /v1/x",
         statement="x.",
         tool_id="openai-api",
-        evidence=[_evidence(url="agentatlas://ingestion/run_1/artifacts/art_1")],
+        evidence=[_evidence(url="ayiru://ingestion/run_1/artifacts/art_1")],
     )
     _persist_at_l2(store, claim)
     svc = RuntimeVerificationService(

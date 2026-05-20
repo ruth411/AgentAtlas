@@ -981,7 +981,7 @@ def _artifact_from_payload(payload: dict[str, Any]) -> RawIngestionArtifact:
         artifact_id=artifact_id,
         run_id=run_id,
         artifact_type=IngestionArtifactType.SANDBOX_EXECUTION_LOG,
-        source_uri=f"agentatlas://verification/runtime/{artifact_id}",
+        source_uri=f"ayiru://verification/runtime/{artifact_id}",
         raw_content=raw,
         hash=f"sha256:{sha256(raw.encode('utf-8')).hexdigest()}",
         captured_at=datetime.now(timezone.utc),
@@ -998,7 +998,7 @@ def _runtime_evidence(
     source_uri = (
         artifact.source_uri
         if artifact is not None
-        else f"agentatlas://verification/runtime/{claim.claim_id}"
+        else f"ayiru://verification/runtime/{claim.claim_id}"
     )
     excerpt_text = (excerpt or ("runtime_pass" if passed else "runtime_fail"))[:8000]
     return Evidence(

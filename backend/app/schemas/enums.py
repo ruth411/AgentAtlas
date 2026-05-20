@@ -136,7 +136,7 @@ class HumanReviewDecision(StrEnum):
 
 
 class AuditEventType(StrEnum):
-    """Every state-changing operation in AgentAtlas emits one event.
+    """Every state-changing operation in Ayiru emits one event.
 
     The audit log is append-only by contract: services may only INSERT
     rows, never UPDATE or DELETE. The event payload captures everything

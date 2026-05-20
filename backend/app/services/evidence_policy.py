@@ -35,7 +35,7 @@ ALLOWED_URL_SCHEMES: frozenset[str] = frozenset(
     {
         "http",
         "https",
-        "agentatlas",
+        "ayiru",
         "local",
         "file",
         "docs",
@@ -66,7 +66,7 @@ def _is_rejected_source(source_uri: str) -> bool:
         return True
 
     # http/https URLs additionally undergo host-level checks; non-web allowed
-    # schemes (`agentatlas`, `local`, `file`, `docs`) carry no hostname and
+    # schemes (`ayiru`, `local`, `file`, `docs`) carry no hostname and
     # are accepted once the scheme passes.
     if scheme not in {"http", "https"}:
         return False

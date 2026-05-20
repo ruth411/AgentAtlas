@@ -66,7 +66,7 @@ def _stage_0_tool_ids() -> frozenset[str]:
     separate arrays in the contract preserves the auditable distinction
     between the original native-ingestion scope and the MCP-proxy scope while
     allowing claims for either kind of tool to clear the gate."""
-    path = contract_path("agentatlas_stage_0.v1.json")
+    path = contract_path("ayiru_stage_0.v1.json")
     with path.open() as handle:
         data = json.load(handle)
     native = {tool["tool_id"] for tool in data["initial_tools"]}

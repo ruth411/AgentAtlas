@@ -1,10 +1,10 @@
-# AgentAtlas — single-stage image that ships the API server, the MCP
-# stdio bridge, and the seed/migrate CLI behind one `agentatlas` binary.
+# Ayiru — single-stage image that ships the API server, the MCP
+# stdio bridge, and the seed/migrate CLI behind one `ayiru` binary.
 #
-# Build:  docker build -t agentatlas .
-# Run:    docker run --rm -p 8000:8000 agentatlas serve --host 0.0.0.0
-# MCP:    docker run --rm -i agentatlas mcp
-# Seed:   docker run --rm -v $(pwd)/data:/app/data agentatlas seed --reset
+# Build:  docker build -t ayiru .
+# Run:    docker run --rm -p 8000:8000 ayiru serve --host 0.0.0.0
+# MCP:    docker run --rm -i ayiru mcp
+# Seed:   docker run --rm -v $(pwd)/data:/app/data ayiru seed --reset
 
 FROM python:3.11-slim
 
@@ -17,7 +17,7 @@ WORKDIR /app
 
 # Backend package + Alembic + seed data. README/contracts are pulled in
 # because the package metadata's `readme = "../README.md"` reference and
-# the Stage 0 tool gate (`contracts/agentatlas_stage_0.v1.json`) both
+# the Stage 0 tool gate (`contracts/ayiru_stage_0.v1.json`) both
 # resolve relative to the source tree at runtime.
 COPY backend/ /app/backend/
 COPY contracts/ /app/contracts/
@@ -26,12 +26,12 @@ COPY scripts/ /app/scripts/
 COPY README.md /app/README.md
 
 # `pip install -e backend` would leave the package as a path import; a
-# regular install lands the `agentatlas` script on PATH the same way it
+# regular install lands the `ayiru` script on PATH the same way it
 # does for end users via PyPI.
 RUN pip install /app/backend
 
-# Default to the API server; override with `docker run ... agentatlas <cmd>`
+# Default to the API server; override with `docker run ... ayiru <cmd>`
 # (e.g. `mcp`, `seed`, `migrate`, `query`).
 EXPOSE 8000
-ENTRYPOINT ["agentatlas"]
+ENTRYPOINT ["ayiru"]
 CMD ["serve", "--host", "0.0.0.0", "--port", "8000"]

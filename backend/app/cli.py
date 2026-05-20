@@ -1,6 +1,6 @@
-"""AgentAtlas command-line entry point.
+"""Ayiru command-line entry point.
 
-`pip install agentatlas` lands a single binary named `agentatlas` on PATH
+`pip install ayiru` lands a single binary named `ayiru` on PATH
 that dispatches to this module's `main()`. Subcommands wrap the same
 service objects the REST and MCP layers use — the CLI is a thin shell,
 not a parallel implementation.
@@ -22,7 +22,7 @@ Design notes:
 - Every subcommand returns an `int` exit code. `main()` returns the same
   code so `sys.exit(main())` does the right thing.
 - Heavy imports (`uvicorn`, `alembic`, the orchestrator stack) are local
-  to their subcommand so `agentatlas --version` and `agentatlas --help`
+  to their subcommand so `ayiru --version` and `ayiru --help`
   start cold in a few hundred ms instead of pulling FastAPI's entire
   graph up front.
 """
@@ -45,15 +45,15 @@ PACKAGE_VERSION = "0.1.0"
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="agentatlas",
+        prog="ayiru",
         description=(
-            "AgentAtlas — verified, machine-readable knowledge layer for AI agents."
+            "Ayiru — verified, machine-readable knowledge layer for AI agents."
         ),
     )
     parser.add_argument(
         "--version",
         action="version",
-        version=f"agentatlas {PACKAGE_VERSION}",
+        version=f"ayiru {PACKAGE_VERSION}",
     )
     sub = parser.add_subparsers(dest="command", metavar="<command>")
     sub.required = True
@@ -99,7 +99,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p_seed.add_argument(
         "--database-url",
         default=None,
-        help="SQLAlchemy URL (defaults to $AGENTATLAS_DATABASE_URL or backend/agentatlas.db).",
+        help="SQLAlchemy URL (defaults to $AYIRU_DATABASE_URL or backend/ayiru.db).",
     )
     p_seed.set_defaults(func=_cmd_seed)
 
@@ -146,7 +146,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p_verify.add_argument("--claim-id", required=True)
     p_verify.add_argument(
         "--submitted-by",
-        default="agentatlas-cli",
+        default="ayiru-cli",
         help="Recorded as the verification result's submitter.",
     )
     p_verify.set_defaults(func=_cmd_verify)
@@ -186,8 +186,8 @@ def _cmd_serve(args: argparse.Namespace) -> int:
             _auto_migrate()
         except Exception as exc:  # pragma: no cover - defensive
             print(
-                f"agentatlas serve: skipping auto-migration ({exc}). "
-                "Run `agentatlas migrate` manually or pass --no-migrate "
+                f"ayiru serve: skipping auto-migration ({exc}). "
+                "Run `ayiru migrate` manually or pass --no-migrate "
                 "to silence this warning.",
                 file=sys.stderr,
             )
@@ -206,7 +206,7 @@ def _auto_migrate() -> None:
 
     Works from a checkout (source-tree ini), a wheel install (bundled
     migrations + programmatic config), and a custom layout
-    (`AGENTATLAS_ALEMBIC_INI`). Idempotent — re-running against an
+    (`AYIRU_ALEMBIC_INI`). Idempotent — re-running against an
     up-to-date DB is a no-op.
     """
     from alembic import command
@@ -231,9 +231,9 @@ def _cmd_mcp(_args: argparse.Namespace) -> int:
 def _cmd_seed(args: argparse.Namespace) -> int:
     # Stage 14: the seed logic moved into `app.seed_data.runner`, which
     # ships inside the wheel along with the artifacts themselves. The
-    # `AGENTATLAS_SEED_SCRIPT` env-var override still works for users who
+    # `AYIRU_SEED_SCRIPT` env-var override still works for users who
     # want to point at a fork of `scripts/seed_examples.py`.
-    override = os.environ.get("AGENTATLAS_SEED_SCRIPT")
+    override = os.environ.get("AYIRU_SEED_SCRIPT")
     seed_argv: list[str] = []
     if args.reset:
         seed_argv.append("--reset")
@@ -241,7 +241,7 @@ def _cmd_seed(args: argparse.Namespace) -> int:
         seed_argv += ["--database-url", args.database_url]
     if override:
         seed_module = _import_module_from_path(
-            "agentatlas_seed_examples_override", Path(override)
+            "ayiru_seed_examples_override", Path(override)
         )
         return int(seed_module.main(seed_argv))
     from app.seed_data.runner import main as seed_main
@@ -259,7 +259,7 @@ def _cmd_migrate(args: argparse.Namespace) -> int:
         cfg = make_alembic_config(args.database_url)
         command.upgrade(cfg, "head")
     except RuntimeError as exc:
-        print(f"agentatlas migrate: {exc}", file=sys.stderr)
+        print(f"ayiru migrate: {exc}", file=sys.stderr)
         return 1
     finally:
         os.chdir(prior_cwd)
@@ -280,7 +280,7 @@ def _cmd_query(args: argparse.Namespace) -> int:
 
     _print_verdict(payload)
     # Exit non-zero when the engine says "do not auto-execute" so shell
-    # callers can chain `agentatlas query ... && <do thing>` safely.
+    # callers can chain `ayiru query ... && <do thing>` safely.
     return 0 if payload["safe_to_auto_execute"] else 2
 
 
@@ -297,7 +297,7 @@ def _cmd_verify(args: argparse.Namespace) -> int:
             claim_id=args.claim_id, submitted_by=args.submitted_by
         )
     except RuntimeVerificationError as exc:
-        print(f"agentatlas verify: {exc}", file=sys.stderr)
+        print(f"ayiru verify: {exc}", file=sys.stderr)
         return 1
 
     print(json.dumps(response.model_dump(mode="json"), indent=2, ensure_ascii=False))
@@ -320,7 +320,7 @@ def _cmd_tools(args: argparse.Namespace) -> int:
 
     matches = payload.get("matches", [])
     if not matches:
-        print("(no tools published yet — try `agentatlas seed --reset`)")
+        print("(no tools published yet — try `ayiru seed --reset`)")
         return 0
     width = max(len(t["tool_id"]) for t in matches)
     for tool in matches:
@@ -351,7 +351,7 @@ def _import_module_from_path(name: str, path: Path) -> Any:
 
     spec = importlib.util.spec_from_file_location(name, path)
     if spec is None or spec.loader is None:
-        raise RuntimeError(f"agentatlas: failed to load module at {path}")
+        raise RuntimeError(f"ayiru: failed to load module at {path}")
     module = importlib.util.module_from_spec(spec)
     sys.modules[name] = module
     spec.loader.exec_module(module)

@@ -37,7 +37,7 @@ FIXED_TIME = datetime(2026, 5, 16, tzinfo=timezone.utc)
 
 @pytest.fixture
 def store(tmp_path) -> ClaimStore:
-    return ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    return ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
 
 
 @pytest.fixture

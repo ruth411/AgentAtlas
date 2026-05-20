@@ -42,7 +42,7 @@ def submit_human_review(
     store: ClaimStore = Depends(get_claim_store),
 ) -> HumanReviewResponse:
     # Stage 14: optional reviewer allowlist. When
-    # AGENTATLAS_REVIEWER_REGISTRY is set, only listed reviewer_ids may
+    # AYIRU_REVIEWER_REGISTRY is set, only listed reviewer_ids may
     # file decisions. The check is independent of API-key auth.
     if not reviewer_allowed(request.reviewer_id):
         raise_api_error(
@@ -50,7 +50,7 @@ def submit_human_review(
             code=ErrorCode.HUMAN_REVIEW_FAILED,
             message=(
                 f"Reviewer '{request.reviewer_id}' is not in the "
-                "configured registry (AGENTATLAS_REVIEWER_REGISTRY)."
+                "configured registry (AYIRU_REVIEWER_REGISTRY)."
             ),
             details={"reviewer_id": request.reviewer_id},
         )

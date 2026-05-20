@@ -57,7 +57,7 @@ from app.services.risk_classifier import classify_action
 
 
 _QUERY_POLICY_CONTRACT = contract_path("query_policy.v1.json")
-_STAGE_0_CONTRACT = contract_path("agentatlas_stage_0.v1.json")
+_STAGE_0_CONTRACT = contract_path("ayiru_stage_0.v1.json")
 
 
 class QueryEngine:

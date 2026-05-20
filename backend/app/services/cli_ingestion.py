@@ -453,7 +453,7 @@ def _artifact_from_capture(
     captured_at: datetime,
 ) -> RawIngestionArtifact:
     artifact_id = generate_ingestion_artifact_id()
-    source_uri = f"agentatlas://ingestion/{run_id}/artifacts/{artifact_id}"
+    source_uri = f"ayiru://ingestion/{run_id}/artifacts/{artifact_id}"
     raw_content = result.output
     return RawIngestionArtifact(
         artifact_id=artifact_id,

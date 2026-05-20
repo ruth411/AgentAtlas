@@ -28,7 +28,7 @@ from tests.helpers import valid_sha256
 
 @pytest.fixture
 def client(tmp_path):
-    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas-test.db'}")
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru-test.db'}")
     app.dependency_overrides[get_claim_store] = lambda: store
     with TestClient(app) as test_client:
         yield test_client
@@ -90,7 +90,7 @@ def _claim(
 
 
 def test_orchestrator_caps_verification_level_at_l2_even_with_sandbox_evidence(tmp_path) -> None:
-    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
     claim = _claim(
         claim_id="claim_l2_cap",
         subject="git status",
@@ -117,7 +117,7 @@ def test_orchestrator_caps_verification_level_at_l2_even_with_sandbox_evidence(t
 
 
 def test_orchestrator_accepts_high_risk_claim_with_two_trusted_evidence_streams(tmp_path) -> None:
-    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
     claim = _claim()
 
     result = CanonOrchestrator(store).verify_claim(claim)

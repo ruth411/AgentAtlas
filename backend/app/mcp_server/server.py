@@ -1,4 +1,4 @@
-"""AgentAtlas MCP server — stdio JSON-RPC dispatcher.
+"""Ayiru MCP server — stdio JSON-RPC dispatcher.
 
 One `McpServer` instance wires a `ClaimStore` (the durable backend) to a
 pair of text streams (`stdin` for incoming frames, `stdout` for replies).
@@ -210,7 +210,7 @@ class McpServer:
                 _error_content(
                     "Tool handler returned a non-object payload "
                     f"({type(payload).__name__}); MCP requires structuredContent "
-                    "to be a JSON object. This is an AgentAtlas bug, not a "
+                    "to be a JSON object. This is an Ayiru bug, not a "
                     "client error — please file an issue."
                 ),
             )

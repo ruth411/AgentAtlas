@@ -8,7 +8,7 @@ Stage 13 introduces two tables:
 
 - ``human_reviews``  — one row per reviewer decision against a claim
 - ``audit_events``  — append-only event log covering every state-changing
-  operation in AgentAtlas (claim submissions, verification results,
+  operation in Ayiru (claim submissions, verification results,
   human reviews, canonical spec publications)
 """
 

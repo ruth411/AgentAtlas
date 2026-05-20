@@ -7,7 +7,7 @@ export default function ToolNotFound() {
         No canonical ToolSpec published.
       </h1>
       <p className="mt-3 text-zinc-600 max-w-md mx-auto">
-        AgentAtlas knows about the tool id you asked for, but no canonical
+        Ayiru knows about the tool id you asked for, but no canonical
         spec has been compiled yet. Add evidence-backed claims for the tool
         and publish a spec to populate this page.
       </p>

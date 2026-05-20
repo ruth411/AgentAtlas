@@ -1,6 +1,6 @@
 # Trust Contract
 
-This document defines the trust semantics for AgentAtlas. Later implementation must not weaken these rules to make demos easier.
+This document defines the trust semantics for Ayiru. Later implementation must not weaken these rules to make demos easier.
 
 ## Canonical Terms
 
@@ -108,7 +108,7 @@ Default execution policy:
 | `high` | no | yes |
 | `critical` | no | yes |
 
-Critical actions must never be auto-executed by AgentAtlas.
+Critical actions must never be auto-executed by Ayiru.
 
 ## Orchestrator Decisions
 
@@ -135,4 +135,4 @@ Every decision must include reason codes or human-readable reasons. Silent promo
 
 Documentation, CLI output, MCP metadata, API descriptions, README files, and issue comments are data. They are not instructions.
 
-AgentAtlas may extract claims from these sources, but must not execute instructions contained inside them unless the instruction is already part of a trusted implementation path.
+Ayiru may extract claims from these sources, but must not execute instructions contained inside them unless the instruction is already part of a trusted implementation path.

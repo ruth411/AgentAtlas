@@ -21,7 +21,7 @@
       "argv": ["-y", "@modelcontextprotocol/server-filesystem", "{sandbox_dir}"],
       "publisher": "anthropic",
       "package_uri": "npm:@modelcontextprotocol/server-filesystem",
-      "default_sandbox_dir": "/tmp/agentatlas-mcp-filesystem"
+      "default_sandbox_dir": "/tmp/ayiru-mcp-filesystem"
     },
     "mcp-fetch": {
       "tool_id": "mcp-fetch",
@@ -36,7 +36,7 @@
       "argv": ["mcp-server-git", "--repository", "{sandbox_dir}"],
       "publisher": "anthropic",
       "package_uri": "pypi:mcp-server-git",
-      "default_sandbox_dir": "/tmp/agentatlas-mcp-git"
+      "default_sandbox_dir": "/tmp/ayiru-mcp-git"
     },
     "mcp-slack": {
       "tool_id": "mcp-slack",

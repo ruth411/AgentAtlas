@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://json.schemastore.org/docker-compose.json",
   "title": "Docker Compose (seed subset)",
-  "description": "A small but representative subset of the docker-compose.yml schema used to seed AgentAtlas with config_field_exists claims. Valid Draft-07 JSON Schema; the same Stage 7c.2 ingestion lane that runs against the live schemastore.org doc accepts this verbatim.",
+  "description": "A small but representative subset of the docker-compose.yml schema used to seed Ayiru with config_field_exists claims. Valid Draft-07 JSON Schema; the same Stage 7c.2 ingestion lane that runs against the live schemastore.org doc accepts this verbatim.",
   "type": "object",
   "properties": {
     "version": {

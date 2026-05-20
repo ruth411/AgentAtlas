@@ -10,7 +10,7 @@ export default function HomePage() {
           A verified knowledge layer for AI agents.
         </h1>
         <p className="mt-5 max-w-2xl mx-auto text-lg text-zinc-600">
-          Wikipedia tells humans what things are. AgentAtlas tells AI agents
+          Wikipedia tells humans what things are. Ayiru tells AI agents
           what tools can do, how to use them, and{" "}
           <span className="text-zinc-900 font-medium">
             whether they&apos;re safe.
@@ -28,10 +28,10 @@ export default function HomePage() {
       {/* The interactive playground */}
       <section>
         <h2 className="text-2xl font-semibold tracking-tight">
-          Ask AgentAtlas if a command is safe
+          Ask Ayiru if a command is safe
         </h2>
         <p className="mt-2 text-zinc-600 max-w-3xl">
-          Every AgentAtlas verdict is backed by cited evidence. The three
+          Every Ayiru verdict is backed by cited evidence. The three
           examples below hit a fresh-seeded graph; the
           <Link href="/query" className="text-zinc-900 underline mx-1">
             full query playground
@@ -47,7 +47,7 @@ export default function HomePage() {
       <section className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <FeatureCard
           title="Six MCP tools"
-          body="Plug AgentAtlas into Claude Desktop or Cursor with one config block. The agent then asks AgentAtlas before acting."
+          body="Plug Ayiru into Claude Desktop or Cursor with one config block. The agent then asks Ayiru before acting."
         />
         <FeatureCard
           title="Deterministic risk classifier"

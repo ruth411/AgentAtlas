@@ -271,7 +271,7 @@ class HumanReviewRecord(Base):
 class AuditEventRecord(Base):
     """Stage 13: append-only audit log.
 
-    Every state-changing operation in AgentAtlas (claim submission,
+    Every state-changing operation in Ayiru (claim submission,
     verification results, human reviews, spec publication) emits one row.
     The service layer must only INSERT; there are no `update` or
     `delete` methods on the `AuditLogger`. The schema enforces no

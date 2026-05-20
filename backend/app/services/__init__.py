@@ -1,2 +1,2 @@
-"""Service layer modules for AgentAtlas."""
+"""Service layer modules for Ayiru."""
 

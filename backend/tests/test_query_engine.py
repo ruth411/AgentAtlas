@@ -54,7 +54,7 @@ FIXED_TIME = datetime(2026, 5, 18, tzinfo=timezone.utc)
 
 @pytest.fixture
 def store(tmp_path) -> ClaimStore:
-    return ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    return ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
 
 
 @pytest.fixture
@@ -225,7 +225,7 @@ def test_evidence_projected_to_citations(
     ev2 = Evidence(
         evidence_id=generate_evidence_id(),
         evidence_type=EvidenceType.CLI_HELP_OUTPUT,
-        source_uri="agentatlas://ingestion/run_x/artifacts/art_y",
+        source_uri="ayiru://ingestion/run_x/artifacts/art_y",
         excerpt="git status --help text",
         hash=valid_sha256("a"),
         captured_at=FIXED_TIME,

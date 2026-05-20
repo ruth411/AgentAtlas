@@ -35,7 +35,7 @@ from app.services.claim_store import (
 from app.services.contract_paths import contract_path
 
 
-_STAGE_0_CONTRACT = contract_path("agentatlas_stage_0.v1.json")
+_STAGE_0_CONTRACT = contract_path("ayiru_stage_0.v1.json")
 _WORKFLOW_SUBJECT = re.compile(r"^(?P<workflow_id>[^:]+)::(?P<step_number>[0-9]+)::(?P<action>.+)$")
 
 class CanonicalPublicationError(ValueError):

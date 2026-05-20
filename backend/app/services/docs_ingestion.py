@@ -313,7 +313,7 @@ class DocsIngestionService:
             except HttpFetchError as exc:
                 raise DocsIngestionError(str(exc)) from exc
             headers: dict[str, str] = {
-                "User-Agent": "AgentAtlas-DocsIngestion/1.0",
+                "User-Agent": "Ayiru-DocsIngestion/1.0",
                 "Accept": ", ".join(spec.allowed_content_types),
             }
             # Conditional request — server may answer 304 even if cache TTL
@@ -588,7 +588,7 @@ def _artifact_from_fetch(
     captured_at: datetime,
 ) -> RawIngestionArtifact:
     artifact_id = generate_ingestion_artifact_id()
-    source_uri = f"agentatlas://ingestion/{run_id}/artifacts/{artifact_id}"
+    source_uri = f"ayiru://ingestion/{run_id}/artifacts/{artifact_id}"
     return RawIngestionArtifact(
         artifact_id=artifact_id,
         run_id=run_id,
@@ -609,7 +609,7 @@ def _claim_from_fetch(
     created_at: datetime,
 ) -> KnowledgeClaim:
     # Evidence points at the original public URL the docs came from (this is
-    # what the trust resolver inspects), not the agentatlas:// artifact URI.
+    # what the trust resolver inspects), not the ayiru:// artifact URI.
     # That way trust = HIGH when the host is in the per-tool official_hosts
     # allowlist, regardless of how the ingester captured it.
     excerpt = fetch.sanitized_text if fetch.sanitized_text else artifact.raw_content[:_EXCERPT_MAX_CHARS]

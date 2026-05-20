@@ -1,10 +1,10 @@
 <div align="center">
 
-# AgentAtlas
+# Ayiru
 
 **A verified, machine-readable knowledge layer for AI agents.**
 
-Wikipedia tells humans what things are. AgentAtlas tells AI agents what tools can do, how to use them, and whether they're safe.
+Wikipedia tells humans what things are. Ayiru tells AI agents what tools can do, how to use them, and whether they're safe.
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/downloads/)
 [![Tests](https://img.shields.io/badge/tests-693%20passing-2EA44F)](#validation)
@@ -35,7 +35,7 @@ agent.run("gh repo delete my-org/production-critical --yes")
 # (the LLM "thought" this was safe. it wasn't.)
 ```
 
-## What AgentAtlas Does
+## What Ayiru Does
 
 A structured, evidence-backed knowledge graph that an agent queries *before* it acts.
 
@@ -64,7 +64,7 @@ verdict = atlas.validate_command(
 # }
 ```
 
-Every fact AgentAtlas serves is backed by **cited, captured evidence** — not LLM reasoning. Every command is **classified for risk** by a deterministic engine, not a chatbot. Every claim is **traceable** to the byte of the source document that grounded it.
+Every fact Ayiru serves is backed by **cited, captured evidence** — not LLM reasoning. Every command is **classified for risk** by a deterministic engine, not a chatbot. Every claim is **traceable** to the byte of the source document that grounded it.
 
 ## How It Works
 
@@ -119,19 +119,19 @@ Six ingestion lanes pull evidence from trusted sources. A deterministic orchestr
 
 ## Quick Start
 
-Stage 14 ships three supported install paths, all of which produce a working `agentatlas` binary with no manual setup.
+Stage 14 ships three supported install paths, all of which produce a working `ayiru` binary with no manual setup.
 
 ### From a checkout (recommended for development)
 
 ```bash
-git clone https://github.com/ruth411/AgentAtlas.git
-cd AgentAtlas
+git clone https://github.com/ruth411/ayiru.git
+cd ayiru
 python3.12 -m venv backend/.venv
 source backend/.venv/bin/activate
 pip install -e 'backend[dev]'
 
-agentatlas seed --reset       # populate the demo graph (~5s, offline-safe)
-agentatlas serve --reload     # API on http://localhost:8000
+ayiru seed --reset       # populate the demo graph (~5s, offline-safe)
+ayiru serve --reload     # API on http://localhost:8000
 ```
 
 OpenAPI docs at <http://localhost:8000/docs>.
@@ -139,7 +139,7 @@ OpenAPI docs at <http://localhost:8000/docs>.
 A fresh checkout is populated with **47 claims** spanning 5 tools (`git`, `github-cli`, `docker`, `vercel-cli`, `openai-api`). The headline demo works immediately:
 
 ```bash
-agentatlas query --tool github-cli --command 'gh repo delete my-org/x --yes'
+ayiru query --tool github-cli --command 'gh repo delete my-org/x --yes'
 # BLOCK  risk=critical  confidence=0.69
 #   matched_claim=claim_d6b8f6a2…  verification_level=L2_source_verified
 #   - Matched claim 'gh repo delete' by prefix.
@@ -152,36 +152,36 @@ agentatlas query --tool github-cli --command 'gh repo delete my-org/x --yes'
 The wheel bundles the trust contracts, seed artifacts, and alembic migrations, so an isolated `pip install` produces a fully-functional package — no checkout required.
 
 ```bash
-python3.12 -m venv ~/venv-agentatlas
-~/venv-agentatlas/bin/pip install agentatlas    # once published to PyPI
-agentatlas seed --reset                         # uses the bundled demo data
-agentatlas serve                                # auto-migrates the schema first
+python3.12 -m venv ~/venv-ayiru
+~/venv-ayiru/bin/pip install ayiru    # once published to PyPI
+ayiru seed --reset                         # uses the bundled demo data
+ayiru serve                                # auto-migrates the schema first
 ```
 
-> v1.0 ships the wheel from a local source build (`pip install /path/to/AgentAtlas/backend`). The PyPI upload itself lands with v1.0's release tag.
+> v1.0 ships the wheel from a local source build (`pip install /path/to/ayiru/backend`). The PyPI upload itself lands with v1.0's release tag.
 
 ### With Docker
 
 ```bash
-docker build -t agentatlas .
-docker run --rm -p 8000:8000 agentatlas         # serve the API
-docker run --rm -i agentatlas mcp               # MCP stdio bridge
+docker build -t ayiru .
+docker run --rm -p 8000:8000 ayiru         # serve the API
+docker run --rm -i ayiru mcp               # MCP stdio bridge
 ```
 
-The image bundles the same seed + contracts as the wheel and ships the `agentatlas` binary as its entrypoint.
+The image bundles the same seed + contracts as the wheel and ships the `ayiru` binary as its entrypoint.
 
 ### CLI reference
 
 | Command | Purpose |
 |---|---|
-| `agentatlas serve [--host --port --reload --no-migrate]` | Run the FastAPI app under uvicorn; auto-migrates the schema on first start unless `--no-migrate` is passed |
-| `agentatlas mcp` | Speak MCP/JSON-RPC over stdio (for Claude Desktop, Cursor, …) |
-| `agentatlas seed [--reset --database-url URL]` | Replay `data/seed_artifacts/` into the DB |
-| `agentatlas migrate [--database-url URL]` | `alembic upgrade head` |
-| `agentatlas query --tool ID --command STR [--json]` | Ask the engine if a command is safe (exits 0 on ALLOW, 2 on BLOCK) |
-| `agentatlas verify --claim-id ID` | Run the runtime verifier; promote L2 → L3 when it passes |
-| `agentatlas tools [--json]` | List every published tool spec |
-| `agentatlas --version` | Print the package version |
+| `ayiru serve [--host --port --reload --no-migrate]` | Run the FastAPI app under uvicorn; auto-migrates the schema on first start unless `--no-migrate` is passed |
+| `ayiru mcp` | Speak MCP/JSON-RPC over stdio (for Claude Desktop, Cursor, …) |
+| `ayiru seed [--reset --database-url URL]` | Replay `data/seed_artifacts/` into the DB |
+| `ayiru migrate [--database-url URL]` | `alembic upgrade head` |
+| `ayiru query --tool ID --command STR [--json]` | Ask the engine if a command is safe (exits 0 on ALLOW, 2 on BLOCK) |
+| `ayiru verify --claim-id ID` | Run the runtime verifier; promote L2 → L3 when it passes |
+| `ayiru tools [--json]` | List every published tool spec |
+| `ayiru --version` | Print the package version |
 
 ### Run the dashboard (optional)
 
@@ -193,7 +193,7 @@ npm install
 npm run dev
 ```
 
-Open <http://localhost:3000>. The dashboard proxies `/api/*` to the FastAPI backend on `localhost:8000` (override with `AGENTATLAS_API_URL`), so the browser only talks to its own origin and no CORS configuration is needed.
+Open <http://localhost:3000>. The dashboard proxies `/api/*` to the FastAPI backend on `localhost:8000` (override with `AYIRU_API_URL`), so the browser only talks to its own origin and no CORS configuration is needed.
 
 ## Core Principles
 
@@ -230,7 +230,7 @@ These are non-negotiable. They're tested.
 | 10 — MCP server (outbound) | Expose 6 query / write tools to Claude Desktop / Cursor over stdio JSON-RPC | ✓ |
 | 11a — Seed dataset | `scripts/seed_examples.py` replays pre-captured artifacts; ~47 claims across 5 tools | ✓ |
 | 11b — Demo dashboard | Minimal Next.js UI: landing + tools list + tool detail + query playground | ✓ |
-| 12 — CLI + Docker | One `agentatlas` binary on PATH; one-stage Dockerfile | ✓ |
+| 12 — CLI + Docker | One `ayiru` binary on PATH; one-stage Dockerfile | ✓ |
 | 13 — Human review + audit | `L5_human_audited` promotion path; append-only audit log; review queue; per-claim history endpoint | ✓ |
 | 14 — Hardening | Wheel bundles contracts + seed + migrations; `/v1/` API versioning; observability + request ids; optional API-key auth + reviewer registry; auto-init on serve; Postgres dialect smoke; GitHub Actions CI; LICENSE / CONTRIBUTING / SECURITY | ✓ |
 
@@ -239,7 +239,7 @@ See [docs/stage_report.md](docs/stage_report.md) for the full per-stage report i
 ## Architecture
 
 ```
-AgentAtlas/
+Ayiru/
 ├── backend/
 │   ├── app/
 │   │   ├── api/             # FastAPI routes (claims, canonical, ingestion, verification, query)
@@ -247,7 +247,7 @@ AgentAtlas/
 │   │   ├── schemas/         # Pydantic v2 typed models
 │   │   ├── services/        # Orchestrator, risk engine, ingestion lanes, runtime verifier, query engine
 │   │   ├── db/              # SQLAlchemy 2.0 models + session
-│   │   ├── cli.py           # Stage 12 — the `agentatlas` console script
+│   │   ├── cli.py           # Stage 12 — the `ayiru` console script
 │   │   └── main.py          # FastAPI app + middleware (body size guard, structured errors)
 │   ├── alembic/             # Migrations (drift-locked against models)
 │   └── tests/               # 693 tests; ruff clean; hermetic
@@ -318,7 +318,7 @@ Live interactive docs at <http://localhost:8000/docs> when the server is running
 
 ## MCP Integration
 
-AgentAtlas ships with a built-in MCP server that exposes the query surface plus claim submission to any MCP-aware agent client (Claude Desktop, Cursor, Cline, Continue, …). One config block in the client and the agent can ask AgentAtlas about safety before acting.
+Ayiru ships with a built-in MCP server that exposes the query surface plus claim submission to any MCP-aware agent client (Claude Desktop, Cursor, Cline, Continue, …). One config block in the client and the agent can ask Ayiru about safety before acting.
 
 ### Tools exposed
 
@@ -334,7 +334,7 @@ AgentAtlas ships with a built-in MCP server that exposes the query surface plus 
 ### Run it
 
 ```bash
-agentatlas mcp
+ayiru mcp
 ```
 
 Speaks JSON-RPC over stdio. Closing stdin (Ctrl-D) exits cleanly.
@@ -346,18 +346,18 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS):
 ```json
 {
   "mcpServers": {
-    "agentatlas": {
-      "command": "/absolute/path/to/agentatlas",
+    "ayiru": {
+      "command": "/absolute/path/to/ayiru",
       "args": ["mcp"],
       "env": {
-        "AGENTATLAS_DATABASE_URL": "sqlite:////absolute/path/to/agentatlas.db"
+        "AYIRU_DATABASE_URL": "sqlite:////absolute/path/to/ayiru.db"
       }
     }
   }
 }
 ```
 
-Run `which agentatlas` inside the activated venv to get the absolute path. Restart Claude Desktop and the 6 AgentAtlas tools appear in the tool list. Ask Claude `"Is it safe to run gh repo delete?"` and the verdict comes back inline with cited evidence.
+Run `which ayiru` inside the activated venv to get the absolute path. Restart Claude Desktop and the 6 Ayiru tools appear in the tool list. Ask Claude `"Is it safe to run gh repo delete?"` and the verdict comes back inline with cited evidence.
 
 **Cursor / other MCP clients** — the config shape is the same; consult the client's docs for where to register MCP servers.
 
@@ -413,39 +413,39 @@ cd backend
 .venv/bin/ruff check app tests
 
 # Migration upgrade / downgrade / upgrade cycle
-rm -f /tmp/agentatlas-smoke.db
-DATABASE_URL=sqlite:////tmp/agentatlas-smoke.db .venv/bin/alembic upgrade head
-DATABASE_URL=sqlite:////tmp/agentatlas-smoke.db .venv/bin/alembic downgrade -5
-DATABASE_URL=sqlite:////tmp/agentatlas-smoke.db .venv/bin/alembic upgrade head
+rm -f /tmp/ayiru-smoke.db
+DATABASE_URL=sqlite:////tmp/ayiru-smoke.db .venv/bin/alembic upgrade head
+DATABASE_URL=sqlite:////tmp/ayiru-smoke.db .venv/bin/alembic downgrade -5
+DATABASE_URL=sqlite:////tmp/ayiru-smoke.db .venv/bin/alembic upgrade head
 ```
 
 ## Configuration
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `AGENTATLAS_DATABASE_URL` | `sqlite:///./agentatlas.db` | SQLAlchemy URL. SQLite is the test-matrix dialect; Stage 14 verified the schema also compiles cleanly under the Postgres dialect (no live Postgres in CI yet). |
-| `AGENTATLAS_ALEMBIC_INI` | autodetected | Optional override path to `alembic.ini`. The CLI resolver tries env-var → source-tree `backend/alembic.ini` → bundled `app/_alembic/` (wheel install) in order. |
-| `AGENTATLAS_SEED_SCRIPT` | autodetected | Optional override path to a `seed_examples.py` fork. Without it, `agentatlas seed` uses the in-package `app.seed_data.runner`. |
-| `AGENTATLAS_API_KEY` | unset (auth off) | When set, Stage 14 enables Bearer-token auth on every state-changing endpoint. Read endpoints stay public regardless. Health endpoints stay public. |
-| `AGENTATLAS_REVIEWER_REGISTRY` | unset (open) | Comma-separated allowlist of `reviewer_id` values for `POST /verification/human-review`. When set, unlisted reviewers receive a structured 403. |
-| `AGENTATLAS_API_URL` (frontend) | `http://localhost:8000` | Where the dashboard's `/api/*` rewrite points. |
+| `AYIRU_DATABASE_URL` | `sqlite:///./ayiru.db` | SQLAlchemy URL. SQLite is the test-matrix dialect; Stage 14 verified the schema also compiles cleanly under the Postgres dialect (no live Postgres in CI yet). |
+| `AYIRU_ALEMBIC_INI` | autodetected | Optional override path to `alembic.ini`. The CLI resolver tries env-var → source-tree `backend/alembic.ini` → bundled `app/_alembic/` (wheel install) in order. |
+| `AYIRU_SEED_SCRIPT` | autodetected | Optional override path to a `seed_examples.py` fork. Without it, `ayiru seed` uses the in-package `app.seed_data.runner`. |
+| `AYIRU_API_KEY` | unset (auth off) | When set, Stage 14 enables Bearer-token auth on every state-changing endpoint. Read endpoints stay public regardless. Health endpoints stay public. |
+| `AYIRU_REVIEWER_REGISTRY` | unset (open) | Comma-separated allowlist of `reviewer_id` values for `POST /verification/human-review`. When set, unlisted reviewers receive a structured 403. |
+| `AYIRU_API_URL` (frontend) | `http://localhost:8000` | Where the dashboard's `/api/*` rewrite points. |
 
 ## What This Isn't (Yet)
 
 Being honest about the gaps that remain after Stage 14:
 
 - **Stage 0 scope is narrow.** Initial tool coverage: `git`, `github-cli`, `docker`, `vercel-cli`, `openai-api` plus 5 MCP servers. Adding tools is a contract change, not code.
-- **No PyPI upload yet.** The wheel works (Stage 14 bundled everything), but the `pip install agentatlas` invocation still points at a local build. The tagged release lands as part of v1.0.
+- **No PyPI upload yet.** The wheel works (Stage 14 bundled everything), but the `pip install ayiru` invocation still points at a local build. The tagged release lands as part of v1.0.
 - **SQLite is the only tested backend.** SQLAlchemy targets Postgres + the schema is dialect-portable (Stage 14 added an offline DDL smoke), but no `testcontainers`-style live Postgres tests run in CI. v1.1 adds them.
 - **No external auth provider integration.** Stage 14 ships an optional API-key gate via env var — solid for protecting a deployment behind a reverse proxy, not a substitute for SSO. OAuth / OIDC integration is v1.1.
 - **No rate limiting.** Deploy behind a reverse proxy (nginx, Caddy) that enforces rate limits. Native rate-limiting is v1.1.
-- **Reviewer auth is identity-by-string.** `AGENTATLAS_REVIEWER_REGISTRY` is a name allowlist; per-reviewer cryptographic identity (Ed25519 keys, signed reviews) is v1.1.
+- **Reviewer auth is identity-by-string.** `AYIRU_REVIEWER_REGISTRY` is a name allowlist; per-reviewer cryptographic identity (Ed25519 keys, signed reviews) is v1.1.
 
 ## Documentation
 
 - [Stage report](docs/stage_report.md) — per-stage audit with quality bar, pass cases, deferred items, and audit log
 - [Roadmap](ROADMAP.md) — what each stage exists to prove
-- [Product lock](docs/product_lock.md) — what AgentAtlas is, what it isn't, and the principles that hold for v1
+- [Product lock](docs/product_lock.md) — what Ayiru is, what it isn't, and the principles that hold for v1
 - [Trust contract](docs/trust_contract.md) — claim taxonomy, evidence taxonomy, verification rules, risk semantics
 - [Demo scenarios](docs/demo_scenarios.md) — the headline queries the project promises to answer correctly
 - [Contributing](CONTRIBUTING.md) — local setup, PR checklist, code style

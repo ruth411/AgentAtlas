@@ -51,7 +51,7 @@ FIXED_TIME = datetime(2026, 5, 17, tzinfo=timezone.utc)
 
 @pytest.fixture
 def store(tmp_path) -> ClaimStore:
-    return ClaimStore(database_url=f"sqlite:///{tmp_path / 'agentatlas.db'}")
+    return ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
 
 
 def _initialize_result(name: str = "fs", version: str = "1.0.0") -> dict[str, Any]:
@@ -148,8 +148,8 @@ def test_sandbox_dir_placeholder_substitution() -> None:
 
 def test_default_sandbox_dir_used_when_not_provided() -> None:
     spec = resolve_mcp_server_spec(server_id="mcp-filesystem")
-    assert spec.sandbox_dir == "/tmp/agentatlas-mcp-filesystem"
-    assert "/tmp/agentatlas-mcp-filesystem" in spec.argv
+    assert spec.sandbox_dir == "/tmp/ayiru-mcp-filesystem"
+    assert "/tmp/ayiru-mcp-filesystem" in spec.argv
 
 
 def test_postgres_requires_database_url() -> None:
@@ -206,7 +206,7 @@ def test_ingest_creates_artifact_and_tool_claim(store: ClaimStore) -> None:
     assert claim.claim_type == ClaimType.MCP_TOOL_EXISTS
     assert claim.subject == "mcp-filesystem: read_file"
     assert claim.risk_level == RiskLevel.LOW
-    assert claim.evidence[0].source_uri == "agentatlas://mcp/mcp-filesystem/tools/read_file"
+    assert claim.evidence[0].source_uri == "ayiru://mcp/mcp-filesystem/tools/read_file"
 
 
 # ---------------------------------------------------------------------------
@@ -349,7 +349,7 @@ def test_evidence_resolves_to_high_trust_for_atlas_capture(store: ClaimStore) ->
     )
     claim = store.get(resp.created_claim_ids[0])
     # Atlas-captured MCP_TOOL_SCHEMA evidence should not be downgraded
-    # to LOW. Trust resolver treats the agentatlas:// scheme as MEDIUM at
+    # to LOW. Trust resolver treats the ayiru:// scheme as MEDIUM at
     # minimum (or HIGH if host-trusted); the request asks for HIGH, which
     # the resolver may keep or cap. Either MEDIUM or HIGH is acceptable;
     # LOW would be a regression.

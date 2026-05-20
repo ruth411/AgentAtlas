@@ -1,2 +1,2 @@
-"""API route modules for AgentAtlas."""
+"""API route modules for Ayiru."""
 

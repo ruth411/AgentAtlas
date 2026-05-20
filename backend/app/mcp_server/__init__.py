@@ -1,4 +1,4 @@
-"""Stage 10: AgentAtlas MCP server.
+"""Stage 10: Ayiru MCP server.
 
 Exposes the Stage 9 query surface (plus claim submission) as MCP tools over
 stdio JSON-RPC. Clients are agent frameworks (Claude Desktop, Cursor, Cline,

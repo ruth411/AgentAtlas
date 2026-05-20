@@ -1,9 +1,9 @@
 /**
- * Typed AgentAtlas API client.
+ * Typed Ayiru API client.
  *
  * Server components (RSCs) hit the FastAPI backend directly through
  * `API_BASE` (an absolute URL, set at build/run time from
- * `AGENTATLAS_API_URL`, default `http://localhost:8000`). Client components
+ * `AYIRU_API_URL`, default `http://localhost:8000`). Client components
  * hit `/api/*`, which `next.config.mjs` rewrites to the same backend at
  * request time. This avoids CORS configuration on the FastAPI side.
  *
@@ -15,7 +15,7 @@
  */
 
 const API_BASE =
-  process.env.AGENTATLAS_API_URL ?? "http://localhost:8000";
+  process.env.AYIRU_API_URL ?? "http://localhost:8000";
 
 // -----------------------------------------------------------------------------
 // Wire types — mirror backend/app/schemas/query.py + tool_spec.py

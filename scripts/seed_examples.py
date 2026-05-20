@@ -1,7 +1,7 @@
 """Thin shim — the actual seed logic lives in `app.seed_data.runner`.
 
 Kept at this path because the existing documentation, tests, and the
-historical CLI fallback (`AGENTATLAS_SEED_SCRIPT=$PWD/scripts/seed_examples.py`)
+historical CLI fallback (`AYIRU_SEED_SCRIPT=$PWD/scripts/seed_examples.py`)
 all reference it. The shim adds the backend directory to `sys.path` so
 `app.*` imports work when the script is run from a fresh checkout
 without `pip install`-ing the package.
@@ -12,7 +12,7 @@ Usage:
     python scripts/seed_examples.py --reset         # drop DB + alembic up + seed
     python scripts/seed_examples.py --database-url sqlite:///... --reset
 
-The recommended invocation post-Stage-14 is `agentatlas seed --reset`,
+The recommended invocation post-Stage-14 is `ayiru seed --reset`,
 which calls into the same `main()` directly without spawning a
 subprocess.
 """

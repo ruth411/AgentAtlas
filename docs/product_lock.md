@@ -1,12 +1,12 @@
 # Product Lock
 
-AgentAtlas is an agent-maintained, orchestrator-verified knowledge graph for AI-agent tool intelligence.
+Ayiru is an agent-maintained, orchestrator-verified knowledge graph for AI-agent tool intelligence.
 
 The product exists so an AI agent can ask what a tool can do, how a command or API behaves, what evidence supports that knowledge, and whether the action is safe before it acts.
 
 ## Product Identity
 
-- Project name: `AgentAtlas`
+- Project name: `Ayiru`
 - Product category: AI-agent infrastructure, tool intelligence, agent safety, MCP/tool governance, executable knowledge graph
 - Primary user: AI agents that need reliable structured knowledge before using tools
 - Secondary users: developers, AI engineers, DevOps teams, security teams, maintainers, MCP server creators, and enterprise agent-platform teams
@@ -15,7 +15,7 @@ The product exists so an AI agent can ask what a tool can do, how a command or A
 
 Most agents can call tools before they understand the tool's behavior, side effects, evidence quality, or operational risk.
 
-AgentAtlas closes that gap by requiring specialized agents and maintainers to submit structured, evidence-backed claims. A Canon Orchestrator verifies those claims before publishing accepted knowledge into canonical `ToolSpec` and `WorkflowSpec` objects.
+Ayiru closes that gap by requiring specialized agents and maintainers to submit structured, evidence-backed claims. A Canon Orchestrator verifies those claims before publishing accepted knowledge into canonical `ToolSpec` and `WorkflowSpec` objects.
 
 ## North Star Flow
 
@@ -51,12 +51,12 @@ Do not expand beyond these tools until the trust core can accept, reject, defer,
 
 ## Anti-Goals
 
-- AgentAtlas is not a generic chatbot
-- AgentAtlas is not a documentation search engine
-- AgentAtlas is not a prose wiki
-- AgentAtlas is not a broad crawler before verification works
-- AgentAtlas is not a UI-first dashboard project
-- AgentAtlas is not a graph database demo without trustworthy inputs
+- Ayiru is not a generic chatbot
+- Ayiru is not a documentation search engine
+- Ayiru is not a prose wiki
+- Ayiru is not a broad crawler before verification works
+- Ayiru is not a UI-first dashboard project
+- Ayiru is not a graph database demo without trustworthy inputs
 
 ## Stage 0 Exit Standard
 

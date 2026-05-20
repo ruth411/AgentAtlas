@@ -4,7 +4,7 @@
     "subject": "gh repo delete",
     "statement": "`gh repo delete` permanently deletes a GitHub repository. The action is irreversible; once a repository is deleted, its issues, pull requests, and history cannot be recovered without a paid GitHub-side restore.",
     "tool_id": "github-cli",
-    "submitted_by": "agentatlas-seed",
+    "submitted_by": "ayiru-seed",
     "risk_level": "critical",
     "evidence": [
       {
@@ -26,7 +26,7 @@
     "subject": "git status",
     "statement": "`git status` shows the working tree status: files staged for commit, files modified but not yet staged, and untracked files. Read-only; does not mutate the working tree, the index, or the repository.",
     "tool_id": "git",
-    "submitted_by": "agentatlas-seed",
+    "submitted_by": "ayiru-seed",
     "risk_level": "low",
     "evidence": [
       {
@@ -54,7 +54,7 @@
     "subject": "git log",
     "statement": "`git log` shows the commit history for the current branch. Read-only; does not mutate the working tree, the index, or the repository.",
     "tool_id": "git",
-    "submitted_by": "agentatlas-seed",
+    "submitted_by": "ayiru-seed",
     "risk_level": "low",
     "evidence": [
       {
@@ -82,7 +82,7 @@
     "subject": "vercel --prod",
     "statement": "`vercel --prod` creates a production deployment on Vercel from the current project directory. Mutates remote state, may incur cost, and exposes a public URL.",
     "tool_id": "vercel-cli",
-    "submitted_by": "agentatlas-seed",
+    "submitted_by": "ayiru-seed",
     "risk_level": "high",
     "evidence": [
       {
@@ -104,7 +104,7 @@
     "subject": "gh repo list",
     "statement": "`gh repo list` lists repositories owned by the current user or a specified owner. Read-only over the GitHub API; does not mutate state.",
     "tool_id": "github-cli",
-    "submitted_by": "agentatlas-seed",
+    "submitted_by": "ayiru-seed",
     "risk_level": "medium",
     "evidence": [
       {
@@ -126,7 +126,7 @@
     "subject": "docker rm",
     "statement": "`docker rm` removes one or more containers. By default, only stopped containers can be removed; `-f` (force) will SIGKILL and remove a running container. Removed containers' filesystem changes are unrecoverable unless previously committed to an image.",
     "tool_id": "docker",
-    "submitted_by": "agentatlas-seed",
+    "submitted_by": "ayiru-seed",
     "risk_level": "critical",
     "evidence": [
       {

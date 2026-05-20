@@ -105,10 +105,10 @@ _API_ROUTERS = (
 )
 
 
-app = FastAPI(title="AgentAtlas", version="0.1.0")
+app = FastAPI(title="Ayiru", version="0.1.0")
 app.add_middleware(RequestBodySizeLimitMiddleware)
 app.add_middleware(LegacyDeprecationHeaderMiddleware)
-# Auth gate. No-op when `AGENTATLAS_API_KEY` is unset (dev default).
+# Auth gate. No-op when `AYIRU_API_KEY` is unset (dev default).
 app.add_middleware(ApiKeyAuthMiddleware)
 # Observability is registered last so it wraps every other middleware
 # layer — request IDs cover body-size, deprecation, and auth paths too.

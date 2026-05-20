@@ -1,9 +1,9 @@
 """Stage 14: optional API-key authentication.
 
-Off by default. When `AGENTATLAS_API_KEY` is set to a non-empty value,
+Off by default. When `AYIRU_API_KEY` is set to a non-empty value,
 all **state-changing** requests (POST / PUT / PATCH / DELETE) must carry
 `Authorization: Bearer <api-key>`; read requests stay public so the
-demo dashboard and `agentatlas query` keep working unchanged.
+demo dashboard and `ayiru query` keep working unchanged.
 
 The choice to gate writes only is deliberate for v1.0:
 
@@ -13,7 +13,7 @@ The choice to gate writes only is deliberate for v1.0:
   review, ingestion, spec publication) change canonical state. Those
   need a credential when the API is reachable outside localhost.
 
-A reviewer-id allowlist (`AGENTATLAS_REVIEWER_REGISTRY`) gates the
+A reviewer-id allowlist (`AYIRU_REVIEWER_REGISTRY`) gates the
 `POST /verification/human-review` route further: when set, the
 `reviewer_id` on the submitted decision must appear in the registry's
 comma-separated list. Without the env var, any `reviewer_id` is
@@ -38,11 +38,11 @@ from app.api.errors import ErrorCode, error_payload
 from fastapi.responses import JSONResponse
 
 
-_API_KEY_ENV = "AGENTATLAS_API_KEY"
-_REVIEWER_REGISTRY_ENV = "AGENTATLAS_REVIEWER_REGISTRY"
+_API_KEY_ENV = "AYIRU_API_KEY"
+_REVIEWER_REGISTRY_ENV = "AYIRU_REVIEWER_REGISTRY"
 
 
-# Read endpoints exempt from auth even when AGENTATLAS_API_KEY is set.
+# Read endpoints exempt from auth even when AYIRU_API_KEY is set.
 _READ_METHODS: frozenset[str] = frozenset({"GET", "HEAD", "OPTIONS"})
 
 # Paths that are always public regardless of method. Health checks need
@@ -85,7 +85,7 @@ def reviewer_allowed(reviewer_id: str) -> bool:
 
 class ApiKeyAuthMiddleware(BaseHTTPMiddleware):
     """Reject state-changing requests that don't carry a valid Bearer
-    token, when `AGENTATLAS_API_KEY` is set.
+    token, when `AYIRU_API_KEY` is set.
 
     Header lookup is constant-time-ish (uses `hmac.compare_digest` to
     avoid leaking the key through timing). Missing header / wrong
@@ -143,7 +143,7 @@ def _unauthorized() -> JSONResponse:
             code=ErrorCode.HTTP_ERROR,
             message=(
                 "Write endpoints require an Authorization: Bearer "
-                "<api-key> header when AGENTATLAS_API_KEY is configured."
+                "<api-key> header when AYIRU_API_KEY is configured."
             ),
         ),
         headers={"WWW-Authenticate": "Bearer"},

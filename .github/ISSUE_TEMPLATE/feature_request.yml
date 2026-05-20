@@ -1,0 +1,61 @@
+name: Feature request
+description: Propose a new capability or change in behaviour.
+title: "[feature] "
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for proposing a feature. The strongest requests describe a
+        **concrete problem you hit while using Ayiru**, not a feature in the
+        abstract. "I wanted X and the system did Y" beats "wouldn't it be
+        cool if…" every time.
+
+        **Want a new tool added** (e.g. `helm`, `aws-cli`, …)? Use the
+        "Add a tool" template instead — it's the highest-volume request
+        and has its own process.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+      description: |
+        Describe the situation you ran into, what you tried, and what was
+        missing. Skip directly to "the solution" only if the problem is
+        obvious to a stranger.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: |
+        What would you have wanted Ayiru to do? Be specific — endpoints,
+        schemas, CLI flags, MCP tool names. Half-formed is fine; missing
+        is not.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: |
+        What did you try before reaching for a new feature? Existing
+        endpoints, workarounds, other tools. Helps us understand whether
+        the gap is real or whether existing docs need to point at the
+        right surface.
+
+  - type: checkboxes
+    id: principles
+    attributes:
+      label: Compatibility with the project's core principles
+      description: |
+        Ayiru's safety story depends on a few non-negotiables (see CONTRIBUTING.md).
+        Tick the boxes you've thought through.
+      options:
+        - label: This does not weaken any safety policy (`allowed_commands`, SSRF guards, evidence-trust requirements).
+        - label: This does not require an LLM in the safety path.
+        - label: If this changes a `contracts/*.json` file, it's a versioned change (new `.v2.json`), not an in-place edit.
+        - label: If this adds an endpoint, it'll be mounted under `/v1/` (or appropriately versioned).

@@ -83,7 +83,7 @@ function Counter({ label, value }: { label: string; value: number }) {
 function ErrorBanner({ message }: { message: string }) {
   return (
     <div className="rounded-md border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">
-      <div className="font-semibold mb-1">Couldn&apos;t reach AgentAtlas.</div>
+      <div className="font-semibold mb-1">Couldn&apos;t reach Ayiru.</div>
       <div className="font-mono text-xs">{message}</div>
       <div className="mt-2 text-xs">
         Start the backend:{" "}

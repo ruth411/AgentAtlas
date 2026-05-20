@@ -6,8 +6,8 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from app.db.models import Base
 
-DEFAULT_DATABASE_URL = "sqlite:///./agentatlas.db"
-DATABASE_URL = environ.get("AGENTATLAS_DATABASE_URL", DEFAULT_DATABASE_URL)
+DEFAULT_DATABASE_URL = "sqlite:///./ayiru.db"
+DATABASE_URL = environ.get("AYIRU_DATABASE_URL", DEFAULT_DATABASE_URL)
 
 
 def create_database_engine(database_url: str = DEFAULT_DATABASE_URL) -> Engine:

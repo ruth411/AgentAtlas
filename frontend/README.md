@@ -1,6 +1,6 @@
-# AgentAtlas — Dashboard
+# Ayiru — Dashboard
 
-Minimal Next.js demo dashboard for AgentAtlas. Built for the v1 demo video
+Minimal Next.js demo dashboard for Ayiru. Built for the v1 demo video
 and as a "first look" surface when someone runs the project locally.
 
 ## What's here
@@ -19,7 +19,7 @@ plain Tailwind on top of Next.js's App Router.
 
 ## Local setup
 
-Requires **Node.js 18+** and the AgentAtlas backend running on
+Requires **Node.js 18+** and the Ayiru backend running on
 `http://localhost:8000` (configurable — see below).
 
 ```bash
@@ -35,7 +35,7 @@ FastAPI backend, so the browser only ever talks to its own origin — no CORS
 configuration on the backend side. Override the proxy target if needed:
 
 ```bash
-AGENTATLAS_API_URL=http://localhost:9000 npm run dev
+AYIRU_API_URL=http://localhost:9000 npm run dev
 ```
 
 ## What it expects
