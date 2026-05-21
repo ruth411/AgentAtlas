@@ -6,11 +6,11 @@
 
 Wikipedia tells humans what things are. Ayiru tells AI agents what tools can do, how to use them, and whether they're safe.
 
-[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/downloads/)
-[![Tests](https://img.shields.io/badge/tests-693%20passing-2EA44F)](#validation)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/downloads/)
+[![Tests](https://img.shields.io/badge/tests-699%20passing-2EA44F)](#validation)
 [![Ruff](https://img.shields.io/badge/lint-ruff%20clean-FCC21B)](https://docs.astral.sh/ruff/)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-[![Status](https://img.shields.io/badge/stage-14%20complete-7C3AED)](docs/stage_report.md)
+[![Status](https://img.shields.io/badge/stage-15%20complete-7C3AED)](docs/stage_report.md)
 
 [Quick Start](#quick-start) · [What's Built](#whats-built) · [MCP Integration](#mcp-integration) · [Architecture](#architecture) · [Roadmap](ROADMAP.md)
 
@@ -120,7 +120,7 @@ Six ingestion lanes pull evidence from trusted sources. A deterministic orchestr
 
 ## Quick Start
 
-Stage 14 ships three supported install paths, all of which produce a working `ayiru` binary with no manual setup.
+Three install paths land you on a working `ayiru` binary. The repo checkout is the recommended dev path. The standalone wheel install is the production path once PyPI publication ships (scheduled for v0.2; see [plan_v02.md](plan_v02.md) §Stage 16.2). The Docker image is the zero-setup path with auto-seeding on first run.
 
 ### From a checkout (recommended for development)
 
@@ -150,16 +150,16 @@ ayiru query --tool github-cli --command 'gh repo delete my-org/x --yes'
 
 ### Standalone wheel install (Stage 14)
 
-The wheel bundles the trust contracts, seed artifacts, and alembic migrations, so an isolated `pip install` produces a fully-functional package — no checkout required.
+The wheel bundles the trust contracts, seed artifacts, and alembic migrations, so an isolated install produces a fully-functional package — no checkout required.
 
 ```bash
 python3.12 -m venv ~/venv-ayiru
-~/venv-ayiru/bin/pip install ayiru    # once published to PyPI
-ayiru seed --reset                         # uses the bundled demo data
-ayiru serve                                # auto-migrates the schema first
+~/venv-ayiru/bin/pip install /path/to/ayiru/backend   # local source build
+ayiru seed --reset                                    # uses the bundled demo data
+ayiru serve                                           # auto-migrates the schema first
 ```
 
-> v1.0 ships the wheel from a local source build (`pip install /path/to/ayiru/backend`). The PyPI upload itself lands with v1.0's release tag.
+> **Note on PyPI.** `pip install ayiru` is not yet a working command — the PyPI publication is part of the v0.2 release plan (see [plan_v02.md](plan_v02.md) §Stage 16.2). For now, install from a local source build as shown above, or from a GitHub release wheel attached to the [v0.1.0 release](https://github.com/ruth411/ayiru/releases/tag/v0.1.0).
 
 ### With Docker
 
@@ -251,7 +251,7 @@ Ayiru/
 │   │   ├── cli.py           # Stage 12 — the `ayiru` console script
 │   │   └── main.py          # FastAPI app + middleware (body size guard, structured errors)
 │   ├── alembic/             # Migrations (drift-locked against models)
-│   └── tests/               # 693 tests; ruff clean; hermetic
+│   └── tests/               # 699 tests; ruff clean; hermetic
 ├── frontend/                # Stage 11b — Next.js demo dashboard (4 pages)
 ├── data/seed_artifacts/     # Stage 11a — pre-captured artifacts for offline-safe seeding
 ├── scripts/                 # seed_examples.py and other operator tools
@@ -407,7 +407,7 @@ curl -X POST http://localhost:8000/ingestion/docs \
 ```bash
 cd backend
 
-# Test suite (693 tests, hermetic, ~30s)
+# Test suite (699 tests, hermetic, ~25s)
 .venv/bin/python -m pytest -q
 
 # Lint
@@ -419,6 +419,17 @@ DATABASE_URL=sqlite:////tmp/ayiru-smoke.db .venv/bin/alembic upgrade head
 DATABASE_URL=sqlite:////tmp/ayiru-smoke.db .venv/bin/alembic downgrade -5
 DATABASE_URL=sqlite:////tmp/ayiru-smoke.db .venv/bin/alembic upgrade head
 ```
+
+## Security model
+
+Auth in v0.1 is intentionally narrow. Two surfaces, two postures:
+
+- **HTTP API.** When `AYIRU_API_KEY` is set, every state-changing request (`POST` / `PUT` / `PATCH` / `DELETE`) must carry `Authorization: Bearer <key>`. Read endpoints stay public so agents can query freely without coordinating credentials with their orchestrator. The check is timing-safe (`hmac.compare_digest`).
+- **MCP stdio (`ayiru mcp`).** The stdio JSON-RPC server is **unauthenticated by design**. It assumes the caller is a local process the user already has exec rights to (Claude Desktop, Cursor, Cline, Continue — the typical MCP host configurations spawn the server as their own subprocess). The `AYIRU_API_KEY` middleware does not apply here because there is no transport layer to attach credentials to.
+
+For any network-exposed deployment, run the HTTP API with `AYIRU_API_KEY` set. Reserve `ayiru mcp` for local trusted callers. Piping the stdio server across SSH or a reverse shell exposes write tools (`submit_claim`) without authentication.
+
+See [SECURITY.md](SECURITY.md) for the full threat model and known residual risks (including the MCP stdio asymmetry and the DNS-rebinding window in the SSRF guard).
 
 ## Configuration
 
@@ -433,10 +444,10 @@ DATABASE_URL=sqlite:////tmp/ayiru-smoke.db .venv/bin/alembic upgrade head
 
 ## What This Isn't (Yet)
 
-Being honest about the gaps that remain after Stage 14:
+Being honest about the gaps that remain after Stage 15:
 
-- **Stage 0 scope is narrow.** Initial tool coverage: `git`, `github-cli`, `docker`, `vercel-cli`, `openai-api` plus 5 MCP servers. Adding tools is a contract change, not code.
-- **No PyPI upload yet.** The wheel works (Stage 14 bundled everything), but the `pip install ayiru` invocation still points at a local build. The tagged release lands as part of v1.0.
+- **Stage 0 scope is narrow.** Initial tool coverage: `git`, `github-cli`, `docker`, `vercel-cli`, `openai-api` plus 5 MCP servers. Adding tools is a contract change, not code. The v0.2 plan ([plan_v02.md](plan_v02.md) §Stage 19/20) relaxes this with a curated/uncurated split and bulk-ingests ≥ 35 more tools.
+- **No PyPI upload yet.** The wheel works (Stage 14 bundled everything), but `pip install ayiru` still points at a local build. The PyPI publication ships with v0.2 ([plan_v02.md](plan_v02.md) §Stage 16.2).
 - **SQLite is the only tested backend.** SQLAlchemy targets Postgres + the schema is dialect-portable (Stage 14 added an offline DDL smoke), but no `testcontainers`-style live Postgres tests run in CI. v1.1 adds them.
 - **No external auth provider integration.** Stage 14 ships an optional API-key gate via env var — solid for protecting a deployment behind a reverse proxy, not a substitute for SSO. OAuth / OIDC integration is v1.1.
 - **No rate limiting.** Deploy behind a reverse proxy (nginx, Caddy) that enforces rate limits. Native rate-limiting is v1.1.

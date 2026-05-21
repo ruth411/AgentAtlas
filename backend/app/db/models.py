@@ -1,3 +1,17 @@
+"""SQLAlchemy ORM models — the persistence layer.
+
+Naming convention: every persistence type in this module is suffixed
+``Record`` (``KnowledgeClaimRecord``, ``VerificationResultRecord``, etc.).
+The bare names (``KnowledgeClaim``, ``VerificationResult``, …) belong to
+the Pydantic transport schemas in ``app.schemas.*``. The orchestrator,
+ingestion lanes, and API routes convert between the two at the
+``ClaimStore`` boundary.
+
+If you import ``KnowledgeClaim`` from here and get an ``ImportError``,
+you want either ``KnowledgeClaim`` from ``app.schemas.claim`` (transport
+shape) or ``KnowledgeClaimRecord`` from this module (DB shape).
+"""
+
 from datetime import datetime
 
 from sqlalchemy import CheckConstraint, DateTime, Float, ForeignKey, String, Text

@@ -1,3 +1,12 @@
+"""Pydantic transport schemas for claims.
+
+``KnowledgeClaim`` (defined here) is the wire / API / orchestrator shape.
+``KnowledgeClaimRecord`` (in ``app.db.models``) is the SQLAlchemy
+persistence shape. The two are converted at the ``ClaimStore`` boundary
+in ``app.services.claim_store``. Pydantic schemas live here; ORM models
+live there; do not cross-import the two in the same module.
+"""
+
 from datetime import datetime
 import re
 

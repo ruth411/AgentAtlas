@@ -78,6 +78,16 @@ def _build_parser() -> argparse.ArgumentParser:
             "manage migrations out of band."
         ),
     )
+    p_serve.add_argument(
+        "--auto-seed",
+        action="store_true",
+        help=(
+            "If the database has zero claims after migration, run "
+            "`seed --reset` automatically. Off by default in dev; the "
+            "Docker image enables this so `docker run … ayiru` produces "
+            "a populated graph on the first start."
+        ),
+    )
     p_serve.set_defaults(func=_cmd_serve)
 
     # mcp
@@ -192,6 +202,13 @@ def _cmd_serve(args: argparse.Namespace) -> int:
                 file=sys.stderr,
             )
 
+    # Stage 15.5: when --auto-seed is passed and the DB has zero claims,
+    # replay the bundled seed artifacts so the headline demo works on
+    # the first request. Docker's CMD sets this; dev workflow leaves it
+    # off because re-seeding mid-loop would clobber local state.
+    if getattr(args, "auto_seed", False):
+        _maybe_auto_seed()
+
     uvicorn.run(
         "app.main:app",
         host=args.host,
@@ -199,6 +216,65 @@ def _cmd_serve(args: argparse.Namespace) -> int:
         reload=args.reload,
     )
     return 0
+
+
+def _maybe_auto_seed() -> None:
+    """Replay the seed artifacts iff the configured DB has zero claims.
+
+    Idempotent: if claims exist, the function is a no-op (and prints
+    one line so an operator who flipped --auto-seed on by mistake knows
+    why nothing changed). Honors AYIRU_DATABASE_URL the same way the
+    seed runner does.
+    """
+    from app.db.models import KnowledgeClaimRecord
+    from app.db.session import SessionLocal
+    from app.seed_data.runner import main as seed_main
+
+    try:
+        with SessionLocal() as db:
+            existing = db.query(KnowledgeClaimRecord).count()
+    except Exception as exc:  # pragma: no cover - defensive
+        # The most common cause is a missing `knowledge_claims` table —
+        # which only happens when the operator passed `--no-migrate`
+        # alongside `--auto-seed`. Surface the actionable fix rather
+        # than the raw SQLAlchemy traceback.
+        print(
+            f"ayiru serve: --auto-seed skipped, could not read claim count ({exc}). "
+            "If you passed --no-migrate, run `ayiru migrate` first or drop "
+            "--no-migrate so auto-seed has a schema to write into.",
+            file=sys.stderr,
+        )
+        return
+
+    if existing > 0:
+        print(
+            f"ayiru serve: --auto-seed no-op (database already holds {existing} claim(s)).",
+            file=sys.stderr,
+        )
+        return
+
+    print(
+        "ayiru serve: --auto-seed populating empty database from bundled artifacts...",
+        file=sys.stderr,
+    )
+    try:
+        seed_main([])
+    except SystemExit as exc:
+        # The runner uses argparse and raises SystemExit on bad input,
+        # not on success. We pass an empty argv so this path is
+        # defensive only.
+        if exc.code not in (0, None):  # pragma: no cover - defensive
+            print(
+                f"ayiru serve: --auto-seed failed (exit {exc.code}); the server will "
+                "start with an empty graph.",
+                file=sys.stderr,
+            )
+    except Exception as exc:  # pragma: no cover - defensive
+        print(
+            f"ayiru serve: --auto-seed failed ({exc}); the server will start with "
+            "an empty graph.",
+            file=sys.stderr,
+        )
 
 
 def _auto_migrate() -> None:
@@ -224,6 +300,22 @@ def _auto_migrate() -> None:
 def _cmd_mcp(_args: argparse.Namespace) -> int:
     from app.mcp_server.server import build_default_server
 
+    # Stage 15.8 — disclose the MCP-stdio-no-auth asymmetry at startup.
+    # When the operator has bothered to set AYIRU_API_KEY, they almost
+    # certainly mean for it to apply everywhere. It does not: the stdio
+    # transport has no place to attach credentials, so the JSON-RPC
+    # surface accepts every framed request. We log the residual risk
+    # rather than silently widening the trust boundary. Goes to stderr
+    # so it doesn't corrupt the JSON-RPC stdout stream.
+    if os.environ.get("AYIRU_API_KEY", "").strip():
+        sys.stderr.write(
+            "WARNING: AYIRU_API_KEY is set, but it does not gate the MCP "
+            "stdio path — only the HTTP API. The stdio JSON-RPC server "
+            "accepts all framed requests, including writes (submit_claim). "
+            "Ensure only trusted local callers can reach this process. "
+            "See SECURITY.md §Known residual risks.\n"
+        )
+        sys.stderr.flush()
     build_default_server().serve()
     return 0
 

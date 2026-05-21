@@ -62,7 +62,7 @@ Open an issue first. We'll save you the trouble of an unmergeable PR.
 
 ## Code style
 
-- Python 3.11+ syntax. Type hints required on every public function.
+- Python 3.12+ syntax. Type hints required on every public function.
 - Pydantic v2 throughout. `ConfigDict(extra="forbid", str_strip_whitespace=True)` on every schema.
 - One short comment per non-obvious decision. Multi-paragraph docstrings only on module headers.
 - Tests use `tmp_path` for ephemeral SQLite DBs. Don't hit the dev DB from tests.

@@ -158,6 +158,113 @@ def test_serve_continues_when_auto_migrate_raises(
     assert "skipping auto-migration" in err
 
 
+def test_serve_auto_seed_runs_when_db_is_empty(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Stage 15.5 — `docker run … ayiru` must produce a populated graph
+    on first start. The --auto-seed flag invokes the bundled seed
+    runner when the claim count is zero post-migration."""
+    seed_calls: list[list[str]] = []
+
+    fake_uvicorn = type(sys)("uvicorn")
+    fake_uvicorn.run = lambda *args, **kwargs: None  # type: ignore[attr-defined]
+    monkeypatch.setitem(sys.modules, "uvicorn", fake_uvicorn)
+    monkeypatch.setattr(cli_module, "_auto_migrate", lambda: None)
+
+    class _EmptyQuery:
+        def count(self) -> int:
+            return 0
+
+    class _FakeSession:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
+
+        def query(self, _record):
+            return _EmptyQuery()
+
+    monkeypatch.setattr(
+        "app.db.session.SessionLocal",
+        lambda: _FakeSession(),
+    )
+    monkeypatch.setattr(
+        "app.seed_data.runner.main",
+        lambda argv: seed_calls.append(argv) or 0,
+    )
+
+    assert main(["serve", "--auto-seed"]) == 0
+    assert seed_calls == [[]]
+    err = capsys.readouterr().err
+    assert "auto-seed populating empty database" in err
+
+
+def test_serve_auto_seed_skips_when_db_has_claims(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Idempotency: container restarts against a persistent volume must
+    not re-seed. The auto-seed path inspects claim count first."""
+    seed_calls: list[list[str]] = []
+
+    fake_uvicorn = type(sys)("uvicorn")
+    fake_uvicorn.run = lambda *args, **kwargs: None  # type: ignore[attr-defined]
+    monkeypatch.setitem(sys.modules, "uvicorn", fake_uvicorn)
+    monkeypatch.setattr(cli_module, "_auto_migrate", lambda: None)
+
+    class _NonEmptyQuery:
+        def count(self) -> int:
+            return 47
+
+    class _FakeSession:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
+
+        def query(self, _record):
+            return _NonEmptyQuery()
+
+    monkeypatch.setattr(
+        "app.db.session.SessionLocal",
+        lambda: _FakeSession(),
+    )
+    monkeypatch.setattr(
+        "app.seed_data.runner.main",
+        lambda argv: seed_calls.append(argv) or 0,
+    )
+
+    assert main(["serve", "--auto-seed"]) == 0
+    assert seed_calls == []
+    err = capsys.readouterr().err
+    assert "auto-seed no-op" in err
+    assert "47" in err
+
+
+def test_serve_without_auto_seed_does_not_invoke_seed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The default dev workflow (`ayiru serve --reload`) must never
+    silently seed — that would clobber whatever the developer is
+    iterating on. Auto-seed is opt-in via the flag."""
+    seed_calls: list[list[str]] = []
+
+    fake_uvicorn = type(sys)("uvicorn")
+    fake_uvicorn.run = lambda *args, **kwargs: None  # type: ignore[attr-defined]
+    monkeypatch.setitem(sys.modules, "uvicorn", fake_uvicorn)
+    monkeypatch.setattr(cli_module, "_auto_migrate", lambda: None)
+    monkeypatch.setattr(
+        "app.seed_data.runner.main",
+        lambda argv: seed_calls.append(argv) or 0,
+    )
+
+    assert main(["serve"]) == 0
+    assert seed_calls == []
+
+
 # ---------------------------------------------------------------------------
 # `ayiru mcp` — stdio bridge
 # ---------------------------------------------------------------------------
@@ -178,6 +285,58 @@ def test_mcp_subcommand_invokes_build_default_server(
     )
     assert main(["mcp"]) == 0
     assert served["called"] is True
+
+
+def test_mcp_subcommand_warns_when_api_key_is_set(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Stage 15.8 — the operator who set AYIRU_API_KEY almost certainly
+    expects it to gate every surface. The MCP stdio path has no transport
+    to attach credentials to, so the only honest mitigation is a stderr
+    disclosure at startup. The HTTP API stays gated; the warning makes
+    the asymmetry visible."""
+
+    monkeypatch.setenv("AYIRU_API_KEY", "secret-token")
+
+    class FakeServer:
+        def serve(self) -> None:
+            return None
+
+    monkeypatch.setattr(
+        "app.mcp_server.server.build_default_server",
+        lambda: FakeServer(),
+    )
+    assert main(["mcp"]) == 0
+    captured = capsys.readouterr()
+    assert "WARNING" in captured.err
+    assert "AYIRU_API_KEY" in captured.err
+    assert "MCP stdio" in captured.err
+    # The JSON-RPC stdout stream must NOT carry the warning — that would
+    # break a client framer that expects valid JSON per line.
+    assert captured.out == ""
+
+
+def test_mcp_subcommand_silent_when_no_api_key(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Without AYIRU_API_KEY the disclosure is noise; emit nothing."""
+
+    monkeypatch.delenv("AYIRU_API_KEY", raising=False)
+
+    class FakeServer:
+        def serve(self) -> None:
+            return None
+
+    monkeypatch.setattr(
+        "app.mcp_server.server.build_default_server",
+        lambda: FakeServer(),
+    )
+    assert main(["mcp"]) == 0
+    captured = capsys.readouterr()
+    assert captured.err == ""
+    assert captured.out == ""
 
 
 # ---------------------------------------------------------------------------

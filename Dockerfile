@@ -6,7 +6,7 @@
 # MCP:    docker run --rm -i ayiru mcp
 # Seed:   docker run --rm -v $(pwd)/data:/app/data ayiru seed --reset
 
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -34,4 +34,8 @@ RUN pip install /app/backend
 # (e.g. `mcp`, `seed`, `migrate`, `query`).
 EXPOSE 8000
 ENTRYPOINT ["ayiru"]
-CMD ["serve", "--host", "0.0.0.0", "--port", "8000"]
+# --auto-seed populates an empty graph from the bundled artifacts on the
+# first start so `docker run -p 8000:8000 ayiru` answers real queries
+# without an explicit `ayiru seed --reset` step. The flag is a no-op
+# when the persistent volume already holds claims (idempotent).
+CMD ["serve", "--host", "0.0.0.0", "--port", "8000", "--auto-seed"]

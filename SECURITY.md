@@ -47,6 +47,25 @@ You will receive an acknowledgement within **72 hours** and a status update with
 - MCP server stderr is routed to `DEVNULL` to prevent pipe-fill deadlocks (Stage 7d audit fix).
 - 1 MiB request body limit; oversized bodies surface as structured `REQUEST_BODY_TOO_LARGE`.
 - Append-only audit log; no service path mutates an existing event (Stage 13 + introspection test).
+- API-key auth (`AYIRU_API_KEY`) gates all state-changing HTTP requests with a timing-safe `hmac.compare_digest` check; read endpoints stay public.
+
+## Known residual risks (acknowledged, scheduled, not yet mitigated)
+
+### MCP stdio is unauthenticated by design
+
+`ayiru mcp` speaks JSON-RPC over stdin/stdout. The `ApiKeyAuthMiddleware` that protects HTTP write endpoints does **not** apply to the stdio path — there is no transport layer to attach credentials to. The assumption is that any caller already has local exec rights on the process (Claude Desktop / Cursor / Cline configurations spawn the server as a subprocess they own).
+
+Implication: if you expose `ayiru mcp` to a remote caller (e.g., piping it across SSH or a reverse shell), there is no in-server auth gate. Run the HTTP API with `AYIRU_API_KEY` set for any network-exposed deployment; reserve stdio for local trusted callers only.
+
+Tracked for v0.3: bringing the stdio path under a separate `AYIRU_MCP_SHARED_SECRET` handshake at session start.
+
+### DNS rebinding window in the SSRF guard
+
+[backend/app/services/http_safety.py](backend/app/services/http_safety.py) resolves a hostname via `socket.getaddrinfo` and asserts every returned address is public. httpx then performs its own DNS resolution at connect time. An attacker-controlled DNS server that returns a public IP on the first lookup and a private IP on the second can in principle slip past the guard.
+
+Not exploited in practice against the current `official_hosts` allowlist (legitimate docs hosts don't rebind), but the residual risk is real. Real fix requires a custom httpx transport that pins the resolved IP between validation and connect.
+
+Tracked for v0.3 alongside the post-launch adversarial pen-test.
 
 ## Coordinated disclosure timeline
 
