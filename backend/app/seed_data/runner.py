@@ -40,6 +40,10 @@ from app.schemas.enums import (
     TrustLevel,
 )
 from app.schemas.evidence import Evidence
+from app.services.canonical_compiler import (
+    CanonicalPublicationError,
+    ToolSpecCompiler,
+)
 from app.services.claim_store import ClaimStore
 from app.services.evidence_trust import normalize_evidence_trust
 from app.services.ids import generate_claim_id, generate_evidence_id
@@ -179,6 +183,33 @@ def _seed_headline_scenarios(store: ClaimStore) -> dict[str, Any]:
     }
 
 
+def _publish_canonical_specs(store: ClaimStore) -> dict[str, Any]:
+    """Compile and persist a canonical ToolSpec for every seeded tool
+    that has at least one accepted claim. Tools with no accepted claims
+    are reported as skipped so the seed output stays honest — agents
+    querying `get_tool_spec` for them will still see a default-deny 404.
+
+    This is the step that makes the Stage 9 agent query surface
+    (`search_tools`, `get_tool_spec`, `canonical/tools`) return data on a
+    fresh seed. Without it, the orchestrator accepts claims but no
+    canonical specs ever land in the graph and four of the six MCP query
+    tools return empty results.
+    """
+    compiler = ToolSpecCompiler(store)
+    tool_ids = sorted({claim.tool_id for claim in store.list(limit=10_000)})
+    published: list[str] = []
+    skipped: dict[str, str] = {}
+    for tool_id in tool_ids:
+        try:
+            compiled = compiler.compile(tool_id)
+        except CanonicalPublicationError as exc:
+            skipped[tool_id] = str(exc)
+            continue
+        store.save_canonical_tool_spec(compiled.spec)
+        published.append(tool_id)
+    return {"published": published, "skipped": skipped}
+
+
 def _evidence_hash(evidence: dict[str, Any]) -> str:
     payload = f"{evidence['source_uri']}::{evidence['excerpt']}".encode("utf-8")
     return f"sha256:{sha256(payload).hexdigest()}"
@@ -278,6 +309,15 @@ def main(argv: list[str] | None = None) -> int:
         f"    submitted={summary['headline']['submitted']}, "
         f"accepted={summary['headline']['accepted']}"
     )
+
+    print("  publishing canonical ToolSpecs from accepted claims...")
+    summary["canonical"] = _publish_canonical_specs(store)
+    print(
+        f"    published={len(summary['canonical']['published'])} "
+        f"({', '.join(summary['canonical']['published']) or '—'})"
+    )
+    for tool_id, reason in summary["canonical"]["skipped"].items():
+        print(f"    skipped {tool_id}: {reason}")
 
     total_claims = (
         summary["openapi"]["claims"]

@@ -78,6 +78,30 @@ def test_seed_covers_multiple_stage_0_tools(seeded_store: ClaimStore) -> None:
         assert claims, f"no claims found for {tool_id}"
 
 
+def test_seed_publishes_canonical_tool_specs(seeded_store: ClaimStore) -> None:
+    """The seed must publish a canonical ToolSpec for every tool whose
+    headline-scenario claims reach ACCEPTED status. Without this step,
+    `search_tools` and `get_tool_spec` return empty/404 and four of the
+    six MCP query tools are useless out of the box — which defeats the
+    whole point of seeding a demo graph.
+
+    The 4 headline tools (`git`, `github-cli`, `docker`, `vercel-cli`)
+    must publish; `openai-api`'s OpenAPI-derived claims stay in pending
+    review so we don't assert a spec for it."""
+    expected_published = {"git", "github-cli", "docker", "vercel-cli"}
+    for tool_id in expected_published:
+        spec = seeded_store.get_canonical_tool_spec(tool_id)
+        assert spec is not None, (
+            f"no canonical ToolSpec published for {tool_id!r} after seed; "
+            "agent-facing search_tools / get_tool_spec endpoints will "
+            "return empty results."
+        )
+        assert spec.capabilities, (
+            f"{tool_id!r} canonical spec has no capabilities; agents "
+            "searching by capability substring will miss this tool."
+        )
+
+
 # ---------------------------------------------------------------------------
 # Headline demo scenarios — these MUST resolve correctly after a fresh seed
 # ---------------------------------------------------------------------------

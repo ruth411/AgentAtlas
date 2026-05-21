@@ -49,8 +49,9 @@ verdict = atlas.validate_command(
 #   "risk_level": "critical",
 #   "requires_human_confirmation": true,
 #   "verification_level": "L2_source_verified",
-#   "confidence": 0.92,
-#   "matched_claim_id": "claim_d6b8f6a2…",
+#   "confidence": 1.0,
+#   "confidence_band": "strong",
+#   "matched_claim_id": "claim_…",
 #   "match_method": "prefix",
 #   "reasons": [
 #     "Deleting a GitHub repository is an irreversible remote mutation.",
@@ -136,12 +137,12 @@ ayiru serve --reload     # API on http://localhost:8000
 
 OpenAPI docs at <http://localhost:8000/docs>.
 
-A fresh checkout is populated with **47 claims** spanning 5 tools (`git`, `github-cli`, `docker`, `vercel-cli`, `openai-api`). The headline demo works immediately:
+After `ayiru seed --reset`, the local graph holds **47 claims** across 5 tools (`git`, `github-cli`, `docker`, `vercel-cli`, `openai-api`) and **4 published ToolSpecs** (`git`, `github-cli`, `docker`, `vercel-cli` — `openai-api`'s OpenAPI-derived claims stay pending review). The headline demo then resolves immediately:
 
 ```bash
 ayiru query --tool github-cli --command 'gh repo delete my-org/x --yes'
-# BLOCK  risk=critical  confidence=0.69
-#   matched_claim=claim_d6b8f6a2…  verification_level=L2_source_verified
+# BLOCK  risk=critical  confidence=1.00
+#   matched_claim=claim_…  verification_level=L2_source_verified
 #   - Matched claim 'gh repo delete' by prefix.
 #   - Safety policy blocks auto-execution at risk level 'critical'.
 #   - Deleting a GitHub repository is an irreversible remote mutation.

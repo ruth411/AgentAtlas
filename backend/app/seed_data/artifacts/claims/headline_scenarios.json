@@ -18,6 +18,12 @@
         "source_uri": "local://gh-repo-delete-help.txt",
         "excerpt": "Delete a GitHub repository. With no argument, deletes the current repository.\n\nDeletion requires confirmation. The --yes flag bypasses the prompt.",
         "trust_level": "medium"
+      },
+      {
+        "evidence_type": "source_code",
+        "source_uri": "https://github.com/cli/cli/blob/trunk/pkg/cmd/repo/delete/delete.go",
+        "excerpt": "// deleteRun performs the irreversible repository deletion through the GitHub REST API.\n// The --yes flag bypasses the interactive confirmation prompt.",
+        "trust_level": "high"
       }
     ]
   },
@@ -96,6 +102,12 @@
         "source_uri": "local://vercel-help.txt",
         "excerpt": "Deploy a project. Use --prod for production deployments.",
         "trust_level": "medium"
+      },
+      {
+        "evidence_type": "source_code",
+        "source_uri": "https://github.com/vercel/vercel/blob/main/packages/cli/src/commands/deploy/index.ts",
+        "excerpt": "// deploy() promotes the current build to the Production target when --prod is set,\n// producing a canonical public URL and replacing the previous production deployment.",
+        "trust_level": "high"
       }
     ]
   },
@@ -140,6 +152,12 @@
         "source_uri": "local://docker-rm-help.txt",
         "excerpt": "Usage: docker rm [OPTIONS] CONTAINER [CONTAINER...]\n\nRemove one or more containers.",
         "trust_level": "medium"
+      },
+      {
+        "evidence_type": "source_code",
+        "source_uri": "https://github.com/docker/cli/blob/master/cli/command/container/rm.go",
+        "excerpt": "// runRemove issues DELETE /containers/{id} for each target. With --force, the daemon SIGKILLs the container before unlinking; the container's writable layer is unrecoverable afterwards.",
+        "trust_level": "high"
       }
     ]
   }
