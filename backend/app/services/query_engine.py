@@ -219,13 +219,28 @@ class QueryEngine:
         `_AVERAGE_WEB_SEARCH_TOKENS`. Stage 18 wires this into the
         audit log; until then it's an informational hint to the caller.
         """
+        from app.services.ids import generate_query_id
+
         normalized_question = question.strip()
         question_tokens = _tokenize_question(normalized_question)
         generated_at = self._timestamp()
+        # Mint one query id per ask() call so the audit row + the
+        # caller-side debug log can correlate the same event.
+        query_id = generate_query_id()
 
         # Pure stop-word query (or empty after stripping): no signal to rank
         # on. Return an honest fallback rather than degenerate ranking.
         if not question_tokens:
+            self._emit_query_served(
+                query_id=query_id,
+                question_length=len(normalized_question),
+                answers_returned=0,
+                tokens_saved=0,
+                top_claim_id=None,
+                fallback_recommended=True,
+                tool_id_hint=tool_id_hint,
+                fallback_reason="all_stopwords",
+            )
             return AskResponse(
                 question=normalized_question,
                 answers=[],
@@ -298,6 +313,18 @@ class QueryEngine:
         else:
             estimated_savings = 0
 
+        top_claim_id = answers[0].claim_id if answers else None
+        self._emit_query_served(
+            query_id=query_id,
+            question_length=len(normalized_question),
+            answers_returned=len(answers),
+            tokens_saved=estimated_savings,
+            top_claim_id=top_claim_id,
+            fallback_recommended=fallback,
+            tool_id_hint=tool_id_hint,
+            fallback_reason=("below_threshold" if fallback else None),
+        )
+
         return AskResponse(
             question=normalized_question,
             answers=answers,
@@ -305,6 +332,62 @@ class QueryEngine:
             estimated_tokens_saved=estimated_savings,
             generated_at=generated_at,
         )
+
+    def _emit_query_served(
+        self,
+        *,
+        query_id: str,
+        question_length: int,
+        answers_returned: int,
+        tokens_saved: int,
+        top_claim_id: str | None,
+        fallback_recommended: bool,
+        tool_id_hint: str | None,
+        fallback_reason: str | None,
+    ) -> None:
+        """Stage 18 — single emission point for the QUERY_SERVED audit row.
+
+        Centralised here (not inline at every return point) so the
+        contract for what we record is testable and self-documenting:
+
+        - Raw question text is NEVER persisted — only its length.
+          Questions can contain proprietary code or PII; we keep the
+          forensic signal (length + match + savings) without the leak.
+        - On a fallback, ``top_claim_id`` is None and ``tokens_saved``
+          is 0 — matching the response shape so the aggregator at
+          /v1/stats/savings doesn't double-count.
+        - ``fallback_reason`` distinguishes "stopword-only question",
+          "score below threshold", and (later) "empty graph" so the
+          telemetry tells us *why* the matcher missed.
+
+        Defense in depth: even though ``ClaimStore.record_query_served``
+        already swallows its own errors, we wrap the call here too —
+        a future store implementation that forgets the try/except must
+        never break the ask() response. Telemetry is best-effort by
+        contract; the read path is the user-facing surface.
+        """
+        try:
+            self._store.record_query_served(
+                query_id=query_id,
+                actor="agent",
+                details={
+                    "question_length": question_length,
+                    "answers_returned": answers_returned,
+                    "tokens_saved": tokens_saved,
+                    "top_claim_id": top_claim_id,
+                    "fallback_recommended": fallback_recommended,
+                    "tool_id_hint": tool_id_hint,
+                    "fallback_reason": fallback_reason,
+                },
+            )
+        except Exception:
+            import logging
+
+            logging.getLogger("ayiru.telemetry").warning(
+                "QUERY_SERVED audit emission failed at engine layer",
+                exc_info=True,
+                extra={"query_id": query_id},
+            )
 
     # -------- search_tools --------
 

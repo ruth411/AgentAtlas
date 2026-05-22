@@ -27,3 +27,10 @@ def generate_audit_event_id() -> str:
 
 def generate_human_review_id() -> str:
     return f"review_{uuid4().hex}"
+
+
+def generate_query_id() -> str:
+    """Stage 18 — synthetic entity id for QUERY_SERVED audit rows. One per
+    ``ask()`` call, recorded as the audit row's ``entity_id`` so the
+    /audit/events endpoint can list a query's history just like claims."""
+    return f"query_{uuid4().hex}"

@@ -15,6 +15,7 @@ from app.api.routes_health import router as health_router
 from app.api.routes_human_review import router as human_review_router
 from app.api.routes_ingestion import router as ingestion_router
 from app.api.routes_query import router as query_router
+from app.api.routes_stats import router as stats_router
 from app.api.routes_verification import router as verification_router
 
 
@@ -101,6 +102,7 @@ _API_ROUTERS = (
     verification_router,
     human_review_router,
     query_router,
+    stats_router,
     audit_router,
 )
 

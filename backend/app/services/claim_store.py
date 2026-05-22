@@ -684,6 +684,54 @@ class ClaimStore:
             session.commit()
         return review
 
+    def record_query_served(
+        self,
+        *,
+        query_id: str,
+        actor: str,
+        details: dict[str, Any],
+    ) -> None:
+        """Stage 18 — append one ``QUERY_SERVED`` audit event per ``ask()``
+        call. Used by ``QueryEngine.ask`` so the cost-savings aggregator at
+        ``GET /v1/stats/savings`` can replay the full query stream from
+        the audit log without recording raw question text.
+
+        ``query_id`` is the synthetic entity id minted by the caller
+        (``app.services.ids.generate_query_id``). ``actor`` is typically
+        the API caller (``"agent"`` if anonymous) or the audited identity
+        when ``AYIRU_API_KEY`` is enforced. ``details`` is JSON-encoded
+        verbatim; expected keys are ``question_length``, ``answers_returned``,
+        ``tokens_saved``, ``top_claim_id``, ``fallback_recommended``,
+        ``request_id``.
+
+        Same append-only contract as every other audit emission: the
+        helper opens its own transaction and commits, so a failure here
+        cannot roll back the upstream ``ask`` response. We do not raise
+        on failure — telemetry must never break a working read endpoint.
+        """
+        try:
+            with self._session_factory() as session:
+                _add_audit_event(
+                    session,
+                    event_type=AuditEventType.QUERY_SERVED,
+                    entity_type=AuditEntityType.QUERY,
+                    entity_id=query_id,
+                    actor=actor,
+                    details=details,
+                )
+                session.commit()
+        except Exception:
+            # Telemetry must never break the read path. Swallow the
+            # error; the operator will notice via the structured-log
+            # WARN below.
+            import logging
+
+            logging.getLogger("ayiru.telemetry").warning(
+                "QUERY_SERVED audit emission failed",
+                exc_info=True,
+                extra={"query_id": query_id},
+            )
+
     def list_human_reviews_for_claim(self, claim_id: str) -> list[HumanReview]:
         with self._session_factory() as session:
             records = session.scalars(
@@ -798,6 +846,64 @@ class ClaimStore:
             offset=0,
         )
         return events
+
+    def aggregate_query_savings(
+        self,
+        *,
+        after: datetime | None = None,
+        before: datetime | None = None,
+    ) -> dict[str, Any]:
+        """Stage 18.4 — return the cost-savings aggregate over QUERY_SERVED
+        events in the given window.
+
+        Returns a dict shaped for direct serialisation into the
+        ``SavingsResponse`` schema:
+
+        - ``total_queries_served``: int — count of QUERY_SERVED rows
+        - ``total_tokens_saved``: int — sum of details.tokens_saved
+        - ``by_top_claim``: dict[claim_id, int] — count of times each
+          claim was the top match. Fallbacks (``top_claim_id is None``)
+          are bucketed under the literal key ``"__fallback__"`` so the
+          caller can quantify miss rate.
+        - ``fallback_count``: int — count of fallback events in the window.
+        - ``window_start`` / ``window_end``: passed through from the
+          caller's filter (None if unbounded).
+
+        The aggregation runs in Python over a paginated read of the
+        underlying rows. At v0.2 scale (≤ 100k events) that's fine;
+        a future SQL-side aggregation can land if telemetry volume
+        outgrows the in-memory window.
+        """
+        events, total = self.list_audit_events(
+            event_type=AuditEventType.QUERY_SERVED,
+            after=after,
+            before=before,
+            limit=10_000,
+            offset=0,
+        )
+
+        total_tokens_saved = 0
+        fallback_count = 0
+        by_top_claim: dict[str, int] = {}
+        for event in events:
+            details = event.details
+            tokens = details.get("tokens_saved", 0) or 0
+            total_tokens_saved += int(tokens)
+            top = details.get("top_claim_id")
+            if top is None or details.get("fallback_recommended"):
+                fallback_count += 1
+                by_top_claim["__fallback__"] = by_top_claim.get("__fallback__", 0) + 1
+            else:
+                by_top_claim[top] = by_top_claim.get(top, 0) + 1
+
+        return {
+            "total_queries_served": int(total),
+            "total_tokens_saved": total_tokens_saved,
+            "fallback_count": fallback_count,
+            "by_top_claim": by_top_claim,
+            "window_start": after,
+            "window_end": before,
+        }
 
     def clear(self) -> None:
         with self._session_factory() as session:

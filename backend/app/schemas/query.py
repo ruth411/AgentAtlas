@@ -261,6 +261,35 @@ class Answer(BaseModel):
     match_reason: str = Field(min_length=1, max_length=256)
 
 
+class SavingsResponse(BaseModel):
+    """Stage 18.4 — aggregate cost-savings over QUERY_SERVED audit events.
+
+    Surface for ``GET /v1/stats/savings``. The window fields echo the
+    caller's filter so a downstream dashboard can render a labelled
+    chart without an extra round-trip. ``estimated_usd_saved`` uses the
+    Anthropic Claude Sonnet input rate by default ($3 / 1M tokens);
+    overridable via the ``AYIRU_PRICE_PER_MTOK_INPUT`` env var for
+    callers on other models.
+
+    ``by_top_claim`` counts how many times each claim was the top
+    match. The literal key ``"__fallback__"`` aggregates miss events
+    (``fallback_recommended=True``) so the caller can compute the
+    miss rate alongside per-claim hit rates without another endpoint.
+    """
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    total_queries_served: int = Field(ge=0)
+    total_tokens_saved: int = Field(ge=0)
+    estimated_usd_saved: float = Field(ge=0.0)
+    fallback_count: int = Field(ge=0)
+    by_top_claim: dict[str, int] = Field(default_factory=dict)
+    window: str = Field(min_length=1, max_length=16)
+    window_start: datetime | None = None
+    window_end: datetime | None = None
+    usd_per_million_input_tokens: float = Field(gt=0.0)
+
+
 class AskResponse(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
 
@@ -300,6 +329,7 @@ __all__ = [
     "RiskDimensions",
     "SafeWorkflowRequest",
     "SafeWorkflowResponse",
+    "SavingsResponse",
     "SearchToolsResponse",
     "ToolMatchSummary",
     "ValidateCommandRequest",

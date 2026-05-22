@@ -148,6 +148,10 @@ class AuditEventType(StrEnum):
     HUMAN_REVIEW_RECORDED = "human_review_recorded"
     TOOL_SPEC_PUBLISHED = "tool_spec_published"
     WORKFLOW_SPEC_PUBLISHED = "workflow_spec_published"
+    # Stage 18 — telemetry: emitted once per successful ask() call so
+    # the cost-savings aggregate at /v1/stats/savings can replay the
+    # full query stream without recording the raw question text.
+    QUERY_SERVED = "query_served"
 
 
 class AuditEntityType(StrEnum):
@@ -160,3 +164,7 @@ class AuditEntityType(StrEnum):
     CLAIM = "claim"
     TOOL_SPEC = "tool_spec"
     WORKFLOW_SPEC = "workflow_spec"
+    # Stage 18 — telemetry: per-ask() audit events live under a synthetic
+    # query entity so the same /audit/events queries that work for claims
+    # also surface query history.
+    QUERY = "query"
