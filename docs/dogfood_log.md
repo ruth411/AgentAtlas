@@ -86,6 +86,41 @@ This means:
 
 ---
 
+## 2026-05-22 — Round 3: post-annotation-fix retest
+
+After committing the MCP 2025 `ToolAnnotations` fix (`98d22d3`) and restarting Claude Desktop.
+
+| Prompt | Tool picked | Useful answer? | Notes |
+|---|---|---|---|
+| "how to delete docker container?" | none (memory) | yes (memory) | Same meta-policy behavior — annotations DID NOT change unprompted use |
+| "did you use any container to answer this" | none | "no — Docker commands like docker rm are standard CLI knowledge, so I just wrote the response directly" | Claude self-explained the policy a third time |
+| "use ayiru to answer the question?" | **ask** ✓ | yes — full citation chain with source code link + official docs link + risk=critical + "now backed by a citation trail rather than just my memory" | `ask` is now visible and callable; Claude framed it as citation > memory |
+
+### What changed vs Round 2
+
+| Question | Round 2 | Round 3 |
+|---|---|---|
+| Is `ask` visible in the tool list? | ❌ hidden by name-prefix heuristic | ✅ visible (`readOnlyHint: true` overrides the heuristic) |
+| Does unprompted Claude pick `ask`? | ❌ no | ❌ still no (meta-policy is below the description / annotation layer) |
+| Does Claude use `ask` correctly when explicitly invoked? | ✓ yes | ✓ yes (same excellent integration: source citations, confidence band, risk level) |
+| Does Claude *value* the cited answer over its memory? | (didn't say) | **✓ yes — explicitly: "now they're backed by a citation trail rather than just my memory"** |
+
+### Empirical conclusions (now twice-confirmed)
+
+1. **MCP 2025 ToolAnnotations are required, not optional**, for any tool that doesn't match `get_*`/`search_*`/`explain_*` name prefix. Without them, hosts silently filter the tool out — no log, no error, just absent from the LLM's tool list. The annotations fix is **load-bearing infrastructure** for any MCP server with non-standard tool names.
+2. **Claude Desktop conversational mode will NOT pick a tool for confident-knowledge questions**, no matter how compelling the description or correct the annotation. The meta-policy lives below the function-calling layer.
+3. **When Claude DOES use the tool, it independently recognizes the value of citations over memory.** Claude's own framing in Round 3 — *"now they're backed by a citation trail rather than just my memory"* — is the v0.2 pitch validated in one sentence by the LLM itself.
+4. **The real audience for the v0.2 pitch is agent frameworks** (LangChain, Cline agent mode, Cursor agent mode) where tool use is the default behavior — not Claude Desktop conversational mode. This wasn't a guess after Round 2; after Round 3 it's the empirical finding.
+
+### Strategic shift in plan_v02.md positioning
+
+| Pre-dogfood v0.2 claim | Post-dogfood v0.2 claim |
+|---|---|
+| *"Ayiru saves tokens for any Claude user."* | *"Ayiru is the verified-citation layer for AI agent frameworks. In conversational chat, citations are an opt-in. In agent workflows, they're the default."* |
+| Target: Claude users / Cursor users / general agent devs | Target: LangChain-style agent frameworks first; conversational hosts as a future surface (Anthropic Skills, eventually) |
+
+---
+
 ## Template for future sessions
 
 ```
