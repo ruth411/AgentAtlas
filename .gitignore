@@ -20,3 +20,10 @@ out/
 phase0_results.json
 # Personal Claude Desktop regression harness — local-only, never committed
 claude_desktop_regression/
+
+# Defense-in-depth: ANY .env file anywhere in the tree is gitignored.
+# .env.example files stay tracked (templates, no secrets).
+.env
+**/.env
+!.env.example
+!**/.env.example
