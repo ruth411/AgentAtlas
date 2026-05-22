@@ -1,15 +1,34 @@
-# Ayiru — v0.2 Stage Plan
+# Ayiru — v0.2 Stage Plan (Build-First, Solo-Dev)
 
 > **Companion to [roadmap_v0.2.md](roadmap_v0.2.md).** That document is the prose / phased / week-based plan with full rationale and council-review history. This document is the **stage-by-stage execution plan** in the same numbered "Stage N — name" cadence the v0.1 codebase already uses (Stages 0 through 14 are shipped). Every stage below is self-contained: goal, preconditions, files, tests, contract impact, definition of done, and what it explicitly defers.
 >
-> **Reads from:**
-> - The [v0.1.0 brutal audit report](#) recorded in conversation on 2026-05-20 (12 findings, 11-item punch list).
-> - The shipped roadmap at [roadmap_v0.2.md](roadmap_v0.2.md) (council-reviewed v0.2.1).
-> - Existing infrastructure in [backend/app/](backend/app/), in particular the 6 services that already exist and must be reused (DocsIngestionService, ClaimStore, CanonOrchestrator, ToolSpecCompiler, QueryEngine, MCP server).
+> ## Maintainer-driven re-sequencing (2026-05-21 — 2026-05-22)
 >
-> **Two decision gates** sit between stages and must be passed before the next stage starts:
-> - **Gate 1** (between Stage 16 and Stage 17): the Phase 0 measurement spike's two metrics must clear the council thresholds. If they don't, Stages 17–23 as written are dead and the project pivots or sunsets.
-> - **Gate 2** (between Stage 22 and Stage 23): the pre-launch checklist from `roadmap_v0.2.md §Phase C` must be true at 07:00 of the chosen Tuesday. Otherwise delay by one week.
+> The maintainer made three load-bearing choices that change which stages are "in scope for v0.2":
+>
+> 1. **Solo-dev path.** No external beta testers. Stage 16.4 is rewritten to a self-test the maintainer can run alone. `docs/beta_tester_outreach.md` is parked for v0.3+. Gate 1 criterion 3 and Gate 2's "named tester / named reviewer" rows are dropped.
+> 2. **Build > publish.** v0.2's scope collapses to the build cycle — making the product *powerful* — and explicitly **defers** PyPI publication, hosted demo, OSS hygiene polish, and the Hacker News launch playbook to a separate **v0.2.5 publish cycle**. Stage 22 splits accordingly: 22.1 (LangChain adapter) stays in v0.2 build; 22.2–22.5 (README pivot / PyPI / Fly.io / hygiene) move to v0.2.5. Stage 23 (launch day) is entirely v0.2.5.
+> 3. **Stage 18 promoted ahead of 19/20.** Telemetry has to ship *before* the bulk ingest in Stage 20 so the calibration window starts collecting data from day 1; otherwise the maintainer loses forensic insight into the first thousand `ask` calls forever.
+>
+> ## Resulting active sequence (v0.2 build cycle)
+>
+> | # | Stage | Status |
+> |---|---|---|
+> | 1 | **Stage 15** — credibility close-out | ✅ shipped, committed `fc96bad` |
+> | 2 | **Stage 16.5** — launch budget memo | ✅ drafted (`docs/launch_budget.md`), uncommitted, 3 `🛑 DECIDE:` blocks left |
+> | 3 | **Stage 17** — `/v1/query/ask` endpoint + 7th MCP tool + CLI | ✅ shipped, uncommitted, includes Stage 17.6 audit-fix substage |
+> | 4 | **Stage 18** — `QUERY_SERVED` audit event + `GET /v1/stats/savings` | ⏭ next active |
+> | 5 | **Stage 19** — curated / uncurated tool split | precondition for 20 |
+> | 6 | **Stage 20** — bulk ingest 50 tools (~5,000 claims) | **the power moment** |
+> | 7 | **Stage 21** — `ayiru-client` Python SDK | reach |
+> | 8 | **Stage 22.1** — LangChain `AyiruTool` adapter | reach |
+> | 9 | Stretch — embeddings / hybrid retrieval, freshness re-ingestion | post-Stage-20 polish |
+> | — | **Stages 22.2 – 22.5 + Stage 23** | **DEFERRED to v0.2.5** (publish cycle) |
+> | — | **Stages 16.1 – 16.4** | **DEFERRED** (not on the build-cycle critical path; do alongside or after Stage 20) |
+>
+> ## One gate, not two
+>
+> Gate 2 (launch-day prerequisites) is irrelevant to the build cycle — there is no launch in v0.2. Only Gate 1 remains, and even Gate 1 is reduced to its self-test criterion since metrics 1+2 need the Phase 0.1 spike which is deferred. Both Gate 1 and Gate 2 are preserved in this document for the eventual v0.2.5 publish cycle; they're just not blocking anything right now.
 
 ---
 
@@ -18,413 +37,155 @@
 | Range | Owner | Status |
 |---|---|---|
 | Stages 0–14 | v0.1 (shipped) — see [docs/stage_report.md](docs/stage_report.md) | Tagged `v0.1.0`, wheel built |
-| **Stage 15** | v0.1 credibility close-out (from the audit punch list) | **partially done in 2026-05-20 session** |
-| **Stages 16–23** | v0.2 — the "agent search box" pivot | not started |
-| Stages 24+ | reserved for v0.3 (L4 cross-agent verification, hosted SaaS rollout, embeddings) | n/a |
+| **Stage 15** | v0.1 credibility close-out (from the audit punch list) | ✅ shipped, committed `fc96bad` |
+| **Stage 16.5** | Launch budget memo | ✅ drafted (`docs/launch_budget.md`), uncommitted |
+| **Stage 17** | `/v1/query/ask` endpoint + MCP + CLI + audit-fix substage | ✅ shipped, uncommitted (721 tests passing) |
+| **Stage 18** | Cost-savings telemetry | ⏭ next active |
+| **Stages 19–21** | Power build (curated split, bulk ingest, SDK) | in-scope |
+| **Stage 22.1** | LangChain adapter | in-scope |
+| **Stages 22.2–22.5** | Publish / hosted / hygiene | **DEFERRED to v0.2.5** |
+| **Stage 23** | Launch day + sustainability | **DEFERRED to v0.2.5** |
+| **Stages 16.1 – 16.4** | Phase 0 spike + PyPI reservation + GitHub release + self-test | **DEFERRED** (off the critical path) |
+| Stages 24+ | Reserved for v0.3 (L4 cross-agent verification, embeddings hardening, hosted SaaS) | n/a |
 
 ---
 
 ## Decision Gates
 
-### Gate 1 — measurement gate (after Stage 16, before Stage 17)
+### Gate 1 — measurement gate (between Stage 18 and Stage 19, in build-cycle terms)
 
-Adapted from [roadmap_v0.2.md §Decision Gate](roadmap_v0.2.md). Originally a 3-criterion gate where the third required 5 named beta testers; **the project is solo-dev, no external testers for v0.2.** Criterion 3 is rewritten to a self-test that the maintainer can run alone, with Claude pair-testing the agent loop. The other two criteria stand unchanged — they're product-truth, not audience-truth.
+Originally a 3-criterion gate that required (1) ≥ 25% web-search-replaceable token cost, (2) ≥ 50% tool-choice rate for a fake `ask`, (3) 5 named beta testers. The solo-dev + build-first re-sequencing turns this into a softer checkpoint:
 
-| # | Threshold | If false |
-|---|---|---|
-| 1 | ≥ 25% of agent token cost is web-search-replaceable lookups (P0.1 metric 1) | Pitch is wrong; sunset Stages 17–23 and replan. |
-| 2 | LLM picks the fake `ask` over `web_search` in ≥ 50% of opportunities (P0.1 metric 2) | Tool-choice / docstring problem dominates retrieval; spend one extra week on docstring optimisation and re-measure. |
-| 3 | **Solo self-test (revised)**: maintainer runs the headline agent loop end-to-end against the v0.1 graph and the fake-`ask` harness from P0.1; at least 7 of 10 realistic dev questions produce a verdict the maintainer would have accepted as a useful answer (not just "matches something"). | Seed graph is too thin to be useful even to the person who designed it. Pause Stage 20 (bulk ingest) until at least 7/10 self-test passes, since a thicker graph is the actual remedy. |
+| # | Threshold | Status under build-first | If false |
+|---|---|---|---|
+| 1 | ≥ 25% of agent token cost is web-search-replaceable lookups (P0.1 metric 1) | **deferred** — the spike is gated on API spend; not blocking the build | Re-evaluate before any v0.2.5 publish work. If the spike eventually shows < 25%, the publish cycle is wrong. |
+| 2 | LLM picks the fake `ask` over `web_search` in ≥ 50% of opportunities (P0.1 metric 2) | **deferred** — same reason | Same as #1. |
+| 3 | **Solo self-test**: ≥ 7 of 10 realistic dev questions produce a verdict the maintainer would accept as useful. | **active**; re-run after Stage 20 against the bulk-ingest graph | Stage 20 didn't add enough useful coverage. Audit `tools/v0.2_seed.yml` for the gaps; expand the ingest list; re-run. |
 
-### Gate 2 — launch-day prerequisites (between Stage 22 and Stage 23)
+In the build cycle, only criterion 3 is enforced — and it's evaluated *after* Stage 20, not before Stage 17 (since Stage 17 already shipped against the v0.1 graph and works on the headline questions).
 
-Originally 5 criteria including "all 5 beta testers gave feedback" and "a named first reviewer is primed." Solo-dev v0.2 collapses those: there are no beta testers and no seeded reviewers. The remaining criteria are technical (the install works, the demo responds). Honesty trumps theatre.
+### Gate 2 — launch-day prerequisites (DEFERRED to v0.2.5)
 
-All four must be true at 07:00 of the launch day:
+Preserved for the eventual v0.2.5 publish cycle. Originally 5 criteria; collapsed to 4 under solo-dev path. **Not enforced in v0.2 build cycle** because no launch is happening.
+
+All four must be true at 07:00 of the launch day, *if and when v0.2.5 is scheduled*:
 
 1. Clean-venv `pip install ayiru` smoke completed in the last 24 hours.
 2. The hosted demo (`try.ayiru.dev` or fallback) responded to a real `ask` call in the last hour.
 3. The maintainer's self-test (Gate 1 criterion 3) has been re-run against the full v0.2 graph in the last 24 hours and still passes 7/10.
 4. README, CHANGELOG, and the hosted-demo "what to type" example all install-and-paste cleanly on the maintainer's secondary machine.
 
-If any is false, delay one week. Solo-dev launches are recoverable; a clean launch that doesn't actually install is not.
+If any is false at v0.2.5 time, delay one week.
 
 ---
 
-# Stage 15 — v0.1 Credibility Close-out
+# Stage 15 — v0.1 Credibility Close-out ✅ SHIPPED (committed `fc96bad`)
 
-**Goal.** Resolve the 11-item brutal-audit punch list so v0.1.0 is *defensible* under a senior-engineer eval. Stage 15 ships no new features — it pays down the credibility debt the audit found between the README's claims and the codebase's reality.
+**Goal.** Resolve the 11-item brutal-audit punch list so v0.1.0 is *defensible* under a senior-engineer eval. Stage 15 shipped no new features — it paid down the credibility debt the audit found between the README's claims and the codebase's reality.
 
-**Why this is a stage, not a footnote.** The roadmap_v0.2.md Phase 0 says "no `backend/app/` code until Phase 0 passes the gate." But Phase 0 itself depends on a credible v0.1 to recruit beta testers (P0.4) and on real wheel artifacts (P0.3) for distribution. If a tester clicks the Stage 14 badge and lands on a docs page covering Stages 0–8, recruitment fails before measurement begins. Fix v0.1's surface first.
+**Why this was a stage, not a footnote.** A senior reviewer clicking the "Stage 14 complete" badge needs to land on a doc that actually covers Stages 9–14. If the audit punch list isn't closed, every downstream stage starts with an unpaid trust deficit.
 
-**Preconditions.** v0.1.0 tag exists; wheel built; tests green; ruff clean. (All verified in audit.)
+**Outcome.** All 11 substages closed. Test suite 693 → 699 passing. Ruff clean. Migration roundtrip clean. Committed 2026-05-21 in `fc96bad "Credibility Close-out"`.
 
-## Stage 15.1 — Seed publishes canonical ToolSpecs ✓ DONE 2026-05-20
-
-The single biggest credibility lever in the audit. Status as of close of session 2026-05-20:
-
-- ✓ Added `source_code/high` evidence to the 3 high/critical headline claims (`gh repo delete`, `vercel --prod`, `docker rm`) at [data/seed_artifacts/claims/headline_scenarios.json](data/seed_artifacts/claims/headline_scenarios.json) (with byte-identical mirror at [backend/app/seed_data/artifacts/claims/headline_scenarios.json](backend/app/seed_data/artifacts/claims/headline_scenarios.json) per the Stage 14 lockstep contract).
-- ✓ Added `_publish_canonical_specs(store)` in [backend/app/seed_data/runner.py:182-208](backend/app/seed_data/runner.py#L182-L208), called from `main()` after `_seed_headline_scenarios`. Compiles+saves a `ToolSpec` for every tool with accepted claims via `ToolSpecCompiler(store).compile(tool_id)` + `store.save_canonical_tool_spec(...)`.
-- ✓ Added test `test_seed_publishes_canonical_tool_specs` in [backend/tests/test_seed_script.py](backend/tests/test_seed_script.py). Asserts the 4 expected tools (`git`, `github-cli`, `docker`, `vercel-cli`) each have a published spec with non-empty capabilities. `openai-api` deliberately excluded — its 32 OpenAPI-derived claims sit in pending review until Stage 19's curated/uncurated split lets us downgrade strictness.
-- ✓ Test suite at 694 passing (was 693).
-
-**End state observable**: `ayiru tools` lists 4 tools; `/v1/query/search-tools` returns matches; `/v1/query/tools/git` returns full spec; `/v1/query/validate-command` for `gh repo delete` returns `confidence=1.00`, `band=strong`, no "informational" caveat.
-
-## Stage 15.2 — README headline output matches reality ✓ DONE 2026-05-20
-
-- ✓ [README.md:144](README.md#L144) updated `confidence=0.69` → `confidence=1.00`.
-- ✓ [README.md:52-54](README.md#L52-L54) updated the Python verdict block: `confidence: 0.92` → `confidence: 1.0` plus `confidence_band: "strong"`. Claim ID elided to `claim_…`.
-- ✓ [README.md:140](README.md#L140) reframed: removed "A fresh checkout is populated…" claim (misleading — fresh checkout has empty DB until `ayiru seed --reset`). New phrasing notes the 4-published / 1-pending tool breakdown so users know what to expect.
-
-## Stage 15.3 — Stage report covers Stages 9–14
-
-**Problem.** [docs/stage_report.md:3](docs/stage_report.md#L3) opens with *"This report consolidates the completion status for every shipped stage of Ayiru (currently 0 through 8)."* The README badge ([README.md:14](README.md#L14)) links to that file under the label "Stage 14 complete." Anyone clicking through to verify finds a doc 6 stages out of date.
-
-**Work.**
-- Add a section per stage 9 / 10 / 11a / 11b / 12 / 13 / 14 to `docs/stage_report.md`, matching the existing Stage 0–8 sections: required artifacts, pass-case audit, quality bar, deferred. Reference the existing test files in [backend/tests/](backend/tests/) as the pass-case audit (e.g., `tests/test_query_engine.py` for Stage 9, `tests/test_mcp_server.py` for Stage 10, `tests/test_seed_script.py` for Stage 11a, `tests/test_human_review.py` + `tests/test_audit_log.py` for Stage 13).
-- Update the opening sentence: "(currently 0 through 14)."
-- Add a top-level "Audit findings — 2026-05-20" subsection that records the v0.1 audit's 11-item punch list and points each item at the Stage 15.x subsection that closed it.
-
-**Files touched.**
-- [docs/stage_report.md](docs/stage_report.md)
-
-**Tests.** None. Doc-only.
-
-**Definition of done.**
-- File length grows from ~200 lines (today's Stage 0–8 coverage) to ~600+ lines.
-- README badge link no longer points at a stale doc.
-- A senior engineer skimming `docs/stage_report.md` can reproduce the v0.1 audit punch list and see each item closed.
-
-**Defers.** A separate "API reference" doc. The OpenAPI spec at `/openapi.json` serves that role for v0.2.
-
-## Stage 15.4 — PyPI install line resolution
-
-**Problem.** [README.md:156](README.md#L156) shows `pip install ayiru`. Verified during audit: `pip index versions ayiru` returns `ERROR: No matching distribution found`. The comment `# once published to PyPI` is easily missed by a copy-paster.
-
-**Work.** Two options, decide *before* Stage 16 (because Stage 16's beta-tester recruitment links to the README).
-
-| Option | What | When valid |
+| # | Title | Outcome |
 |---|---|---|
-| **A (preferred)** | Reserve `ayiru` on PyPI now with the existing wheel. `python -m build backend && twine upload backend/dist/*`. Pin `0.1.0` in `pyproject.toml`. | If the maintainer is ready to maintain a published package surface from this moment. Frees Stage 23 (Phase C #1 in roadmap_v0.2.md) of a release-day risk. |
-| **B** | Demote the `pip install ayiru` block to a callout: *"PyPI publication lands with v1.0; for now, install from source per the dev block above."* | If reserving PyPI now is premature. Lower-cost reversible. |
+| 15.1 | Seed publishes canonical ToolSpecs ✓ DONE 2026-05-20 | 47 claims, 6 accepted, 4 published ToolSpecs |
+| 15.2 | README headline output matches reality ✓ DONE 2026-05-20 | Confidence 1.00, band=strong, no "informational" caveat |
+| 15.3 | Stage report covers Stages 9–14 ✓ DONE 2026-05-21 | Opening sentence + Stage 15 section + audit-pointer note |
+| 15.4 | PyPI install ambiguity ✓ DONE 2026-05-21 | **Option B chosen** — README explicitly states PyPI ships with v0.2 |
+| 15.5 | Docker image first-run experience ✓ DONE 2026-05-21 | `ayiru serve --auto-seed` + idempotent skip when DB has claims |
+| 15.6 | pytest CVE-2025-71176 bump ✓ DONE 2026-05-21 | `pytest>=8.5,<10.0`; pip-audit clean |
+| 15.7 | Python version consistency ✓ DONE 2026-05-21 | **3.12 floor chosen**; Dockerfile + CI matrix + ruff aligned |
+| 15.8 | MCP-stdio auth disclosure ✓ DONE 2026-05-21 | README Security section + SECURITY.md residual risks + stderr warning |
+| 15.9 | DNS rebinding mitigation | **Deferred to v0.3** (acknowledged in SECURITY.md) |
+| 15.10 | `.gitignore` housekeeping ✓ DONE 2026-05-21 | `.coverage`, `htmlcov/` ignored |
+| 15.11 | Naming convention docstrings ✓ DONE 2026-05-21 | `*Record` vs bare-name pattern documented |
 
-Either way, [README.md](README.md) changes. Option A also touches GitHub release artifacts.
+For the per-substage detail, see [docs/stage_report.md](docs/stage_report.md) §Stage 15.
 
-**Tests.** None. (The existing `pip install -e backend[dev]` dev path already has CI coverage via [.github/workflows/ci.yml](.github/workflows/ci.yml).)
+---
 
-**Definition of done.** No `pip install ayiru` instruction in the README that fails on a clean venv against the live PyPI index.
+# Stage 16 — Phase 0 Pre-flight (mostly DEFERRED)
 
-**Defers.** `ayiru-client` PyPI publication — that's Stage 21's deliverable, not Stage 15's.
+**Original goal.** Validate the v0.2 pivot's central assumption (*"agents waste meaningful tokens on web searches that a local knowledge layer can serve"*) before writing any `backend/app/` code. Plus tee up the four other pre-flight items.
 
-## Stage 15.5 — Docker image first-run experience
+**Build-cycle reality.** Build > publish means the spike + the pre-launch artifacts aren't on the critical path. Stage 17 has already shipped; the build path continues to Stage 18 next. Stage 16 substages are individually deferred or done as below:
 
-**Problem.** [Dockerfile:30-32](Dockerfile#L30-L32) sets `ENTRYPOINT ["ayiru"]` and `CMD ["serve", "--host", "0.0.0.0", "--port", "8000"]`. The README quick-start ([README.md:166-167](README.md#L166-L167)) tells users `docker run --rm -p 8000:8000 ayiru` — which starts the API against an empty DB. `data/` is COPYed in but `seed --reset` is never run during build.
-
-**Work.** Three options, ordered by preference:
-
-| Option | What | Trade-off |
+| Substage | Status | Notes |
 |---|---|---|
-| **A** | `ayiru serve` auto-seeds on first start when `--auto-seed` is passed (off by default in dev, on in the Docker image's CMD). Add `--auto-seed` to [backend/app/cli.py:_cmd_serve](backend/app/cli.py). | Best UX. Adds one branch to `ayiru serve`. |
-| **B** | Add `RUN ayiru seed --reset` to [Dockerfile](Dockerfile) right after `RUN pip install /app/backend`. Pre-seeds at build time. | DB shipped in image (bigger image, ~10MB). Read-only filesystem won't work; image must use a writable volume. |
-| **C** | Document in README quick-start: "first run requires `docker run --rm -v $(pwd)/data:/app/data ayiru seed --reset` before `ayiru serve`." | Cheapest. Worst UX. |
+| **16.1** Phase 0 measurement spike (P0.1) | **DEFERRED** | `scripts/phase0_measurement_spike.py` is ready to run. Requires Anthropic key + ~$5–20 spend. Run before any v0.2.5 publish work to validate the pitch. |
+| **16.2** PyPI name reservation (P0.2) | **DEFERRED** to v0.2.5 | Per Stage 15.4 Option B — PyPI publication ships with the v0.2.5 publish cycle, not v0.2 build. |
+| **16.3** v0.1.0 release artifacts (P0.3) | **DEFERRED** (optional) | Mechanical: `gh release create v0.1.0 backend/dist/*` when ready. Not blocking the build. |
+| **16.4** Solo self-test (replaces beta-tester recruitment) | **DEFERRED** until after Stage 20 | Re-run against the post-bulk-ingest graph; that's when the test has signal. Pre-Stage-20 the seed is too thin to give a useful PASS/FAIL distribution. |
+| **16.5** Launch budget memo (P0.5) | ✅ **DRAFTED** (uncommitted) | `docs/launch_budget.md` exists with itemised cost table; 3 `🛑 DECIDE:` blocks waiting on the maintainer: funding source, 6-month kill date, hosted-demo-or-skip. |
 
-Recommend **A**: add `--auto-seed` flag, default off, set to on in [Dockerfile:CMD](Dockerfile). Behavior: at server startup, count claims; if zero, run the seed runner inline.
-
-**Files touched.**
-- [backend/app/cli.py](backend/app/cli.py) — add `--auto-seed` to `serve` subparser.
-- [backend/app/main.py](backend/app/main.py) — startup hook calls the seed runner when auto-seed is requested and the DB is empty.
-- [Dockerfile](Dockerfile) — update `CMD` to `["serve", "--host", "0.0.0.0", "--port", "8000", "--auto-seed"]`.
-
-**Tests.** New test in [backend/tests/test_cli.py](backend/tests/test_cli.py): `test_serve_auto_seeds_when_db_is_empty` and `test_serve_does_not_re_seed_when_db_is_populated`. Use FastAPI's TestClient + a tmp DB URL.
-
-**Definition of done.** `docker run --rm -p 8000:8000 ayiru` followed by `curl localhost:8000/v1/query/tools/git` returns a full ToolSpec without any prior `seed` command.
-
-**Defers.** Volume persistence between container restarts. v0.2 hosted-demo will use a Fly.io persistent volume — that's Stage 22's deliverable.
-
-## Stage 15.6 — pytest CVE bump
-
-**Problem.** Audit flagged `pytest 8.4.2` has `CVE-2025-71176`. Test-runner only, dev-dep, but the fix is one-line.
-
-**Work.**
-- [backend/pyproject.toml](backend/pyproject.toml): change `pytest>=8.0,<9.0` → `pytest>=8.5,<10.0` (8.5 contains the patch backport; 9.0.3 is the canonical fix; allowing both keeps compatibility with environments that haven't moved to pytest 9 yet).
-- Re-run `pip-audit` after the change. Confirm zero findings.
-
-**Files touched.**
-- [backend/pyproject.toml](backend/pyproject.toml)
-
-**Tests.** Existing 694 must still pass. No new tests.
-
-**Definition of done.** `pip-audit` against a fresh venv install reports zero known vulnerabilities for project deps.
-
-## Stage 15.7 — Python version consistency
-
-**Problem.** [backend/pyproject.toml](backend/pyproject.toml) says `>=3.11`; [Dockerfile:9](Dockerfile#L9) uses `python:3.11-slim`; README's dev quick-start uses `python3.12 -m venv`. Not broken — just inconsistent.
-
-**Work.** Pick 3.12 as the supported floor for v0.2 (Python 3.11 is approaching its EOL window; 3.12 is the active stable). Update all three references; bump `requires-python` to `>=3.12`; update Dockerfile base image to `python:3.12-slim`.
-
-Alternative: keep 3.11 floor and just align Dockerfile + README. Lower-impact, but defers the version bump to v0.3.
-
-Pick one. Document the decision in `docs/stage_report.md` under the Stage 15 addendum.
-
-**Files touched.**
-- [backend/pyproject.toml](backend/pyproject.toml)
-- [Dockerfile](Dockerfile)
-- [README.md](README.md) (quick-start)
-- [.github/workflows/ci.yml](.github/workflows/ci.yml) — Python matrix entry
-
-**Tests.** Existing 694 must pass under the chosen interpreter. CI matrix should run the chosen version (and optionally the next-newer one to catch forward-compat breakage early).
-
-**Definition of done.** A grep for `python3\.\d\d` across the repo shows one and only one supported version. CI passes on that version.
-
-## Stage 15.8 — MCP-stdio-no-auth disclosure
-
-**Problem.** [backend/app/auth.py](backend/app/auth.py) gates HTTP via `ApiKeyAuthMiddleware` when `AYIRU_API_KEY` is set. The MCP stdio server (`ayiru mcp`) has no equivalent gate. Acceptable as a *local-only* assumption, but undisclosed.
-
-**Work.**
-- Add a "Security model" subsection to [README.md](README.md) between the "MCP Integration" and "Core Principles" sections. Three paragraphs: (1) auth applies to HTTP writes only, off by default; (2) MCP stdio assumes the caller is local and trusted (the typical Claude Desktop / Cursor config); (3) for network-exposed MCP, run via the HTTP API with auth on (not stdio).
-- Add `WARNING` log on `ayiru mcp` start when stdin/stdout are not TTYs *and* `AYIRU_API_KEY` is set: "MCP stdio path is unauthenticated regardless of AYIRU_API_KEY; ensure callers are local."
-
-**Files touched.**
-- [README.md](README.md) — new subsection.
-- [backend/app/mcp_server/server.py](backend/app/mcp_server/server.py) — add startup warning.
-- [SECURITY.md](SECURITY.md) — mirror the disclosure.
-
-**Tests.** New test in [backend/tests/test_mcp_server.py](backend/tests/test_mcp_server.py): asserts the warning is emitted when `AYIRU_API_KEY` is set and the process is started via the MCP entry point.
-
-**Definition of done.** README has an explicit "MCP stdio runs unauthenticated by design" callout. SECURITY.md mirrors it.
-
-## Stage 15.9 — DNS rebinding mitigation (deferred to v0.3)
-
-Audit finding #7. SSRF guard at [backend/app/services/http_safety.py:68-85](backend/app/services/http_safety.py#L68-L85) resolves DNS once at validation time; httpx resolves again at connect. Window for DNS rebinding. Not exploited against the current `official_hosts` allowlist (legit docs hosts don't rebind), but the guard's *claim* is weaker than it reads.
-
-**Decision for v0.2:** track in [GitHub Project](https://github.com/ruth411/ayiru/projects) but don't block v0.2 on it. Real fix requires custom httpx transport that pins the resolved IP. Schedule for v0.3 alongside the post-launch adversarial pen-test (roadmap_v0.2.md §Hardening backlog).
-
-**Documentation.** Add a paragraph to [SECURITY.md](SECURITY.md) acknowledging the DNS-rebinding window so the residual risk is honestly stated.
-
-## Stage 15.10 — `.gitignore` housekeeping
-
-Minor: `.coverage` left untracked after the audit's coverage run. Add `.coverage` and `htmlcov/` to [.gitignore](.gitignore).
-
-## Stage 15.11 — Mapping comment for `KnowledgeClaim` vs `KnowledgeClaimRecord`
-
-Minor (audit finding). [backend/app/db/models.py](backend/app/db/models.py) defines `KnowledgeClaimRecord`; [backend/app/schemas/claim.py](backend/app/schemas/claim.py) defines `KnowledgeClaim`. Convention: `*Record` for SQLAlchemy persistence, bare name for Pydantic transport. Add a one-line module docstring to both files documenting the convention so new contributors don't trip on imports.
+For the original detailed work breakdown of each 16.x substage, see the git history of this file (commit `a9a60e7`) or pull from `roadmap_v0.2.md §Phase 0`. The deferral is recorded here so a future scheduler knows the work exists; the detail is preserved upstream.
 
 ---
 
-## Stage 15 — Definition of Done
+# Stage 17 — `/v1/query/ask` Endpoint ✅ SHIPPED (uncommitted)
 
-All 11 substages closed. The brutal-audit punch list is empty. The README's "Stage 14 complete" badge now links to a doc that actually covers Stages 9–14. A senior engineer doing a 30-minute eval cannot find a documented claim that contradicts the codebase's behavior.
+**Goal.** Add the headline v0.2 endpoint: agents call `ask(question)` and receive cited, ranked answers from the verified knowledge graph. Pure lexical ranking (no embeddings yet; B3 from roadmap_v0.2.md is the stretch-goal at the end of v0.2).
 
-**Tests at Stage 15 close:** ~700 passing (current 694 + ~6 new from 15.5, 15.8). Ruff clean. Coverage ≥ 88% (no regression).
+**Outcome.** Five substages shipped + a sixth audit-fixes substage shipped same day. Test suite 699 → 721 passing. Ruff clean. End-to-end smoke against the v0.1 graph confirms the 6 headline dev questions hit (rank, statement, citations, exit codes) correctly.
 
-**Estimated effort:** 2–3 focused days. 15.1 and 15.2 are done. 15.3 (stage report) is the longest single piece (~4h prose). 15.5 (Docker auto-seed) is the only nontrivial code change (~3h).
+## Stage 17.1 — Pydantic schemas ✓ DONE 2026-05-21
 
----
+Three models added to [backend/app/schemas/query.py](backend/app/schemas/query.py):
+- `AskRequest` `{question (1–512), limit (1–20 default 5), tool_id_hint}` — pattern-validated.
+- `Answer` — projected from a `KnowledgeClaim` with `confidence`, `verification_level`, `evidence`, `match_reason`.
+- `AskResponse` `{question, answers, fallback_recommended, estimated_tokens_saved, generated_at}` — same shape on hit OR miss.
 
-# Stage 16 — Phase 0 Measurement + Pre-flight
+## Stage 17.2 — `QueryEngine.ask()` ✓ DONE 2026-05-21
 
-**Goal.** Validate the v0.2 pivot's central assumption (*"agents waste meaningful tokens on web searches that a local knowledge layer can serve"*) before writing any `backend/app/` code. Plus tee up the four other pre-flight items (PyPI name, v0.1.0 tag, 5 beta testers, launch budget).
+In [backend/app/services/query_engine.py](backend/app/services/query_engine.py). Token-overlap ranking, weights: subject ×3, tool_id ×2, statement ×1. Threshold `_ASK_SCORE_THRESHOLD = 0.30` for fallback. ACCEPTED-only filter. Batch-fetches verification levels for top-N candidates only (one extra query regardless of fan-out).
 
-**Why this is a stage, not week-0.** Roadmap_v0.2.md frames Phase 0 as "Week 0." Calling it Stage 16 makes it explicit that the decision-gate output is a release artifact (committed `phase0_results.json` + a written go/no-go memo) — not a vibes check.
+## Stage 17.3 — `POST /v1/query/ask` route ✓ DONE 2026-05-21
 
-**Preconditions.** Stage 15 fully closed (the audit punch list is empty; the README is honest).
+In [backend/app/api/routes_query.py](backend/app/api/routes_query.py). Read endpoint — no auth required even with `AYIRU_API_KEY` set. Malformed body → structured 422.
 
-## Stage 16.1 — Run the measurement spike (P0.1)
+## Stage 17.4 — 7th MCP tool (`ask`) ✓ DONE 2026-05-21
 
-**Existing asset.** [scripts/phase0_measurement_spike.py](scripts/phase0_measurement_spike.py) — 503 lines, ready to run. Audit confirmed: well-documented, idiomatic, supports `--provider anthropic|openai`, has a `--dry-run` that exercises the script without LLM calls.
+In [backend/app/mcp_server/tools.py](backend/app/mcp_server/tools.py). Registered as the **first** tool in the registry so LLMs see it at position #1 (tool-choice is order-sensitive). Description written for LLM consumption: *"Look up a verified, cited answer from the local knowledge graph before invoking web search."*
 
-**Work.**
-- Set up isolated venv with LangChain + provider SDK:
-  ```bash
-  python3 -m venv /tmp/phase0-venv
-  /tmp/phase0-venv/bin/pip install langchain langchain-anthropic langchain-community duckduckgo-search
-  ```
-- Run `--dry-run` first to confirm the harness is intact.
-- Run the real spike: `ANTHROPIC_API_KEY=... /tmp/phase0-venv/bin/python scripts/phase0_measurement_spike.py --provider anthropic`. Budget: ~$5–20 in API charges (see roadmap_v0.2.md P0.1 budget note).
-- Capture `phase0_results.json` (the script writes this to the repo root by default; `.gitignore` already excludes it).
-- Manually copy the two headline numbers + the qualitative observation into a new file `docs/phase0_memo.md`.
+## Stage 17.5 — Tests + end-to-end smoke ✓ DONE 2026-05-21
 
-**Output artifacts.**
-- `phase0_results.json` (local, gitignored — never committed; the file contains LLM responses that may be noisy).
-- `docs/phase0_memo.md` — a ≤ 1-page memo, committed. Contains:
-  - Two numbers (web-search-replaceable token fraction; ask-vs-web_search tool-choice rate).
-  - One qualitative paragraph (did the LLM hallucinate plausible-but-wrong when the fake `ask` returned hits?).
-  - Decision Gate verdict: pass / borderline / fail per row of the gate table.
-  - Date, model used, total spend.
+[backend/tests/test_query_ask.py](backend/tests/test_query_ask.py) — 14 tests covering happy path, ranking, fallback, accept-only filter, tool_id_hint, telemetry. End-to-end smoke run against real seeded DB: 4/4 headline questions return the right top hit.
 
-**Definition of done.** `docs/phase0_memo.md` exists, committed, has a clear go/no-go verdict per Decision Gate row.
+## Stage 17.6 — Audit fixes (second-pass senior-dev review) ✓ DONE 2026-05-22
 
-## Stage 16.2 — PyPI name reservation (P0.2)
+A senior-dev audit on 2026-05-22 found 5 bugs and a code smell. All fixed same day.
 
-Already validated free during the audit: `pip index versions ayiru` and `pip index versions ayiru-client` both return "No matching distribution found."
+| # | Severity | Bug | Fix |
+|---|---|---|---|
+| 17.6.1 | 🔴 critical | `_MIN_TOKEN_LENGTH = 3` dropped half the Unix CLI vocabulary (`rm`, `ls`, `cd`, `gh`, `jq`, `mv`, `cp`…) — the headline pitch breaks for any 2-char command | Removed the length filter; stop-words already drop short noise particles |
+| 17.6.2 | 🔴 critical | Repeated keywords (`"docker docker docker"`) inflated the score by ~70% — gameable, non-deterministic for verbose LLMs | Dedupe question tokens before scoring + normalising |
+| 17.6.3 | 🔴 critical | README API Surface didn't list `/v1/query/ask`; MCP table didn't list `ask` | Added bullet at top of Agent Query Surface; added `ask` as row 1 in MCP table |
+| 17.6.4 | 🟠 high | No `ayiru ask` CLI subcommand — install-and-try users couldn't hit the headline endpoint without curl | Added `ayiru ask "question"` with `--limit`, `--tool`, `--json` flags + `_print_ask_response` + 4 tests |
+| 17.6.5 | 🟡 medium | `PACKAGE_VERSION = "0.1.0"` hardcoded in `cli.py` — bumping pyproject silently drifts | Derive from `importlib.metadata.version("ayiru")` at startup; verified by bumping pyproject 0.1.0 → 0.1.99 → CLI tracks |
+| smell-17.6 | 🟡 medium | Lazy `import re` inside `_tokenize_question` | Moved to module top |
 
-If Stage 15.4 picked **Option A** (publish `ayiru` immediately), this stage just confirms the upload was successful. Else, it reserves both names with empty/stub packages:
-- Run `python -m build` against a stub package at `backend/` (the v0.1.0 wheel is a fine stub).
-- `twine upload backend/dist/ayiru-0.1.0*` (requires PyPI API token; document the token rotation procedure in `docs/operations/pypi.md`).
-- For `ayiru-client`: build a stub `clients/python/dist/` with the package skeleton from Stage 21, version `0.0.1`.
+Three regression tests added to lock the fixes: `test_short_command_tokens_survive_tokenization`, `test_repeated_keywords_do_not_inflate_score`, `test_repeated_single_token_question_scores_same_as_one`. All Bug 1, 2, 4, 11 reverified independently with concrete behavioral probes (not just "tests pass").
 
-**Definition of done.** `pip install ayiru` and `pip install ayiru-client` both succeed on a clean venv. Names are reserved. PyPI tokens are stored in a password manager (not the repo).
+## Stage 17 — Definition of Done ✅
 
-## Stage 16.3 — v0.1.0 release artifacts (P0.3)
+- `POST /v1/query/ask` returns non-empty answers for the 6 headline dev questions.
+- `ask` is the 1st MCP tool, MCP 2024-11-05 spec-compliant.
+- `ayiru ask` CLI subcommand with proper exit codes (0=hit, 1=fallback — distinct from `ayiru query`'s 0/2).
+- 17 new test_query_ask.py tests + 4 new ask CLI tests + 3 audit-regression tests + 2 MCP ordering tests = 22 new total. Backend tests 699 → 721 passing.
+- Ruff clean. Wheel still builds. Migration roundtrip clean.
 
-**Status.** v0.1.0 tag already pushed; wheel at `backend/dist/ayiru-0.1.0-py3-none-any.whl`.
+**Estimated effort (actual).** Stage 17 + audit fixes shipped in one focused day. Faster than the original 3–4 day estimate because Claude pair-built each substage rather than the plan's solo-from-spec sequencing.
 
-Remaining work:
-- Create a GitHub Release for the `v0.1.0` tag if one doesn't exist. Upload the wheel + sdist as release assets. Title: "v0.1.0 — initial public release." Body: link to `CHANGELOG.md` v0.1.0 entry + the brutal-audit punch list close-out from Stage 15.
-
-**Definition of done.** [https://github.com/ruth411/ayiru/releases/tag/v0.1.0](https://github.com/ruth411/ayiru/releases/tag/v0.1.0) has wheel + sdist attached.
-
-## Stage 16.4 — Solo self-test (replaces beta-tester recruitment)
-
-The original plan called for recruiting 5 named beta testers — the council framed it as *"the single highest-risk pre-flight item."* **The project is solo-dev. There are no external testers for v0.2.** Stage 16.4 is rewritten to a self-test the maintainer can run alone with Claude pair-testing the agent loop.
-
-This swap accepts a real cost: at launch, zero external humans will have run v0.2 against a real agent. The mitigations are (a) a stricter self-test threshold than the original 5-tester "feedback in" bar, and (b) running the self-test *twice* — once at the Gate 1 measurement, once on launch eve at Gate 2 — to catch regressions introduced by Stages 17–22.
-
-**Work.**
-
-1. Pick 10 realistic dev questions matching the Phase 0.1 task list (the [phase0_measurement_spike.py](scripts/phase0_measurement_spike.py) `DEV_TASKS` list is the canonical source — use those questions, not invented ones).
-2. For each question, run the agent harness from P0.1 with the fake `ask` tool wired to the v0.1 graph (or a stub that returns canned answers from the headline scenarios — whichever P0.1 used).
-3. Score each question on a 3-state rubric:
-   - **PASS** — the verdict's `statement` is something I would have actually given a colleague who asked. Not "matches by keyword" but "this is the answer."
-   - **WEAK** — keyword match, but I'd flag the answer as incomplete or imprecise.
-   - **MISS** — no match, or the match is wrong.
-4. Record the 10 verdicts in `docs/self_test_results.md` (committed). One row per question with the verdict, the rubric grade, and a one-sentence rationale.
-
-**Threshold.** ≥ 7 PASS out of 10 → criterion 3 of Gate 1 met. ≤ 6 PASS → pause Stage 17 and start Stage 20 (bulk ingest) early; a thicker graph is the only remedy for "the seed is too thin."
-
-**Output.** `docs/self_test_results.md` — 10 rows, committed. Re-run at Gate 2 against the post-Stage-22 graph.
-
-**Why this works as a stand-in for recruitment.** A solo dev who can't satisfy their own use case won't satisfy anyone else's. The 7/10 bar is intentionally stricter than the council's "did they call ask() at all?" bar because there's no external feedback loop to catch a bad gate verdict — the maintainer's own honesty is the only check.
-
-**Deferred from this substage:** [docs/beta_tester_outreach.md](docs/beta_tester_outreach.md) and the recruitment-tracking workflow it describes. The playbook is preserved in the repo for a future moment (v0.3 or post-launch) when recruitment becomes viable. It's not removed — it's *parked*.
-
-**Definition of done.** `docs/self_test_results.md` exists, committed, with 10 rows. ≥ 7 PASS. The two PASS/WEAK/MISS counts and one verdict sentence are written down per question.
-
-## Stage 16.5 — Launch budget memo (P0.5)
-
-Itemise the monthly running cost per roadmap_v0.2.md §Launch Budget. Floor: ~$50/month sustained for 6 months = ~$300 minimum.
-
-**Work.** Create `docs/launch_budget.md`:
-- Itemised table (Fly.io / domain / email / Stripe / S3 / Twitter) matching roadmap_v0.2.md.
-- Funding source: self-funded / sponsor / cap-to-no-hosted-mode.
-- Explicit 6-month kill date written down (e.g., "If by 2026-11-20 the kill criteria fire, the SaaS arm sunsets and the OSS layer continues without hosted demo").
-
-**Definition of done.** Memo committed. Funding decision is *written*, not implicit.
+**Deferred to Stage 22.1 stretch / v0.3.** Embeddings hybrid retrieval. Per-IP rate limiting. Multi-language stop-words. `ask` response caching.
 
 ---
 
-## Stage 16 — Definition of Done
+# Stage 18 — Cost-Savings Telemetry ⏭ NEXT ACTIVE
 
-All 5 substages closed. `docs/phase0_memo.md` exists with a written Decision Gate verdict. `docs/launch_budget.md` exists with a written funding decision. `docs/self_test_results.md` exists with ≥ 7 PASS out of 10. PyPI names reserved (or Stage 15.4 Option B's deferral is the explicit decision). v0.1.0 release published on GitHub.
+**Goal.** Make the cost savings observable. Every `ask` emits an audit event; a new aggregated endpoint exposes "X tokens saved this month." This is the moat-as-data: agents using Ayiru can prove the savings. Equally important: telemetry has to ship *before* Stage 20's bulk ingest so the calibration window starts collecting data from the first `ask` call.
 
-**No code in `backend/app/` has been touched.** That's the point.
-
-**Estimated effort:** Roadmap_v0.2.md says "Week 0." Realistic solo-dev estimate: 5–7 days for P0.1 (set up venv, run spike, write memo) + ongoing 1–2 weeks for P0.4 recruitment (the long-pole task). Run P0.4 in parallel with the rest.
-
----
-
-## ⚠️  GATE 1 — Decision Gate
-
-Per [Decision Gates](#decision-gates) above. **Do not start Stage 17 unless all three gate criteria are met.**
-
-If Gate 1 fails:
-- Metric 1 fails → pitch is wrong. Pivot Stages 17–23 to whatever the spike surfaces as the real dominant cost (cost-observability dashboard? MCP registry? something else?). Rewrite this plan from Stage 17 onward.
-- Metric 2 fails → docstring problem dominates. Spend a 1-week sub-stage on docstring optimisation, re-run the spike, re-evaluate.
-- Self-test fails (< 7/10 PASS) → seed is too thin. Start Stage 20 (bulk ingest) before Stage 17; re-run the self-test against the post-Stage-20 graph.
-
-Write the gate verdict into [docs/phase0_memo.md](docs/phase0_memo.md). Sign it with date + maintainer name.
-
----
-
-# Stage 17 — `/v1/query/ask` Endpoint (Phase A1)
-
-**Goal.** Add the headline endpoint: agents call `ask(question)` and receive cited, ranked answers from the knowledge graph. Pure lexical ranking (no embeddings yet; B3 in roadmap_v0.2.md is demoted to stretch).
-
-**Preconditions.** Gate 1 passed.
-
-## Stage 17.1 — New Pydantic schemas
-
-**Files touched.**
-- [backend/app/schemas/query.py](backend/app/schemas/query.py) — add:
-  - `AskRequest`: `{question: str (1–512 chars), limit: int (1–20, default 5), tool_id_hint: str | None}`
-  - `Answer`: `{claim_id, subject, statement, tool_id, confidence, verification_level, evidence: list[EvidenceCitation], match_reason: str}`
-  - `AskResponse`: `{question, answers: list[Answer], fallback_recommended: bool, estimated_tokens_saved: int, generated_at: datetime}`
-
-## Stage 17.2 — `QueryEngine.ask()`
-
-**Files touched.**
-- [backend/app/services/query_engine.py](backend/app/services/query_engine.py) — add `ask(question, limit, tool_id_hint)` next to existing `search_tools()` (~line 143).
-
-**Implementation.**
-- Pure lexical: `LIKE %term%` against `KnowledgeClaim.subject` + `statement` columns, with token-overlap ranking. Stop-word filtering against a small embedded set (~30 common English words).
-- Tiered ranking like the existing `search_tools` does: exact subject match > prefix subject match > statement substring match.
-- Filter to claims at `verification_status='accepted'` only — uncurated/pending claims (Stage 19 territory) are excluded from `ask` until Stage 19 introduces a flag.
-- If 0 hits: `fallback_recommended=True`, empty `answers[]`.
-
-**Tests.**
-- [backend/tests/test_query_ask.py](backend/tests/test_query_ask.py) — new file, 8–12 tests:
-  - Exact subject match returns top hit.
-  - Substring statement match returns ranked correctly.
-  - Stop-word query (`"how do I"`) returns empty + `fallback_recommended=True`.
-  - Empty question → 422.
-  - Question > 512 chars → 422.
-  - `limit` clamped to range.
-  - `tool_id_hint` narrows results.
-  - Pending claims excluded from results.
-
-## Stage 17.3 — `POST /v1/query/ask` route
-
-**Files touched.**
-- [backend/app/api/routes_query.py](backend/app/api/routes_query.py) — add the route. Reuse the existing `Depends(get_claim_store)` pattern.
-
-**Behavior.**
-- Default-deny: malformed body → structured 422 via `INVALID_CLAIM_SCHEMA` (already wired). No `ask` request should reach 500.
-- Read endpoint — does **not** require auth even with `AYIRU_API_KEY` set. Matches the existing `/v1/query/*` precedent.
-
-## Stage 17.4 — MCP tool #7 (`ask`)
-
-**Files touched.**
-- [backend/app/mcp_server/tools.py](backend/app/mcp_server/tools.py) — add `ask` to the tool registry list. The other 6 tools are already there; the list is a single declarative array.
-
-**Docstring** (the LLM sees this — written carefully):
-> *"Look up a verified, cited answer from the local knowledge graph before invoking web search. Returns ranked answers with confidence and source citations. Faster and cheaper than web search for common dev questions about tools, CLIs, APIs, and SDKs. Returns `fallback_recommended: true` on a miss — only then should you escalate to web search."*
-
-**Tests.**
-- [backend/tests/test_mcp_server.py](backend/tests/test_mcp_server.py) — extend the existing roundtrip tests to include `ask`.
-- Schema validation: ensure `inputSchema` declares `question` (required), `limit` (optional, integer 1–20), `tool_id_hint` (optional).
-
-## Stage 17.5 — Integration smoke
-
-After implementing 17.1–17.4, verify end-to-end:
-```bash
-curl -X POST localhost:8000/v1/query/ask \
-  -H 'Content-Type: application/json' \
-  -d '{"question":"how do I delete a docker container"}'
-```
-Should return at least one answer matching the `docker rm` headline claim.
-
-Also via MCP:
-```bash
-echo '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"ask","arguments":{"question":"how do I delete a docker container"}}}' | ayiru mcp
-```
-
-## Stage 17 — Definition of Done
-
-- `POST /v1/query/ask` returns non-empty answers for the headline scenarios.
-- `ask` is the 7th MCP tool, schema-valid, returns `structuredContent` per MCP 2024-11-05 spec.
-- ≥ 10 new tests passing. Total ~710. Ruff clean.
-
-**Estimated effort.** Roadmap_v0.2.md says "Week 1." 3–4 days realistic.
-
-**Defers.** Embeddings (Stage 22.x stretch). Per-IP rate limiting (post-launch hardening). Multi-language stop-words (English-only for v0.2).
-
----
-
-# Stage 18 — Cost-Savings Telemetry (Phase A2)
-
-**Goal.** Make the cost savings observable. Every `ask` emits an audit event; a new aggregated endpoint exposes "X tokens saved this month." This is the moat-as-data: agents using Ayiru can prove the savings.
-
-**Preconditions.** Stage 17 closed.
+**Preconditions.** Stage 17 closed ✓.
 
 ## Stage 18.1 — `QUERY_SERVED` audit event type
 
@@ -432,7 +193,7 @@ echo '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"ask","argu
 - New file: `backend/alembic/versions/0016_add_query_served_event_type.py`.
 - Mirror file: `backend/app/_alembic/versions/0016_add_query_served_event_type.py` (Stage 14 lockstep contract).
 - DDL: extend the CHECK constraint on `audit_events.event_type` to include `QUERY_SERVED`.
-- Pattern to follow: any of the existing `0010`/`0011`/`0012` extend-checks-for-X migrations. They're 30–50 lines each. Copy the structure.
+- Pattern to follow: any of the existing `0010`/`0011`/`0012` extend-checks-for-X migrations (~30–50 lines each). Copy the structure.
 
 **Enum.**
 - [backend/app/schemas/enums.py](backend/app/schemas/enums.py) — add `QUERY_SERVED = "query_served"` to `AuditEventType`.
@@ -455,29 +216,13 @@ echo '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"ask","argu
     "request_id": current_request_id(),  # from observability.py
   }
   ```
+- Avoid logging the raw `question` text — for v0.2 we don't want freeform PII / proprietary code snippets in the audit log. Length + the matched claim_id are enough to debug a session.
 
-## Stage 18.3 — `_AVERAGE_WEB_SEARCH_TOKENS` constant + math
+## Stage 18.3 — `_AVERAGE_WEB_SEARCH_TOKENS` constant
 
-**Files touched.**
-- [backend/app/services/query_engine.py](backend/app/services/query_engine.py) — add module-level constant near the top:
-  ```python
-  # Tokens replaced when an agent picks ask() over web_search.
-  # Typical web_search costs ~30 input tokens (query) + ~800 output
-  # tokens (search results) ≈ 830 tokens. Ayiru's answer averages
-  # ~150 tokens. Net savings ≈ 680 tokens per query.
-  # Recalibrate from observed audit data after the first 1k real
-  # queries land. The constant is the only knob; do not scatter
-  # token-cost arithmetic across the codebase.
-  _AVERAGE_WEB_SEARCH_TOKENS = 830
-  ```
+**Status.** Already shipped in Stage 17.2 as `_AVERAGE_WEB_SEARCH_TOKENS = 830` in `query_engine.py`. Comment in the code points at the post-launch calibration step.
 
-- Cost-savings calculation lives inside `ask()`:
-  ```python
-  response_tokens = len(json.dumps([a.dict() for a in answers])) // 4
-  estimated_tokens_saved = max(0, _AVERAGE_WEB_SEARCH_TOKENS - response_tokens)
-  ```
-
-**Calibration sub-stage (post-launch).** After 1k real queries: compute observed mean `response_tokens` and adjust the constant. This becomes a measured number, not a guess.
+**Calibration sub-stage (after Stage 20 + 1k real queries).** Recompute observed mean `response_tokens` from the audit log; adjust the constant. This becomes a measured number, not a guess. The audit memo at [docs/stage_report.md](docs/stage_report.md) §Stage 15 calls the current value out as "fiction until Stage 18 calibrates it."
 
 ## Stage 18.4 — `GET /v1/stats/savings`
 
@@ -493,8 +238,8 @@ echo '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"ask","argu
     "by_tool": {"docker": 312, "git": 287, "github-cli": 245, ...}
   }
   ```
-- `_USD_PER_MILLION_INPUT_TOKENS` constant (default $3, Anthropic Claude Sonnet input rate). Make it configurable via env var `AYIRU_PRICE_PER_MTOK_INPUT` for projects on other models.
-- Optional query params: `window=24h|7d|30d|all`, `api_key=...` (filter to one caller). When `AYIRU_API_KEY` is set, the endpoint becomes write-aware: any caller can read the aggregate, but only callers with the API key can filter by `api_key`.
+- `_USD_PER_MILLION_INPUT_TOKENS` constant (default $3, Anthropic Claude Sonnet input rate). Configurable via env var `AYIRU_PRICE_PER_MTOK_INPUT` for projects on other models.
+- Optional query params: `window=24h|7d|30d|all`, `api_key=...` (filter to one caller). When `AYIRU_API_KEY` is set, any caller can read the aggregate, but only callers with the API key can filter by `api_key`.
 
 ## Stage 18.5 — Tests
 
@@ -506,17 +251,17 @@ echo '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"ask","argu
 - Every `ask` call appends one `QUERY_SERVED` row to `audit_events`.
 - `GET /v1/stats/savings` returns a structured aggregate.
 - Migration `0016` applied; alembic drift test passes.
-- ~720 tests passing. Ruff clean. Coverage ≥ 88%.
+- ~730 tests passing. Ruff clean. Coverage ≥ 88%.
 
 **Estimated effort.** 2–3 days.
 
-**Defers.** Per-API-key telemetry dashboard UI (Stage 22). Multi-currency conversion (USD only for v0.2).
+**Defers.** Per-API-key telemetry dashboard UI (v0.2.5). Multi-currency conversion (USD only for v0.2). Refining the heuristic against measured data (post-Stage-20 calibration sub-stage).
 
 ---
 
-# Stage 19 — Curated vs Uncurated Tool Split (Phase B1)
+# Stage 19 — Curated vs Uncurated Tool Split
 
-**Goal.** Relax the Stage 0 tool lock so the seed graph can hold the 5,000+ uncurated claims Stage 20 is about to add. Curated tools keep the full orchestrator path (claims → accepted → spec → validate_command). Uncurated tools land at `L0_unverified` / `pending` and are visible to `ask` but excluded from `validate_command`.
+**Goal.** Relax the Stage 0 tool lock so the graph can hold the 5,000+ uncurated claims Stage 20 is about to add. Curated tools keep the full orchestrator path (claims → accepted → spec → validate_command). Uncurated tools land at `L0_unverified` / `pending` and are visible to `ask` but excluded from `validate_command`.
 
 **Preconditions.** Stage 18 closed.
 
@@ -527,7 +272,7 @@ echo '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"ask","argu
 - Mirror file: [backend/app/contracts/ayiru_stage_0.v2.json](backend/app/contracts/ayiru_stage_0.v2.json) (Stage 14 lockstep).
 - Schema: add `"curated": true` to each of the existing 5 entries (git, github-cli, docker, vercel-cli, openai-api). Bump `"version": 2`.
 
-**Test.**
+**Tests.**
 - [backend/tests/test_bundled_contracts_in_sync.py](backend/tests/test_bundled_contracts_in_sync.py) — should auto-pass.
 - New: [backend/tests/test_contract_v2_schema.py](backend/tests/test_contract_v2_schema.py) — validates v2 has the `curated` field and v1 doesn't (old contract preserved for replay).
 
@@ -550,7 +295,7 @@ echo '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"ask","argu
 ## Stage 19.3 — Matcher behavior for uncurated claims
 
 **Files touched.**
-- [backend/app/services/command_matcher.py](backend/app/services/command_matcher.py) — extend the existing exclusion logic. `validate_command` already filters to `verification_status='accepted'` (per the audit's observation). Confirm this; if not, add the filter.
+- [backend/app/services/command_matcher.py](backend/app/services/command_matcher.py) — extend the existing exclusion logic. `validate_command` already filters to `verification_status='accepted'`; confirm + lock.
 - [backend/app/services/query_engine.py](backend/app/services/query_engine.py) — `ask()` includes uncurated claims at `L0_unverified` but flags them in `match_reason`. `validate_command` does not.
 
 ## Stage 19.4 — Strict-mode flag
@@ -566,30 +311,29 @@ echo '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"ask","argu
   - `ask` returns uncurated claims with a "low confidence" reason in match_reason.
   - `validate_command` excludes uncurated claims (default-deny).
   - `AYIRU_STRICT_TOOL_LOCK=1` restores Stage 0 lock behavior.
-  - Migration not required for this stage (no schema change).
 
 ## Stage 19 — Definition of Done
 
 - Uncurated claims persist and surface in `ask`.
 - Curated tools still get the full Stage 6 pipeline (Stage 0 → 14 behavior unchanged).
-- ~730 tests passing.
+- ~740 tests passing.
 
-**Estimated effort.** 2 days. Council called this "one week" in roadmap_v0.2.md; that was bundled with B2 and B3 — B1 alone is faster.
+**Estimated effort.** 2 days.
 
 **Defers.** A reviewer UI for promoting uncurated claims (continues to use the existing `POST /verification/human-review` endpoint). Per-tool ingestion rate limits.
 
 ---
 
-# Stage 20 — Bulk Ingestion Harness (Phase B2)
+# Stage 20 — Bulk Ingestion Harness — **THE POWER MOMENT**
 
-**Goal.** Populate the graph from ~47 claims (Stage 15.1 end state) to ≥ 5,000 claims across ≥ 50 tools. Without this, the `ask` endpoint is a toy.
+**Goal.** Populate the graph from ~47 claims (Stage 15.1 end state) to ≥ 5,000 claims across ≥ 50 tools. Without this, the `ask` endpoint is a toy. With this, the v0.2 pitch becomes real: an agent asking *"how do I configure terraform state in s3"* gets a verified answer instead of paying for web_search.
 
 **Preconditions.** Stage 19 closed (so uncurated claims can land without orchestrator rejection).
 
 ## Stage 20.1 — `ayiru ingest` CLI subcommand
 
 **Files touched.**
-- [backend/app/cli.py](backend/app/cli.py) — new `ingest` subparser with args:
+- [backend/app/cli.py](backend/app/cli.py) — new `ingest` subparser:
   ```
   ayiru ingest --source docs --tool-list path/to/tools.yml [--force] [--resume]
   ```
@@ -614,7 +358,7 @@ echo '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"ask","argu
 
 ## Stage 20.3 — Per-tool legal pre-check
 
-**Work.** For each of the 50 tools, document the docs license in `tools/v0.2_seed_licenses.md`:
+For each of the 50 tools, document the docs license in `tools/v0.2_seed_licenses.md`:
 - GitHub docs: CC BY 4.0 ✓
 - Docker docs: Apache 2.0 ✓
 - Stripe API reference: © Stripe Inc — drop from v0.2 list (re-evaluate post-launch).
@@ -634,15 +378,11 @@ echo '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"ask","argu
 
 ## Stage 20.6 — JS-rendered docs handling
 
-**Realism note from roadmap_v0.2.md.** Some docs sites (e.g., Vercel's, parts of AWS) are SPA-rendered. httpx alone won't fetch the content. Two options:
-- **For v0.2:** drop those tools from `tools/v0.2_seed.yml` and queue a Playwright-based fetcher for v0.2.2.
-- **Stretch:** integrate Playwright behind a new ingestion lane (Stage 7e). Too much scope for v0.2.
-
-Decision: drop the JS-only sites. Document the dropped tools in `tools/v0.2_seed_dropped.md` with reasoning.
+**Realism note.** Some docs sites (Vercel's, parts of AWS) are SPA-rendered; httpx alone won't fetch the content. For v0.2 build, drop those tools from `tools/v0.2_seed.yml` and queue a Playwright-based fetcher for v0.3. Document the dropped tools in `tools/v0.2_seed_dropped.md`.
 
 ## Stage 20.7 — Rate limit + ToS compliance
 
-For each docs host: honor `robots.txt`, set `User-Agent: Ayiru-Bulk-Ingestion/1.0 (+https://github.com/ruth411/ayiru)`, cap to 1 req / sec per host. Already enforced by the existing httpx client's defaults; this stage adds the per-host rate limiter.
+For each docs host: honor `robots.txt`, set `User-Agent: Ayiru-Bulk-Ingestion/1.0 (+https://github.com/ruth411/ayiru)`, cap to 1 req / sec per host.
 
 **Files touched.**
 - [backend/app/services/docs_ingestion.py](backend/app/services/docs_ingestion.py) — extend the existing client with a `httpx.Limits` configuration.
@@ -653,21 +393,28 @@ After 20.1–20.7 land:
 ```bash
 ayiru ingest --source docs --tool-list tools/v0.2_seed.yml
 ```
-Expected: 50 tools × ~100 claims/tool = ~5,000 claims. Realistic: 35–45 tools clear legal review × ~80 claims = 2,800–3,600 claims. Both numbers comfortably above the "≥ 5,000 claims" target if you also include the existing 47 curated claims and the existing OpenAPI/JSON Schema bulk.
+Expected: 50 tools × ~100 claims/tool = ~5,000 claims. Realistic after license-drops: 35–45 tools × ~80 claims = 2,800–3,600 claims. Either number is the v0.2 power moment.
 
-**Definition of done.**
+## Stage 20.9 — Re-run the solo self-test (Gate 1 criterion 3)
+
+After Stage 20.8 finishes, run Stage 16.4's self-test against the bulk-ingest graph. Record in `docs/self_test_results.md`. **≥ 7/10 PASS** → Gate 1 criterion 3 cleared; v0.2 build cycle is on track. **< 7/10 PASS** → expand the ingest list or fix the tokenizer / matcher gaps the failures expose.
+
+## Stage 20 — Definition of Done
+
 - `tools/v0.2_seed.yml` committed with 35–50 entries.
 - `tools/v0.2_seed_licenses.md` committed with per-tool license review.
 - `ayiru ingest` runs end-to-end against the file, populates ≥ 2,800 claims.
 - Audit events log every ingestion run.
+- `docs/self_test_results.md` committed with ≥ 7/10 PASS.
+- Stage 18 calibration sub-stage triggered: recompute `_AVERAGE_WEB_SEARCH_TOKENS` from the first 1k post-Stage-20 `QUERY_SERVED` audit events.
 
-**Estimated effort.** Roadmap_v0.2.md says "Week 3" — 5–10 days. Realistic: 4 days CLI/contract work + 2–3 days legal review + 1 day rate-limited crawl run.
+**Estimated effort.** 5–8 days. Realistic: 4 days CLI/contract work + 2–3 days legal review + 1 day rate-limited crawl run.
 
-**Defers.** Playwright lane. Per-tool freshness re-ingestion schedule. OpenAPI / GraphQL bulk variants (only docs lane for v0.2; existing OpenAPI / JSON Schema / GraphQL lanes still work one-off via their existing endpoints).
+**Defers.** Playwright lane (v0.3). Per-tool freshness re-ingestion schedule (v0.2 stretch — see below). OpenAPI / GraphQL bulk variants (only docs lane for v0.2; existing one-off lanes still work).
 
 ---
 
-# Stage 21 — Python Client SDK (Phase C1)
+# Stage 21 — Python Client SDK
 
 **Goal.** A drop-in `ayiru_client` package so an agent dev's code goes from "wire raw httpx" to two lines.
 
@@ -691,7 +438,6 @@ Expected: 50 tools × ~100 claims/tool = ~5,000 claims. Realistic: 35–45 tools
 **Public surface (sync):**
 ```python
 from ayiru_client import Ayiru
-
 atlas = Ayiru(base_url="http://localhost:8000", api_key=None)
 answer = atlas.ask("how do I delete a docker volume")
 if answer.is_useful:
@@ -701,12 +447,11 @@ if answer.is_useful:
 **Public surface (async):**
 ```python
 from ayiru_client import AsyncAyiru
-
-atlas = AsyncAyiru(base_url="https://try.ayiru.dev")
+atlas = AsyncAyiru(base_url="http://localhost:8000")
 answer = await atlas.ask("...")
 ```
 
-**Methods on each:** `ask(question, limit=5)`, `validate_command(tool_id, command)`, `get_tool_spec(tool_id)`, `search_tools(query)`, `savings(window="30d")`.
+**Methods:** `ask`, `validate_command`, `get_tool_spec`, `search_tools`, `savings`.
 
 **Computed properties on `Answer`:**
 - `is_useful` — `confidence >= 0.6 and verification_level != L0_UNVERIFIED`.
@@ -714,9 +459,7 @@ answer = await atlas.ask("...")
 
 ## Stage 21.3 — Tests
 
-**Files touched.**
-- [clients/python/tests/test_client.py](clients/python/tests/test_client.py) — runs against a FastAPI `TestClient`-wrapped backend (no network).
-- Same hermeticity contract as backend tests.
+[clients/python/tests/test_client.py](clients/python/tests/test_client.py) — runs against a FastAPI `TestClient`-wrapped backend (no network). Same hermeticity contract as backend tests.
 
 ## Stage 21.4 — Documentation
 
@@ -726,149 +469,104 @@ answer = await atlas.ask("...")
 ## Stage 21 — Definition of Done
 
 - `pip install -e clients/python` works.
-- `pip install ayiru-client` works (PyPI publication via Stage 22.3).
-- Documented examples run.
-- ~750 tests total (backend 730 + client 20).
+- Documented examples run end-to-end against a locally-running backend.
+- ~760 tests total (backend ~740 + client ~20).
 
 **Estimated effort.** 2 days.
 
-**Defers.** TypeScript / JS client (v0.3). Streaming `ask` responses (no use case yet).
+**Defers.** PyPI publication of `ayiru-client` — that's v0.2.5 (Stage 22.3). TypeScript / JS client (v0.3). Streaming `ask` responses (no use case yet).
 
 ---
 
-# Stage 22 — LangChain Adapter + Hosted Demo + OSS Hygiene (Phases C2, B, README Pivot)
+# Stage 22 — Reach + Publish (split between v0.2 build and v0.2.5)
 
-**Goal.** Make Ayiru reachable to LangChain users with zero glue code, host a live demo at `try.ayiru.dev` (or fallback), and tidy the OSS surface (issue templates, CHANGELOG, social preview, etc.).
+**Goal.** Make Ayiru reachable to LangChain users with zero glue code (in v0.2 build) and prepare the public-launch surface (in v0.2.5 publish).
+
+## Stage 22.1 — LangChain `AyiruTool` (v0.2 build, in-scope)
 
 **Preconditions.** Stage 21 closed.
-
-## Stage 22.1 — LangChain `AyiruTool`
 
 **Files touched.**
 - New file: `clients/python/ayiru_client/langchain.py`.
 - Class: `AyiruTool(BaseTool)` subclassing `langchain_core.tools.BaseTool`.
-- Critical: the docstring is what the LLM sees as the tool description. Should explicitly say *"use this before invoking web search for common dev questions about CLIs, APIs, and tools."*
+- Critical: the docstring is what the LLM sees as the tool description. Should explicitly say *"use this before invoking web search for common dev questions about CLIs, APIs, and tools."* Same framing as the MCP tool description from Stage 17.4.
+- `clients/python/examples/langchain_demo.ipynb` — 10-question notebook. Show ~7 hits + ~3 fallbacks with cost-saved counter at the end.
 
-**Files touched.**
-- `clients/python/examples/langchain_demo.ipynb` — 10-question notebook. Show 7 hits + 3 fallbacks with cost-saved counter at the end.
+**Definition of done.** LangChain demo notebook runs end-to-end against a locally-running backend, prints a "saved $X.XX" footer derived from the `GET /v1/stats/savings` endpoint.
 
-## Stage 22.2 — README pivot
+**Estimated effort.** 1–2 days.
 
-The audit acknowledged the current README sells "verified knowledge layer" — the v0.2 pitch is "agent search box that cuts API costs." Time to rewrite the hero.
+## Stage 22.2 — README pivot ⏸ **DEFERRED to v0.2.5**
 
-**Files touched.**
-- [README.md](README.md) — hero rewrite:
-  - Drop "Wikipedia for AI agents" framing.
-  - New first sentence: *"Ayiru is the local search box your AI agent hits before the web — cuts tool-call costs by routing common queries to a verified knowledge graph instead of paying for `WebSearch` tokens."*
-  - Replace the headline `validate_command` example with an `ask` example.
-  - Demote the stages table from the headline into a collapsed `<details>` block at the bottom.
-  - New 15-second GIF: LangChain agent → `atlas.ask("how do I delete a docker volume")` → cited answer → cost-saved counter on screen.
-- GitHub repo description (settings): one sentence matching the new hero.
-- GitHub topics: `ai-agents`, `mcp-server`, `llm-tools`, `langchain`, `agent-infrastructure`, `llm-cost-optimization`.
-- [frontend/app/page.tsx](frontend/app/page.tsx) — hero rewrite matching README; swap interactive component from `validate_command` to `ask`.
+Originally in-scope; deferred because the maintainer's *build > publish* directive means we're not running a launch cycle yet. The hero rewrite (drop "Wikipedia for AI agents" framing, swap to "agent search box that cuts API costs") lands when v0.2.5 actually publishes. Until then, the v0.1 README is the documented surface — internally consistent thanks to Stage 15.4 + 15.8.
 
-## Stage 22.3 — PyPI publication
+## Stage 22.3 — PyPI publication ⏸ **DEFERRED to v0.2.5**
 
-Two packages, two uploads:
-- `python -m build backend && twine upload backend/dist/ayiru-0.2.0*`
-- `python -m build clients/python && twine upload clients/python/dist/ayiru-client-0.2.0*`
+`twine upload backend/dist/ayiru-0.2.0*` and the same for `ayiru-client`. Gated on the maintainer's PyPI token + a clean-venv smoke test. Not part of the build cycle.
 
-Tag `v0.2.0` first. Confirm a clean-venv `pip install ayiru` and `pip install ayiru-client` both work.
+## Stage 22.4 — Hosted demo at `try.ayiru.dev` ⏸ **DEFERRED to v0.2.5**
 
-## Stage 22.4 — Hosted demo at `try.ayiru.dev`
+Fly.io deploy, custom domain, TLS, persistent SQLite volume, rate-limiting. Council-revised estimate is 8–12 hours when it does land. Skipped in v0.2 build because the cost (~$15–35/month per `docs/launch_budget.md`) doesn't pay until users exist.
 
-**Realism note from roadmap_v0.2.md:** 8–12h, not the original 4h. First Fly.io deploy with secrets, persistent SQLite volume, custom domain, TLS, rate-limiting config.
+## Stage 22.5 — OSS hygiene ⏸ **DEFERRED to v0.2.5**
 
-**Work.**
-- `fly.toml` at the repo root configuring shared-CPU 1GB instance, persistent volume of 1 GB for `ayiru.db`, custom domain `try.ayiru.dev` (or `ayiru.fly.dev` as fallback).
-- `Dockerfile` already exists from Stage 12 (Stage 15.5 adds auto-seed).
-- Fly secrets: `AYIRU_API_KEY` for any private endpoints (defaults remain readable per Stage 19's design).
-- Rate limit: 100 req/min/IP using Fly's built-in `services.concurrency`.
-- TLS via Fly's automatic Let's Encrypt.
-
-## Stage 22.5 — OSS hygiene (Phase B from roadmap_v0.2.md)
-
-- [CHANGELOG.md](CHANGELOG.md) — v0.2.0 entry, Keep-a-Changelog format.
-- New: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) — Contributor Covenant 2.1.
-- New: `.github/ISSUE_TEMPLATE/bug_report.yml`, `feature_request.yml`, `new_tool_request.yml`.
-- New: `.github/pull_request_template.md` — checklist mirrors CONTRIBUTING.md (tests, migration reversible, contract versioned).
-- New: `.github/FUNDING.yml`.
-- Enable GitHub Discussions.
-- Repo social preview image (1280×640 PNG) uploaded via repo settings.
-- Star History badge in README.
-- Maintainer contact in SECURITY.md + README.
-- Replace any `ruth411` placeholders with the canonical repo path.
-
-## Stage 22 — Definition of Done
-
-- `pip install ayiru` and `pip install ayiru-client` both work on clean venv.
-- `https://try.ayiru.dev/v1/query/ask` responds with a real answer (smoke-tested in the last hour).
-- LangChain demo notebook runs end-to-end, prints "saved $X.XX" footer.
-- GitHub repo card shows new description, topics, social image.
-- All 15 Phase B hygiene items complete.
-
-**Estimated effort.** Roadmap_v0.2.md says "Week 6," ~12h focused work. Realistic with hosting: 4–5 days. The Fly.io deploy is the long pole.
-
-**Defers.** Authenticated multi-tenant hosted SaaS (Stage 24+). Self-service signup. Stripe billing (Phase D, post-launch).
+CHANGELOG.md v0.2 entry, CODE_OF_CONDUCT.md, issue + PR templates, FUNDING.yml, GitHub Discussions enable, social preview image, Star History badge, repo-wide replace of `ruth411` placeholders. All low-individual-cost; bundled with the launch cycle so they hit at once.
 
 ---
 
-## ⚠️  GATE 2 — Launch-Day Prerequisites
+# Stage 22 stretch — Embeddings / hybrid retrieval (v0.2 build, stretch goal)
 
-See [Gate 2](#gate-2--launch-day-prerequisites-between-stage-22-and-stage-23). All 5 prerequisites must be true at 07:00 of the chosen launch Tuesday. If any is false, delay one week.
+**Goal.** Replace lexical-only `ask()` with hybrid lexical + semantic ranking so paraphrased / synonymous queries surface the right claim. The B3 stretch from `roadmap_v0.2.md`.
+
+**Preconditions.** Stage 20 closed (bulk graph populated). Optional — only run this if there's slack after the core build is done.
+
+## Stage 22-stretch.1 — Embedding column + migration
+
+- New table column: `claim_embeddings.claim_id → vector(384)`.
+- Migration `0017_create_claim_embeddings.py` (+ lockstep mirror).
+- Deps: `sentence-transformers>=3.0,<4.0`, `sqlite-vec>=0.1,<1.0`.
+
+## Stage 22-stretch.2 — Background embed job
+
+- At ingestion time, compute the `all-MiniLM-L6-v2` embedding (80MB, CPU-only, ~10ms/query) for every new claim's `statement`.
+- Add a backfill script: `ayiru reindex` regenerates embeddings; safe to re-run.
+
+## Stage 22-stretch.3 — Hybrid `ask()`
+
+- Rewrite `QueryEngine.ask` as: lexical candidate pool (top 50 by token-overlap) → re-rank by cosine similarity to question embedding → return top K.
+- Tests: `backend/tests/test_hybrid_retrieval.py` — pin the property that semantic-only matches (synonyms, paraphrases) surface, not just keyword overlap.
+
+**Definition of done.** A question like *"how do I free up disk space from container layers"* matches the `docker system prune` claim even when no keyword overlaps.
+
+**Estimated effort.** 2–3 days.
+
+**If skipped.** v0.2 build ships lexical-only. Self-test (Stage 20.9) is the indicator: if the self-test passes 7/10 on lexical, the embedding stretch can wait until v0.3.
 
 ---
 
-# Stage 23 — Launch Day + Sustainability (Phase C, D)
+# Stage 22 stretch — Per-claim freshness re-ingestion (v0.2 build, stretch goal)
 
-**Goal.** Execute the launch playbook from `roadmap_v0.2.md §Phase C` on a single chosen Tuesday. Then enter sustainability mode with explicit kill criteria.
+**Goal.** Re-ingest each tool's docs on a schedule so stale claims don't accumulate.
 
-**Preconditions.** Gate 2 passed.
+**Preconditions.** Stage 20 closed.
 
-## Stage 23.1 — Launch-day timeline
+**Files touched.**
+- [backend/app/cli.py](backend/app/cli.py) — `ayiru ingest --refresh-stale --older-than 30d`.
+- New `audit_events` query: find URLs whose last `INGESTION_RUN_COMPLETED` is older than the threshold; re-ingest them.
 
-Follow [roadmap_v0.2.md §Phase C](roadmap_v0.2.md) verbatim:
+**Definition of done.** Cron-scheduled `ayiru ingest --refresh-stale` keeps the graph current without manual intervention.
 
-| Time | Action |
-|---|---|
-| **08:00** | Final smoke — clean-venv `pip install ayiru`, run `ask`, verify GIF still plays, hosted demo responsive. |
-| **09:00** | Publish blog post: *"I built Ayiru to cut my agent's API bill"*. |
-| **10:00** | Twitter/X thread (7–10 posts). Open with itemized-bill screenshot. |
-| **11:00** | r/LocalLLaMA post. |
-| **13:00** | r/LangChain post with LangChain demo notebook. |
-| **15:00** | **Hacker News — Show HN.** Stay online until 22:00 answering comments. |
-| **18:00** | Cross-post to Lobsters, the LangChain / Cursor / Anthropic / OpenAI Discords, the MCP working group Slack. |
-| **Wed–Fri** | 24h response SLA on every issue. Merge low-risk PRs same-day. |
+**Estimated effort.** 1 day.
 
-## Stage 23.2 — Post-launch first 30 days
+---
 
-- 24–48h issue response SLA (self-imposed, non-negotiable). Solo-dev SLA is harder to honour — if real life intervenes, post one line on the relevant issue *("oncall this week, will respond by [date]")* rather than going silent.
-- Weekly digest post: *"This week in Ayiru: X tools added, Y queries served, Z PRs merged."*
-- Identify the first named user from the post-launch traffic for the README's "Used by" section. (There are no pre-launch testers to cite.)
-- Public counter on hosted demo: *"X tokens saved across all users this month."* Includes the maintainer's own use against `try.ayiru.dev` so the number doesn't sit at zero on launch day.
+# Stage 23 — Launch day + sustainability ⏸ **DEFERRED to v0.2.5**
 
-## Stage 23.3 — Kill criteria checkpoints
+Entirely a publish-cycle concern. The original plan's launch-day timeline (08:00 final smoke → 09:00 blog post → 10:00 X thread → 11:00 r/LocalLLaMA → 13:00 r/LangChain → 15:00 Show HN → 18:00 Discord cross-posts) runs when v0.2.5 ships, not before.
 
-Adapted from [roadmap_v0.2.md §Kill Criteria](roadmap_v0.2.md). Original Week-10 criterion referenced "the 5 beta testers" — rewritten below for the solo-dev path. The other rows stand unchanged.
+Kill criteria from the original plan are preserved for v0.2.5 evaluation (Week 8 stars, Week 10 usage, Month 3 paying customers, Month 6 MAU). The Stage 23.3 *Solo-dev addendum* about Week-8 / Week-10 being the only feedback loop (no pre-launch testers to catch problems) still applies.
 
-| Checkpoint | Failure trigger | Decision |
-|---|---|---|
-| **Week 8** (1 week post-launch) | < 10 GitHub stars from non-personal-network sources | HN/Reddit/Discord didn't catch. Stop launch amplification; debrief on positioning. |
-| **Week 10** (1 month post-launch) | < 3 unique API-key holders called `ask` ≥ 10 times each on the hosted demo, AND zero new GitHub Discussions threads from strangers | Installs exist but no usage. Talk to the *first 1-2 users who did call it* — if any — and ask why retention dropped. Without beta testers, the only feedback loop is real users. |
-| **Month 3** | Zero paying customers or sponsors | Cost-savings pitch doesn't convert. OSS continues; SaaS arm dies. |
-| **Month 6** | Combined MAUs < 50 | Audience not found. Pivot again (council pressure-test) or sunset. |
-
-Hitting any of these is **not** "grind harder." It's "the product is wrong; pivot or stop."
-
-**Solo-dev addendum.** The original plan had a 5-tester feedback loop catching problems *before* launch. The solo-dev path has no such loop, so the first real failure signal will come from post-launch usage data. The Week-8 and Week-10 checkpoints are therefore *more* load-bearing than they would be with seeded testers — they're the only feedback before the project either grows or stops.
-
-## Stage 23.4 — Hosted SaaS rollout (Month 2–3 only if Stage 23.3 doesn't trigger)
-
-Reserved for v0.3 / post-launch. Stripe + signup + per-key rate limiting + cost-analytics dashboard. Not part of v0.2 proper.
-
-## Stage 23 — Definition of Done
-
-v0.2.0 is on PyPI, on the hosted demo, on HN, and on the kill-criteria board. v0.2 ships.
+For full detail of the deferred Stage 23 substages, see commit `a9a60e7` in this file's git history or `roadmap_v0.2.md §Phase C–D`.
 
 ---
 
@@ -882,11 +580,11 @@ Every contract JSON change must:
 - Land in [contracts/](contracts/) (source of truth).
 - Mirror byte-identically into [backend/app/contracts/](backend/app/contracts/).
 - Increment the version filename if behavior changes (`*.v1.json` → `*.v2.json`). Old version stays for replay.
-- Be covered by [backend/tests/test_bundled_contracts_in_sync.py](backend/tests/test_bundled_contracts_in_sync.py) (auto-passes if files match).
+- Be covered by [backend/tests/test_bundled_contracts_in_sync.py](backend/tests/test_bundled_contracts_in_sync.py).
 
 ## CC.2 — Seed artifact lockstep
 
-Same lockstep contract for [data/seed_artifacts/](data/seed_artifacts/) ↔ [backend/app/seed_data/artifacts/](backend/app/seed_data/artifacts/). Enforced by [backend/tests/test_bundled_seed_in_sync.py](backend/tests/test_bundled_seed_in_sync.py). The Stage 15.1 work surfaced this — both locations must move together.
+Same lockstep contract for [data/seed_artifacts/](data/seed_artifacts/) ↔ [backend/app/seed_data/artifacts/](backend/app/seed_data/artifacts/). Enforced by [backend/tests/test_bundled_seed_in_sync.py](backend/tests/test_bundled_seed_in_sync.py). Stage 15.1 caught this contract; both locations must move together.
 
 ## CC.3 — Alembic migration lockstep
 
@@ -913,65 +611,80 @@ Every migration must:
 
 - Public-facing endpoint changes update [README.md](README.md) `§API Surface`.
 - New CLI subcommands update the README CLI reference table.
-- New env vars get a row in `docs/operations/env_vars.md` (new file in Stage 15.5 or earlier).
-- Every stage's close-out adds a section to `docs/stage_report.md`.
+- New env vars get a row in the README configuration table (or `docs/operations/env_vars.md` once that file is created).
+- Every stage's close-out adds a section to [docs/stage_report.md](docs/stage_report.md).
 
 ## CC.7 — Backward compat
 
 - v0.1 API (`/v1/query/validate-command`, the 6 existing MCP tools) is **frozen**. v0.2 only adds.
 - Legacy unversioned routes (`/query/...` without `/v1` prefix) keep working until v1.0. RFC 8594 deprecation headers stay attached per Stage 14.
+- v0.2's new `ask` endpoint (Stage 17) ships on `/v1/query/ask` *and* `/query/ask` (legacy mount) for the same reason.
 
 ---
 
-# Estimated Total Effort
+# Estimated Total Effort — build cycle only
 
-| Stage | Work item | Solo-dev focused-days |
+| Stage | Work item | Status | Solo-dev focused-days |
+|---|---|---|---|
+| Stage 15 | Credibility close-out | ✅ shipped | 0 (done) |
+| Stage 16.5 | Launch budget memo | ✅ drafted | 0.25 |
+| Stage 17 | `ask` endpoint + audit fixes | ✅ shipped | 0 (done) |
+| **Stage 18** | Cost-savings telemetry | ⏭ next active | **2–3 days** |
+| **Stage 19** | Curated split | active | **2 days** |
+| **Stage 20** | Bulk ingest (the power moment) | active | **5–8 days** |
+| **Stage 21** | Python SDK | active | **2 days** |
+| **Stage 22.1** | LangChain adapter | active | **1–2 days** |
+| Stage 22 stretch | Embeddings / freshness re-ingest | optional | 0–4 days |
+
+**Realistic total to v0.2 build complete:** ~2–3 focused weeks (≤ 20 days). Calendar time will be longer because evenings/weekends.
+
+## Deferred to v0.2.5 publish cycle
+
+| Stage | Item | Estimate when scheduled |
 |---|---|---|
-| 15.1, 15.2 | DONE ✓ | 0 |
-| 15.3 | Stage report doc | 0.5 |
-| 15.4 | PyPI install decision | 0.25 |
-| 15.5 | Docker auto-seed | 1 |
-| 15.6 | pytest CVE bump | 0.1 |
-| 15.7 | Python version | 0.5 |
-| 15.8 | MCP-stdio disclosure | 0.5 |
-| 15.10, 15.11 | gitignore + naming | 0.1 |
-| **Stage 15 total** | | **~3 days** |
-| **Stage 16** | Phase 0 + recruitment | **5–7 days (P0.1) + 7–14 days (P0.4 in parallel)** |
-| **Stage 17** | `/v1/query/ask` | **3–4 days** |
-| **Stage 18** | Cost telemetry | **2–3 days** |
-| **Stage 19** | Curated split | **2 days** |
-| **Stage 20** | Bulk ingest | **5–8 days** |
-| **Stage 21** | Python SDK | **2 days** |
-| **Stage 22** | LangChain + hosted + hygiene | **4–5 days** |
-| **Stage 23** | Launch + sustain | **1 launch day + ongoing** |
+| 16.1 | Phase 0 measurement spike | 1 day + $5–20 API spend |
+| 16.2 | PyPI name reservation | 30 min |
+| 16.3 | v0.1.0 GitHub release | 5 min |
+| 16.4 | Solo self-test (full Gate 1) | re-runs at Stage 20.9 |
+| 22.2 | README pivot | 0.5 day |
+| 22.3 | PyPI publication | 1 day |
+| 22.4 | Hosted demo at try.ayiru.dev | 1–2 days (Fly.io setup) |
+| 22.5 | OSS hygiene (CHANGELOG / CoC / templates / FUNDING / etc.) | 1 day |
+| 23.1 | Launch-day playbook | 1 launch day |
+| 23.2 | Post-launch first 30 days | ongoing |
+| 23.3 | Kill criteria checkpoints | quarterly |
 
-**Realistic total to v0.2.0 launch:** 9–11 weeks (~2.5 months) of solo-dev focused work, matching roadmap_v0.2.md's 9-week council-revised estimate. Calendar time will be longer because evenings/weekends/recruitment-wait.
+**v0.2.5 total:** ~1 focused week + 1 launch day, *if and when scheduled*.
 
 ---
 
-# v0.2 — Definition of Done (entire release)
+# v0.2 Build-Cycle Definition of Done
 
-Composite of every stage's DoD. v0.2.0 ships when **all** of:
+v0.2 build is **done** when **all** of:
 
-1. Stage 15 closed (audit punch list empty).
-2. Stage 16 closed (Phase 0 memo + budget + recruitment + tags).
-3. Gate 1 passed in writing.
-4. Stage 17 closed (`ask` endpoint live; MCP tool #7 listed).
-5. Stage 18 closed (`QUERY_SERVED` audit + `/v1/stats/savings` live).
-6. Stage 19 closed (curated split shipped; uncurated claims allowed at L0).
-7. Stage 20 closed (≥ 2,800 claims across ≥ 35 tools).
-8. Stage 21 closed (`ayiru-client` on PyPI).
-9. Stage 22 closed (LangChain adapter; hosted demo; OSS hygiene complete).
-10. Gate 2 passed.
-11. Stage 23.1 executed (launch day).
+1. ✅ Stage 15 closed (audit punch list empty; committed `fc96bad`).
+2. ✅ Stage 16.5 launch budget memo committed.
+3. ✅ Stage 17 closed (`ask` endpoint live; 7th MCP tool; CLI subcommand; 17.6 audit fixes).
+4. Stage 18 closed (`QUERY_SERVED` audit + `/v1/stats/savings` live; migration 0016).
+5. Stage 19 closed (curated split shipped; uncurated claims allowed at L0; contract v2).
+6. Stage 20 closed (≥ 2,800 claims across ≥ 35 tools; self-test 7/10 PASS).
+7. Stage 21 closed (`ayiru_client` package installable from source).
+8. Stage 22.1 closed (LangChain `AyiruTool` adapter + demo notebook).
 
-Test count at v0.2 close: **≥ 730 backend + ~20 client = ~750**. Ruff clean. Coverage ≥ 88%.
+**Test count at v0.2 build close:** ≥ 760 backend + ~20 client = ~780 total. Ruff clean. Coverage ≥ 88%.
 
-Migrations: 0001 through ~0017. Alembic drift test green.
+**Migrations:** 0001 through 0016 (or 0017 if the embeddings stretch lands).
 
-Contracts: v1 (legacy, replay) + v2 (Stage 19 curated split). Lockstep mirror enforced.
+**Contracts:** v1 (legacy, replay) + v2 (Stage 19 curated split). Lockstep mirror enforced.
 
-**The product test:** A LangChain agent in a fresh project, given an Ayiru tool with the v0.2 docstring, picks `ask` over `web_search` on ≥ 50% of common dev questions and saves ≥ 25% of the corresponding token budget. That's the spike's Decision Gate threshold made real, post-launch.
+**The product test:** A LangChain agent in a fresh project, given Ayiru's `AyiruTool` with the v0.2 docstring, picks `ask` over `web_search` on ≥ 50% of common dev questions covering the bulk-ingest tool list, and the resulting `tokens_saved` aggregate in `/v1/stats/savings` is non-trivially positive. The maintainer self-test in `docs/self_test_results.md` (Stage 20.9) is the canonical verification.
+
+## v0.2.5 publish-cycle Definition of Done (for when it eventually runs)
+
+1. Stages 22.2 – 22.5 closed.
+2. Stage 23.1 executed (launch day).
+3. Stage 23.3 kill-criteria checkpoint dates entered in the maintainer's calendar.
+4. Gate 1 + Gate 2 both passed in writing (memos committed).
 
 ---
 
@@ -979,10 +692,11 @@ Contracts: v1 (legacy, replay) + v2 (Stage 19 curated split). Lockstep mirror en
 
 - **Not the prose roadmap.** That's [roadmap_v0.2.md](roadmap_v0.2.md). This document is its stage breakdown.
 - **Not an estimate for paid contractors.** Solo-dev focused-day estimates assume context retention from prior stages.
-- **Not a marketing plan.** Stage 23.1 references the launch playbook, but the brand / GTM strategy lives in the launch blog draft at [docs/launch_blog_post.md](docs/launch_blog_post.md).
-- **Not a substitute for talking to the 5 beta testers.** Every stage from 17 onward is wrong by default until they say otherwise.
-- **Not a v1.0 plan.** v1.0 owns L4 cross-agent verification, embeddings, Stripe billing, multi-tenant SaaS, and the post-launch hardening backlog. None of that is in scope here.
+- **Not a marketing plan.** The launch-day playbook lives in roadmap_v0.2.md and the launch blog draft at [docs/launch_blog_post.md](docs/launch_blog_post.md). Reads from those when v0.2.5 actually schedules.
+- **Not a substitute for talking to users.** Stage 16.4 was originally about recruiting 5 testers; under the solo-dev path it's a self-test. Real users only show up at v0.2.5 launch.
+- **Not a v1.0 plan.** v1.0 owns L4 cross-agent verification, Stripe billing, multi-tenant SaaS, native rate limiting, and the post-launch hardening backlog. None of that is in scope here.
+- **Not a publish plan.** Stages 22.2 – 22.5 + 23 are explicitly deferred to v0.2.5. The build cycle and the publish cycle are different scopes with different definitions of done.
 
 ---
 
-*Plan authored 2026-05-20 based on the brutal v0.1.0 audit + roadmap_v0.2.md (v0.2.1 council revision). Stages 15.1 and 15.2 completed in the same session.*
+*Plan authored 2026-05-20. Re-sequenced for solo-dev path 2026-05-21. Re-sequenced for build > publish 2026-05-22 (this revision). Stages 15.1–15.11, 16.5, 17.1–17.6 shipped between 2026-05-20 and 2026-05-22.*
