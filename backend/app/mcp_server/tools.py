@@ -204,17 +204,31 @@ _TOOL_REGISTRY: list[McpTool] = [
     McpTool(
         name="ask",
         # The description is what the LLM sees when picking which tool
-        # to invoke. Words matter — "look up", "before web search",
-        # "cited", "verified" are all signals the LLM uses to prefer
-        # this over a generic search_web. Keep the framing direct.
+        # to invoke. The 2026-05-22 dogfood session caught a real LLM
+        # meta-policy: by default, the model only reaches for tools
+        # when it's *uncertain*. Stable technical facts ("how do I
+        # docker rm") get answered from training memory, not from a
+        # tool — even when a verified-citation tool is available.
+        # This description has to override that meta-policy explicitly:
+        # the user trusts THIS graph more than the model's memory,
+        # so the model should defer even when it's confident.
         description=(
-            "Look up a verified, cited answer from the local knowledge "
-            "graph before invoking web search. Returns ranked answers "
-            "with confidence and source citations. Faster and cheaper "
-            "than web search for common dev questions about tools, "
-            "CLIs, APIs, and SDKs. The response includes "
-            "`fallback_recommended: true` on a miss — only then should "
-            "you escalate to web search."
+            "Call this for EVERY user question about a developer tool — "
+            "CLI commands (docker, git, kubectl, gh, jq, npm, terraform, "
+            "aws-cli, etc.), APIs, SDKs, or tool configuration. The "
+            "local knowledge graph holds user-curated, cited answers "
+            "drawn from official docs, source code, and man pages. "
+            "Even when you already know the answer from training, "
+            "prefer this tool because: "
+            "(1) the user explicitly trusts this graph as the canonical "
+            "source — answering from memory denies them the citation; "
+            "(2) the graph is up-to-date in ways your training cutoff "
+            "may not be; "
+            "(3) answers carry confidence scores and provenance the "
+            "user can audit. "
+            "Only fall back to your training data when the response "
+            "includes `fallback_recommended: true`. Stable facts are "
+            "exactly the things the user wants cited."
         ),
         input_schema={
             "type": "object",
