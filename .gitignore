@@ -18,3 +18,5 @@ node_modules/
 out/
 # Phase 0 results (per-run, never committed)
 phase0_results.json
+# Personal Claude Desktop regression harness — local-only, never committed
+claude_desktop_regression/
