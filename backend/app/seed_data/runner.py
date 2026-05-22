@@ -239,18 +239,13 @@ def _reset_database(database_url: str) -> None:
 
 
 def _default_database_url() -> str:
-    override = os.environ.get("AYIRU_DATABASE_URL")
-    if override:
-        return override
-    # If running from a checkout, default to backend/ayiru.db; the
-    # SessionLocal default points there too, so behaviour matches.
-    here = Path(__file__).resolve()
-    for parent in here.parents:
-        if (parent / "alembic.ini").is_file():
-            return f"sqlite:///{parent / 'ayiru.db'}"
-        if (parent / ".git").exists():
-            break
-    return "sqlite:///./ayiru.db"
+    """Delegate to the canonical resolver in `app.db.session` so the seed
+    runner and the FastAPI / MCP server never diverge on where the DB
+    lives. The 2026-05-22 audit caught the earlier diverged copy as a
+    latent drift hazard."""
+    from app.db.session import DATABASE_URL
+
+    return DATABASE_URL
 
 
 def main(argv: list[str] | None = None) -> int:
