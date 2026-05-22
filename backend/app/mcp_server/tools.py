@@ -41,12 +41,30 @@ from app.services.query_engine import QueryEngine
 
 @dataclass(frozen=True)
 class McpTool:
-    """A single tool exposed over MCP."""
+    """A single tool exposed over MCP.
+
+    ``annotations`` carries the MCP 2025-06-18 ``ToolAnnotations`` object
+    (https://modelcontextprotocol.io/specification/2025-06-18/server/tools).
+    The 2026-05-22 dogfood session caught a real bug: without annotations,
+    Claude Desktop falls back to name-prefix heuristics (auto-trusts
+    `get_*`/`search_*`/`explain_*`, gates everything else) and hides our
+    `ask`, `validate_command`, `submit_claim` tools from the LLM. Setting
+    ``readOnlyHint: true`` on the read tools tells the host explicitly
+    that the tool is safe to expose, overriding the heuristic.
+
+    Annotation fields (per spec):
+      - ``title``: human-readable display name shown in the host's UI
+      - ``readOnlyHint``: tool does not modify environment (default: false)
+      - ``destructiveHint``: tool may have destructive side effects (default: true)
+      - ``idempotentHint``: repeated calls with same args have same effect (default: false)
+      - ``openWorldHint``: tool interacts with external systems (default: true)
+    """
 
     name: str
     description: str
     input_schema: dict[str, Any]
     handler: Callable[[dict[str, Any], ClaimStore], dict[str, Any]]
+    annotations: dict[str, Any] | None = None
 
 
 # -------- Tool handlers --------
@@ -264,6 +282,17 @@ _TOOL_REGISTRY: list[McpTool] = [
             "additionalProperties": False,
         },
         handler=_handle_ask,
+        # MCP 2025-06-18 annotations — declare ask as pure-read so
+        # Claude Desktop's tool-gating heuristic exposes it to the LLM
+        # alongside the get_*/search_*/explain_* tools. Without this,
+        # the 2026-05-22 dogfood showed Claude Desktop hiding `ask`.
+        annotations={
+            "title": "Look up a verified answer",
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
     ),
     McpTool(
         name="validate_command",
@@ -292,6 +321,13 @@ _TOOL_REGISTRY: list[McpTool] = [
             "additionalProperties": False,
         },
         handler=_handle_validate_command,
+        annotations={
+            "title": "Check command safety",
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
     ),
     McpTool(
         name="get_tool_spec",
@@ -312,6 +348,13 @@ _TOOL_REGISTRY: list[McpTool] = [
             "additionalProperties": False,
         },
         handler=_handle_get_tool_spec,
+        annotations={
+            "title": "Get tool specification",
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
     ),
     McpTool(
         name="search_tools",
@@ -331,6 +374,13 @@ _TOOL_REGISTRY: list[McpTool] = [
             "additionalProperties": False,
         },
         handler=_handle_search_tools,
+        annotations={
+            "title": "Search tools",
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
     ),
     McpTool(
         name="explain_risk",
@@ -354,6 +404,13 @@ _TOOL_REGISTRY: list[McpTool] = [
             "additionalProperties": False,
         },
         handler=_handle_explain_risk,
+        annotations={
+            "title": "Explain risk classification",
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
     ),
     McpTool(
         name="get_safe_workflow",
@@ -373,6 +430,13 @@ _TOOL_REGISTRY: list[McpTool] = [
             "additionalProperties": False,
         },
         handler=_handle_get_safe_workflow,
+        annotations={
+            "title": "Get safe workflow",
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
     ),
     McpTool(
         name="submit_claim",
@@ -433,6 +497,18 @@ _TOOL_REGISTRY: list[McpTool] = [
             "additionalProperties": False,
         },
         handler=_handle_submit_claim,
+        # submit_claim is the only write tool. We declare it accurately:
+        # not read-only (it persists state), but not destructive either
+        # (claims are append-only — they can't overwrite existing data).
+        # Hosts should still require explicit user approval for writes,
+        # which is fine — this is the one tool where gating is correct.
+        annotations={
+            "title": "Submit a knowledge claim",
+            "readOnlyHint": False,
+            "destructiveHint": False,
+            "idempotentHint": False,
+            "openWorldHint": False,
+        },
     ),
 ]
 

@@ -320,6 +320,60 @@ def test_tools_list_count_matches_registry() -> None:
     assert len(list_tools()) == 7
 
 
+def test_every_tool_declares_mcp_2025_annotations(server: McpServer) -> None:
+    """The 2026-05-22 dogfood session caught Claude Desktop hiding 3 of
+    7 tools because we didn't declare MCP 2025-06-18 ``ToolAnnotations``.
+    Without explicit ``readOnlyHint``, hosts fall back to name-prefix
+    heuristics that auto-trust `get_*`/`search_*`/`explain_*` but gate
+    `ask`/`validate_*`/`submit_*` — invisible filter, no error logged.
+
+    This regression test pins the contract: every tool MUST declare
+    annotations so the host treats them deterministically, not by
+    name guesswork.
+    """
+    raw = server.handle_frame(_frame("tools/list"))
+    response = json.loads(raw)
+    for tool in response["result"]["tools"]:
+        assert "annotations" in tool, (
+            f"tool {tool['name']!r} is missing annotations — "
+            "Claude Desktop will fall back to name-prefix heuristics. "
+            "Add a ToolAnnotations dict with at least readOnlyHint."
+        )
+        annotations = tool["annotations"]
+        assert "readOnlyHint" in annotations, (
+            f"tool {tool['name']!r} annotations missing readOnlyHint"
+        )
+        assert "title" in annotations, (
+            f"tool {tool['name']!r} annotations missing title (UX surface)"
+        )
+
+
+def test_read_tools_are_marked_read_only(server: McpServer) -> None:
+    """The six query/lookup tools must declare ``readOnlyHint: true``.
+    Only ``submit_claim`` writes state; if any read tool drifts to
+    ``readOnlyHint: false`` it gets gated by the host UI and the LLM
+    can no longer reach for it."""
+    raw = server.handle_frame(_frame("tools/list"))
+    response = json.loads(raw)
+    read_only_expected = {
+        "ask",
+        "validate_command",
+        "get_tool_spec",
+        "search_tools",
+        "explain_risk",
+        "get_safe_workflow",
+    }
+    for tool in response["result"]["tools"]:
+        if tool["name"] in read_only_expected:
+            assert tool["annotations"]["readOnlyHint"] is True, (
+                f"{tool['name']} must declare readOnlyHint=True or Claude Desktop "
+                "will hide it from the LLM"
+            )
+    # submit_claim is the one write tool — explicitly NOT read-only.
+    submit = next(t for t in response["result"]["tools"] if t["name"] == "submit_claim")
+    assert submit["annotations"]["readOnlyHint"] is False
+
+
 # ---------------------------------------------------------------------------
 # tools/call validate_command
 # ---------------------------------------------------------------------------

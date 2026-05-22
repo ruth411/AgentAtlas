@@ -142,14 +142,22 @@ class McpServer:
     def _handle_tools_list(
         self, request: proto.JsonRpcRequest
     ) -> proto.JsonRpcResponse:
-        tools_payload = [
-            {
+        tools_payload = []
+        for tool in list_tools():
+            entry: dict[str, Any] = {
                 "name": tool.name,
                 "description": tool.description,
                 "inputSchema": tool.input_schema,
             }
-            for tool in list_tools()
-        ]
+            # MCP 2025-06-18 ToolAnnotations — propagate iff the tool
+            # declared them. Without this, Claude Desktop (and other
+            # 2025-protocol hosts) fall back to name-prefix heuristics
+            # that gate our `ask` / `validate_command` / `submit_claim`
+            # tools out of the LLM's view. The 2026-05-22 dogfood log
+            # captures the symptom.
+            if tool.annotations is not None:
+                entry["annotations"] = tool.annotations
+            tools_payload.append(entry)
         return proto.make_result(request.id, {"tools": tools_payload})
 
     def _handle_tools_call(
