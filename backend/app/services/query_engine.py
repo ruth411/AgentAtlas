@@ -25,6 +25,7 @@ from collections.abc import Callable
 from datetime import datetime, timezone
 from functools import cache
 import json
+import re
 from typing import Any
 
 from app.schemas.enums import (
@@ -36,7 +37,10 @@ from app.schemas.enums import (
     VerificationStatus,
 )
 from app.schemas.evidence import Evidence
+from app.schemas.claim import KnowledgeClaim
 from app.schemas.query import (
+    Answer,
+    AskResponse,
     EvidenceCitation,
     ExplainRiskResponse,
     RiskDimensions,
@@ -47,6 +51,7 @@ from app.schemas.query import (
     WorkflowSummary,
 )
 from app.schemas.risk import RiskAssessment, RiskDimension
+from app.schemas.verification import VerificationResult
 from app.schemas.tool_spec import ToolSpec
 from app.schemas.workflow_spec import WorkflowSpec
 from app.services.claim_store import ClaimStore
@@ -58,6 +63,57 @@ from app.services.risk_classifier import classify_action
 
 _QUERY_POLICY_CONTRACT = contract_path("query_policy.v1.json")
 _STAGE_0_CONTRACT = contract_path("ayiru_stage_0.v1.json")
+
+
+# Stage 17 — ask() lexical retrieval knobs.
+#
+# Token-overlap matching on (subject, statement, tool_id). Stop-words are
+# the closed list of English function words that show up in every natural-
+# language question ("how do I"). Removing them lets the matcher rank
+# claims on the content tokens that actually distinguish them.
+#
+# Critical: do NOT impose a min-length filter on top of the stop-word set.
+# Half the canonical Unix CLI vocabulary is ≤ 2 chars — `rm`, `ls`, `cd`,
+# `mv`, `cp`, `du`, `df`, `ps`, plus modern dev tools `gh`, `jq`, `yq`,
+# `bq`, `pg`, `vi`. A length filter at 3 silently makes those commands
+# invisible to ask(). The audit caught this; the regression test is at
+# tests/test_query_ask.py::test_short_command_tokens_survive_tokenization.
+#
+# _ASK_SCORE_THRESHOLD is the floor below which the engine reports
+# `fallback_recommended=True` even if some lexical overlap exists. The
+# value (0.30) was picked so that a question whose only matching term is
+# the tool_id itself ("how to use docker?") falls through to web_search
+# rather than returning a random docker claim — but a question that
+# matches subject AND a content token in the statement clears the bar.
+# Tune from real audit data once Stage 18 telemetry lands.
+_ASK_SCORE_THRESHOLD = 0.30
+_STOP_WORDS: frozenset[str] = frozenset({
+    "a", "about", "after", "again", "all", "also", "am", "an", "and", "any",
+    "are", "as", "at", "be", "because", "been", "before", "being", "between",
+    "both", "but", "by", "can", "could", "did", "do", "does", "doing", "for",
+    "from", "had", "has", "have", "having", "he", "her", "here", "hers",
+    "him", "his", "how", "i", "if", "in", "into", "is", "it", "its", "just",
+    "let", "let's", "lets", "like", "me", "my", "no", "nor", "not", "now",
+    "of", "off", "on", "once", "only", "or", "other", "our", "ours", "out",
+    "over", "own", "please", "same", "she", "should", "show", "so", "some",
+    "such", "tell", "than", "that", "the", "their", "theirs", "them",
+    "then", "there", "these", "they", "this", "those", "through", "to",
+    "too", "under", "until", "up", "use", "using", "very", "want", "was",
+    "way", "we", "were", "what", "when", "where", "which", "while", "who",
+    "whom", "why", "will", "with", "would", "yes", "you", "your", "yours",
+})
+
+# Stage 17 — cost-savings heuristic.
+#
+# Tokens an agent saves when it picks ask() over web_search. A typical
+# Claude/OpenAI web_search call costs ~30 input tokens (the query) +
+# ~800 output tokens (the search-result digest) ≈ 830 tokens. Ayiru
+# returns the same answer in ~150 response tokens; net saving ≈ 680
+# tokens per query. The constant is the only knob; do not scatter
+# token-cost arithmetic across the codebase. Recalibrate from observed
+# audit data once Stage 18 telemetry lands (the calibration task in
+# plan_v02.md §Stage 18.3 makes the constant a measured number).
+_AVERAGE_WEB_SEARCH_TOKENS = 830
 
 
 class QueryEngine:
@@ -133,6 +189,122 @@ class QueryEngine:
         agents have one query surface instead of having to remember the
         `/canonical/` prefix. The route layer converts `None` into 404."""
         return self._store.get_canonical_tool_spec(tool_id.strip())
+
+    # -------- ask --------
+
+    def ask(
+        self,
+        *,
+        question: str,
+        limit: int = 5,
+        tool_id_hint: str | None = None,
+    ) -> AskResponse:
+        """Stage 17 — the headline v0.2 retrieval surface.
+
+        Lexical token-overlap ranking against accepted claims. Mirrors
+        the patterns in `search_tools` and `_score_tool_spec`: pull
+        candidates from the store, score in memory, return the top
+        `limit` with cited evidence.
+
+        Filters to `verification_status='accepted'` only — the matcher
+        deliberately excludes PENDING and REQUIRES_HUMAN_REVIEW claims
+        so the response is never informational on a hit. Stage 19's
+        curated/uncurated split will revisit this with an opt-in flag.
+
+        Returns the same shape on hit OR miss. On miss, `answers=[]`
+        and `fallback_recommended=True` — the agent's signal to escalate
+        to web_search. On a confident hit, `fallback_recommended=False`.
+
+        `estimated_tokens_saved` is heuristic — see
+        `_AVERAGE_WEB_SEARCH_TOKENS`. Stage 18 wires this into the
+        audit log; until then it's an informational hint to the caller.
+        """
+        normalized_question = question.strip()
+        question_tokens = _tokenize_question(normalized_question)
+        generated_at = self._timestamp()
+
+        # Pure stop-word query (or empty after stripping): no signal to rank
+        # on. Return an honest fallback rather than degenerate ranking.
+        if not question_tokens:
+            return AskResponse(
+                question=normalized_question,
+                answers=[],
+                fallback_recommended=True,
+                estimated_tokens_saved=0,
+                generated_at=generated_at,
+            )
+
+        if limit < 1:
+            limit = 1
+        if limit > 20:
+            limit = 20
+
+        # Pull every accepted claim (optionally narrowed by tool_id_hint).
+        # The v0.2 graph holds ~5k accepted claims after Stage 20; in-memory
+        # ranking is comfortably under 100ms for that scale. Embeddings +
+        # SQL pre-filter land in v0.2.x stretch / v0.3.
+        normalized_hint: str | None = None
+        if tool_id_hint is not None:
+            normalized_hint = tool_id_hint.strip().lower() or None
+
+        candidates = _paginate_all(
+            lambda lim, off: self._store.list(
+                tool_id=normalized_hint,
+                verification_status=VerificationStatus.ACCEPTED,
+                limit=lim,
+                offset=off,
+            ),
+            page_size=int(_query_policy()["default_search_limit"]),
+            hard_cap=10_000,
+        )
+
+        scored: list[tuple[float, str, KnowledgeClaim, str]] = []
+        for claim in candidates:
+            score, reason = _score_claim_for_question(claim, question_tokens)
+            if score <= 0.0:
+                continue
+            scored.append((score, claim.claim_id, claim, reason))
+
+        # Sort: score DESC, claim_id ASC (deterministic tie-break).
+        scored.sort(key=lambda row: (-row[0], row[1]))
+
+        top = scored[:limit]
+        top_score = top[0][0] if top else 0.0
+        fallback = top_score < _ASK_SCORE_THRESHOLD
+
+        answers: list[Answer] = []
+        if not fallback:
+            # Single batch lookup for verification levels on the top-N
+            # claims — keeps ask() at one extra query no matter how many
+            # candidates were scored.
+            top_claim_ids = [claim.claim_id for _, _, claim, _ in top]
+            latest_results = self._store.get_latest_verification_results(top_claim_ids)
+            answers = [
+                _claim_to_answer(
+                    claim,
+                    match_reason=reason,
+                    latest_result=latest_results.get(claim.claim_id),
+                )
+                for _, _, claim, reason in top
+            ]
+
+        # Heuristic token savings. Zero on fallback so the caller doesn't
+        # get a positive savings count for a miss they'll re-route anyway.
+        if answers:
+            response_tokens = len(
+                json.dumps([a.model_dump(mode="json") for a in answers])
+            ) // 4
+            estimated_savings = max(0, _AVERAGE_WEB_SEARCH_TOKENS - response_tokens)
+        else:
+            estimated_savings = 0
+
+        return AskResponse(
+            question=normalized_question,
+            answers=answers,
+            fallback_recommended=fallback,
+            estimated_tokens_saved=estimated_savings,
+            generated_at=generated_at,
+        )
 
     # -------- search_tools --------
 
@@ -532,6 +704,151 @@ def _paginate_all(
         if len(page) < page_size:
             break
     return out
+
+
+# -------- ask scoring + summary --------
+
+
+def _tokenize_question(question: str) -> list[str]:
+    """Lowercase, split on non-alphanumeric, drop stop-words.
+
+    Returns the list of content tokens the matcher should rank on. An
+    all-stop-word question (``"how do I"``) returns ``[]`` — the caller
+    treats that as an automatic fallback rather than degenerate ranking
+    against an empty filter.
+
+    Critical: short tokens (1–2 chars) are NOT filtered. Half the Unix
+    CLI vocabulary is ≤ 2 chars (`rm`, `ls`, `cd`, `gh`, `jq`, ...);
+    suppressing them silently breaks the headline use case. The
+    stop-word set already drops short noise particles (`a`, `i`, `is`,
+    `to`, `of`, `do`).
+    """
+    raw = re.findall(r"[A-Za-z0-9]+", question.lower())
+    return [token for token in raw if token not in _STOP_WORDS]
+
+
+def _score_claim_for_question(
+    claim: KnowledgeClaim, question_tokens: list[str]
+) -> tuple[float, str]:
+    """Return (score, match_reason) for one claim against the question.
+
+    Score is a 0..1 float (typically — can exceed 1.0 on a heavily-matched
+    statement, but normalised by the question-token count to stay
+    comparable across queries of different length). Higher = more
+    relevant. 0.0 means the candidate had zero overlap and should be
+    dropped before sorting.
+
+    Weights (chosen to dominate when the question's content tokens land
+    in the subject, not just the statement prose):
+      - subject token match  → weight 3.0
+      - tool_id token match  → weight 2.0  (a question naming the tool is
+                                a strong signal even if the rest is fuzzy)
+      - statement token match → weight 1.0
+
+    Confidence and recency are NOT in the score — they're orthogonal
+    quality signals carried on the Answer payload for the caller to read.
+    Boosting by confidence would let a low-relevance but high-confidence
+    claim drown out a precisely-matched lower-confidence one, which is
+    the wrong UX for a search box.
+
+    `match_reason` is a one-line debug string surfaced to the caller via
+    `Answer.match_reason`. Examples:
+      - ``"subject hit on 'docker delete'"`` (best case)
+      - ``"tool_id hit on 'docker'; statement hit on 'remove'"``
+      - ``"statement hit on 'container'"`` (weakest, often fallback territory)
+    """
+    if not question_tokens:
+        return 0.0, ""
+
+    # Dedupe the question tokens before scoring. Without this, a question
+    # like "docker docker docker" gets each occurrence counted as a
+    # separate hit and inflates the score by ~70% relative to the same
+    # question with each keyword written once. The audit caught this;
+    # the regression is at tests/test_query_ask.py::
+    # test_repeated_keywords_do_not_inflate_score.
+    unique_question_tokens = set(question_tokens)
+
+    subject_tokens = set(_tokenize_question(claim.subject))
+    statement_tokens = set(_tokenize_question(claim.statement))
+    tool_tokens = set(_tokenize_question(claim.tool_id))
+
+    subject_hits = sorted(unique_question_tokens & subject_tokens)
+    tool_hits = sorted(unique_question_tokens & tool_tokens)
+    statement_hits = sorted(unique_question_tokens & statement_tokens)
+
+    raw_score = (
+        3.0 * len(subject_hits)
+        + 2.0 * len(tool_hits)
+        + 1.0 * len(statement_hits)
+    )
+    # Normalise by the de-duplicated question size so 2/2 unique-token
+    # hits scores higher than 2/8. The max possible per question token
+    # is 6.0 (subject + tool + statement all hit); subject + statement
+    # is the common upper bound.
+    score = raw_score / (len(unique_question_tokens) * 3.0)
+
+    if score == 0.0:
+        return 0.0, ""
+
+    # Build the human-readable reason. Subject hits dominate the
+    # narrative ("we matched on the command name itself"); tool and
+    # statement hits are mentioned only when they're the primary signal.
+    # Lists are already sorted + unique from the intersection above.
+    parts: list[str] = []
+    if subject_hits:
+        parts.append(f"subject hit on {subject_hits!r}")
+    if tool_hits:
+        parts.append(f"tool_id hit on {tool_hits!r}")
+    if statement_hits and not subject_hits:
+        # Only surface statement-only matches when there's nothing
+        # stronger — otherwise the reason gets noisy.
+        parts.append(f"statement hit on {statement_hits!r}")
+
+    reason = "; ".join(parts) if parts else "lexical token overlap"
+    return score, reason
+
+
+def _claim_to_answer(
+    claim: KnowledgeClaim,
+    *,
+    match_reason: str,
+    latest_result: VerificationResult | None,
+) -> Answer:
+    """Project an accepted `KnowledgeClaim` into an `Answer` for the
+    AskResponse. Mirrors `_summarise_tool_spec`'s role for search_tools.
+
+    `latest_result` is the most recent `VerificationResult` for this
+    claim (the caller batch-fetches via `get_latest_verification_results`
+    to keep ask() at one extra query regardless of fan-out). The
+    orchestrator writes confidence into the claim record itself, but
+    verification_level lives only on the result row — so we read it
+    from there.
+
+    For ACCEPTED claims (the only kind ask() returns) the orchestrator
+    guarantees a result exists. We still defend against the type-system
+    gap with an L1 + claim.confidence fallback rather than raising;
+    a missing result here is a data-integrity issue worth surfacing
+    upstream, not a request-time crash.
+    """
+    if latest_result is not None:
+        verification_level = latest_result.verification_level
+        confidence = latest_result.confidence
+    else:
+        verification_level = VerificationLevel.L1_SCHEMA_VALID
+        confidence = claim.confidence or 0.0
+
+    return Answer(
+        claim_id=claim.claim_id,
+        subject=claim.subject,
+        statement=claim.statement,
+        tool_id=claim.tool_id,
+        confidence=confidence,
+        confidence_band=band_for_score(confidence),
+        verification_level=verification_level,
+        risk_level=claim.risk_level,
+        evidence=[_project_evidence(e) for e in claim.evidence],
+        match_reason=match_reason,
+    )
 
 
 # -------- search_tools scoring + summary --------

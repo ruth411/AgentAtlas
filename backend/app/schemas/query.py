@@ -200,10 +200,100 @@ class SafeWorkflowResponse(BaseModel):
     total: int = Field(ge=0)
 
 
+# -------- ask --------
+#
+# Stage 17.1 — the headline v0.2 surface. An agent submits a natural-language
+# question; the engine searches the verified knowledge graph and returns
+# ranked, cited answers. Replaces a web_search round-trip for common dev /
+# CLI / API questions.
+#
+# Contract notes:
+# - Question is free-form prose (1–512 chars). No required structure.
+# - tool_id_hint is optional — when present, narrows the search to one tool's
+#   claims (cheap and useful when the agent already knows the tool).
+# - limit clamps to 1..20 so a buggy caller can't drag the matcher into a
+#   pathological scan; default 5 matches the docs hero example.
+# - The response is verdict-like: callers get the SAME structured shape on
+#   hit OR miss (empty answers + fallback_recommended=True on miss). Never
+#   returns a 404 for a no-match — that's a valid result, not an error.
+# - estimated_tokens_saved is a heuristic (see app.services.query_engine
+#   _AVERAGE_WEB_SEARCH_TOKENS). Stage 18 wires this to the audit log.
+
+
+class AskRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    question: str = Field(min_length=1, max_length=512)
+    limit: int = Field(default=5, ge=1, le=20)
+    tool_id_hint: str | None = Field(default=None, max_length=128)
+
+    @field_validator("tool_id_hint")
+    @classmethod
+    def validate_tool_id_hint(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        return _validate_tool_id(value)
+
+
+class Answer(BaseModel):
+    """One ranked answer projected from a `KnowledgeClaim`.
+
+    Carries enough for the agent to decide whether to use the answer (or
+    fall back to web search) without a follow-up round-trip: the matched
+    statement, the tool it belongs to, the verification level and
+    confidence the orchestrator assigned, and the cited evidence. The
+    match_reason field documents *why* this claim surfaced for the
+    question — useful for debugging mis-matches without re-querying."""
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    claim_id: str = Field(min_length=1, max_length=128)
+    subject: str = Field(min_length=1, max_length=512)
+    statement: str = Field(min_length=1)
+    tool_id: str = Field(min_length=1, max_length=128)
+
+    confidence: float = Field(ge=0.0, le=1.0)
+    confidence_band: ConfidenceBand
+    verification_level: VerificationLevel
+    risk_level: RiskLevel | None = None
+
+    evidence: list[EvidenceCitation] = Field(default_factory=list)
+    match_reason: str = Field(min_length=1, max_length=256)
+
+
+class AskResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    question: str = Field(min_length=1, max_length=512)
+    answers: list[Answer] = Field(default_factory=list)
+
+    # When True, the matcher couldn't find a confident match — the caller
+    # should fall through to web_search (the v0.2 product thesis: ask first,
+    # web only on miss). When False, the answers list is the authoritative
+    # response and the agent should NOT escalate to web search.
+    fallback_recommended: bool
+
+    # Heuristic: how many LLM tokens the caller saved by using ask instead
+    # of web_search. Zero on a fallback. Stage 18 calibrates against real
+    # audit data. The field is informational — never used for billing or
+    # auth decisions.
+    estimated_tokens_saved: int = Field(ge=0)
+
+    generated_at: datetime
+
+    @field_validator("generated_at")
+    @classmethod
+    def validate_generated_at(cls, value: datetime) -> datetime:
+        return _require_tz_aware(value)
+
+
 # -------- shared helpers exposed for the engine --------
 
 
 __all__ = [
+    "Answer",
+    "AskRequest",
+    "AskResponse",
     "EvidenceCitation",
     "ExplainRiskRequest",
     "ExplainRiskResponse",

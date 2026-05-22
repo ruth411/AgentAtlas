@@ -488,6 +488,188 @@ def test_query_json_flag_emits_parseable_payload(
 
 
 # ---------------------------------------------------------------------------
+# `ayiru ask` — Stage 17 retrieval CLI
+# ---------------------------------------------------------------------------
+
+
+def _build_fake_ask_engine(*, fallback: bool, answer_count: int = 2) -> Any:
+    """Build a FakeEngine class that returns a deterministic AskResponse.
+
+    Cribbed from the validate_command fakes — keeps the CLI tests
+    hermetic by avoiding any real ClaimStore or graph state. The
+    response shape mirrors what QueryEngine.ask would have returned."""
+
+    from datetime import datetime, timezone
+
+    from app.schemas.enums import (
+        ConfidenceBand,
+        RiskLevel,
+        TrustLevel,
+        VerificationLevel,
+    )
+    from app.schemas.evidence import EvidenceType
+    from app.schemas.query import Answer, AskResponse, EvidenceCitation
+
+    class FakeEngine:
+        def __init__(self, _store: Any) -> None:
+            pass
+
+        def ask(
+            self,
+            *,
+            question: str,
+            limit: int = 5,
+            tool_id_hint: str | None = None,
+        ) -> Any:
+            if fallback:
+                return AskResponse(
+                    question=question,
+                    answers=[],
+                    fallback_recommended=True,
+                    estimated_tokens_saved=0,
+                    generated_at=datetime.now(timezone.utc),
+                )
+            answers = [
+                Answer(
+                    claim_id=f"claim_test_{i}",
+                    subject="docker rm",
+                    statement="removes one or more containers",
+                    tool_id=tool_id_hint or "docker",
+                    confidence=0.92,
+                    confidence_band=ConfidenceBand.STRONG,
+                    verification_level=VerificationLevel.L2_SOURCE_VERIFIED,
+                    risk_level=RiskLevel.CRITICAL,
+                    evidence=[
+                        EvidenceCitation(
+                            evidence_type=EvidenceType.OFFICIAL_DOCS,
+                            source_uri="https://docs.docker.com/reference/cli/docker/container/rm/",
+                            trust_level=TrustLevel.HIGH,
+                        )
+                    ],
+                    match_reason="subject hit on ['docker', 'rm']",
+                )
+                for i in range(answer_count)
+            ]
+            return AskResponse(
+                question=question,
+                answers=answers,
+                fallback_recommended=False,
+                estimated_tokens_saved=420,
+                generated_at=datetime.now(timezone.utc),
+            )
+
+    return FakeEngine
+
+
+def test_ask_hit_returns_exit_code_zero(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """A confident match → exit 0. Lets shell pipelines branch on
+    `ayiru ask "..." && do_thing`."""
+    monkeypatch.setattr(
+        "app.services.query_engine.QueryEngine",
+        _build_fake_ask_engine(fallback=False),
+    )
+    monkeypatch.setattr(
+        "app.services.claim_store.get_claim_store", lambda: object()
+    )
+
+    rc = main(["ask", "how do I delete a docker container"])
+    out = capsys.readouterr().out
+    assert "HIT" in out
+    assert "estimated_tokens_saved=420" in out
+    assert "docker rm" in out
+    assert "https://docs.docker.com" in out
+    assert rc == 0
+
+
+def test_ask_fallback_returns_exit_code_one(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """A fallback verdict → exit 1. Distinct from `ayiru query`'s 0/2
+    contract so a shell pipeline can `ayiru ask "..." || curl
+    web-search-fallback` without ambiguity."""
+    monkeypatch.setattr(
+        "app.services.query_engine.QueryEngine",
+        _build_fake_ask_engine(fallback=True),
+    )
+    monkeypatch.setattr(
+        "app.services.claim_store.get_claim_store", lambda: object()
+    )
+
+    rc = main(["ask", "aurora borealis quantum"])
+    out = capsys.readouterr().out
+    assert "FALLBACK" in out
+    assert "web_search" in out
+    assert rc == 1
+
+
+def test_ask_json_flag_emits_parseable_payload(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """`--json` must emit the AskResponse dump unmodified so scripts
+    can pipe it to `jq` and friends."""
+    monkeypatch.setattr(
+        "app.services.query_engine.QueryEngine",
+        _build_fake_ask_engine(fallback=False, answer_count=1),
+    )
+    monkeypatch.setattr(
+        "app.services.claim_store.get_claim_store", lambda: object()
+    )
+
+    rc = main(["ask", "docker container", "--json"])
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["fallback_recommended"] is False
+    assert payload["estimated_tokens_saved"] == 420
+    assert len(payload["answers"]) == 1
+    assert payload["answers"][0]["tool_id"] == "docker"
+    assert rc == 0
+
+
+def test_ask_forwards_tool_hint_to_engine(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """`--tool github-cli` must surface as tool_id_hint to the engine.
+    Without this, the CLI silently ignores the narrowing flag."""
+    captured: dict[str, Any] = {}
+
+    from datetime import datetime, timezone
+
+    from app.schemas.query import AskResponse
+
+    class CaptureEngine:
+        def __init__(self, _store: Any) -> None:
+            pass
+
+        def ask(self, *, question: str, limit: int, tool_id_hint: str | None) -> Any:
+            captured["question"] = question
+            captured["limit"] = limit
+            captured["tool_id_hint"] = tool_id_hint
+            return AskResponse(
+                question=question,
+                answers=[],
+                fallback_recommended=True,
+                estimated_tokens_saved=0,
+                generated_at=datetime.now(timezone.utc),
+            )
+
+    monkeypatch.setattr(
+        "app.services.query_engine.QueryEngine", CaptureEngine
+    )
+    monkeypatch.setattr(
+        "app.services.claim_store.get_claim_store", lambda: object()
+    )
+
+    main(["ask", "delete a repo", "--tool", "github-cli", "--limit", "3"])
+    assert captured["question"] == "delete a repo"
+    assert captured["limit"] == 3
+    assert captured["tool_id_hint"] == "github-cli"
+
+
+# ---------------------------------------------------------------------------
 # `ayiru tools`
 # ---------------------------------------------------------------------------
 

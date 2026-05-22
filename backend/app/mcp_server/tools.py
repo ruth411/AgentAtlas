@@ -21,6 +21,7 @@ from typing import Any
 from app.schemas.claim import ClaimCreate, KnowledgeClaim
 from app.schemas.evidence import Evidence
 from app.schemas.query import (
+    AskRequest,
     ExplainRiskRequest,
     SafeWorkflowRequest,
     ValidateCommandRequest,
@@ -49,6 +50,19 @@ class McpTool:
 
 
 # -------- Tool handlers --------
+
+
+def _handle_ask(
+    arguments: dict[str, Any], store: ClaimStore
+) -> dict[str, Any]:
+    """`POST /query/ask` over MCP — the headline v0.2 retrieval surface."""
+    request = AskRequest.model_validate(arguments)
+    response = QueryEngine(store).ask(
+        question=request.question,
+        limit=request.limit,
+        tool_id_hint=request.tool_id_hint,
+    )
+    return response.model_dump(mode="json")
 
 
 def _handle_validate_command(
@@ -187,6 +201,56 @@ def _handle_submit_claim(
 
 
 _TOOL_REGISTRY: list[McpTool] = [
+    McpTool(
+        name="ask",
+        # The description is what the LLM sees when picking which tool
+        # to invoke. Words matter — "look up", "before web search",
+        # "cited", "verified" are all signals the LLM uses to prefer
+        # this over a generic search_web. Keep the framing direct.
+        description=(
+            "Look up a verified, cited answer from the local knowledge "
+            "graph before invoking web search. Returns ranked answers "
+            "with confidence and source citations. Faster and cheaper "
+            "than web search for common dev questions about tools, "
+            "CLIs, APIs, and SDKs. The response includes "
+            "`fallback_recommended: true` on a miss — only then should "
+            "you escalate to web search."
+        ),
+        input_schema={
+            "type": "object",
+            "properties": {
+                "question": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512,
+                    "description": (
+                        "The natural-language question, e.g. "
+                        "'how do I delete a docker container' or "
+                        "'what does gh repo delete --yes do'."
+                    ),
+                },
+                "limit": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 20,
+                    "default": 5,
+                    "description": "Max number of answers to return.",
+                },
+                "tool_id_hint": {
+                    "type": "string",
+                    "pattern": r"^[A-Za-z0-9_.-]{1,128}$",
+                    "description": (
+                        "Optional. When you already know which tool "
+                        "the question is about (e.g. 'docker', 'git'), "
+                        "pass it here to narrow the search."
+                    ),
+                },
+            },
+            "required": ["question"],
+            "additionalProperties": False,
+        },
+        handler=_handle_ask,
+    ),
     McpTool(
         name="validate_command",
         description=(

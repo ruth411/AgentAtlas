@@ -309,11 +309,12 @@ Every endpoint returns typed JSON; errors are structured.
 - `GET /audit/claims/{claim_id}` — full chronological history of every event recorded against one claim.
 
 **Agent Query Surface** (the agent-facing API)
-- `POST /query/validate-command` — *the headline endpoint.* Returns a structured `{safe_to_auto_execute, risk_level, requires_human_confirmation, reasons, evidence, verification_level, confidence}` verdict. Default-deny on no match.
-- `GET /query/tools/{tool_id}` — canonical `ToolSpec` retrieval; 404 if no spec published.
-- `GET /query/search-tools?q=&limit=&offset=` — tiered substring search across published tools.
-- `POST /query/explain-risk` — deterministic risk classification with dimensions + citing claim ids.
-- `POST /query/safe-workflow` — published workflows matching a goal, sorted safest-first.
+- `POST /v1/query/ask` — *the v0.2 headline retrieval surface.* Natural-language question in, ranked + cited answers out from the verified knowledge graph. Returns `{answers: [{claim_id, subject, statement, tool_id, confidence, verification_level, evidence, match_reason}], fallback_recommended, estimated_tokens_saved}`. On a miss, `fallback_recommended=True` signals the agent should escalate to web_search.
+- `POST /v1/query/validate-command` — Returns a structured `{safe_to_auto_execute, risk_level, requires_human_confirmation, reasons, evidence, verification_level, confidence}` verdict. Default-deny on no match.
+- `GET /v1/query/tools/{tool_id}` — canonical `ToolSpec` retrieval; 404 if no spec published.
+- `GET /v1/query/search-tools?q=&limit=&offset=` — tiered substring search across published tools.
+- `POST /v1/query/explain-risk` — deterministic risk classification with dimensions + citing claim ids.
+- `POST /v1/query/safe-workflow` — published workflows matching a goal, sorted safest-first.
 
 Live interactive docs at <http://localhost:8000/docs> when the server is running.
 
@@ -325,6 +326,7 @@ Ayiru ships with a built-in MCP server that exposes the query surface plus claim
 
 | Tool | What it does |
 |---|---|
+| `ask` | **v0.2 headline.** Natural-language question → ranked, cited answers from the verified knowledge graph. The agent's first stop before `web_search`. Returns `fallback_recommended=True` on a miss. |
 | `validate_command` | Safety verdict for `{tool_id, command}`. Default-deny on no match. |
 | `get_tool_spec` | Full canonical `ToolSpec` for a known tool. |
 | `search_tools` | Tiered substring search across published tools. |

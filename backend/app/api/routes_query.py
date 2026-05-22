@@ -13,6 +13,8 @@ from fastapi import APIRouter, Depends, Path, Query, status
 
 from app.api.errors import ERROR_RESPONSES, ErrorCode, raise_api_error
 from app.schemas.query import (
+    AskRequest,
+    AskResponse,
     ExplainRiskRequest,
     ExplainRiskResponse,
     SafeWorkflowRequest,
@@ -48,6 +50,30 @@ def validate_command(
 ) -> ValidateCommandResponse:
     return engine.validate_command(
         tool_id=request.tool_id, command=request.command
+    )
+
+
+@router.post(
+    "/ask",
+    response_model=AskResponse,
+    responses=ERROR_RESPONSES,
+)
+def ask(
+    request: AskRequest,
+    engine: QueryEngine = Depends(get_query_engine),
+) -> AskResponse:
+    """Stage 17 — the headline v0.2 endpoint.
+
+    Natural-language question → ranked, cited answers from the verified
+    knowledge graph. Returns the same response shape on hit OR miss
+    (`fallback_recommended=True` signals the agent should escalate to
+    web_search). Reads only — no auth required even when
+    `AYIRU_API_KEY` is set.
+    """
+    return engine.ask(
+        question=request.question,
+        limit=request.limit,
+        tool_id_hint=request.tool_id_hint,
     )
 
 

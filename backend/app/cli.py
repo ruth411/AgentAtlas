@@ -37,7 +37,28 @@ from pathlib import Path
 from typing import Any
 
 
-PACKAGE_VERSION = "0.1.0"
+def _package_version() -> str:
+    """Read the installed wheel's version metadata at runtime so the
+    CLI's `--version` output stays in sync with pyproject.toml without
+    a hardcoded duplicate. Earlier draft set ``PACKAGE_VERSION = "0.1.0"``
+    in this module and the audit caught the drift hazard: bump pyproject
+    to 0.2.0 and the CLI silently keeps saying 0.1.0.
+
+    Falls back to "0.0.0+unknown" only if the package isn't installed at
+    all (i.e., running the source tree directly without `pip install -e`).
+    """
+    try:
+        from importlib.metadata import version
+
+        return version("ayiru")
+    except Exception:
+        # importlib.metadata.PackageNotFoundError is the expected miss;
+        # any other failure (very old Python without importlib.metadata)
+        # falls through to the same sentinel.
+        return "0.0.0+unknown"
+
+
+PACKAGE_VERSION = _package_version()
 
 
 # -------- argparse wiring --------
@@ -144,6 +165,37 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Emit raw JSON instead of the human-readable verdict.",
     )
     p_query.set_defaults(func=_cmd_query)
+
+    # ask  — Stage 17 v0.2 headline
+    p_ask = sub.add_parser(
+        "ask",
+        help=(
+            "Look up a verified, cited answer from the local knowledge "
+            "graph (same answer as POST /v1/query/ask). The v0.2 "
+            "headline endpoint — agents should hit this before web_search."
+        ),
+    )
+    p_ask.add_argument(
+        "question",
+        help='Natural-language question, e.g. "how do I delete a docker container".',
+    )
+    p_ask.add_argument(
+        "--limit",
+        type=int,
+        default=5,
+        help="Max answers to return (1..20, default 5).",
+    )
+    p_ask.add_argument(
+        "--tool",
+        default=None,
+        help="Optional tool_id hint, e.g. 'docker' or 'git'. Narrows the search.",
+    )
+    p_ask.add_argument(
+        "--json",
+        action="store_true",
+        help="Emit raw JSON instead of the human-readable answer list.",
+    )
+    p_ask.set_defaults(func=_cmd_ask)
 
     # verify
     p_verify = sub.add_parser(
@@ -374,6 +426,62 @@ def _cmd_query(args: argparse.Namespace) -> int:
     # Exit non-zero when the engine says "do not auto-execute" so shell
     # callers can chain `ayiru query ... && <do thing>` safely.
     return 0 if payload["safe_to_auto_execute"] else 2
+
+
+def _cmd_ask(args: argparse.Namespace) -> int:
+    """Stage 17 — `ayiru ask "question"`. Thin CLI over POST /v1/query/ask.
+
+    Exits 0 on a hit (at least one answer returned, fallback NOT
+    recommended) and 1 on a fallback so shell pipelines can branch.
+    Distinct from `ayiru query`'s 0/2 contract — `query` is a safety
+    gate; `ask` is a retrieval probe. Conflating them would mislead
+    a script that pipes `ayiru ask ... || curl web-search-fallback`.
+    """
+    from app.services.claim_store import get_claim_store
+    from app.services.query_engine import QueryEngine
+
+    engine = QueryEngine(get_claim_store())
+    response = engine.ask(
+        question=args.question,
+        limit=args.limit,
+        tool_id_hint=args.tool,
+    )
+    payload = response.model_dump(mode="json")
+
+    if args.json:
+        print(json.dumps(payload, indent=2, ensure_ascii=False))
+        return 1 if payload["fallback_recommended"] else 0
+
+    _print_ask_response(payload)
+    return 1 if payload["fallback_recommended"] else 0
+
+
+def _print_ask_response(payload: dict[str, Any]) -> None:
+    """Human-readable rendering of an AskResponse for the CLI."""
+    if payload["fallback_recommended"]:
+        print("FALLBACK — no confident match in the local graph.")
+        print("  → escalate to web_search.")
+        return
+
+    print(
+        f"HIT  answers={len(payload['answers'])}  "
+        f"estimated_tokens_saved={payload['estimated_tokens_saved']}"
+    )
+    for i, answer in enumerate(payload["answers"], start=1):
+        print(
+            f"  {i}. [{answer['tool_id']}] {answer['subject']} "
+            f"(conf={answer['confidence']:.2f} {answer['confidence_band']}, "
+            f"{answer['verification_level']})"
+        )
+        # Truncate long statements so the CLI output stays scannable.
+        statement = answer["statement"]
+        if len(statement) > 200:
+            statement = statement[:197] + "..."
+        print(f"     {statement}")
+        if answer["evidence"]:
+            top = answer["evidence"][0]
+            print(f"     ↪ {top['evidence_type']} ({top['trust_level']}): {top['source_uri']}")
+        print(f"     ↪ match: {answer['match_reason']}")
 
 
 def _cmd_verify(args: argparse.Namespace) -> int:

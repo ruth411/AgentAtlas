@@ -275,11 +275,13 @@ def test_prompts_list_returns_empty(server: McpServer) -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_tools_list_returns_all_six_tools(server: McpServer) -> None:
+def test_tools_list_returns_all_seven_tools(server: McpServer) -> None:
+    """Stage 17 added `ask` as the 7th MCP tool; the v0.2 headline."""
     raw = server.handle_frame(_frame("tools/list"))
     response = json.loads(raw)
     names = {t["name"] for t in response["result"]["tools"]}
     assert names == {
+        "ask",
         "validate_command",
         "get_tool_spec",
         "search_tools",
@@ -287,6 +289,16 @@ def test_tools_list_returns_all_six_tools(server: McpServer) -> None:
         "get_safe_workflow",
         "submit_claim",
     }
+
+
+def test_ask_is_the_first_tool_listed(server: McpServer) -> None:
+    """LLM tool-choice is order-sensitive — the first listed tool gets
+    the strongest implicit prior. Stage 17 puts `ask` first so an agent
+    given Ayiru's MCP defaults reaches for ask() before web_search."""
+    raw = server.handle_frame(_frame("tools/list"))
+    response = json.loads(raw)
+    tools = response["result"]["tools"]
+    assert tools[0]["name"] == "ask"
 
 
 def test_every_tool_has_required_metadata(server: McpServer) -> None:
@@ -305,7 +317,7 @@ def test_every_tool_has_required_metadata(server: McpServer) -> None:
 
 
 def test_tools_list_count_matches_registry() -> None:
-    assert len(list_tools()) == 6
+    assert len(list_tools()) == 7
 
 
 # ---------------------------------------------------------------------------
@@ -776,7 +788,7 @@ def test_subprocess_entry_point_runs_handshake_cleanly(tmp_path) -> None:
         assert init_response["result"]["protocolVersion"] == proto.PROTOCOL_VERSION
         tools_response = json.loads(out_lines[1])
         tool_names = {t["name"] for t in tools_response["result"]["tools"]}
-        assert len(tool_names) == 6
+        assert len(tool_names) == 7
     finally:
         if proc.poll() is None:
             proc.kill()
