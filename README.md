@@ -442,6 +442,7 @@ See [SECURITY.md](SECURITY.md) for the full threat model and known residual risk
 | `AYIRU_SEED_SCRIPT` | autodetected | Optional override path to a `seed_examples.py` fork. Without it, `ayiru seed` uses the in-package `app.seed_data.runner`. |
 | `AYIRU_API_KEY` | unset (auth off) | When set, Stage 14 enables Bearer-token auth on every state-changing endpoint. Read endpoints stay public regardless. Health endpoints stay public. |
 | `AYIRU_REVIEWER_REGISTRY` | unset (open) | Comma-separated allowlist of `reviewer_id` values for `POST /verification/human-review`. When set, unlisted reviewers receive a structured 403. |
+| `AYIRU_STRICT_TOOL_LOCK` | unset (relaxed) | When `1`/`true`/`yes`/`on`, restores the v0.1 hard-reject behavior — claims with tool_ids not in the v2 contract's curated set are refused at `POST /claims`. Default (relaxed) lets unknown tools persist at `L0_UNVERIFIED` so Stage 20's bulk ingest can land without contract bumps. Set this in compliance contexts where unknown tools must never silently accumulate. |
 | `AYIRU_API_URL` (frontend) | `http://localhost:8000` | Where the dashboard's `/api/*` rewrite points. |
 
 ## What This Isn't (Yet)
