@@ -133,6 +133,8 @@ def _add_claim(
         VerificationStatus.ACCEPTED: OrchestratorDecision.ACCEPTED,
         VerificationStatus.PENDING: OrchestratorDecision.PENDING_MORE_EVIDENCE,
         VerificationStatus.REQUIRES_HUMAN_REVIEW: OrchestratorDecision.REQUIRES_HUMAN_REVIEW,
+        VerificationStatus.REJECTED: OrchestratorDecision.REJECTED,
+        VerificationStatus.CONFLICT_DETECTED: OrchestratorDecision.CONFLICT_DETECTED,
     }[status]
     store.save_verification_result(
         VerificationResult(
@@ -300,9 +302,14 @@ def test_ask_returns_fallback_on_empty_graph(engine: QueryEngine) -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_ask_excludes_pending_claims(engine: QueryEngine, store: ClaimStore) -> None:
-    """Stage 19 will add an opt-in for uncurated claims. Until then, ask
-    must only return claims at verification_status='accepted'."""
+def test_ask_includes_pending_claims_for_curated_tools(
+    engine: QueryEngine, store: ClaimStore
+) -> None:
+    """Stage 19: PENDING claims (which is the L0 state for uncurated
+    bulk-ingest from Stage 20) are now SURFACED by ask, not excluded.
+    The original v0.1 'ACCEPTED only' filter was tightened too far;
+    the matcher's L2+ requirement still keeps these out of
+    validate_command's safety surface."""
     _add_claim(
         store,
         subject="docker rm",
@@ -313,17 +320,18 @@ def test_ask_excludes_pending_claims(engine: QueryEngine, store: ClaimStore) -> 
 
     response = engine.ask(question="how do I delete a docker container")
 
-    assert response.fallback_recommended is True
-    assert response.answers == []
+    assert response.fallback_recommended is False
+    assert len(response.answers) >= 1
+    assert response.answers[0].subject == "docker rm"
 
 
-def test_ask_excludes_requires_human_review_claims(
+def test_ask_includes_requires_human_review_claims(
     engine: QueryEngine, store: ClaimStore
 ) -> None:
-    """High/critical-risk claims that the orchestrator routed to human
-    review must not surface in ask responses — that path is explicitly
-    informational-only in validate_command, and ask() makes no such
-    distinction (answers are authoritative or absent)."""
+    """Stage 19: REQUIRES_HUMAN_REVIEW claims (curated tools the
+    orchestrator wants a human to look at) now surface in ask too.
+    This matches command_matcher's behavior — informational, not
+    excluded. Only REJECTED / CONFLICT_DETECTED are dropped."""
     _add_claim(
         store,
         subject="docker rm",
@@ -335,8 +343,68 @@ def test_ask_excludes_requires_human_review_claims(
 
     response = engine.ask(question="how do I delete a docker container")
 
+    assert response.fallback_recommended is False
+    assert len(response.answers) >= 1
+    assert response.answers[0].subject == "docker rm"
+
+
+def test_ask_excludes_rejected_claims(engine: QueryEngine, store: ClaimStore) -> None:
+    """Stage 19: REJECTED claims must NEVER surface in ask. The
+    orchestrator explicitly said 'don't trust this' — surfacing it
+    would undermine the audit trail."""
+    _add_claim(
+        store,
+        subject="docker rm",
+        statement="removes containers",
+        status=VerificationStatus.REJECTED,
+        level=VerificationLevel.L1_SCHEMA_VALID,
+    )
+
+    response = engine.ask(question="how do I delete a docker container")
+
     assert response.fallback_recommended is True
     assert response.answers == []
+
+
+def test_ask_marks_uncurated_tools_in_match_reason(
+    engine: QueryEngine, store: ClaimStore
+) -> None:
+    """Stage 19: when a matched claim's tool_id is NOT in the v2
+    contract's curated set, ask must tag the match_reason so the
+    caller can distinguish L0 contributions from full-pipeline
+    answers. The marker phrase is part of the contract — Stage 21's
+    Python SDK reads it to set the ``Answer.is_useful`` heuristic."""
+    # vercel-cli IS curated (in v2 contract); use a definitely-uncurated id.
+    # We need to call store.create() directly with a non-curated tool_id
+    # to bypass the curated-tools-only test fixtures.
+    from app.schemas.claim import KnowledgeClaim
+    from app.schemas.enums import ClaimType
+    from app.services.ids import generate_claim_id
+    from datetime import datetime, timezone
+
+    uncurated_claim = KnowledgeClaim(
+        claim_id=generate_claim_id(),
+        claim_type=ClaimType.CLI_COMMAND_EXISTS,
+        subject="kubectl scale",
+        statement="kubectl scale deployment to N replicas",
+        tool_id="kubectl",  # NOT in v2 curated contract
+        submitted_by="ask-test",
+        evidence=[_evidence("https://kubernetes.io/docs/reference/kubectl/")],
+        risk_level=RiskLevel.MEDIUM,
+        verification_status=VerificationStatus.PENDING,
+        created_at=datetime.now(timezone.utc),
+    )
+    store.create(uncurated_claim)
+
+    response = engine.ask(question="how do I scale a kubectl deployment")
+
+    assert response.fallback_recommended is False
+    assert len(response.answers) >= 1
+    top = response.answers[0]
+    assert top.tool_id == "kubectl"
+    assert "uncurated" in top.match_reason.lower(), (
+        f"expected 'uncurated' tag in match_reason, got: {top.match_reason!r}"
+    )
 
 
 # ---------------------------------------------------------------------------

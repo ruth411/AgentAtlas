@@ -262,10 +262,15 @@ class QueryEngine:
         if tool_id_hint is not None:
             normalized_hint = tool_id_hint.strip().lower() or None
 
+        # Stage 19: pull both ACCEPTED (curated, full-orchestrator-blessed)
+        # claims AND PENDING claims (uncurated L0 state — Stage 20's bulk
+        # ingest lands here). REJECTED / CONFLICT_DETECTED claims are
+        # excluded downstream via the latest-verification lookup so the
+        # matcher never surfaces "the orchestrator said no" content.
+        # validate_command stays strict — it requires L2+ via command_matcher.
         candidates = _paginate_all(
             lambda lim, off: self._store.list(
                 tool_id=normalized_hint,
-                verification_status=VerificationStatus.ACCEPTED,
                 limit=lim,
                 offset=off,
             ),
@@ -273,11 +278,29 @@ class QueryEngine:
             hard_cap=10_000,
         )
 
+        # Stage 19: uncurated tools (not in the v2 contract's curated set)
+        # surface with a marker in match_reason so the caller can tell
+        # graph-blessed answers apart from L0 contributions. Loaded once
+        # per ask() call; the inner set lookup is O(1).
+        from app.services.claim_store import _curated_tool_ids
+        curated_set = _curated_tool_ids()
+
+        # Same exclusion list the matcher uses — never surface claims
+        # whose orchestrator decision explicitly distrusts them.
+        excluded_statuses = {
+            VerificationStatus.REJECTED,
+            VerificationStatus.CONFLICT_DETECTED,
+        }
+
         scored: list[tuple[float, str, KnowledgeClaim, str]] = []
         for claim in candidates:
+            if claim.verification_status in excluded_statuses:
+                continue
             score, reason = _score_claim_for_question(claim, question_tokens)
             if score <= 0.0:
                 continue
+            if claim.tool_id not in curated_set:
+                reason = f"{reason}; uncurated tool ({claim.tool_id})"
             scored.append((score, claim.claim_id, claim, reason))
 
         # Sort: score DESC, claim_id ASC (deterministic tie-break).
