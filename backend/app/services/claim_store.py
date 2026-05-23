@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from functools import cache
 from hashlib import sha256
 import json
+import os
 from typing import Any
 
 from sqlalchemy import Engine, Select, delete, select
@@ -58,20 +59,45 @@ from app.services.evidence_trust import normalize_claim_evidence_trust
 
 
 @cache
-def _stage_0_tool_ids() -> frozenset[str]:
-    """Return the union of locked Stage 0 tool_ids: the original MVP
-    `initial_tools` set, plus the Stage 7d `mcp_server_tools` expansion.
+def _curated_tool_ids() -> frozenset[str]:
+    """Return the tool_ids the Stage 0 v2 contract marks ``curated: true``.
 
-    Both lists are loaded once from the Stage 0 contract. Keeping them as
-    separate arrays in the contract preserves the auditable distinction
-    between the original native-ingestion scope and the MCP-proxy scope while
-    allowing claims for either kind of tool to clear the gate."""
-    path = contract_path("ayiru_stage_0.v1.json")
+    Loaded from ``ayiru_stage_0.v2.json`` — both ``initial_tools`` and
+    ``mcp_server_tools`` lists are scanned for entries with the
+    ``curated`` flag set. These are the tools that get the full
+    orchestrator path (claims → ACCEPTED → published ToolSpec →
+    matched by ``validate_command``). Tools NOT in this set persist at
+    ``L0_UNVERIFIED`` / ``PENDING`` and are visible to ``ask`` only.
+
+    The earlier ``_stage_0_tool_ids()`` predecessor (v0.1) loaded v1
+    and treated every entry as curated by definition. Stage 19's
+    split moves the curation distinction into the contract itself so
+    Stage 20's bulk ingest can add tools without contract bumps.
+    """
+    path = contract_path("ayiru_stage_0.v2.json")
     with path.open() as handle:
         data = json.load(handle)
-    native = {tool["tool_id"] for tool in data["initial_tools"]}
-    mcp = {tool["tool_id"] for tool in data.get("mcp_server_tools", [])}
+    native = {
+        tool["tool_id"]
+        for tool in data["initial_tools"]
+        if tool.get("curated") is True
+    }
+    mcp = {
+        tool["tool_id"]
+        for tool in data.get("mcp_server_tools", [])
+        if tool.get("curated") is True
+    }
     return frozenset(native | mcp)
+
+
+def _strict_tool_lock_enabled() -> bool:
+    """Stage 19.4: ``AYIRU_STRICT_TOOL_LOCK=1`` restores v0.1 behavior
+    where ``ClaimStore.create()`` rejects any tool_id not in the curated
+    set. Operators who want the original hard gate (e.g. compliance
+    contexts where unknown tools must never silently land at L0) flip
+    this. Default off — the relaxed L0 path is the v0.2 norm."""
+    raw = os.environ.get("AYIRU_STRICT_TOOL_LOCK", "").strip().lower()
+    return raw in ("1", "true", "yes", "on")
 
 
 class DuplicateClaimError(ValueError):
@@ -137,11 +163,18 @@ class ClaimStore:
     def create(self, claim: KnowledgeClaim) -> KnowledgeClaim:
         claim = normalize_claim_evidence_trust(claim)
 
-        # Gate against the locked Stage 0 tool contract so garbage tool_ids
-        # cannot quietly accumulate in the store.
-        allowed_tools = _stage_0_tool_ids()
-        if claim.tool_id not in allowed_tools:
-            raise ToolNotAllowedError(claim.tool_id, allowed_tools)
+        # Stage 19: tool gating is now curated vs uncurated, not absolute.
+        # - Curated tool_id  → full orchestrator path (verified, can publish
+        #                      a ToolSpec, surfaces in validate_command).
+        # - Uncurated tool_id → claim persists at L0_UNVERIFIED so it can
+        #                       still surface in `ask`, but stays out of
+        #                       the safety surface. This unlocks Stage 20's
+        #                       bulk ingest without contract bumps.
+        # - AYIRU_STRICT_TOOL_LOCK=1 restores the v0.1 hard reject for
+        #   operators who need the original gate semantics.
+        curated_tools = _curated_tool_ids()
+        if claim.tool_id not in curated_tools and _strict_tool_lock_enabled():
+            raise ToolNotAllowedError(claim.tool_id, curated_tools)
 
         violations = evidence_policy_violations(claim.evidence)
         if violations:

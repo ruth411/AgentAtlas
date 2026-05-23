@@ -253,7 +253,15 @@ def test_workflow_step_with_valid_subject_is_accepted() -> None:
 # ============================================================================
 
 
-def test_garbage_tool_id_is_rejected_by_store(store: ClaimStore) -> None:
+def test_garbage_tool_id_is_rejected_by_store_in_strict_mode(
+    store: ClaimStore, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Stage 19: the v0.1 hard-reject behavior is now opt-in via
+    ``AYIRU_STRICT_TOOL_LOCK=1``. Without that env var, unknown tools
+    persist at L0_UNVERIFIED instead. This test pins the strict-mode
+    path so the original semantics survive for ops teams that require
+    them (compliance, regulated industries)."""
+    monkeypatch.setenv("AYIRU_STRICT_TOOL_LOCK", "1")
     garbage = KnowledgeClaim(**_knowledge_claim(
         claim_id="garbage",
         tool_id="nonexistent-tool",
@@ -262,7 +270,13 @@ def test_garbage_tool_id_is_rejected_by_store(store: ClaimStore) -> None:
         store.create(garbage)
 
 
-def test_garbage_tool_id_returns_structured_422_via_route(client) -> None:
+def test_garbage_tool_id_returns_structured_422_via_route_in_strict_mode(
+    client, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Stage 19: the v0.1 reject path is now gated on
+    AYIRU_STRICT_TOOL_LOCK. Without it, unknown tools land at L0 and
+    the route returns 200. This test pins the strict-mode surface."""
+    monkeypatch.setenv("AYIRU_STRICT_TOOL_LOCK", "1")
     response = client.post(
         "/claims",
         json={

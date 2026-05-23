@@ -557,9 +557,14 @@ def test_submit_claim_persists_and_returns_verified_claim(
     assert store.get(cid) is not None
 
 
-def test_submit_claim_rejects_unknown_tool_id(
+def test_submit_claim_rejects_unknown_tool_id_in_strict_mode(
     server: McpServer,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    """Stage 19: unknown tool_ids now persist at L0 by default. The
+    v0.1 reject behavior is gated on AYIRU_STRICT_TOOL_LOCK=1. This
+    test pins the strict-mode reject path through the MCP surface."""
+    monkeypatch.setenv("AYIRU_STRICT_TOOL_LOCK", "1")
     response = _call_tool(
         server, "submit_claim",
         {
