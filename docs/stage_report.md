@@ -1675,3 +1675,84 @@ The audit's most cutting line: *"The badge is the single most clicked link for s
 ### Bugs found and fixed during Stage 15
 
 No new latent bugs — the audit's findings were all documentation-vs-reality gaps or v0.2-direction questions, not code defects. The closest item to a "bug" is 15.1 (seed publishing zero canonical specs), but the underlying `ToolSpecCompiler` was already correct; the seed pipeline just never called it. The fix added the missing step.
+
+---
+
+## Stage 17: /v1/query/ask Endpoint (Phase A1)
+
+Ship the v0.2 headline retrieval surface: agents call `ask(question)` and receive cited, ranked answers from the verified knowledge graph instead of paying for `web_search` tokens.
+
+Five substages plus a senior-dev audit substage (17.6) caught and fixed mid-session bugs:
+
+| Substage | Outcome |
+|---|---|
+| 17.1 | `AskRequest`, `Answer`, `AskResponse` Pydantic schemas |
+| 17.2 | `QueryEngine.ask()` — token-overlap ranking (subject×3 / tool_id×2 / statement×1), ACCEPTED-only filter (lifted in Stage 19), batch-fetched verification levels for top-N |
+| 17.3 | `POST /v1/query/ask` route (read endpoint, no auth required) |
+| 17.4 | Seventh MCP tool, registered first in the registry so the LLM sees `ask` ahead of other tools |
+| 17.5 | 17 ask tests + end-to-end smoke + MCP ordering tests |
+| 17.6 | Audit fixes: `_MIN_TOKEN_LENGTH=3` dropped half the Unix CLI vocabulary; repeated keywords inflated score ~70%; README API surface missing /v1/query/ask; no `ayiru ask` CLI subcommand; `PACKAGE_VERSION` hardcoded |
+
+Test count went 699 → 721 (+22). End-to-end smoke against the seeded graph confirmed the 6 headline dev questions all hit the right top answer with confidence + citation.
+
+## Stage 18: Cost-Savings Telemetry
+
+Stage 18 makes Ayiru observable about itself. Every `ask()` call emits a `QUERY_SERVED` audit event; `GET /v1/stats/savings` aggregates the events into a cost-savings summary with USD conversion (configurable via `AYIRU_PRICE_PER_MTOK_INPUT`).
+
+| Substage | Outcome |
+|---|---|
+| 18.1 | Migration `0016_add_query_served_event_type.py` extends the `audit_events` CHECK constraints to allow `event_type='query_served'` and `entity_type='query'` |
+| 18.2 | `QueryEngine.ask` calls `ClaimStore.record_query_served()` after every response; raw question text is NEVER persisted (only its length) |
+| 18.3 | `_AVERAGE_WEB_SEARCH_TOKENS = 830` constant (already lived in Stage 17); calibration sub-stage scheduled post-Stage-20 |
+| 18.4 | `GET /v1/stats/savings?window=24h|7d|30d|all` returns `{total_queries_served, total_tokens_saved, estimated_usd_saved, fallback_count, by_top_claim, window_*}` |
+| 18.5 | 14 new tests in `test_query_served_telemetry.py` |
+
+Test count went 726 → 740 (+14). End-to-end verified: 3 ask calls → `/v1/stats/savings` returns the right aggregate.
+
+**Bugs found mid-session:**
+- DB resolver bug: `DEFAULT_DATABASE_URL = "sqlite:///./ayiru.db"` was CWD-relative. Claude Desktop spawns `ayiru mcp` from `/`, so every tool call returned `OperationalError`. Fix walks up from `app/db/session.py`'s `__file__` to find `alembic.ini`. 5 regression tests added.
+- MCP tools hidden: Claude Desktop hid 3 of 7 tools (`ask`, `validate_command`, `submit_claim`). Cause: missing MCP 2025-06-18 `ToolAnnotations`. Without `readOnlyHint`, hosts fall back to name-prefix heuristics. Fix added `annotations` field to `McpTool` dataclass + all 7 tool entries. 2 regression tests pin the contract.
+
+## Stage 19: Curated vs Uncurated Tool Split
+
+Precondition for Stage 20's bulk ingest. The v0.1 `_stage_0_tool_ids()` gate rejected any claim outside the original 5-tool MVP scope; Stage 19 relaxes the lock so Stage 20 can ingest 50+ tools without contract bumps.
+
+| Substage | Outcome |
+|---|---|
+| 19.1 | New `contracts/ayiru_stage_0.v2.json` (+ bundled mirror) with `"curated": true` on the original 10 entries (5 native + 5 MCP servers). v1 stays for replay. |
+| 19.2 | `_stage_0_tool_ids()` → `_curated_tool_ids()`. `ClaimStore.create()` accepts unknown tools and persists them at `verification_status=PENDING / L1_SCHEMA_VALID` (effectively L0 uncurated). v0.1 hard-reject behavior preserved via `AYIRU_STRICT_TOOL_LOCK=1`. |
+| 19.3 | `QueryEngine.ask` no longer applies `verification_status=ACCEPTED` SQL filter. Pulls all candidates, drops REJECTED / CONFLICT_DETECTED at score time, tags uncurated tool_ids in `match_reason` (`"uncurated tool (kubectl)"`). `validate_command` stays strict — its L2+ requirement naturally excludes L0 uncurated claims. |
+| 19.4 | `AYIRU_STRICT_TOOL_LOCK` env var documented in README. Truthy strings (`1`/`true`/`yes`/`on`, case-insensitive) restore the v0.1 reject path. 19 tests in `test_uncurated_persistence.py` cover the matrix. |
+| 19.5 | Full regression sweep — 763 tests passing (was 740, +23 net new). Ruff clean. Alembic roundtrip clean (no schema change needed). |
+
+### Required Artifacts
+
+- `contracts/ayiru_stage_0.v2.json` (+ `backend/app/contracts/ayiru_stage_0.v2.json` lockstep mirror)
+- `backend/app/services/claim_store.py` — `_curated_tool_ids()`, `_strict_tool_lock_enabled()`, relaxed `create()` gate
+- `backend/app/services/query_engine.py` — uncurated marker in `match_reason`, REJECTED filter
+- `backend/tests/test_uncurated_persistence.py` — 19 new tests
+- `backend/tests/test_query_ask.py` — 3 tests updated to reflect new inclusion semantics + 1 new `test_ask_marks_uncurated_tools_in_match_reason`
+- `backend/tests/test_deep_crack_regressions.py`, `backend/tests/test_mcp_server.py` — 2 v0.1 reject tests rewrapped with `AYIRU_STRICT_TOOL_LOCK=1`
+- `README.md` — env-var table extended
+
+### Pass Cases
+
+- Unknown tool_id at `POST /claims` → 200, claim persists at L0 (was: 422 ToolNotAllowedError in v0.1).
+- Same call with `AYIRU_STRICT_TOOL_LOCK=1` → 422 ToolNotAllowedError (preserved v0.1 path).
+- `ask` against an uncurated tool returns the claim with `match_reason` containing `"uncurated tool (<tool_id>)"`.
+- `validate_command` against an uncurated tool still default-denies (because L0 claims don't clear the matcher's L2+ requirement).
+
+### Quality Bar
+
+- 763 tests passing, ruff clean, migration roundtrip clean.
+- No new migration (schema unchanged — only behavior).
+- Contracts v1 (preserved for replay) and v2 (new source of truth) both in lockstep mirror.
+
+### Deferred (Stage 20+)
+
+- **Auto-promotion** of uncurated claims to ACCEPTED. Promotion still requires the orchestrator pipeline + (for high-risk) human review. Bulk-ingested L0 claims stay informational until manually verified.
+- **Per-tool ingest rate limits.** A future Stage 20.7 handles this when the real crawl runs.
+
+### Why this is a stage, not part of Stage 20
+
+Stage 20's bulk ingest writes thousands of claims for 50+ tools. Without 19, every one of those would 422 at the contract gate. Splitting the lock relax into its own stage means we can test the L0/uncurated path with **zero new data** before stressing it with the real crawl — a much cleaner debugging surface.
