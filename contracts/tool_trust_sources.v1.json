@@ -175,6 +175,294 @@
         }
       ],
       "mcp_publisher": "third-party"
+    },
+    "kubectl": {
+      "official_hosts": [
+        "kubernetes.io"
+      ],
+      "source_repositories": []
+    },
+    "terraform": {
+      "official_hosts": [
+        "developer.hashicorp.com"
+      ],
+      "source_repositories": []
+    },
+    "helm": {
+      "official_hosts": [
+        "helm.sh"
+      ],
+      "source_repositories": []
+    },
+    "ansible": {
+      "official_hosts": [
+        "docs.ansible.com"
+      ],
+      "source_repositories": []
+    },
+    "aws-cli": {
+      "official_hosts": [
+        "docs.aws.amazon.com"
+      ],
+      "source_repositories": []
+    },
+    "gcloud": {
+      "official_hosts": [
+        "cloud.google.com"
+      ],
+      "source_repositories": []
+    },
+    "az-cli": {
+      "official_hosts": [
+        "learn.microsoft.com"
+      ],
+      "source_repositories": []
+    },
+    "npm": {
+      "official_hosts": [
+        "docs.npmjs.com"
+      ],
+      "source_repositories": []
+    },
+    "pnpm": {
+      "official_hosts": [
+        "pnpm.io"
+      ],
+      "source_repositories": []
+    },
+    "yarn": {
+      "official_hosts": [
+        "yarnpkg.com"
+      ],
+      "source_repositories": []
+    },
+    "pip": {
+      "official_hosts": [
+        "pip.pypa.io"
+      ],
+      "source_repositories": []
+    },
+    "poetry": {
+      "official_hosts": [
+        "python-poetry.org"
+      ],
+      "source_repositories": []
+    },
+    "uv": {
+      "official_hosts": [
+        "docs.astral.sh"
+      ],
+      "source_repositories": []
+    },
+    "cargo": {
+      "official_hosts": [
+        "doc.rust-lang.org"
+      ],
+      "source_repositories": []
+    },
+    "go": {
+      "official_hosts": [
+        "go.dev"
+      ],
+      "source_repositories": []
+    },
+    "rust": {
+      "official_hosts": [
+        "rust-lang.github.io"
+      ],
+      "source_repositories": []
+    },
+    "postgresql-cli": {
+      "official_hosts": [
+        "www.postgresql.org"
+      ],
+      "source_repositories": []
+    },
+    "mysql-cli": {
+      "official_hosts": [
+        "dev.mysql.com"
+      ],
+      "source_repositories": []
+    },
+    "redis-cli": {
+      "official_hosts": [
+        "redis.io"
+      ],
+      "source_repositories": []
+    },
+    "mongodb": {
+      "official_hosts": [
+        "www.mongodb.com"
+      ],
+      "source_repositories": []
+    },
+    "sqlite3": {
+      "official_hosts": [
+        "sqlite.org"
+      ],
+      "source_repositories": []
+    },
+    "curl": {
+      "official_hosts": [
+        "curl.se"
+      ],
+      "source_repositories": []
+    },
+    "wget": {
+      "official_hosts": [
+        "www.gnu.org"
+      ],
+      "source_repositories": []
+    },
+    "ssh": {
+      "official_hosts": [
+        "man.openbsd.org"
+      ],
+      "source_repositories": []
+    },
+    "rsync": {
+      "official_hosts": [
+        "download.samba.org"
+      ],
+      "source_repositories": []
+    },
+    "jq": {
+      "official_hosts": [
+        "jqlang.org"
+      ],
+      "source_repositories": []
+    },
+    "yq": {
+      "official_hosts": [
+        "mikefarah.gitbook.io"
+      ],
+      "source_repositories": []
+    },
+    "sed": {
+      "official_hosts": [
+        "www.gnu.org"
+      ],
+      "source_repositories": []
+    },
+    "awk": {
+      "official_hosts": [
+        "www.gnu.org"
+      ],
+      "source_repositories": []
+    },
+    "tmux": {
+      "official_hosts": [
+        "man.openbsd.org"
+      ],
+      "source_repositories": []
+    },
+    "vim": {
+      "official_hosts": [
+        "vimhelp.org"
+      ],
+      "source_repositories": []
+    },
+    "ffmpeg": {
+      "official_hosts": [
+        "ffmpeg.org"
+      ],
+      "source_repositories": []
+    },
+    "imagemagick": {
+      "official_hosts": [
+        "imagemagick.org"
+      ],
+      "source_repositories": []
+    },
+    "openssl": {
+      "official_hosts": [
+        "docs.openssl.org"
+      ],
+      "source_repositories": []
+    },
+    "gpg": {
+      "official_hosts": [
+        "www.gnupg.org"
+      ],
+      "source_repositories": []
+    },
+    "systemctl": {
+      "official_hosts": [
+        "www.freedesktop.org"
+      ],
+      "source_repositories": []
+    },
+    "journalctl": {
+      "official_hosts": [
+        "www.freedesktop.org"
+      ],
+      "source_repositories": []
+    },
+    "brew": {
+      "official_hosts": [
+        "docs.brew.sh"
+      ],
+      "source_repositories": []
+    },
+    "apt": {
+      "official_hosts": [
+        "manpages.debian.org"
+      ],
+      "source_repositories": []
+    },
+    "dnf": {
+      "official_hosts": [
+        "dnf.readthedocs.io"
+      ],
+      "source_repositories": []
+    },
+    "supabase-cli": {
+      "official_hosts": [
+        "supabase.com"
+      ],
+      "source_repositories": []
+    },
+    "fly-cli": {
+      "official_hosts": [
+        "fly.io"
+      ],
+      "source_repositories": []
+    },
+    "railway": {
+      "official_hosts": [
+        "docs.railway.com"
+      ],
+      "source_repositories": []
+    },
+    "heroku": {
+      "official_hosts": [
+        "devcenter.heroku.com"
+      ],
+      "source_repositories": []
+    },
+    "netlify-cli": {
+      "official_hosts": [
+        "docs.netlify.com"
+      ],
+      "source_repositories": []
+    },
+    "stripe-cli": {
+      "official_hosts": [
+        "docs.stripe.com"
+      ],
+      "source_repositories": []
+    },
+    "psql-postgres": {
+      "official_hosts": [
+        "www.postgresql.org"
+      ],
+      "source_repositories": []
+    },
+    "kubernetes-helm": {
+      "official_hosts": [
+        "helm.sh"
+      ],
+      "source_repositories": []
     }
   }
 }

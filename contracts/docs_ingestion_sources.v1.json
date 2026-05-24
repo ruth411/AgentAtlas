@@ -72,6 +72,486 @@
           "evidence_type": "official_docs"
         }
       ]
+    },
+    "kubectl": {
+      "sources": [
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "terraform": {
+      "sources": [
+        {
+          "url": "https://developer.hashicorp.com/terraform/cli/commands",
+          "claim_type": "cli_command_exists",
+          "subject": "terraform",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "helm": {
+      "sources": [
+        {
+          "url": "https://helm.sh/docs/helm/helm/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "ansible": {
+      "sources": [
+        {
+          "url": "https://docs.ansible.com/ansible/latest/cli/ansible.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "aws-cli": {
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/cli/latest/reference/index.html",
+          "claim_type": "cli_command_exists",
+          "subject": "aws",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "gcloud": {
+      "sources": [
+        {
+          "url": "https://cloud.google.com/sdk/gcloud/reference",
+          "claim_type": "cli_command_exists",
+          "subject": "gcloud",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "az-cli": {
+      "sources": [
+        {
+          "url": "https://learn.microsoft.com/en-us/cli/azure/reference-index",
+          "claim_type": "cli_command_exists",
+          "subject": "az",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "npm": {
+      "sources": [
+        {
+          "url": "https://docs.npmjs.com/cli/v10/commands/npm",
+          "claim_type": "cli_command_exists",
+          "subject": "npm",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "pnpm": {
+      "sources": [
+        {
+          "url": "https://pnpm.io/cli/install",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "yarn": {
+      "sources": [
+        {
+          "url": "https://yarnpkg.com/cli",
+          "claim_type": "cli_command_exists",
+          "subject": "yarn",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "pip": {
+      "sources": [
+        {
+          "url": "https://pip.pypa.io/en/stable/cli/",
+          "claim_type": "cli_command_exists",
+          "subject": "pip",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "poetry": {
+      "sources": [
+        {
+          "url": "https://python-poetry.org/docs/cli/",
+          "claim_type": "cli_command_exists",
+          "subject": "poetry",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "uv": {
+      "sources": [
+        {
+          "url": "https://docs.astral.sh/uv/reference/cli/",
+          "claim_type": "cli_command_exists",
+          "subject": "uv",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "cargo": {
+      "sources": [
+        {
+          "url": "https://doc.rust-lang.org/cargo/commands/index.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cargo",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "go": {
+      "sources": [
+        {
+          "url": "https://go.dev/ref/mod",
+          "claim_type": "cli_command_exists",
+          "subject": "go",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "rust": {
+      "sources": [
+        {
+          "url": "https://rust-lang.github.io/rustup/concepts/index.html",
+          "claim_type": "cli_command_exists",
+          "subject": "rust",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "postgresql-cli": {
+      "sources": [
+        {
+          "url": "https://www.postgresql.org/docs/current/app-psql.html",
+          "claim_type": "cli_command_exists",
+          "subject": "psql",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "mysql-cli": {
+      "sources": [
+        {
+          "url": "https://dev.mysql.com/doc/refman/8.0/en/mysql.html",
+          "claim_type": "cli_command_exists",
+          "subject": "mysql",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "redis-cli": {
+      "sources": [
+        {
+          "url": "https://redis.io/docs/latest/develop/tools/cli/",
+          "claim_type": "cli_command_exists",
+          "subject": "redis-cli",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "mongodb": {
+      "sources": [
+        {
+          "url": "https://www.mongodb.com/docs/mongodb-shell/reference/",
+          "claim_type": "cli_command_exists",
+          "subject": "mongosh",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "sqlite3": {
+      "sources": [
+        {
+          "url": "https://sqlite.org/cli.html",
+          "claim_type": "cli_command_exists",
+          "subject": "sqlite3",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "curl": {
+      "sources": [
+        {
+          "url": "https://curl.se/docs/manpage.html",
+          "claim_type": "cli_command_exists",
+          "subject": "curl",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "wget": {
+      "sources": [
+        {
+          "url": "https://www.gnu.org/software/wget/manual/wget.html",
+          "claim_type": "cli_command_exists",
+          "subject": "wget",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "ssh": {
+      "sources": [
+        {
+          "url": "https://man.openbsd.org/ssh.1",
+          "claim_type": "cli_command_exists",
+          "subject": "ssh",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "rsync": {
+      "sources": [
+        {
+          "url": "https://download.samba.org/pub/rsync/rsync.1",
+          "claim_type": "cli_command_exists",
+          "subject": "rsync",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "jq": {
+      "sources": [
+        {
+          "url": "https://jqlang.org/manual/",
+          "claim_type": "cli_command_exists",
+          "subject": "jq",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "yq": {
+      "sources": [
+        {
+          "url": "https://mikefarah.gitbook.io/yq/",
+          "claim_type": "cli_command_exists",
+          "subject": "yq",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "sed": {
+      "sources": [
+        {
+          "url": "https://www.gnu.org/software/sed/manual/sed.html",
+          "claim_type": "cli_command_exists",
+          "subject": "sed",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "awk": {
+      "sources": [
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/gawk.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "tmux": {
+      "sources": [
+        {
+          "url": "https://man.openbsd.org/tmux.1",
+          "claim_type": "cli_command_exists",
+          "subject": "tmux",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "vim": {
+      "sources": [
+        {
+          "url": "https://vimhelp.org/usr_toc.txt.html",
+          "claim_type": "cli_command_exists",
+          "subject": "vim",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "ffmpeg": {
+      "sources": [
+        {
+          "url": "https://ffmpeg.org/ffmpeg.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ffmpeg",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "imagemagick": {
+      "sources": [
+        {
+          "url": "https://imagemagick.org/script/command-line-options.php",
+          "claim_type": "cli_command_exists",
+          "subject": "imagemagick",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "openssl": {
+      "sources": [
+        {
+          "url": "https://docs.openssl.org/3.0/man1/openssl/",
+          "claim_type": "cli_command_exists",
+          "subject": "openssl",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "gpg": {
+      "sources": [
+        {
+          "url": "https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG.html",
+          "claim_type": "cli_command_exists",
+          "subject": "gpg",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "systemctl": {
+      "sources": [
+        {
+          "url": "https://www.freedesktop.org/software/systemd/man/latest/systemctl.html",
+          "claim_type": "cli_command_exists",
+          "subject": "systemctl",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "journalctl": {
+      "sources": [
+        {
+          "url": "https://www.freedesktop.org/software/systemd/man/latest/journalctl.html",
+          "claim_type": "cli_command_exists",
+          "subject": "journalctl",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "brew": {
+      "sources": [
+        {
+          "url": "https://docs.brew.sh/Manpage",
+          "claim_type": "cli_command_exists",
+          "subject": "brew",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "apt": {
+      "sources": [
+        {
+          "url": "https://manpages.debian.org/bookworm/apt/apt.8.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "apt",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "dnf": {
+      "sources": [
+        {
+          "url": "https://dnf.readthedocs.io/en/latest/command_ref.html",
+          "claim_type": "cli_command_exists",
+          "subject": "dnf",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "supabase-cli": {
+      "sources": [
+        {
+          "url": "https://supabase.com/docs/reference/cli/introduction",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "fly-cli": {
+      "sources": [
+        {
+          "url": "https://fly.io/docs/flyctl/",
+          "claim_type": "cli_command_exists",
+          "subject": "flyctl",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "railway": {
+      "sources": [
+        {
+          "url": "https://docs.railway.com/reference/cli-api",
+          "claim_type": "cli_command_exists",
+          "subject": "railway",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "heroku": {
+      "sources": [
+        {
+          "url": "https://devcenter.heroku.com/articles/heroku-cli-commands",
+          "claim_type": "cli_command_exists",
+          "subject": "heroku",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "netlify-cli": {
+      "sources": [
+        {
+          "url": "https://docs.netlify.com/cli/get-started/",
+          "claim_type": "cli_command_exists",
+          "subject": "netlify",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "stripe-cli": {
+      "sources": [
+        {
+          "url": "https://docs.stripe.com/stripe-cli",
+          "claim_type": "cli_command_exists",
+          "subject": "stripe",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "psql-postgres": {
+      "sources": [
+        {
+          "url": "https://www.postgresql.org/docs/current/app-psql.html#APP-PSQL-META-COMMANDS",
+          "claim_type": "cli_command_exists",
+          "subject": "psql meta-commands",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "kubernetes-helm": {
+      "sources": [
+        {
+          "url": "https://helm.sh/docs/topics/charts/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm charts",
+          "evidence_type": "official_docs"
+        }
+      ]
     }
   }
 }
