@@ -1,0 +1,394 @@
+{
+  "_comment": "Stage 20 bulk-ingest target list. Drives `ayiru ingest --tool-list tools/v0.2_seed.json`. Per-tool docs license review lives in tools/v0.2_seed_licenses.md (Stage 20.3); tools dropped from this list before the actual crawl get recorded in tools/v0.2_seed_dropped.md (Stage 20.6). The 5 already-curated tools (docker/git/github-cli/vercel-cli/openai-api) are NOT in this list — they're handled by the original seed pipeline.",
+  "version": 1,
+  "defaults": {
+    "submitted_by": "ayiru-bulk-ingest",
+    "verify": true
+  },
+  "tools": [
+    {
+      "tool_id": "kubectl",
+      "name": "Kubernetes CLI",
+      "category": "container_orchestration",
+      "urls": [
+        "https://kubernetes.io/docs/reference/kubectl/"
+      ]
+    },
+    {
+      "tool_id": "terraform",
+      "name": "Terraform CLI",
+      "category": "infrastructure_as_code",
+      "urls": [
+        "https://developer.hashicorp.com/terraform/cli/commands"
+      ]
+    },
+    {
+      "tool_id": "helm",
+      "name": "Helm",
+      "category": "container_orchestration",
+      "urls": [
+        "https://helm.sh/docs/helm/helm/"
+      ]
+    },
+    {
+      "tool_id": "ansible",
+      "name": "Ansible",
+      "category": "configuration_management",
+      "urls": [
+        "https://docs.ansible.com/ansible/latest/cli/ansible.html"
+      ]
+    },
+    {
+      "tool_id": "aws-cli",
+      "name": "AWS CLI",
+      "category": "cloud_cli",
+      "urls": [
+        "https://docs.aws.amazon.com/cli/latest/reference/index.html"
+      ]
+    },
+    {
+      "tool_id": "gcloud",
+      "name": "Google Cloud SDK",
+      "category": "cloud_cli",
+      "urls": [
+        "https://cloud.google.com/sdk/gcloud/reference"
+      ]
+    },
+    {
+      "tool_id": "az-cli",
+      "name": "Azure CLI",
+      "category": "cloud_cli",
+      "urls": [
+        "https://learn.microsoft.com/en-us/cli/azure/reference-index"
+      ]
+    },
+    {
+      "tool_id": "npm",
+      "name": "npm",
+      "category": "package_manager",
+      "urls": [
+        "https://docs.npmjs.com/cli/v10/commands/npm"
+      ]
+    },
+    {
+      "tool_id": "pnpm",
+      "name": "pnpm",
+      "category": "package_manager",
+      "urls": [
+        "https://pnpm.io/cli/install"
+      ]
+    },
+    {
+      "tool_id": "yarn",
+      "name": "Yarn",
+      "category": "package_manager",
+      "urls": [
+        "https://yarnpkg.com/cli"
+      ]
+    },
+    {
+      "tool_id": "pip",
+      "name": "pip",
+      "category": "package_manager",
+      "urls": [
+        "https://pip.pypa.io/en/stable/cli/"
+      ]
+    },
+    {
+      "tool_id": "poetry",
+      "name": "Poetry",
+      "category": "package_manager",
+      "urls": [
+        "https://python-poetry.org/docs/cli/"
+      ]
+    },
+    {
+      "tool_id": "uv",
+      "name": "uv (Astral)",
+      "category": "package_manager",
+      "urls": [
+        "https://docs.astral.sh/uv/reference/cli/"
+      ]
+    },
+    {
+      "tool_id": "cargo",
+      "name": "Cargo",
+      "category": "package_manager",
+      "urls": [
+        "https://doc.rust-lang.org/cargo/commands/index.html"
+      ]
+    },
+    {
+      "tool_id": "go",
+      "name": "Go toolchain",
+      "category": "language_toolchain",
+      "urls": [
+        "https://go.dev/ref/mod"
+      ]
+    },
+    {
+      "tool_id": "rust",
+      "name": "rustup",
+      "category": "language_toolchain",
+      "urls": [
+        "https://rust-lang.github.io/rustup/concepts/index.html"
+      ]
+    },
+    {
+      "tool_id": "postgresql-cli",
+      "name": "psql",
+      "category": "database_cli",
+      "urls": [
+        "https://www.postgresql.org/docs/current/app-psql.html"
+      ]
+    },
+    {
+      "tool_id": "mysql-cli",
+      "name": "mysql CLI",
+      "category": "database_cli",
+      "urls": [
+        "https://dev.mysql.com/doc/refman/8.0/en/mysql.html"
+      ]
+    },
+    {
+      "tool_id": "redis-cli",
+      "name": "redis-cli",
+      "category": "database_cli",
+      "urls": [
+        "https://redis.io/docs/latest/develop/tools/cli/"
+      ]
+    },
+    {
+      "tool_id": "mongodb",
+      "name": "mongosh",
+      "category": "database_cli",
+      "urls": [
+        "https://www.mongodb.com/docs/mongodb-shell/reference/"
+      ]
+    },
+    {
+      "tool_id": "sqlite3",
+      "name": "sqlite3 CLI",
+      "category": "database_cli",
+      "urls": [
+        "https://sqlite.org/cli.html"
+      ]
+    },
+    {
+      "tool_id": "curl",
+      "name": "curl",
+      "category": "network_cli",
+      "urls": [
+        "https://curl.se/docs/manpage.html"
+      ]
+    },
+    {
+      "tool_id": "wget",
+      "name": "GNU wget",
+      "category": "network_cli",
+      "urls": [
+        "https://www.gnu.org/software/wget/manual/wget.html"
+      ]
+    },
+    {
+      "tool_id": "ssh",
+      "name": "OpenSSH client",
+      "category": "network_cli",
+      "urls": [
+        "https://man.openbsd.org/ssh.1"
+      ]
+    },
+    {
+      "tool_id": "rsync",
+      "name": "rsync",
+      "category": "network_cli",
+      "urls": [
+        "https://download.samba.org/pub/rsync/rsync.1"
+      ]
+    },
+    {
+      "tool_id": "jq",
+      "name": "jq",
+      "category": "text_processing",
+      "urls": [
+        "https://jqlang.org/manual/"
+      ]
+    },
+    {
+      "tool_id": "yq",
+      "name": "yq",
+      "category": "text_processing",
+      "urls": [
+        "https://mikefarah.gitbook.io/yq/"
+      ]
+    },
+    {
+      "tool_id": "sed",
+      "name": "GNU sed",
+      "category": "text_processing",
+      "urls": [
+        "https://www.gnu.org/software/sed/manual/sed.html"
+      ]
+    },
+    {
+      "tool_id": "awk",
+      "name": "GNU awk",
+      "category": "text_processing",
+      "urls": [
+        "https://www.gnu.org/software/gawk/manual/gawk.html"
+      ]
+    },
+    {
+      "tool_id": "tmux",
+      "name": "tmux",
+      "category": "shell_utility",
+      "urls": [
+        "https://man.openbsd.org/tmux.1"
+      ]
+    },
+    {
+      "tool_id": "vim",
+      "name": "Vim",
+      "category": "shell_utility",
+      "urls": [
+        "https://vimhelp.org/usr_toc.txt.html"
+      ]
+    },
+    {
+      "tool_id": "ffmpeg",
+      "name": "FFmpeg",
+      "category": "media_processing",
+      "urls": [
+        "https://ffmpeg.org/ffmpeg.html"
+      ]
+    },
+    {
+      "tool_id": "imagemagick",
+      "name": "ImageMagick",
+      "category": "media_processing",
+      "urls": [
+        "https://imagemagick.org/script/command-line-options.php"
+      ]
+    },
+    {
+      "tool_id": "openssl",
+      "name": "OpenSSL CLI",
+      "category": "security_cli",
+      "urls": [
+        "https://docs.openssl.org/3.0/man1/openssl/"
+      ]
+    },
+    {
+      "tool_id": "gpg",
+      "name": "GnuPG",
+      "category": "security_cli",
+      "urls": [
+        "https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG.html"
+      ]
+    },
+    {
+      "tool_id": "systemctl",
+      "name": "systemctl",
+      "category": "linux_system",
+      "urls": [
+        "https://www.freedesktop.org/software/systemd/man/latest/systemctl.html"
+      ]
+    },
+    {
+      "tool_id": "journalctl",
+      "name": "journalctl",
+      "category": "linux_system",
+      "urls": [
+        "https://www.freedesktop.org/software/systemd/man/latest/journalctl.html"
+      ]
+    },
+    {
+      "tool_id": "brew",
+      "name": "Homebrew",
+      "category": "package_manager",
+      "urls": [
+        "https://docs.brew.sh/Manpage"
+      ]
+    },
+    {
+      "tool_id": "apt",
+      "name": "APT",
+      "category": "package_manager",
+      "urls": [
+        "https://manpages.debian.org/bookworm/apt/apt.8.en.html"
+      ]
+    },
+    {
+      "tool_id": "dnf",
+      "name": "DNF",
+      "category": "package_manager",
+      "urls": [
+        "https://dnf.readthedocs.io/en/latest/command_ref.html"
+      ]
+    },
+    {
+      "tool_id": "supabase-cli",
+      "name": "Supabase CLI",
+      "category": "platform_cli",
+      "urls": [
+        "https://supabase.com/docs/reference/cli/introduction"
+      ]
+    },
+    {
+      "tool_id": "fly-cli",
+      "name": "Fly.io CLI",
+      "category": "platform_cli",
+      "urls": [
+        "https://fly.io/docs/flyctl/"
+      ]
+    },
+    {
+      "tool_id": "railway",
+      "name": "Railway CLI",
+      "category": "platform_cli",
+      "urls": [
+        "https://docs.railway.com/reference/cli-api"
+      ]
+    },
+    {
+      "tool_id": "heroku",
+      "name": "Heroku CLI",
+      "category": "platform_cli",
+      "urls": [
+        "https://devcenter.heroku.com/articles/heroku-cli-commands"
+      ]
+    },
+    {
+      "tool_id": "netlify-cli",
+      "name": "Netlify CLI",
+      "category": "platform_cli",
+      "urls": [
+        "https://docs.netlify.com/cli/get-started/"
+      ]
+    },
+    {
+      "tool_id": "stripe-cli",
+      "name": "Stripe CLI",
+      "category": "platform_cli",
+      "urls": [
+        "https://docs.stripe.com/stripe-cli"
+      ]
+    },
+    {
+      "tool_id": "psql-postgres",
+      "name": "psql (PostgreSQL meta-commands)",
+      "category": "database_cli",
+      "urls": [
+        "https://www.postgresql.org/docs/current/app-psql.html#APP-PSQL-META-COMMANDS"
+      ]
+    },
+    {
+      "tool_id": "kubernetes-helm",
+      "name": "Helm Charts",
+      "category": "container_orchestration",
+      "urls": [
+        "https://helm.sh/docs/topics/charts/"
+      ]
+    }
+  ]
+}
