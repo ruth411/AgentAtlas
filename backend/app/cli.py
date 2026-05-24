@@ -224,6 +224,45 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     p_tools.set_defaults(func=_cmd_tools)
 
+    # ingest — Stage 20 bulk-ingest harness. Reads a JSON tool list and
+    # drives the docs ingestion lane for every (tool, url) pair. Stage
+    # 19's relaxed gate lets unknown tools persist at L0; this is what
+    # finally fills the graph beyond the original 5 curated tools.
+    p_ingest = sub.add_parser(
+        "ingest",
+        help=(
+            "Bulk-ingest docs for the tools listed in a JSON tool list. "
+            "Each (tool_id, url) pair runs through DocsIngestionService."
+        ),
+    )
+    p_ingest.add_argument(
+        "--source",
+        choices=["docs"],
+        default="docs",
+        help="Ingestion lane (only 'docs' supported in v0.2; OpenAPI / GraphQL / MCP "
+        "remain one-off-per-endpoint surfaces).",
+    )
+    p_ingest.add_argument(
+        "--tool-list",
+        required=True,
+        help="Path to a JSON file listing tools and their docs URLs. "
+        "See tools/v0.2_seed.json for the canonical example.",
+    )
+    p_ingest.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Parse the tool list and print what WOULD be ingested without "
+        "calling the network.",
+    )
+    p_ingest.add_argument(
+        "--limit-tools",
+        type=int,
+        default=None,
+        help="Only ingest the first N tools (useful for smoke-testing against a "
+        "subset of the seed list).",
+    )
+    p_ingest.set_defaults(func=_cmd_ingest)
+
     return parser
 
 
@@ -370,6 +409,137 @@ def _cmd_mcp(_args: argparse.Namespace) -> int:
         sys.stderr.flush()
     build_default_server().serve()
     return 0
+
+
+def _cmd_ingest(args: argparse.Namespace) -> int:
+    """Stage 20 — bulk-ingest the docs lane for every (tool_id, url) pair
+    declared in the tool-list JSON file.
+
+    Resume / force flags are stubs for now — Stage 20.4 wires them to the
+    audit log so reruns can skip already-completed URLs.
+
+    Exit codes:
+      0 — every (tool, url) pair succeeded (or --dry-run completed)
+      1 — at least one pair failed; counts surface in the summary
+      2 — fatal setup error (bad tool list path, malformed JSON, etc.)
+    """
+    from app.services.claim_store import get_claim_store
+    from app.services.docs_ingestion import (
+        DocsIngestionError,
+        DocsIngestionService,
+    )
+
+    tool_list_path = Path(args.tool_list)
+    if not tool_list_path.is_file():
+        print(
+            f"ayiru ingest: tool list file not found: {tool_list_path}",
+            file=sys.stderr,
+        )
+        return 2
+
+    try:
+        tool_list = json.loads(tool_list_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        print(
+            f"ayiru ingest: invalid JSON in {tool_list_path}: {exc}",
+            file=sys.stderr,
+        )
+        return 2
+
+    # Schema validation — keep it strict so a typo doesn't silently
+    # produce a no-op crawl.
+    if not isinstance(tool_list, dict) or "tools" not in tool_list:
+        print(
+            "ayiru ingest: tool list must be a JSON object with a 'tools' array. "
+            "See tools/v0.2_seed.json for the canonical schema.",
+            file=sys.stderr,
+        )
+        return 2
+
+    tools: list[dict[str, Any]] = list(tool_list.get("tools", []))
+    if args.limit_tools is not None:
+        tools = tools[: args.limit_tools]
+
+    defaults: dict[str, Any] = tool_list.get("defaults", {})
+    submitted_by = defaults.get("submitted_by", "ayiru-bulk-ingest")
+    verify = bool(defaults.get("verify", True))
+
+    print(
+        f"ayiru ingest ({args.source} lane): "
+        f"{len(tools)} tools in '{tool_list_path}'  "
+        f"submitted_by={submitted_by!r}  verify={verify}  "
+        f"dry_run={args.dry_run}"
+    )
+
+    # Tally summary across the whole run so the operator gets one
+    # actionable number at the end.
+    total_urls = 0
+    success = 0
+    failure = 0
+    skipped = 0
+
+    if args.dry_run:
+        for tool in tools:
+            tool_id = tool.get("tool_id", "?")
+            urls = tool.get("urls", [])
+            total_urls += len(urls)
+            print(f"  [DRY RUN] {tool_id}: {len(urls)} URL(s)")
+            for url in urls:
+                print(f"    → {url}")
+        print(
+            f"\nDry run complete. Would ingest {total_urls} URLs across "
+            f"{len(tools)} tools."
+        )
+        return 0
+
+    store = get_claim_store()
+    service = DocsIngestionService(store)
+
+    for i, tool in enumerate(tools, start=1):
+        tool_id = tool.get("tool_id")
+        urls = tool.get("urls", [])
+        if not tool_id or not urls:
+            print(
+                f"  [{i}/{len(tools)}] ⚠  entry missing tool_id or urls; "
+                f"skipping: {tool!r}"
+            )
+            skipped += len(urls or [1])
+            continue
+        print(f"  [{i}/{len(tools)}] {tool_id} ({len(urls)} URL(s))")
+        for url in urls:
+            total_urls += 1
+            try:
+                response = service.ingest(
+                    tool_id=tool_id,
+                    url=url,
+                    submitted_by=submitted_by,
+                    verify=verify,
+                )
+                # The ingestion service returns a structured response with
+                # a status enum and claim ids; print the headline numbers.
+                status = response.status.value
+                claim_count = len(response.created_claim_ids)
+                if status == "completed":
+                    success += 1
+                    print(f"    ✓ {url}  ({status}, +{claim_count} claims)")
+                else:
+                    failure += 1
+                    print(
+                        f"    ✗ {url}  ({status}; see ingestion run "
+                        f"{response.run_id!r})"
+                    )
+            except DocsIngestionError as exc:
+                failure += 1
+                print(f"    ✗ {url}  (DocsIngestionError: {exc})")
+            except Exception as exc:  # noqa: BLE001
+                failure += 1
+                print(f"    ✗ {url}  ({type(exc).__name__}: {exc})")
+
+    print(
+        f"\nIngest complete: {success} ok / {failure} failed / "
+        f"{skipped} skipped across {total_urls} URLs."
+    )
+    return 0 if failure == 0 else 1
 
 
 def _cmd_seed(args: argparse.Namespace) -> int:
