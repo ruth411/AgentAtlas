@@ -30,8 +30,10 @@ from hashlib import sha256
 import html
 from html.parser import HTMLParser
 import json
-from typing import Any, Protocol
+import time
+from typing import Any, Callable, Protocol
 from urllib.parse import urlparse
+from urllib.robotparser import RobotFileParser
 
 import httpx
 
@@ -79,6 +81,59 @@ _EXCERPT_MAX_CHARS = 8000
 _SAFE_TAGS_DROP_TEXT = frozenset(
     {"script", "style", "iframe", "object", "embed", "template", "noscript", "svg"}
 )
+
+# Stage 20.7 — ToS compliance for the bulk-ingest crawl.
+_USER_AGENT = "Ayiru-Bulk-Ingestion/1.0 (+https://github.com/ruth411/ayiru)"
+_DEFAULT_MIN_INTERVAL_PER_HOST_SECONDS = 1.0
+_ROBOTS_FETCH_TIMEOUT_SECONDS = 5.0
+
+
+def _default_robots_fetch(host: str) -> str | None:
+    """Fetch https://<host>/robots.txt. Returns body text, or None if the
+    file is missing / unreachable / served as an error.
+
+    Network errors are treated as "no robots.txt" rather than fatal — the
+    bulk ingester then falls back to permit-by-default for that host. The
+    contract gate, SSRF guard, and per-host rate limit still apply."""
+
+    url = f"https://{host}/robots.txt"
+    try:
+        response = httpx.get(
+            url,
+            headers={"User-Agent": _USER_AGENT},
+            timeout=_ROBOTS_FETCH_TIMEOUT_SECONDS,
+            follow_redirects=True,
+        )
+    except httpx.RequestError:
+        return None
+    if response.status_code >= 400:
+        return None
+    return response.text
+
+
+class _RobotsCache:
+    """Per-host RobotFileParser cache. `None` means no robots.txt (permit)."""
+
+    def __init__(self, fetch: Callable[[str], str | None]) -> None:
+        self._fetch = fetch
+        self._cache: dict[str, RobotFileParser | None] = {}
+
+    def can_fetch(self, url: str, *, user_agent: str = _USER_AGENT) -> bool:
+        host = (urlparse(url).hostname or "").lower()
+        if not host:
+            return False
+        if host not in self._cache:
+            body = self._fetch(host)
+            if body is None:
+                self._cache[host] = None
+            else:
+                rp = RobotFileParser()
+                rp.parse(body.splitlines())
+                self._cache[host] = rp
+        rp = self._cache[host]
+        if rp is None:
+            return True
+        return rp.can_fetch(user_agent, url)
 
 
 class DocsIngestionError(ValueError):
@@ -144,10 +199,26 @@ class DocsIngestionService:
         *,
         client: DocsHttpClient | None = None,
         now: datetime | None = None,
+        compliance: bool = True,
+        robots_fetch: Callable[[str], str | None] | None = None,
+        sleep: Callable[[float], None] | None = None,
+        monotonic: Callable[[], float] | None = None,
+        min_interval_per_host_seconds: float = _DEFAULT_MIN_INTERVAL_PER_HOST_SECONDS,
     ) -> None:
         self._store = store
         self._client = client or HttpxDocsClient()
         self._now = now
+        # Stage 20.7 — ToS compliance. `compliance=False` (used in unit tests)
+        # disables both the per-host rate limit and the robots.txt check so
+        # scripted FakeDocsClient tests don't need to also stub robots.txt
+        # responses. Production callers (CLI bulk ingest, HTTP routes) keep
+        # the default `compliance=True`.
+        self._compliance = compliance
+        self._sleep = sleep or time.sleep
+        self._monotonic = monotonic or time.monotonic
+        self._min_interval = min_interval_per_host_seconds
+        self._last_fetch_at: dict[str, float] = {}
+        self._robots = _RobotsCache(robots_fetch or _default_robots_fetch)
 
     def ingest(
         self,
@@ -296,6 +367,19 @@ class DocsIngestionService:
     def _timestamp(self) -> datetime:
         return self._now or datetime.now(timezone.utc)
 
+    def _apply_rate_limit(self, url: str) -> None:
+        host = (urlparse(url).hostname or "").lower()
+        if not host:
+            return
+        last = self._last_fetch_at.get(host)
+        now = self._monotonic()
+        if last is not None:
+            elapsed = now - last
+            if elapsed < self._min_interval:
+                self._sleep(self._min_interval - elapsed)
+                now = self._monotonic()
+        self._last_fetch_at[host] = now
+
     def _fetch(
         self,
         spec: DocsFetchSpec,
@@ -312,8 +396,16 @@ class DocsIngestionService:
                 )
             except HttpFetchError as exc:
                 raise DocsIngestionError(str(exc)) from exc
+
+            if self._compliance:
+                if not self._robots.can_fetch(url):
+                    raise DocsIngestionError(
+                        f"robots.txt disallows {url!r} for user-agent {_USER_AGENT!r}."
+                    )
+                self._apply_rate_limit(url)
+
             headers: dict[str, str] = {
-                "User-Agent": "Ayiru-DocsIngestion/1.0",
+                "User-Agent": _USER_AGENT,
                 "Accept": ", ".join(spec.allowed_content_types),
             }
             # Conditional request — server may answer 304 even if cache TTL

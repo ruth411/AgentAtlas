@@ -236,7 +236,7 @@ def test_ingest_creates_artifact_and_claim_and_verifies(store: ClaimStore) -> No
             },
         )
     ])
-    service = DocsIngestionService(store, client=client, now=FIXED_TIME)
+    service = DocsIngestionService(store, client=client, now=FIXED_TIME, compliance=False)
 
     resp = service.ingest(tool_id="git", url="https://git-scm.com/docs/git-status")
     assert resp.status == IngestionStatus.COMPLETED
@@ -273,7 +273,7 @@ def test_304_not_modified_reuses_cached_artifact(store: ClaimStore) -> None:
             headers={"content-type": "text/html", "etag": '"v1"'},
         )
     ])
-    first = DocsIngestionService(store, client=initial, now=FIXED_TIME).ingest(
+    first = DocsIngestionService(store, client=initial, now=FIXED_TIME, compliance=False).ingest(
         tool_id="git", url="https://git-scm.com/docs/git-status"
     )
     assert first.cache_hit is False
@@ -284,7 +284,7 @@ def test_304_not_modified_reuses_cached_artifact(store: ClaimStore) -> None:
         _FakeResponse(status_code=304, text="", headers={"content-type": "text/html"})
     ])
     second = DocsIngestionService(
-        store, client=revalidation, now=FIXED_TIME + timedelta(hours=1)
+        store, client=revalidation, now=FIXED_TIME + timedelta(hours=1), compliance=False
     ).ingest(tool_id="git", url="https://git-scm.com/docs/git-status")
     assert second.cache_hit is True
     # Reused the same artifact_id from cache instead of creating a new one.
@@ -309,7 +309,7 @@ def test_304_without_cached_artifact_raises(store: ClaimStore) -> None:
         )
     )
     client = FakeDocsClient([_FakeResponse(status_code=304, text="")])
-    resp = DocsIngestionService(store, client=client, now=FIXED_TIME).ingest(
+    resp = DocsIngestionService(store, client=client, now=FIXED_TIME, compliance=False).ingest(
         tool_id="git", url="https://git-scm.com/docs/git-status"
     )
     assert resp.status == IngestionStatus.FAILED
@@ -333,7 +333,7 @@ def test_redirect_to_allowed_host_is_followed(store: ClaimStore) -> None:
         ),
         _FakeResponse(text="<p>v2 docs</p>"),
     ])
-    resp = DocsIngestionService(store, client=client, now=FIXED_TIME).ingest(
+    resp = DocsIngestionService(store, client=client, now=FIXED_TIME, compliance=False).ingest(
         tool_id="git", url="https://git-scm.com/docs/git-status"
     )
     assert resp.status == IngestionStatus.COMPLETED
@@ -352,7 +352,7 @@ def test_redirect_to_disallowed_host_is_rejected(store: ClaimStore) -> None:
             text="",
         )
     ])
-    resp = DocsIngestionService(store, client=client, now=FIXED_TIME).ingest(
+    resp = DocsIngestionService(store, client=client, now=FIXED_TIME, compliance=False).ingest(
         tool_id="git", url="https://git-scm.com/docs/git-status"
     )
     assert resp.status == IngestionStatus.FAILED
@@ -372,7 +372,7 @@ def test_too_many_redirects_rejected(store: ClaimStore) -> None:
         for i in range(10)
     ]
     client = FakeDocsClient(redirects)
-    resp = DocsIngestionService(store, client=client, now=FIXED_TIME).ingest(
+    resp = DocsIngestionService(store, client=client, now=FIXED_TIME, compliance=False).ingest(
         tool_id="git", url="https://git-scm.com/docs/git-status"
     )
     assert resp.status == IngestionStatus.FAILED
@@ -383,7 +383,7 @@ def test_redirect_response_missing_location_rejected(store: ClaimStore) -> None:
     client = FakeDocsClient([
         _FakeResponse(status_code=302, headers={"content-type": "text/html"}, text=""),
     ])
-    resp = DocsIngestionService(store, client=client, now=FIXED_TIME).ingest(
+    resp = DocsIngestionService(store, client=client, now=FIXED_TIME, compliance=False).ingest(
         tool_id="git", url="https://git-scm.com/docs/git-status"
     )
     assert resp.status == IngestionStatus.FAILED
@@ -399,7 +399,7 @@ def test_disallowed_content_type_rejected(store: ClaimStore) -> None:
     client = FakeDocsClient([
         _FakeResponse(text="<p>x</p>", headers={"content-type": "application/javascript"}),
     ])
-    resp = DocsIngestionService(store, client=client, now=FIXED_TIME).ingest(
+    resp = DocsIngestionService(store, client=client, now=FIXED_TIME, compliance=False).ingest(
         tool_id="git", url="https://git-scm.com/docs/git-status"
     )
     assert resp.status == IngestionStatus.FAILED
@@ -409,7 +409,7 @@ def test_disallowed_content_type_rejected(store: ClaimStore) -> None:
 def test_oversized_response_rejected(store: ClaimStore) -> None:
     huge = "<p>" + ("x" * (2 * 1024 * 1024)) + "</p>"
     client = FakeDocsClient([_FakeResponse(text=huge, headers={"content-type": "text/html"})])
-    resp = DocsIngestionService(store, client=client, now=FIXED_TIME).ingest(
+    resp = DocsIngestionService(store, client=client, now=FIXED_TIME, compliance=False).ingest(
         tool_id="git", url="https://git-scm.com/docs/git-status"
     )
     assert resp.status == IngestionStatus.FAILED
@@ -418,7 +418,7 @@ def test_oversized_response_rejected(store: ClaimStore) -> None:
 
 def test_empty_body_rejected(store: ClaimStore) -> None:
     client = FakeDocsClient([_FakeResponse(text="   \n  ", headers={"content-type": "text/html"})])
-    resp = DocsIngestionService(store, client=client, now=FIXED_TIME).ingest(
+    resp = DocsIngestionService(store, client=client, now=FIXED_TIME, compliance=False).ingest(
         tool_id="git", url="https://git-scm.com/docs/git-status"
     )
     assert resp.status == IngestionStatus.FAILED
@@ -432,7 +432,7 @@ def test_response_with_only_script_content_rejected(store: ClaimStore) -> None:
             headers={"content-type": "text/html"},
         )
     ])
-    resp = DocsIngestionService(store, client=client, now=FIXED_TIME).ingest(
+    resp = DocsIngestionService(store, client=client, now=FIXED_TIME, compliance=False).ingest(
         tool_id="git", url="https://git-scm.com/docs/git-status"
     )
     assert resp.status == IngestionStatus.FAILED
@@ -446,7 +446,7 @@ def test_response_with_only_script_content_rejected(store: ClaimStore) -> None:
 
 def test_http_error_status_rejected(store: ClaimStore) -> None:
     client = FakeDocsClient([_FakeResponse(status_code=500, text="oops")])
-    resp = DocsIngestionService(store, client=client, now=FIXED_TIME).ingest(
+    resp = DocsIngestionService(store, client=client, now=FIXED_TIME, compliance=False).ingest(
         tool_id="git", url="https://git-scm.com/docs/git-status"
     )
     assert resp.status == IngestionStatus.FAILED
@@ -455,7 +455,7 @@ def test_http_error_status_rejected(store: ClaimStore) -> None:
 
 def test_transport_timeout_rejected(store: ClaimStore) -> None:
     client = FakeDocsClient([httpx.TimeoutException("simulated timeout")])
-    resp = DocsIngestionService(store, client=client, now=FIXED_TIME).ingest(
+    resp = DocsIngestionService(store, client=client, now=FIXED_TIME, compliance=False).ingest(
         tool_id="git", url="https://git-scm.com/docs/git-status"
     )
     assert resp.status == IngestionStatus.FAILED
@@ -473,7 +473,7 @@ def test_bulk_ingest_runs_every_allowlisted_url(store: ClaimStore) -> None:
         _FakeResponse(text="<p>git status text</p>"),
         _FakeResponse(text="<p>git log text</p>"),
     ])
-    responses = DocsIngestionService(store, client=client, now=FIXED_TIME).ingest_all_for_tool(
+    responses = DocsIngestionService(store, client=client, now=FIXED_TIME, compliance=False).ingest_all_for_tool(
         tool_id="git"
     )
     assert len(responses) == 2
@@ -482,7 +482,7 @@ def test_bulk_ingest_runs_every_allowlisted_url(store: ClaimStore) -> None:
 
 def test_bulk_ingest_unknown_tool_raises(store: ClaimStore) -> None:
     with pytest.raises(DocsIngestionError):
-        DocsIngestionService(store, client=FakeDocsClient([])).ingest_all_for_tool(
+        DocsIngestionService(store, client=FakeDocsClient([]), compliance=False).ingest_all_for_tool(
             tool_id="nonexistent"
         )
 
@@ -559,3 +559,114 @@ def test_api_bulk_endpoint_rejects_unknown_tool(store: ClaimStore) -> None:
             assert response.json()["error"]["code"] == "DOCS_FETCH_FAILED"
     finally:
         app.dependency_overrides.clear()
+
+
+# ---------------------------------------------------------------------------
+# Stage 20.7 — ToS compliance (rate limit + robots.txt + User-Agent)
+# ---------------------------------------------------------------------------
+
+
+def test_user_agent_header_identifies_ayiru_bulk_ingester(store: ClaimStore) -> None:
+    client = FakeDocsClient([_FakeResponse(text="<p>git status doc.</p>")])
+    DocsIngestionService(store, client=client, now=FIXED_TIME, compliance=False).ingest(
+        tool_id="git", url="https://git-scm.com/docs/git-status"
+    )
+    assert len(client.calls) == 1
+    _, headers = client.calls[0]
+    assert headers["User-Agent"] == (
+        "Ayiru-Bulk-Ingestion/1.0 (+https://github.com/ruth411/ayiru)"
+    )
+
+
+def test_robots_txt_disallow_blocks_fetch(store: ClaimStore) -> None:
+    robots_body = "User-agent: *\nDisallow: /docs/\n"
+    client = FakeDocsClient([_FakeResponse(text="<p>should not reach.</p>")])
+    service = DocsIngestionService(
+        store,
+        client=client,
+        now=FIXED_TIME,
+        compliance=True,
+        robots_fetch=lambda host: robots_body,
+        sleep=lambda _: None,
+    )
+    resp = service.ingest(tool_id="git", url="https://git-scm.com/docs/git-status")
+    assert resp.status == IngestionStatus.FAILED
+    assert any("robots.txt" in err for err in resp.errors)
+    # The client was never called because the robots check failed first.
+    assert client.calls == []
+
+
+def test_robots_txt_allow_permits_fetch(store: ClaimStore) -> None:
+    robots_body = "User-agent: *\nAllow: /\n"
+    client = FakeDocsClient([_FakeResponse(text="<p>git status doc.</p>")])
+    service = DocsIngestionService(
+        store,
+        client=client,
+        now=FIXED_TIME,
+        compliance=True,
+        robots_fetch=lambda host: robots_body,
+        sleep=lambda _: None,
+    )
+    resp = service.ingest(tool_id="git", url="https://git-scm.com/docs/git-status")
+    assert resp.status == IngestionStatus.COMPLETED
+
+
+def test_missing_robots_txt_permits_fetch(store: ClaimStore) -> None:
+    client = FakeDocsClient([_FakeResponse(text="<p>git status doc.</p>")])
+    service = DocsIngestionService(
+        store,
+        client=client,
+        now=FIXED_TIME,
+        compliance=True,
+        robots_fetch=lambda host: None,  # no robots.txt
+        sleep=lambda _: None,
+    )
+    resp = service.ingest(tool_id="git", url="https://git-scm.com/docs/git-status")
+    assert resp.status == IngestionStatus.COMPLETED
+
+
+def test_rate_limit_sleeps_between_same_host_fetches(store: ClaimStore) -> None:
+    sleeps: list[float] = []
+    tick = [100.0]
+
+    def fake_sleep(seconds: float) -> None:
+        sleeps.append(seconds)
+        tick[0] += seconds
+
+    def fake_monotonic() -> float:
+        return tick[0]
+
+    client = FakeDocsClient([
+        _FakeResponse(text="<p>git status doc.</p>"),
+        _FakeResponse(text="<p>git log doc.</p>"),
+    ])
+    service = DocsIngestionService(
+        store,
+        client=client,
+        now=FIXED_TIME,
+        compliance=True,
+        robots_fetch=lambda host: None,
+        sleep=fake_sleep,
+        monotonic=fake_monotonic,
+        min_interval_per_host_seconds=1.0,
+    )
+    service.ingest(tool_id="git", url="https://git-scm.com/docs/git-status")
+    service.ingest(tool_id="git", url="https://git-scm.com/docs/git-log")
+    # First fetch: no prior timestamp, no sleep. Second fetch: same host, < 1s
+    # later in fake time, so the limiter sleeps to fill the gap.
+    assert sleeps == [1.0]
+
+
+def test_rate_limit_does_not_sleep_for_first_fetch(store: ClaimStore) -> None:
+    sleeps: list[float] = []
+    client = FakeDocsClient([_FakeResponse(text="<p>git status doc.</p>")])
+    service = DocsIngestionService(
+        store,
+        client=client,
+        now=FIXED_TIME,
+        compliance=True,
+        robots_fetch=lambda host: None,
+        sleep=lambda s: sleeps.append(s),
+    )
+    service.ingest(tool_id="git", url="https://git-scm.com/docs/git-status")
+    assert sleeps == []
