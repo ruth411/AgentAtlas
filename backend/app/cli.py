@@ -255,6 +255,19 @@ def _build_parser() -> argparse.ArgumentParser:
         "calling the network.",
     )
     p_ingest.add_argument(
+        "--resume",
+        action="store_true",
+        help="Skip URLs that already have a COMPLETED ingestion run in the "
+        "store. Useful for re-running after partial failures without "
+        "re-fetching what already succeeded. Mutually exclusive with --force.",
+    )
+    p_ingest.add_argument(
+        "--force",
+        action="store_true",
+        help="Ignore --resume and re-process every URL even if it has a "
+        "prior COMPLETED ingestion run. Mutually exclusive with --resume.",
+    )
+    p_ingest.add_argument(
         "--limit-tools",
         type=int,
         default=None,
@@ -415,8 +428,10 @@ def _cmd_ingest(args: argparse.Namespace) -> int:
     """Stage 20 — bulk-ingest the docs lane for every (tool_id, url) pair
     declared in the tool-list JSON file.
 
-    Resume / force flags are stubs for now — Stage 20.4 wires them to the
-    audit log so reruns can skip already-completed URLs.
+    `--resume` skips URLs that already have a COMPLETED ingestion run; a
+    re-run after partial failure won't re-fetch what already succeeded.
+    `--force` ignores --resume so the operator can re-process the full
+    set. The two flags are mutually exclusive.
 
     Exit codes:
       0 — every (tool, url) pair succeeded (or --dry-run completed)
@@ -428,6 +443,13 @@ def _cmd_ingest(args: argparse.Namespace) -> int:
         DocsIngestionError,
         DocsIngestionService,
     )
+
+    if args.resume and args.force:
+        print(
+            "ayiru ingest: --resume and --force are mutually exclusive.",
+            file=sys.stderr,
+        )
+        return 2
 
     tool_list_path = Path(args.tool_list)
     if not tool_list_path.is_file():
@@ -468,7 +490,7 @@ def _cmd_ingest(args: argparse.Namespace) -> int:
         f"ayiru ingest ({args.source} lane): "
         f"{len(tools)} tools in '{tool_list_path}'  "
         f"submitted_by={submitted_by!r}  verify={verify}  "
-        f"dry_run={args.dry_run}"
+        f"dry_run={args.dry_run}  resume={args.resume}  force={args.force}"
     )
 
     # Tally summary across the whole run so the operator gets one
@@ -508,6 +530,12 @@ def _cmd_ingest(args: argparse.Namespace) -> int:
         print(f"  [{i}/{len(tools)}] {tool_id} ({len(urls)} URL(s))")
         for url in urls:
             total_urls += 1
+            if args.resume and not args.force and store.has_completed_ingestion_run(
+                tool_id=tool_id, command=url
+            ):
+                skipped += 1
+                print(f"    ↷ {url}  (resume: prior COMPLETED run, skipped)")
+                continue
             try:
                 response = service.ingest(
                     tool_id=tool_id,

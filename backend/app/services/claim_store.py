@@ -640,6 +640,24 @@ class ClaimStore:
             record = session.get(IngestionRunRecord, run_id)
             return _record_to_ingestion_run(record) if record else None
 
+    def has_completed_ingestion_run(self, *, tool_id: str, command: str) -> bool:
+        """Stage 20.4 — `ayiru ingest --resume` uses this to skip URLs that
+        already have a successful ingestion run. `command` is the per-lane
+        identifier the lane stores in `ingestion_runs.command` — for docs
+        ingestion that's the source URL."""
+
+        with self._session_factory() as session:
+            record = session.scalars(
+                select(IngestionRunRecord)
+                .where(
+                    IngestionRunRecord.tool_id == tool_id,
+                    IngestionRunRecord.command == command,
+                    IngestionRunRecord.status == IngestionStatus.COMPLETED.value,
+                )
+                .limit(1)
+            ).first()
+            return record is not None
+
     def save_ingestion_artifact(self, artifact: RawIngestionArtifact) -> RawIngestionArtifact:
         with self._session_factory() as session:
             session.add(_ingestion_artifact_to_record(artifact))

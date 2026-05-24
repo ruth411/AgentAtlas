@@ -1008,3 +1008,134 @@ def test_migrate_surfaces_clean_error_when_config_resolver_fails(
     err = capsys.readouterr().err
     assert rc == 1
     assert "bundled migrations missing" in err
+
+
+# ---------------------------------------------------------------------------
+# `ayiru ingest --resume / --force` (Stage 20.4)
+# ---------------------------------------------------------------------------
+
+
+def _write_minimal_seed(tmp_path, tool_id: str, url: str):
+    seed = {
+        "version": 1,
+        "defaults": {"submitted_by": "test-bulk", "verify": False},
+        "tools": [{"tool_id": tool_id, "name": tool_id, "urls": [url]}],
+    }
+    path = tmp_path / "seed.json"
+    path.write_text(json.dumps(seed))
+    return path
+
+
+class _FakeStore:
+    def __init__(self, *, completed_urls: set[tuple[str, str]] | None = None) -> None:
+        self._completed = completed_urls or set()
+        self.skip_checks: list[tuple[str, str]] = []
+
+    def has_completed_ingestion_run(self, *, tool_id: str, command: str) -> bool:
+        self.skip_checks.append((tool_id, command))
+        return (tool_id, command) in self._completed
+
+
+class _FakeService:
+    def __init__(self, *_, **__) -> None:
+        self.calls: list[tuple[str, str]] = []
+
+    def ingest(self, *, tool_id: str, url: str, **_kwargs):
+        from app.schemas.enums import IngestionStatus
+        from app.schemas.ingestion import DocsIngestionResponse
+
+        self.calls.append((tool_id, url))
+        return DocsIngestionResponse(
+            run_id=f"run-{len(self.calls)}",
+            status=IngestionStatus.COMPLETED,
+            final_url=url,
+        )
+
+
+def _patch_ingest_deps(monkeypatch, store, service):
+    monkeypatch.setattr("app.services.claim_store.get_claim_store", lambda: store)
+    monkeypatch.setattr(
+        "app.services.docs_ingestion.DocsIngestionService",
+        lambda *a, **k: service,
+    )
+
+
+def test_ingest_resume_skips_urls_with_completed_run(
+    monkeypatch: pytest.MonkeyPatch, tmp_path, capsys
+) -> None:
+    seed_path = _write_minimal_seed(tmp_path, "git", "https://git-scm.com/docs/git-status")
+    store = _FakeStore(completed_urls={("git", "https://git-scm.com/docs/git-status")})
+    service = _FakeService()
+    _patch_ingest_deps(monkeypatch, store, service)
+
+    rc = main(["ingest", "--tool-list", str(seed_path), "--resume"])
+    out = capsys.readouterr().out
+    assert rc == 0
+    assert service.calls == []  # never ingested
+    assert "(resume: prior COMPLETED run, skipped)" in out
+    assert "1 skipped" in out
+
+
+def test_ingest_resume_processes_urls_without_completed_run(
+    monkeypatch: pytest.MonkeyPatch, tmp_path
+) -> None:
+    seed_path = _write_minimal_seed(tmp_path, "git", "https://git-scm.com/docs/git-status")
+    store = _FakeStore(completed_urls=set())  # nothing done yet
+    service = _FakeService()
+    _patch_ingest_deps(monkeypatch, store, service)
+
+    rc = main(["ingest", "--tool-list", str(seed_path), "--resume"])
+    assert rc == 0
+    assert service.calls == [("git", "https://git-scm.com/docs/git-status")]
+
+
+def test_ingest_force_overrides_resume(
+    monkeypatch: pytest.MonkeyPatch, tmp_path, capsys
+) -> None:
+    """--resume and --force together is a CLI usage error: the operator
+    should pick one. _cmd_ingest exits 2 before any work happens."""
+
+    seed_path = _write_minimal_seed(tmp_path, "git", "https://git-scm.com/docs/git-status")
+    store = _FakeStore()
+    service = _FakeService()
+    _patch_ingest_deps(monkeypatch, store, service)
+
+    rc = main(["ingest", "--tool-list", str(seed_path), "--resume", "--force"])
+    err = capsys.readouterr().err
+    assert rc == 2
+    assert "mutually exclusive" in err
+    assert service.calls == []
+
+
+def test_ingest_force_alone_processes_all_urls(
+    monkeypatch: pytest.MonkeyPatch, tmp_path
+) -> None:
+    """Without --resume, --force is a no-op signal — the loop processes
+    every URL regardless of prior completed runs (no skip check fires)."""
+
+    seed_path = _write_minimal_seed(tmp_path, "git", "https://git-scm.com/docs/git-status")
+    store = _FakeStore(completed_urls={("git", "https://git-scm.com/docs/git-status")})
+    service = _FakeService()
+    _patch_ingest_deps(monkeypatch, store, service)
+
+    rc = main(["ingest", "--tool-list", str(seed_path), "--force"])
+    assert rc == 0
+    assert service.calls == [("git", "https://git-scm.com/docs/git-status")]
+    assert store.skip_checks == []  # resume off → store never queried
+
+
+def test_ingest_default_does_not_check_resume_state(
+    monkeypatch: pytest.MonkeyPatch, tmp_path
+) -> None:
+    """Backward-compat: without --resume, the CLI behaves exactly as it
+    did pre-20.4 — no skip check, every URL is processed."""
+
+    seed_path = _write_minimal_seed(tmp_path, "git", "https://git-scm.com/docs/git-status")
+    store = _FakeStore(completed_urls={("git", "https://git-scm.com/docs/git-status")})
+    service = _FakeService()
+    _patch_ingest_deps(monkeypatch, store, service)
+
+    rc = main(["ingest", "--tool-list", str(seed_path)])
+    assert rc == 0
+    assert service.calls == [("git", "https://git-scm.com/docs/git-status")]
+    assert store.skip_checks == []
