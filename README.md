@@ -336,6 +336,16 @@ with Ayiru(base_url="http://localhost:8000") as client:
 
 `Answer.is_useful` is the convenience heuristic Stage 21.2 calls out: `confidence ≥ 0.6 AND verification_level != "L0_unverified"`. See [clients/python/README.md](clients/python/README.md) for the full method reference, the async variant, error handling, and auth.
 
+### LangChain adapter (Stage 22.1)
+
+A drop-in `BaseTool` for LangChain agents lives at [clients/python/ayiru_client/langchain.py](clients/python/ayiru_client/langchain.py). The tool's LLM-facing `description` is the load-bearing piece — it overrides the default "only use tools when uncertain" meta-policy so the agent actually picks `ask` over web_search for stable technical questions.
+
+```bash
+pip install 'ayiru-client[langchain]'
+```
+
+A runnable 10-question demo notebook at [clients/python/examples/langchain_demo.ipynb](clients/python/examples/langchain_demo.ipynb) shows ~7 hits + ~3 fallbacks against the v0.2 bulk graph and ends with a `/v1/stats/savings`-derived token-savings footer (the v0.2 product thesis materialized).
+
 ## MCP Integration
 
 Ayiru ships with a built-in MCP server that exposes the query surface plus claim submission to any MCP-aware agent client (Claude Desktop, Cursor, Cline, Continue, …). One config block in the client and the agent can ask Ayiru about safety before acting.

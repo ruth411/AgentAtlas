@@ -117,6 +117,40 @@ The `code`, `message`, and `details` fields mirror the server's
 structured error envelope, so caller code can branch on the stable code
 without parsing strings.
 
+## LangChain integration
+
+A drop-in `BaseTool` so a LangChain agent can call Ayiru with zero glue
+code:
+
+```bash
+pip install 'ayiru-client[langchain]'
+```
+
+```python
+from ayiru_client import Ayiru
+from ayiru_client.langchain import AyiruTool
+
+client = Ayiru(base_url="http://localhost:8000")
+tool = AyiruTool(client=client)
+
+# In an agent:
+#     agent = create_react_agent(llm, tools=[tool])
+# Or call directly:
+result = tool.invoke({"question": "how do I remove a docker volume"})
+```
+
+The tool's `description` field is deliberately tuned to defeat the
+default LLM meta-policy ("only use tools when uncertain") — without
+that override, agents skip `ask` for stable technical questions and
+the savings story collapses. See
+[`ayiru_client/langchain.py`](ayiru_client/langchain.py) for the
+exact wording and the Stage 17.4 / 22.1 reasoning.
+
+A runnable 10-question demo is at
+[`examples/langchain_demo.ipynb`](examples/langchain_demo.ipynb) — it
+ends with a `/v1/stats/savings`-derived footer showing the token-savings
+tally for the run.
+
 ## Auth
 
 The Ayiru server exposes read endpoints (everything the SDK calls except
