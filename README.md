@@ -318,6 +318,24 @@ Every endpoint returns typed JSON; errors are structured.
 
 Live interactive docs at <http://localhost:8000/docs> when the server is running.
 
+## Python SDK
+
+Agents that prefer a typed Python client over raw HTTP can pip-install `ayiru-client` from [clients/python/](clients/python/). Both blocking and async flavors expose the same five methods — `ask`, `validate_command`, `get_tool_spec`, `search_tools`, `savings` — and return Pydantic models.
+
+```python
+from ayiru_client import Ayiru
+
+with Ayiru(base_url="http://localhost:8000") as client:
+    answer = client.ask("how do I remove a docker volume")
+    if answer.is_useful:
+        print(answer.top.statement)
+    else:
+        # Miss — agent code should fall through to web_search here.
+        ...
+```
+
+`Answer.is_useful` is the convenience heuristic Stage 21.2 calls out: `confidence ≥ 0.6 AND verification_level != "L0_unverified"`. See [clients/python/README.md](clients/python/README.md) for the full method reference, the async variant, error handling, and auth.
+
 ## MCP Integration
 
 Ayiru ships with a built-in MCP server that exposes the query surface plus claim submission to any MCP-aware agent client (Claude Desktop, Cursor, Cline, Continue, …). One config block in the client and the agent can ask Ayiru about safety before acting.
