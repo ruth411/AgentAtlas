@@ -32,7 +32,7 @@ from html.parser import HTMLParser
 import json
 import time
 from typing import Any, Callable, Protocol
-from urllib.parse import urlparse
+from urllib.parse import urljoin, urlparse
 from urllib.robotparser import RobotFileParser
 
 import httpx
@@ -439,6 +439,10 @@ class DocsIngestionService:
                     raise DocsIngestionError(
                         f"Docs fetch exceeded max_redirects={spec.max_redirects}."
                     )
+                # Resolve relative redirects (`Location: /foo`) against the
+                # current absolute URL so the next loop iteration's SSRF
+                # guard sees a well-formed `https://host/path` URL.
+                location = urljoin(url, location)
                 redirect_chain.append(location)
                 url = location
                 continue

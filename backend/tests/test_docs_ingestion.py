@@ -341,6 +341,28 @@ def test_redirect_to_allowed_host_is_followed(store: ClaimStore) -> None:
     assert client.calls[1][0] == "https://git-scm.com/docs/git-status/v2"
 
 
+def test_relative_redirect_is_resolved_against_current_url(store: ClaimStore) -> None:
+    """Regression for the Stage 20.8 imagemagick failure: when a server
+    sends `Location: /relative/path`, urljoin must resolve it against the
+    current absolute URL before the SSRF guard re-validates the next hop.
+    Previously this raised "Only https:// URLs are allowed; got scheme ''"."""
+
+    client = FakeDocsClient([
+        _FakeResponse(
+            status_code=302,
+            headers={"location": "/docs/git-status-v2", "content-type": "text/html"},
+            text="",
+        ),
+        _FakeResponse(text="<p>git-status v2 docs.</p>"),
+    ])
+    resp = DocsIngestionService(store, client=client, now=FIXED_TIME, compliance=False).ingest(
+        tool_id="git", url="https://git-scm.com/docs/git-status"
+    )
+    assert resp.status == IngestionStatus.COMPLETED
+    assert len(client.calls) == 2
+    assert client.calls[1][0] == "https://git-scm.com/docs/git-status-v2"
+
+
 def test_redirect_to_disallowed_host_is_rejected(store: ClaimStore) -> None:
     client = FakeDocsClient([
         _FakeResponse(
@@ -407,7 +429,8 @@ def test_disallowed_content_type_rejected(store: ClaimStore) -> None:
 
 
 def test_oversized_response_rejected(store: ClaimStore) -> None:
-    huge = "<p>" + ("x" * (2 * 1024 * 1024)) + "</p>"
+    # default_max_bytes is 4 MB (Stage 20.8 bump); use 5 MB to trip the limit.
+    huge = "<p>" + ("x" * (5 * 1024 * 1024)) + "</p>"
     client = FakeDocsClient([_FakeResponse(text=huge, headers={"content-type": "text/html"})])
     resp = DocsIngestionService(store, client=client, now=FIXED_TIME, compliance=False).ingest(
         tool_id="git", url="https://git-scm.com/docs/git-status"

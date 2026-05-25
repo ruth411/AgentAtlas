@@ -1,7 +1,7 @@
 {
   "version": 1,
   "default_timeout_seconds": 10,
-  "default_max_bytes": 1048576,
+  "default_max_bytes": 4194304,
   "default_cache_ttl_seconds": 86400,
   "max_redirects": 3,
   "allowed_content_types": [
