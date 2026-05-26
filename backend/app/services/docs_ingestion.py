@@ -30,6 +30,7 @@ from hashlib import sha256
 import html
 from html.parser import HTMLParser
 import json
+import threading
 import time
 from typing import Any, Callable, Protocol
 from urllib.parse import urljoin, urlparse
@@ -92,20 +93,62 @@ def _default_robots_fetch(host: str) -> str | None:
     """Fetch https://<host>/robots.txt. Returns body text, or None if the
     file is missing / unreachable / served as an error.
 
-    Network errors are treated as "no robots.txt" rather than fatal — the
-    bulk ingester then falls back to permit-by-default for that host. The
-    contract gate, SSRF guard, and per-host rate limit still apply."""
+    The robots URL is validated against the same SSRF guard the docs
+    fetch uses (scheme + resolved-IP + host allowlist of exactly the
+    one host whose robots we're asking for). Without this, an
+    attacker-influenced trust contract that lists an internal host as
+    ``official_hosts`` could exfiltrate via the robots probe; with it,
+    the robots fetcher is no weaker than the docs fetcher.
+
+    Network errors and failed-validation results are treated as "no
+    robots.txt" — the bulk ingester then falls back to permit-by-default
+    for that host. The contract gate and per-host rate limit still apply."""
 
     url = f"https://{host}/robots.txt"
+    try:
+        assert_url_is_safe(url, allowed_hosts=frozenset({host}))
+    except HttpFetchError:
+        # Host failed the SSRF gate (e.g. resolved to a private IP).
+        # Permit-by-default semantics still apply: the docs fetch for
+        # the same host will fail too, with a more useful error.
+        return None
     try:
         response = httpx.get(
             url,
             headers={"User-Agent": _USER_AGENT},
             timeout=_ROBOTS_FETCH_TIMEOUT_SECONDS,
-            follow_redirects=True,
+            follow_redirects=False,
         )
     except httpx.RequestError:
         return None
+    # Manual redirect handling so we never silently follow a Location:
+    # header into an unvalidated host. Three hops is enough for the
+    # typical "robots.txt redirects to canonical host" pattern.
+    for _ in range(3):
+        if response.status_code not in (301, 302, 303, 307, 308):
+            break
+        location = response.headers.get("location")
+        if not location:
+            return None
+        next_url = urljoin(str(response.url), location)
+        parsed = urlparse(next_url)
+        next_host = (parsed.hostname or "").lower()
+        if parsed.scheme != "https" or next_host != host:
+            # Refuse cross-host robots redirects — they could exfil.
+            return None
+        try:
+            assert_url_is_safe(next_url, allowed_hosts=frozenset({host}))
+        except HttpFetchError:
+            return None
+        try:
+            response = httpx.get(
+                next_url,
+                headers={"User-Agent": _USER_AGENT},
+                timeout=_ROBOTS_FETCH_TIMEOUT_SECONDS,
+                follow_redirects=False,
+            )
+        except httpx.RequestError:
+            return None
     if response.status_code >= 400:
         return None
     return response.text
@@ -218,6 +261,12 @@ class DocsIngestionService:
         self._monotonic = monotonic or time.monotonic
         self._min_interval = min_interval_per_host_seconds
         self._last_fetch_at: dict[str, float] = {}
+        # The rate limiter dict is mutated from _apply_rate_limit; under
+        # the single-threaded CLI today there's no contention, but the
+        # service is constructed per-request on the HTTP path so two
+        # concurrent ingestion calls would race. The lock keeps the
+        # 1-req/sec-per-host contract honest if the caller parallelizes.
+        self._rate_limit_lock = threading.Lock()
         self._robots = _RobotsCache(robots_fetch or _default_robots_fetch)
 
     def ingest(
@@ -371,14 +420,20 @@ class DocsIngestionService:
         host = (urlparse(url).hostname or "").lower()
         if not host:
             return
-        last = self._last_fetch_at.get(host)
-        now = self._monotonic()
-        if last is not None:
-            elapsed = now - last
-            if elapsed < self._min_interval:
-                self._sleep(self._min_interval - elapsed)
-                now = self._monotonic()
-        self._last_fetch_at[host] = now
+        # The lock straddles read → sleep → write so two threads racing
+        # on the same host can't both pass the elapsed check and double-
+        # fire. The sleep itself is cooperative — we hold the lock so
+        # the next caller waits until our gap is filled, which is
+        # exactly the serialization we want.
+        with self._rate_limit_lock:
+            last = self._last_fetch_at.get(host)
+            now = self._monotonic()
+            if last is not None:
+                elapsed = now - last
+                if elapsed < self._min_interval:
+                    self._sleep(self._min_interval - elapsed)
+                    now = self._monotonic()
+            self._last_fetch_at[host] = now
 
     def _fetch(
         self,

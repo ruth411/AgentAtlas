@@ -341,10 +341,22 @@ with Ayiru(base_url="http://localhost:8000") as client:
 A drop-in `BaseTool` for LangChain agents lives at [clients/python/ayiru_client/langchain.py](clients/python/ayiru_client/langchain.py). The tool's LLM-facing `description` is the load-bearing piece — it overrides the default "only use tools when uncertain" meta-policy so the agent actually picks `ask` over web_search for stable technical questions.
 
 ```bash
-pip install 'ayiru-client[langchain]'
+# v0.2.5 will ship to PyPI; until then install from a checkout:
+pip install -e 'clients/python[langchain]'
 ```
 
-A runnable 10-question demo notebook at [clients/python/examples/langchain_demo.ipynb](clients/python/examples/langchain_demo.ipynb) shows ~7 hits + ~3 fallbacks against the v0.2 bulk graph and ends with a `/v1/stats/savings`-derived token-savings footer (the v0.2 product thesis materialized).
+A runnable 10-question demo notebook at [clients/python/examples/langchain_demo.ipynb](clients/python/examples/langchain_demo.ipynb) ends with a `/v1/stats/savings`-derived token-savings footer. See *Coverage today* below for the honest framing of what to expect.
+
+### Coverage today (v0.2)
+
+The graph indexes **40 tools** but the depth varies sharply:
+
+- **5 tools curated to depth** (the Stage 0 hand-built layer): `docker`, `git`, `github-cli`, `vercel-cli`, `openai-api`. These produce high-confidence (`≥ 0.6`), `L2_source_verified` answers and have published canonical `ToolSpec`s suitable for `validate_command`.
+- **35 tools with one thin index-page claim each** (the Stage 20 bulk-ingest layer): `kubectl`, `terraform`, `helm`, GNU CLIs, package managers, etc. These return *something* on `ask()` but at low confidence (~0.30–0.50, L1/L2 mix) because the seed URL is the docs *index*, not per-command pages. They do **not** have a published `ToolSpec` — `validate_command` won't find them.
+
+The v0.2.x depth work is to expand each bulk-ingest tool's seed list from one index URL to a handful of per-command URLs (e.g. `kubectl describe`, `kubectl logs`, …) and re-run `ayiru ingest --resume`. Track that work in [tools/v0.2_seed_keep.json](tools/v0.2_seed_keep.json).
+
+`Answer.is_useful` (`confidence ≥ 0.6 AND verification_level != "L0_unverified"`) is the right boundary for agent code: an USEFUL answer can be returned verbatim; anything else should escalate to `web_search`.
 
 ## MCP Integration
 

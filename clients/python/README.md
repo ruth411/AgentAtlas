@@ -10,11 +10,19 @@ web search round-trip on every question.
 
 ## Install
 
+PyPI publication ships with v0.2.5. Until then, install from a checkout:
+
 ```bash
-pip install ayiru-client
+git clone https://github.com/ruth411/ayiru.git
+cd ayiru
+pip install -e clients/python                     # core SDK
+pip install -e 'clients/python[langchain]'        # + LangChain adapter
 ```
 
-Requires Python 3.10+. Depends on `httpx` and `pydantic v2`.
+Requires Python 3.10+. Depends on `httpx` and `pydantic v2`. The
+`langchain` extra adds `langchain-core>=0.2`.
+
+Once 0.2.5 publishes the `pip install ayiru-client` path will work too.
 
 ## Quickstart
 
@@ -70,19 +78,83 @@ graph (Stage 20).
 All methods are available on both `Ayiru` and `AsyncAyiru`; the async
 versions are coroutines, otherwise identical.
 
-| method | purpose |
-|---|---|
-| `ask(question, *, limit=5, tool_id_hint=None)` | Natural-language query against the verified graph. |
-| `validate_command(*, tool_id, command)` | Lookup the verdict + risk classification for a specific command. |
-| `get_tool_spec(tool_id)` | Fetch the canonical ToolSpec for a tool. |
-| `search_tools(query="", *, limit=100, offset=0)` | List or filter tools known to the graph. |
-| `savings(window="all")` | Aggregate cost savings (queries served, tokens saved, USD saved). |
+### `ask(question, *, limit=5, tool_id_hint=None) -> AskResponse`
+
+Natural-language query against the verified graph. Returns an
+`AskResponse` with up to `limit` ranked `Answer`s. Pass `tool_id_hint`
+when you already know which tool the question is about (e.g.
+`"docker"`, `"kubectl"`) to narrow the search.
+
+```python
+resp = client.ask("how do I remove a docker volume")
+# resp.answers: list[Answer]
+# resp.fallback_recommended: bool  → True ⇒ agent should escalate
+# resp.estimated_tokens_saved: int → heuristic token-savings credit
+# resp.top: Answer | None          → convenience for resp.answers[0]
+# resp.is_useful: bool             → resp.top.is_useful and not fallback
+```
+
+### `validate_command(*, tool_id, command) -> ValidateCommandResponse`
+
+Lookup the verdict + risk classification for a specific command. Used
+when an agent is about to *execute* something and needs a go/no-go
+decision before the side-effect.
+
+```python
+v = client.validate_command(tool_id="github-cli", command="gh repo delete x")
+# v.safe_to_auto_execute: bool
+# v.requires_human_confirmation: bool
+# v.risk_level: "low" | "medium" | "high" | "critical" | None
+# v.reasons: list[str]            → human-readable rationale
+# v.evidence: list[EvidenceCitation]
+```
+
+### `get_tool_spec(tool_id) -> ToolSpec` (dict)
+
+Fetch the canonical ToolSpec — capability catalog, verified commands,
+risk profile. Raises `AyiruError(status_code=404,
+code="CANONICAL_SPEC_NOT_FOUND")` when no spec has been published for
+`tool_id` (the v0.2 graph has published specs for 5 tools — `docker`,
+`git`, `github-cli`, `vercel-cli`, plus `openai-api`'s pending claims).
+
+### `search_tools(query="", *, limit=100, offset=0) -> SearchToolsResponse`
+
+List tools known to the graph, optionally filtered by a substring
+match. Useful for discovery (e.g. "what does Ayiru know about?").
+
+```python
+resp = client.search_tools("docker")
+# resp.matches: list[ToolMatchSummary]
+# resp.total: int  → pre-pagination total
+```
+
+### `savings(window="all") -> SavingsResponse`
+
+Aggregate cost savings over the `QUERY_SERVED` audit stream. Pass one
+of `"24h"`, `"7d"`, `"30d"`, `"all"`.
+
+```python
+s = client.savings("7d")
+# s.total_queries_served: int
+# s.total_tokens_saved: int
+# s.estimated_usd_saved: float
+# s.fallback_count: int            → hit rate = 1 - fallback_count / total
+# s.by_top_claim: dict[str, int]   → per-claim hit counts ("__fallback__" key = misses)
+```
 
 ### `Answer.is_useful`
 
 Quick heuristic on each answer: `True` when `confidence ≥ 0.6 AND
-verification_level != "L0_UNVERIFIED"`. The threshold is intentionally
-loose — agent code typically reads it directly:
+verification_level != "L0_unverified"`.
+
+> **Wire-format note.** `verification_level` is a string with an
+> uppercase-prefix + lowercase-suffix shape: `"L0_unverified"`,
+> `"L1_schema_valid"`, `"L2_source_verified"`, `"L3_runtime_verified"`,
+> `"L4_cross_agent_verified"`, `"L5_human_audited"`. Pattern-match
+> defensively if you string-compare.
+
+The threshold is intentionally loose — agent code typically reads it
+directly:
 
 ```python
 answer = client.ask(question)
@@ -151,6 +223,22 @@ A runnable 10-question demo is at
 ends with a `/v1/stats/savings`-derived footer showing the token-savings
 tally for the run.
 
+### What "useful" means
+
+`ask()` returns three semantically distinct outcomes that agent code
+should handle separately:
+
+| outcome | how to detect | what the agent should do |
+|---|---|---|
+| **Useful** | `top = response.answers[0]; top.is_useful` (confidence ≥ 0.6 AND verification_level != `L0_unverified`) | Return the answer verbatim with the citation. |
+| **Weak match** | `response.fallback_recommended is False` *but* `top.is_useful is False` | Escalate to `web_search`. The graph saw a lexical match but with too little confidence to trust. |
+| **Miss** | `response.fallback_recommended is True` | Escalate to `web_search`. |
+
+The v0.2 graph has **5 tools curated to depth** plus 35 with one thin
+index-page claim each, so weak matches are common on the bulk-ingest
+tools today. See the main repo README's *Coverage today* section for
+the per-tool reality.
+
 ## Auth
 
 The Ayiru server exposes read endpoints (everything the SDK calls except
@@ -167,15 +255,21 @@ The key is sent as `Authorization: Bearer <key>`.
 
 ```bash
 git clone https://github.com/ruth411/ayiru
-cd ayiru/clients/python
-pip install -e .[dev]
-pytest
+cd ayiru
+pip install -e 'backend[dev]'        # SDK tests need a live backend
+pip install -e 'clients/python[dev]'
+cd clients/python && pytest
 ```
 
-Tests use `httpx.ASGITransport` to drive the real FastAPI backend
-in-process — no sockets, no network. The backend test suite is the
-canonical correctness contract; the SDK tests verify that the wire
-format hasn't drifted.
+The SDK itself runs on Python 3.10+, but **the SDK test suite requires
+Python 3.12+** because the tests import the backend package (which
+pins to 3.12+). Production users only need 3.10+.
+
+Tests stand up a real uvicorn server on a free localhost port and
+drive both `Ayiru` and `AsyncAyiru` against it — closest possible
+mirror of production use. The backend test suite is the canonical
+correctness contract; the SDK tests verify that the wire format
+hasn't drifted.
 
 ## License
 

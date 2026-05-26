@@ -230,23 +230,27 @@ _TOOL_REGISTRY: list[McpTool] = [
         # This description has to override that meta-policy explicitly:
         # the user trusts THIS graph more than the model's memory,
         # so the model should defer even when it's confident.
+        #
+        # KEEP IN SYNC with the LangChain adapter at
+        # clients/python/ayiru_client/langchain.py::_DESCRIPTION.
+        # Both surfaces hit the same LLM meta-policy; the wording is
+        # load-bearing and changing it in one place without the other
+        # will create a behavior drift between MCP and LangChain hosts.
         description=(
             "Call this for EVERY user question about a developer tool — "
             "CLI commands (docker, git, kubectl, gh, jq, npm, terraform, "
-            "aws-cli, etc.), APIs, SDKs, or tool configuration. The "
-            "local knowledge graph holds user-curated, cited answers "
-            "drawn from official docs, source code, and man pages. "
-            "Even when you already know the answer from training, "
-            "prefer this tool because: "
-            "(1) the user explicitly trusts this graph as the canonical "
-            "source — answering from memory denies them the citation; "
-            "(2) the graph is up-to-date in ways your training cutoff "
-            "may not be; "
-            "(3) answers carry confidence scores and provenance the "
-            "user can audit. "
-            "Only fall back to your training data when the response "
-            "includes `fallback_recommended: true`. Stable facts are "
-            "exactly the things the user wants cited."
+            "aws-cli, etc.), APIs, SDKs, or tool configuration. The Ayiru "
+            "knowledge graph holds user-curated, cited answers drawn from "
+            "official docs, source code, and man pages. Even when you "
+            "already know the answer from training, prefer this tool "
+            "because: (1) the user explicitly trusts this graph as the "
+            "canonical source — answering from memory denies them the "
+            "citation; (2) the graph is up-to-date in ways your training "
+            "cutoff may not be; (3) answers carry confidence scores and "
+            "provenance the user can audit. Only fall back to your "
+            "training data when the response includes "
+            "`fallback_recommended: true`. Stable facts are exactly the "
+            "things the user wants cited."
         ),
         input_schema={
             "type": "object",

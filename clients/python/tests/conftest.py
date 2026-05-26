@@ -9,7 +9,9 @@ production, and which works uniformly across `httpx.Client` and
 on `Client.close()`).
 
 The DB is session-scoped (one fresh SQLite file for the entire run);
-tests use uniquely-suffixed claim IDs so they don't collide on inserts."""
+tests use uniquely-suffixed claim IDs so they don't collide on inserts.
+Tests that need a clean DB per run can use the function-scoped
+`isolated_claim_store` fixture, which clears tables before yielding."""
 
 from __future__ import annotations
 
@@ -47,6 +49,11 @@ def _session_db() -> Iterator[str]:
     os.close(fd)
     url = f"sqlite:///{path}"
     os.environ["AYIRU_DATABASE_URL"] = url
+    # The backend's app.db.session module reads AYIRU_DATABASE_URL at
+    # import time; we set it BEFORE first import here, but if anything
+    # imported it earlier (e.g. a plugin), the module-level bindings
+    # are stale. The lazy `rebind_default_engine` helper (Stage P1-3)
+    # is the canonical way to force a refresh.
     try:
         yield url
     finally:
@@ -56,12 +63,26 @@ def _session_db() -> Iterator[str]:
 
 @pytest.fixture(scope="session")
 def _server(_session_db) -> Iterator[str]:
-    """Start uvicorn in a background thread; yield the base_url."""
+    """Start uvicorn in a background thread; yield the base_url.
+
+    Defends against three failure modes a test author shouldn't have
+    to think about:
+      1. Module already imported by a plugin before our env-var was set
+         → we call `rebind_default_engine()` to re-bind against the
+         current env. Without this, the server would write to
+         backend/ayiru.db (the dev DB) instead of our temp file.
+      2. uvicorn fails to start within 5s → raise loudly instead of
+         leaving tests timing out one by one.
+      3. Test process killed mid-run → the `try/finally` issues a
+         graceful shutdown via `should_exit`, plus a hard
+         `server.shutdown()` synchronously so the OS releases the
+         port even if the thread is jammed."""
 
     import uvicorn  # noqa: PLC0415
-    from app.db.session import init_db  # noqa: PLC0415
+    from app.db.session import init_db, rebind_default_engine  # noqa: PLC0415
     from app.main import app  # noqa: PLC0415
 
+    rebind_default_engine()  # honor the temp DB even if the module was preloaded
     init_db()
     port = _free_port()
     config = uvicorn.Config(app, host="127.0.0.1", port=port, log_level="warning")
@@ -74,6 +95,7 @@ def _server(_session_db) -> Iterator[str]:
     deadline = time.monotonic() + 5.0
     while not getattr(server, "started", False):
         if time.monotonic() > deadline:
+            server.should_exit = True
             raise RuntimeError("uvicorn did not start within 5s")
         time.sleep(0.05)
 
@@ -85,6 +107,9 @@ def _server(_session_db) -> Iterator[str]:
             h.get(f"{base_url}/health", timeout=5.0).raise_for_status()
         yield base_url
     finally:
+        # Two-phase shutdown: the cooperative flag lets uvicorn drain
+        # in-flight requests, but if it's stuck we don't want to hold
+        # the port forever — join with a short timeout, then move on.
         server.should_exit = True
         thread.join(timeout=5.0)
 
@@ -101,4 +126,35 @@ def claim_store(_server):
 
     from app.services.claim_store import get_claim_store  # noqa: PLC0415
 
+    return get_claim_store()
+
+
+@pytest.fixture
+def isolated_claim_store(_server):
+    """Function-scoped variant of `claim_store` that truncates the
+    knowledge-graph tables before yielding. Use when a test asserts on
+    "the graph is empty" or "the graph holds exactly N claims" — the
+    default session-scoped DB would carry over state from earlier tests
+    and cause non-deterministic flakes."""
+
+    from app.db.models import (  # noqa: PLC0415
+        AuditEventRecord,
+        EvidenceRecord,
+        IngestionRunRecord,
+        KnowledgeClaimRecord,
+        VerificationResultRecord,
+    )
+    from app.db.session import engine  # noqa: PLC0415
+    from app.services.claim_store import get_claim_store  # noqa: PLC0415
+    from sqlalchemy import delete  # noqa: PLC0415
+    from sqlalchemy.orm import Session  # noqa: PLC0415
+
+    with Session(engine) as session:
+        # FK order matters — evidence and verifications dangle off claims.
+        session.execute(delete(VerificationResultRecord))
+        session.execute(delete(EvidenceRecord))
+        session.execute(delete(AuditEventRecord))
+        session.execute(delete(IngestionRunRecord))
+        session.execute(delete(KnowledgeClaimRecord))
+        session.commit()
     return get_claim_store()
