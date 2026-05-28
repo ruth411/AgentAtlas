@@ -226,6 +226,28 @@ def test_answer_is_useful_threshold() -> None:
     ).is_useful is False
 
 
+def test_answer_accepts_risk_level_none() -> None:
+    """Regression for P0-1 (2026-05-26 second-pass audit): the server's
+    RiskLevel.NONE value is emitted as the string "none" for no-risk
+    claims (e.g. read-only queries cleared by safety_policy.py). The
+    SDK must accept it as a valid wire value alongside the other four
+    risk levels."""
+
+    answer = Answer(
+        claim_id="c1",
+        subject="git log",
+        statement="git log shows commit history.",
+        tool_id="git",
+        confidence=0.9,
+        confidence_band="high",
+        verification_level="L2_source_verified",
+        risk_level="none",
+        evidence=[],
+        match_reason="exact",
+    )
+    assert answer.risk_level == "none"
+
+
 def test_ask_response_top_is_none_on_empty_answers() -> None:
     resp = AskResponse(
         question="q",

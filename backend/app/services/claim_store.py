@@ -288,6 +288,58 @@ class ClaimStore:
             ).one_or_none()
             return _record_to_claim(record) if record else None
 
+    # ------------------------------------------------------------------
+    # Stage 22-stretch — semantic embedding read/write helpers
+    # ------------------------------------------------------------------
+
+    def set_embedding(self, claim_id: str, embedding_json: str) -> bool:
+        """Store the serialized 384-dim embedding for ``claim_id``.
+
+        Returns True on success, False if the claim does not exist.
+        Called by the ``ayiru reindex`` backfill and by future
+        ingestion pipelines after ``create()``."""
+
+        with self._session_factory() as session:
+            record = session.get(KnowledgeClaimRecord, claim_id)
+            if record is None:
+                return False
+            record.embedding = embedding_json
+            session.commit()
+            return True
+
+    def get_embedding(self, claim_id: str) -> str | None:
+        """Return the JSON-encoded embedding for ``claim_id``, or None
+        if the claim has not been embedded yet (or doesn't exist)."""
+
+        with self._session_factory() as session:
+            record = session.get(KnowledgeClaimRecord, claim_id)
+            return record.embedding if record else None
+
+    def list_unembedded_claim_ids(self, *, limit: int = 1000) -> list[str]:
+        """Return claim_ids for claims that don't yet have an embedding.
+        Used by ``ayiru reindex`` to find work to do."""
+
+        with self._session_factory() as session:
+            rows = session.scalars(
+                select(KnowledgeClaimRecord.claim_id)
+                .where(KnowledgeClaimRecord.embedding.is_(None))
+                .order_by(KnowledgeClaimRecord.created_at, KnowledgeClaimRecord.claim_id)
+                .limit(limit)
+            ).all()
+            return list(rows)
+
+    def list_all_claim_embeddings(self) -> list[tuple[str, str]]:
+        """Return [(claim_id, embedding_json)] for every claim that has
+        an embedding stored. Loaded once per ``ask()`` call so the
+        re-rank step is O(n) over claims rather than O(n) round-trips."""
+
+        with self._session_factory() as session:
+            rows = session.execute(
+                select(KnowledgeClaimRecord.claim_id, KnowledgeClaimRecord.embedding)
+                .where(KnowledgeClaimRecord.embedding.is_not(None))
+            ).all()
+            return [(claim_id, emb) for claim_id, emb in rows]
+
     def find_semantic_duplicates(self, claim: KnowledgeClaim) -> list[KnowledgeClaim]:
         with self._session_factory() as session:
             records = session.scalars(

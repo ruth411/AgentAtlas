@@ -83,6 +83,11 @@ class KnowledgeClaimRecord(Base):
     confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
     confidence_band: Mapped[str | None] = mapped_column(String(32), nullable=True, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    # Stage 22-stretch — JSON-encoded list[float] embedding of
+    # "subject + statement" used by the query engine for semantic
+    # re-ranking. Nullable: existing claims load without; backfill via
+    # `ayiru reindex`. See migration 0017.
+    embedding: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     evidence: Mapped[list["EvidenceRecord"]] = relationship(
         back_populates="claim",

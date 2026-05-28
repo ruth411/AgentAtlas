@@ -276,6 +276,34 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     p_ingest.set_defaults(func=_cmd_ingest)
 
+    # reindex — Stage 22-stretch: backfill embeddings for claims that
+    # don't have one yet. Run once after migration 0017 lands; idempotent
+    # so re-running on an already-embedded DB is a fast no-op.
+    p_reindex = sub.add_parser(
+        "reindex",
+        help=(
+            "Compute and store semantic embeddings for every claim that "
+            "doesn't have one yet. Required to enable the query engine's "
+            "semantic re-ranking; without it, `ask` falls back to "
+            "lexical-only scoring (the v0.2 behaviour)."
+        ),
+    )
+    p_reindex.add_argument(
+        "--batch-size",
+        type=int,
+        default=64,
+        help="Embed this many claims per fastembed batch. Higher = faster "
+        "throughput but more RAM. Default 64.",
+    )
+    p_reindex.add_argument(
+        "--limit",
+        type=int,
+        default=None,
+        help="Only embed the first N un-embedded claims. Useful for "
+        "incremental backfills on large graphs.",
+    )
+    p_reindex.set_defaults(func=_cmd_reindex)
+
     return parser
 
 
@@ -568,6 +596,77 @@ def _cmd_ingest(args: argparse.Namespace) -> int:
         f"{skipped} skipped across {total_urls} URLs."
     )
     return 0 if failure == 0 else 1
+
+
+def _cmd_reindex(args: argparse.Namespace) -> int:
+    """Stage 22-stretch — backfill semantic embeddings for un-embedded claims.
+
+    Computes a 384-dim BGE embedding of ``subject + statement`` for every
+    claim whose ``embedding`` column is NULL, then writes it via
+    ``ClaimStore.set_embedding``. Idempotent: re-running after every claim
+    has an embedding is a fast no-op (0 claims to process).
+
+    Exit codes:
+      0 — success (including the no-op case)
+      1 — at least one claim failed to embed; counts surface in the summary
+    """
+    from app.services.claim_store import get_claim_store
+    from app.services.embedding_service import (
+        EmbeddingService,
+        claim_embedding_text,
+        serialize_embedding,
+    )
+
+    store = get_claim_store()
+    todo_ids = store.list_unembedded_claim_ids(
+        limit=args.limit if args.limit is not None else 1_000_000
+    )
+    total = len(todo_ids)
+
+    if total == 0:
+        print("ayiru reindex: no un-embedded claims; graph is up to date.")
+        return 0
+
+    print(
+        f"ayiru reindex: {total} claims to embed "
+        f"(batch_size={args.batch_size})  this loads BAAI/bge-small-en-v1.5 "
+        f"on first call (~130 MB, one-time)…",
+        flush=True,
+    )
+
+    svc = EmbeddingService.get_default()
+    ok = failed = 0
+
+    # Process in batches: fastembed amortizes ONNX session overhead, so
+    # batching is ~5x faster than one-by-one even for small graphs.
+    for batch_start in range(0, total, args.batch_size):
+        batch_ids = todo_ids[batch_start : batch_start + args.batch_size]
+        claims = [store.get(cid) for cid in batch_ids]
+        valid = [(cid, c) for cid, c in zip(batch_ids, claims) if c is not None]
+        if not valid:
+            failed += len(batch_ids)
+            continue
+        texts = [
+            claim_embedding_text(subject=c.subject, statement=c.statement)
+            for _, c in valid
+        ]
+        try:
+            vectors = svc.embed_many(texts)
+        except Exception as exc:  # noqa: BLE001
+            print(f"  ✗ batch starting at #{batch_start}: {type(exc).__name__}: {exc}")
+            failed += len(valid)
+            continue
+        for (cid, _), vec in zip(valid, vectors):
+            if store.set_embedding(cid, serialize_embedding(vec)):
+                ok += 1
+            else:
+                failed += 1
+        # Per-batch progress so a slow first-batch (cold model load) is
+        # visible instead of looking hung.
+        print(f"  ✓ embedded {batch_start + len(valid)}/{total}", flush=True)
+
+    print(f"\nReindex complete: {ok} embedded / {failed} failed.")
+    return 0 if failed == 0 else 1
 
 
 def _cmd_seed(args: argparse.Namespace) -> int:

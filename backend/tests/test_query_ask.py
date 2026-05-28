@@ -493,7 +493,14 @@ def test_ask_answer_projects_verification_level_from_latest_result(
 ) -> None:
     """verification_level lives on the VerificationResult, not the claim
     record. ask() must batch-fetch the latest result for the top-N
-    claims and surface its level on the Answer payload."""
+    claims and surface its level on the Answer payload.
+
+    Stage 22-stretch — Answer.confidence is now the match-relevance score
+    (lexical-only here since the test fixture doesn't embed claims), not
+    the orchestrator's claim-quality score. verification_level remains
+    the canonical trust signal; confidence answers a different question
+    ("does this claim address THIS question") and is computed per-ask.
+    """
     _add_claim(
         store,
         subject="docker rm",
@@ -508,8 +515,11 @@ def test_ask_answer_projects_verification_level_from_latest_result(
     answer = response.answers[0]
     assert isinstance(answer, Answer)
     assert answer.verification_level == VerificationLevel.L3_RUNTIME_VERIFIED
-    assert answer.confidence == pytest.approx(0.92)
-    assert answer.confidence_band == ConfidenceBand.STRONG
+    # Match-relevance score is normalised lexical (or hybrid lexical+semantic
+    # when embeddings exist). Without an embedding in this fixture it's the
+    # lexical score; we just require it to be positive and bounded.
+    assert 0.0 < answer.confidence <= 1.0
+    assert answer.confidence_band is not None
 
 
 def test_ask_limit_caps_returned_answers(

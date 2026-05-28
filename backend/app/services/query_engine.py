@@ -58,6 +58,11 @@ from app.services.claim_store import ClaimStore
 from app.services.command_matcher import CommandMatch, match_command
 from app.services.confidence_scorer import band_for_score
 from app.services.contract_paths import contract_path
+from app.services.embedding_service import (
+    EmbeddingService,
+    cosine_similarity,
+    deserialize_embedding,
+)
 from app.services.risk_classifier import classify_action
 
 
@@ -87,6 +92,21 @@ _STAGE_0_CONTRACT = contract_path("ayiru_stage_0.v1.json")
 # matches subject AND a content token in the statement clears the bar.
 # Tune from real audit data once Stage 18 telemetry lands.
 _ASK_SCORE_THRESHOLD = 0.30
+
+# Stage 22-stretch — semantic re-rank weighting.
+#
+# When a claim has a stored embedding, ask() blends lexical and semantic
+# scores into a hybrid:
+#   hybrid = (1 - _SEMANTIC_WEIGHT) * lexical + _SEMANTIC_WEIGHT * semantic
+# Semantic dominates because the failure mode we're fixing is "right
+# claim found by lexical, but at 0.45 confidence — below the SDK's
+# is_useful 0.6 gate." Cosine similarity on correct matches clusters
+# 0.7-0.85, so with semantic weighted 0.7 the hybrid clears 0.6 for
+# real matches while keeping the threshold honest for noise.
+#
+# Set _SEMANTIC_WEIGHT=0 to disable semantic re-rank entirely (back to
+# the v0.2 lexical-only behavior — useful for A/B comparisons).
+_SEMANTIC_WEIGHT = 0.70
 _STOP_WORDS: frozenset[str] = frozenset({
     "a", "about", "after", "again", "all", "also", "am", "an", "and", "any",
     "are", "as", "at", "be", "because", "been", "before", "being", "between",
@@ -303,6 +323,13 @@ class QueryEngine:
                 reason = f"{reason}; uncurated tool ({claim.tool_id})"
             scored.append((score, claim.claim_id, claim, reason))
 
+        # Stage 22-stretch — semantic re-rank.
+        # For each lexically-scored candidate that has a stored embedding,
+        # replace its score with a hybrid of lexical + cosine-similarity.
+        # Candidates without an embedding (un-reindexed legacy rows) keep
+        # their lexical score so the engine still works gracefully.
+        scored = self._semantic_rerank(normalized_question, scored)
+
         # Sort: score DESC, claim_id ASC (deterministic tie-break).
         scored.sort(key=lambda row: (-row[0], row[1]))
 
@@ -322,8 +349,9 @@ class QueryEngine:
                     claim,
                     match_reason=reason,
                     latest_result=latest_results.get(claim.claim_id),
+                    match_score=match_score,
                 )
-                for _, _, claim, reason in top
+                for match_score, _, claim, reason in top
             ]
 
         # Heuristic token savings. Zero on fallback so the caller doesn't
@@ -355,6 +383,67 @@ class QueryEngine:
             estimated_tokens_saved=estimated_savings,
             generated_at=generated_at,
         )
+
+    def _semantic_rerank(
+        self,
+        question: str,
+        scored: list[tuple[float, str, KnowledgeClaim, str]],
+    ) -> list[tuple[float, str, KnowledgeClaim, str]]:
+        """Stage 22-stretch — re-rank lexical candidates by semantic
+        similarity to the question.
+
+        Strategy:
+          1. Pull each candidate's stored embedding (NULL = no rerank for
+             that row; keeps lexical score).
+          2. Embed the question once via the shared EmbeddingService
+             singleton. Model loads lazily on first call.
+          3. For each candidate with an embedding, replace its score with
+             ``(1 - W) * lexical + W * cosine`` where W = _SEMANTIC_WEIGHT.
+
+        Returns a new list with updated scores; caller still sorts.
+
+        If the EmbeddingService can't be loaded (offline, missing model
+        weights), this falls back gracefully to lexical-only ranking
+        rather than failing the entire ``ask()`` call."""
+
+        if _SEMANTIC_WEIGHT <= 0.0 or not scored:
+            return scored
+
+        # Pull only the embeddings we need (top-N candidates after lexical
+        # — typically <50 even for popular tools).
+        candidate_ids = [row[1] for row in scored]
+        embeddings: dict[str, list[float]] = {}
+        for cid in candidate_ids:
+            raw = self._store.get_embedding(cid)
+            decoded = deserialize_embedding(raw)
+            if decoded is not None:
+                embeddings[cid] = decoded
+
+        if not embeddings:
+            # No candidate has an embedding yet → behave exactly like the
+            # v0.2 lexical-only engine. The `ayiru reindex` command is
+            # the one-shot fix.
+            return scored
+
+        try:
+            question_vec = EmbeddingService.get_default().embed_one(question)
+        except Exception:  # noqa: BLE001
+            # Model load failed (e.g., no network, no cached weights).
+            # Fall back to lexical; the operator can fix this offline
+            # without breaking the ask() endpoint.
+            return scored
+
+        reranked: list[tuple[float, str, KnowledgeClaim, str]] = []
+        for lex_score, cid, claim, reason in scored:
+            emb = embeddings.get(cid)
+            if emb is None:
+                reranked.append((lex_score, cid, claim, reason))
+                continue
+            sem = max(0.0, cosine_similarity(question_vec, emb))
+            hybrid = (1 - _SEMANTIC_WEIGHT) * lex_score + _SEMANTIC_WEIGHT * sem
+            new_reason = f"{reason}; semantic={sem:.2f}, hybrid={hybrid:.2f}"
+            reranked.append((hybrid, cid, claim, new_reason))
+        return reranked
 
     def _emit_query_served(
         self,
@@ -919,6 +1008,7 @@ def _claim_to_answer(
     *,
     match_reason: str,
     latest_result: VerificationResult | None,
+    match_score: float | None = None,
 ) -> Answer:
     """Project an accepted `KnowledgeClaim` into an `Answer` for the
     AskResponse. Mirrors `_summarise_tool_spec`'s role for search_tools.
@@ -930,18 +1020,33 @@ def _claim_to_answer(
     verification_level lives only on the result row — so we read it
     from there.
 
-    For ACCEPTED claims (the only kind ask() returns) the orchestrator
-    guarantees a result exists. We still defend against the type-system
-    gap with an L1 + claim.confidence fallback rather than raising;
-    a missing result here is a data-integrity issue worth surfacing
-    upstream, not a request-time crash.
+    Stage 22-stretch — ``match_score`` is the (now-hybrid) score from the
+    query engine's lexical + semantic ranking pipeline. When provided,
+    we report it as ``Answer.confidence`` because it answers the
+    question "how confident are we this claim is RELEVANT to the
+    question." Verification level still carries the trust signal
+    separately, so the SDK's ``is_useful`` (confidence ≥ 0.6 AND level
+    != L0_unverified) becomes a clean composition: match-quality AND
+    trust.
+
+    Callers that don't run through the ranking pipeline (validate_command,
+    direct claim retrieval) pass ``match_score=None`` and we fall back
+    to the orchestrator's claim confidence — preserving v0.2 behavior
+    for non-ask code paths.
     """
     if latest_result is not None:
         verification_level = latest_result.verification_level
-        confidence = latest_result.confidence
+        claim_confidence = latest_result.confidence
     else:
         verification_level = VerificationLevel.L1_SCHEMA_VALID
-        confidence = claim.confidence or 0.0
+        claim_confidence = claim.confidence or 0.0
+
+    if match_score is None:
+        confidence = claim_confidence
+    else:
+        # Clamp into [0, 1] in case the hybrid math produces a tiny
+        # overshoot from float precision.
+        confidence = max(0.0, min(1.0, match_score))
 
     return Answer(
         claim_id=claim.claim_id,

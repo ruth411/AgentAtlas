@@ -28,7 +28,11 @@ _VerificationLevel = Literal[
 ]
 
 _ConfidenceBand = Literal["none", "low", "moderate", "high", "strong"]
-_RiskLevel = Literal["low", "medium", "high", "critical"]
+# Server's RiskLevel StrEnum has 5 values — "none" is emitted for no-risk
+# claims by safety_policy.py and consumed by risk_engine.py. Missing this
+# literal here was P0-1 from the 2026-05-26 second-pass audit: real server
+# responses with risk_level="none" failed Pydantic validation.
+_RiskLevel = Literal["none", "low", "medium", "high", "critical"]
 _MatchMethod = Literal["exact", "prefix", "none"]
 _TrustLevel = Literal["low", "medium", "high"]
 
