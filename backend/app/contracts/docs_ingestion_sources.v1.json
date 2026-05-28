@@ -80,6 +80,42 @@
           "claim_type": "cli_command_exists",
           "subject": "kubectl",
           "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_get/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl get",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_describe/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl describe",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_apply/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl apply",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_logs/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl logs",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_exec/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl exec",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_delete/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl delete",
+          "evidence_type": "official_docs"
         }
       ]
     },
@@ -89,6 +125,42 @@
           "url": "https://developer.hashicorp.com/terraform/cli/commands",
           "claim_type": "cli_command_exists",
           "subject": "terraform",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://developer.hashicorp.com/terraform/cli/commands/init",
+          "claim_type": "cli_command_exists",
+          "subject": "terraform init",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://developer.hashicorp.com/terraform/cli/commands/plan",
+          "claim_type": "cli_command_exists",
+          "subject": "terraform plan",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://developer.hashicorp.com/terraform/cli/commands/apply",
+          "claim_type": "cli_command_exists",
+          "subject": "terraform apply",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://developer.hashicorp.com/terraform/cli/commands/destroy",
+          "claim_type": "cli_command_exists",
+          "subject": "terraform destroy",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://developer.hashicorp.com/terraform/cli/commands/state",
+          "claim_type": "cli_command_exists",
+          "subject": "terraform state",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://developer.hashicorp.com/terraform/cli/commands/import",
+          "claim_type": "cli_command_exists",
+          "subject": "terraform import",
           "evidence_type": "official_docs"
         }
       ]
@@ -100,6 +172,42 @@
           "claim_type": "cli_command_exists",
           "subject": "helm",
           "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_install/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm install",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_upgrade/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm upgrade",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_uninstall/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm uninstall",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_list/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm list",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_repo/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm repo",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_template/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm template",
+          "evidence_type": "official_docs"
         }
       ]
     },
@@ -109,6 +217,42 @@
           "url": "https://docs.ansible.com/ansible/latest/cli/ansible.html",
           "claim_type": "cli_command_exists",
           "subject": "ansible",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/cli/ansible-playbook.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible-playbook",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/cli/ansible-galaxy.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible-galaxy",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/cli/ansible-vault.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible-vault",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/cli/ansible-config.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible-config",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/cli/ansible-inventory.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible-inventory",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/cli/ansible-doc.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible-doc",
           "evidence_type": "official_docs"
         }
       ]
@@ -179,6 +323,42 @@
           "url": "https://pip.pypa.io/en/stable/cli/",
           "claim_type": "cli_command_exists",
           "subject": "pip",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/cli/pip_install/",
+          "claim_type": "cli_command_exists",
+          "subject": "pip install",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/cli/pip_uninstall/",
+          "claim_type": "cli_command_exists",
+          "subject": "pip uninstall",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/cli/pip_list/",
+          "claim_type": "cli_command_exists",
+          "subject": "pip list",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/cli/pip_freeze/",
+          "claim_type": "cli_command_exists",
+          "subject": "pip freeze",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/cli/pip_show/",
+          "claim_type": "cli_command_exists",
+          "subject": "pip show",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/cli/pip_download/",
+          "claim_type": "cli_command_exists",
+          "subject": "pip download",
           "evidence_type": "official_docs"
         }
       ]
@@ -549,6 +729,2756 @@
           "url": "https://helm.sh/docs/topics/charts/",
           "claim_type": "cli_command_exists",
           "subject": "helm charts",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "ansible-cli": {
+      "sources": [
+        {
+          "url": "https://docs.ansible.com/ansible/latest/cli/ansible.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible (ad-hoc command tool)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/cli/ansible-playbook.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible-playbook",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/cli/ansible-galaxy.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible-galaxy",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/cli/ansible-vault.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible-vault (CLI)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/cli/ansible-doc.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible-doc",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/cli/ansible-config.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible-config",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/cli/ansible-inventory.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible-inventory (CLI)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/cli/ansible-console.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible-console",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/cli/ansible-pull.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible-pull",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/cli/ansible-test.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible-test",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_startnstep.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible-playbook --start-at-task and --step",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_intro.html#using-tags",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible-playbook --tags and --skip-tags",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/galaxy/user_guide/index.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible-galaxy user guide (installing roles + collections)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections_guide/index.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Ansible collections guide (FQCN, ansible.cfg, namespaces)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections_guide/collections_installing.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Installing collections (ansible-galaxy collection install)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections_guide/collections_using_playbooks.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Using collections in playbooks (collections: keyword, FQCN)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections_guide/collections_listing.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Listing installed collections",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections_guide/collections_downloading.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Downloading collections offline",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections_guide/collections_verifying.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Verifying collection signatures",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "ansible-modules": {
+      "sources": [
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/apt_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.apt",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/yum_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.yum",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/dnf_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.dnf",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/package_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.package",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/pip_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.pip",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/copy_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.copy",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/template_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.template",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.file",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/lineinfile_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.lineinfile",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/replace_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.replace",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/blockinfile_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.blockinfile",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/unarchive_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.unarchive",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/find_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.find",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/stat_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.stat",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/fetch_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.fetch",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/user_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.user",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/group_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.group",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/service_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.service",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/systemd_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.systemd",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/command_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.command",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.shell",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/raw_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.raw",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/script_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.script",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/uri_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.uri",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/get_url_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.get_url",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/git_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.git",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/debug_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.debug",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/set_fact_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.set_fact",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/fail_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.fail",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/assert_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.assert",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/pause_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.pause",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/wait_for_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.wait_for",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/include_tasks_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.include_tasks",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/import_tasks_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.import_tasks",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/include_role_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.include_role",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/import_role_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.import_role",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/include_vars_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.include_vars",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/setup_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.setup (gather_facts)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/cron_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.cron",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/meta_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.meta",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/add_host_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.add_host",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/group_by_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.group_by",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/hostname_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.hostname",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/reboot_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.reboot",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/known_hosts_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.known_hosts",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/set_stats_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.set_stats",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/slurp_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.slurp",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/tempfile_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.tempfile",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/validate_argument_spec_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.validate_argument_spec",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/import_playbook_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.import_playbook",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/iptables_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.iptables",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/expect_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.expect",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/rpm_key_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.rpm_key",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/service_facts_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.service_facts",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/package_facts_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.package_facts",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/getent_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.getent",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/gather_facts_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.gather_facts",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/deb822_repository_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.deb822_repository",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/apt_key_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.apt_key",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/apt_repository_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.apt_repository",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/yum_repository_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.yum_repository",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/subversion_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.subversion",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/hg_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.hg",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/ping_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.ping",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/archive_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.archive",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/xml_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.xml",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/timezone_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.timezone",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/locale_gen_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.locale_gen",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/hostname_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.hostname",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/sudoers_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.sudoers",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/interfaces_file_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.interfaces_file",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/nmcli_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.nmcli",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/ufw_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.ufw",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/iptables_state_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.iptables_state",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/pacman_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.pacman",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/snap_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.snap",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/snap_alias_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.snap_alias",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/flatpak_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.flatpak",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/flatpak_remote_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.flatpak_remote",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/homebrew_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.homebrew",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/homebrew_cask_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.homebrew_cask",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/homebrew_tap_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.homebrew_tap",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/make_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.make",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/npm_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.npm",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/bundler_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.bundler",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/bower_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.bower",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/composer_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.composer",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/gem_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.gem",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/yarn_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.yarn",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/htpasswd_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.htpasswd",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/ini_file_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.ini_file",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/ipa_config_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.ipa_config",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/json_query_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.json_query",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/pids_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.pids",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/supervisorctl_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.supervisorctl",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/modprobe_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.modprobe",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/mongodb_user_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.mongodb_user",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/redis_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.redis",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/mssql_db_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.mssql_db",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/lxc_container_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.lxc_container",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/proxmox_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.proxmox",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/proxmox_kvm_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.proxmox_kvm",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/java_keystore_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.java_keystore",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/openssh_keypair_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.openssh_keypair",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/pam_limits_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.pam_limits",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/cronvar_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.cronvar",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/consul_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.consul",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/etcd3_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.etcd3",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/keycloak_user_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.keycloak_user",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/rabbitmq_user_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.rabbitmq_user",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/redis_data_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.redis_data",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/ec2_instance_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.ec2_instance",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/ec2_instance_info_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.ec2_instance_info",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/ec2_key_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.ec2_key",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/ec2_security_group_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.ec2_security_group",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/ec2_vpc_net_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.ec2_vpc_net",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/ec2_vpc_subnet_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.ec2_vpc_subnet",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/ec2_vpc_route_table_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.ec2_vpc_route_table",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/ec2_vpc_igw_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.ec2_vpc_igw",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/ec2_vpc_nat_gateway_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.ec2_vpc_nat_gateway",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/ec2_eip_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.ec2_eip",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/s3_bucket_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.s3_bucket",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/s3_object_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.s3_object",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/s3_bucket_info_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.s3_bucket_info",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/iam_user_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.iam_user",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/iam_role_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.iam_role",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/iam_policy_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.iam_policy",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/iam_group_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.iam_group",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/iam_access_key_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.iam_access_key",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/rds_instance_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.rds_instance",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/rds_cluster_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.rds_cluster",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/rds_snapshot_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.rds_snapshot",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/lambda_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.lambda",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/lambda_alias_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.lambda_alias",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/lambda_event_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.lambda_event",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/cloudformation_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.cloudformation",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/cloudformation_stack_set_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.cloudformation_stack_set",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/route53_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.route53",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/route53_zone_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.route53_zone",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/elb_application_lb_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.elb_application_lb",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/elb_classic_lb_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.elb_classic_lb",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/autoscaling_group_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.autoscaling_group",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "kubernetes.core.k8s",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_info_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "kubernetes.core.k8s_info",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_scale_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "kubernetes.core.k8s_scale",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_drain_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "kubernetes.core.k8s_drain",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_exec_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "kubernetes.core.k8s_exec",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_log_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "kubernetes.core.k8s_log",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_rollback_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "kubernetes.core.k8s_rollback",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/kubernetes/core/helm_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "kubernetes.core.helm",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/kubernetes/core/helm_info_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "kubernetes.core.helm_info",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/kubernetes/core/helm_repository_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "kubernetes.core.helm_repository",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/kubernetes/core/helm_template_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "kubernetes.core.helm_template",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_taint_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "kubernetes.core.k8s_taint",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_cluster_info_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "kubernetes.core.k8s_cluster_info",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/posix/acl_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.posix.acl",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/posix/at_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.posix.at",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/posix/authorized_key_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.posix.authorized_key",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/posix/firewalld_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.posix.firewalld",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/posix/firewalld_info_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.posix.firewalld_info",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/posix/mount_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.posix.mount",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/posix/patch_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.posix.patch",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/posix/rhel_facts_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.posix.rhel_facts",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/posix/rsync_password_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.posix.rsync_password",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/posix/seboolean_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.posix.seboolean",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/posix/selinux_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.posix.selinux",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/posix/sysctl_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.posix.sysctl",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/posix/synchronize_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.posix.synchronize",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/posix/skippy_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.posix.skippy",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_command_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.windows.win_command",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_shell_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.windows.win_shell",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_powershell_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.windows.win_powershell",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_copy_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.windows.win_copy",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_get_url_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.windows.win_get_url",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_file_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.windows.win_file",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_template_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.windows.win_template",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_user_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.windows.win_user",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_group_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.windows.win_group",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_group_membership_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.windows.win_group_membership",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_service_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.windows.win_service",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_service_info_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.windows.win_service_info",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_package_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.windows.win_package",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_chocolatey_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.windows.win_chocolatey",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_dsc_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.windows.win_dsc",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_reboot_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.windows.win_reboot",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_updates_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.windows.win_updates",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_feature_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.windows.win_feature",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_regedit_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.windows.win_regedit",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_path_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.windows.win_path",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_environment_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.windows.win_environment",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_acl_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.windows.win_acl",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_owner_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.windows.win_owner",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_share_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.windows.win_share",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_robocopy_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.windows.win_robocopy",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_uri_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.windows.win_uri",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_credential_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.windows.win_credential",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_firewall_rule_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.windows.win_firewall_rule",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_certificate_store_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.windows.win_certificate_store",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_scheduled_task_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.windows.win_scheduled_task",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/docker/docker_container_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.docker.docker_container",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/docker/docker_container_info_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.docker.docker_container_info",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/docker/docker_container_exec_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.docker.docker_container_exec",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/docker/docker_image_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.docker.docker_image",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/docker/docker_image_info_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.docker.docker_image_info",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/docker/docker_image_pull_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.docker.docker_image_pull",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/docker/docker_image_push_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.docker.docker_image_push",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/docker/docker_image_tag_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.docker.docker_image_tag",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/docker/docker_compose_v2_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.docker.docker_compose_v2",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/docker/docker_compose_v2_pull_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.docker.docker_compose_v2_pull",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/docker/docker_login_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.docker.docker_login",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/docker/docker_network_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.docker.docker_network",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/docker/docker_network_info_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.docker.docker_network_info",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/docker/docker_volume_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.docker.docker_volume",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/docker/docker_volume_info_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.docker.docker_volume_info",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/docker/docker_swarm_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.docker.docker_swarm",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/docker/docker_swarm_info_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.docker.docker_swarm_info",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/docker/docker_swarm_service_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.docker.docker_swarm_service",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/docker/docker_node_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.docker.docker_node",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/docker/docker_stack_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.docker.docker_stack",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/docker/docker_config_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.docker.docker_config",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/docker/docker_secret_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.docker.docker_secret",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/docker/docker_host_info_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.docker.docker_host_info",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/docker/docker_prune_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.docker.docker_prune",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/docker/current_container_facts_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.docker.current_container_facts",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/crypto/openssl_privatekey_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.crypto.openssl_privatekey",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/crypto/openssl_certificate_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.crypto.openssl_certificate",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/crypto/openssl_csr_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.crypto.openssl_csr",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/crypto/openssl_csr_pipe_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.crypto.openssl_csr_pipe",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/crypto/openssl_publickey_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.crypto.openssl_publickey",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/crypto/openssl_publickey_info_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.crypto.openssl_publickey_info",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/crypto/x509_certificate_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.crypto.x509_certificate",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/crypto/x509_certificate_info_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.crypto.x509_certificate_info",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/crypto/x509_crl_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.crypto.x509_crl",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/crypto/acme_certificate_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.crypto.acme_certificate",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/crypto/acme_certificate_revoke_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.crypto.acme_certificate_revoke",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/crypto/acme_account_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.crypto.acme_account",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/crypto/certificate_complete_chain_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.crypto.certificate_complete_chain",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/crypto/openssh_cert_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.crypto.openssh_cert",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/crypto/openssh_keypair_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.crypto.openssh_keypair",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/mysql/mysql_db_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.mysql.mysql_db",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/mysql/mysql_user_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.mysql.mysql_user",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/mysql/mysql_query_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.mysql.mysql_query",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/mysql/mysql_replication_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.mysql.mysql_replication",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/mysql/mysql_variables_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.mysql.mysql_variables",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/mysql/mysql_info_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.mysql.mysql_info",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/mysql/mysql_role_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.mysql.mysql_role",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/mysql/mysql_global_status_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.mysql.mysql_global_status",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/mysql/mysql_innodb_cluster_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.mysql.mysql_innodb_cluster",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/mysql/mysql_settings_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.mysql.mysql_settings",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/postgresql/postgresql_db_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.postgresql.postgresql_db",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/postgresql/postgresql_user_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.postgresql.postgresql_user",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/postgresql/postgresql_query_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.postgresql.postgresql_query",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/postgresql/postgresql_privs_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.postgresql.postgresql_privs",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/postgresql/postgresql_table_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.postgresql.postgresql_table",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/postgresql/postgresql_info_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.postgresql.postgresql_info",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/postgresql/postgresql_idx_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.postgresql.postgresql_idx",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/postgresql/postgresql_membership_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.postgresql.postgresql_membership",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/postgresql/postgresql_owner_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.postgresql.postgresql_owner",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/postgresql/postgresql_publication_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.postgresql.postgresql_publication",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/mongodb/mongodb_user_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.mongodb.mongodb_user",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/mongodb/mongodb_shard_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.mongodb.mongodb_shard",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/mongodb/mongodb_shell_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.mongodb.mongodb_shell",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/mongodb/mongodb_replicaset_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.mongodb.mongodb_replicaset",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/mongodb/mongodb_status_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.mongodb.mongodb_status",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/mongodb/mongodb_balancer_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.mongodb.mongodb_balancer",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/mongodb/mongodb_index_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.mongodb.mongodb_index",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/mongodb/mongodb_role_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.mongodb.mongodb_role",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/mongodb/mongodb_oplog_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.mongodb.mongodb_oplog",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/mongodb/mongodb_parameter_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.mongodb.mongodb_parameter",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/cisco/ios/ios_command_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cisco.ios.ios_command",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/cisco/ios/ios_config_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cisco.ios.ios_config",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/cisco/ios/ios_facts_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cisco.ios.ios_facts",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/cisco/ios/ios_interfaces_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cisco.ios.ios_interfaces",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/cisco/ios/ios_l3_interfaces_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cisco.ios.ios_l3_interfaces",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/cisco/ios/ios_l2_interfaces_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cisco.ios.ios_l2_interfaces",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/cisco/ios/ios_vlans_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cisco.ios.ios_vlans",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/cisco/ios/ios_bgp_global_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cisco.ios.ios_bgp_global",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/cisco/ios/ios_acls_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cisco.ios.ios_acls",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/cisco/ios/ios_static_routes_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cisco.ios.ios_static_routes",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/cisco/ios/ios_user_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cisco.ios.ios_user",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/cisco/ios/ios_logging_global_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cisco.ios.ios_logging_global",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/cisco/ios/ios_system_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cisco.ios.ios_system",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/cisco/ios/ios_ntp_global_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cisco.ios.ios_ntp_global",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/cisco/ios/ios_lag_interfaces_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cisco.ios.ios_lag_interfaces",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/cisco/nxos/nxos_command_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cisco.nxos.nxos_command",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/cisco/nxos/nxos_config_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cisco.nxos.nxos_config",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/cisco/nxos/nxos_facts_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cisco.nxos.nxos_facts",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/cisco/nxos/nxos_interfaces_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cisco.nxos.nxos_interfaces",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/cisco/nxos/nxos_l3_interfaces_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cisco.nxos.nxos_l3_interfaces",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/cisco/nxos/nxos_vlans_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cisco.nxos.nxos_vlans",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/cisco/nxos/nxos_bgp_global_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cisco.nxos.nxos_bgp_global",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/cisco/nxos/nxos_ospfv2_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cisco.nxos.nxos_ospfv2",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/cisco/nxos/nxos_acls_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cisco.nxos.nxos_acls",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/cisco/nxos/nxos_static_routes_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cisco.nxos.nxos_static_routes",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/cisco/nxos/nxos_user_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cisco.nxos.nxos_user",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/cisco/nxos/nxos_vrf_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cisco.nxos.nxos_vrf",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/cisco/nxos/nxos_evpn_global_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cisco.nxos.nxos_evpn_global",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/cisco/nxos/nxos_vpc_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cisco.nxos.nxos_vpc",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/cisco/nxos/nxos_logging_global_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cisco.nxos.nxos_logging_global",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/vyos/vyos/vyos_command_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "vyos.vyos.vyos_command",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/vyos/vyos/vyos_config_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "vyos.vyos.vyos_config",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/vyos/vyos/vyos_facts_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "vyos.vyos.vyos_facts",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/vyos/vyos/vyos_interfaces_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "vyos.vyos.vyos_interfaces",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/vyos/vyos/vyos_l3_interfaces_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "vyos.vyos.vyos_l3_interfaces",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/vyos/vyos/vyos_lag_interfaces_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "vyos.vyos.vyos_lag_interfaces",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/vyos/vyos/vyos_static_routes_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "vyos.vyos.vyos_static_routes",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/vyos/vyos/vyos_firewall_rules_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "vyos.vyos.vyos_firewall_rules",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/vyos/vyos/vyos_user_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "vyos.vyos.vyos_user",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/vyos/vyos/vyos_ntp_global_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "vyos.vyos.vyos_ntp_global",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/azure/azcollection/azure_rm_virtualmachine_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "azure.azcollection.azure_rm_virtualmachine",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/azure/azcollection/azure_rm_virtualmachine_info_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "azure.azcollection.azure_rm_virtualmachine_info",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/azure/azcollection/azure_rm_resourcegroup_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "azure.azcollection.azure_rm_resourcegroup",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/azure/azcollection/azure_rm_storageaccount_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "azure.azcollection.azure_rm_storageaccount",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/azure/azcollection/azure_rm_storageblob_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "azure.azcollection.azure_rm_storageblob",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/azure/azcollection/azure_rm_keyvault_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "azure.azcollection.azure_rm_keyvault",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/azure/azcollection/azure_rm_keyvaultsecret_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "azure.azcollection.azure_rm_keyvaultsecret",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/azure/azcollection/azure_rm_aks_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "azure.azcollection.azure_rm_aks",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/azure/azcollection/azure_rm_aksversion_info_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "azure.azcollection.azure_rm_aksversion_info",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/azure/azcollection/azure_rm_publicipaddress_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "azure.azcollection.azure_rm_publicipaddress",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/azure/azcollection/azure_rm_networkinterface_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "azure.azcollection.azure_rm_networkinterface",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/azure/azcollection/azure_rm_subnet_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "azure.azcollection.azure_rm_subnet",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/azure/azcollection/azure_rm_virtualnetwork_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "azure.azcollection.azure_rm_virtualnetwork",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/azure/azcollection/azure_rm_appgateway_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "azure.azcollection.azure_rm_appgateway",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/azure/azcollection/azure_rm_loadbalancer_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "azure.azcollection.azure_rm_loadbalancer",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/google/cloud/gcp_compute_instance_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "google.cloud.gcp_compute_instance",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/google/cloud/gcp_compute_instance_info_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "google.cloud.gcp_compute_instance_info",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/google/cloud/gcp_compute_disk_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "google.cloud.gcp_compute_disk",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/google/cloud/gcp_compute_image_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "google.cloud.gcp_compute_image",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/google/cloud/gcp_compute_network_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "google.cloud.gcp_compute_network",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/google/cloud/gcp_compute_subnetwork_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "google.cloud.gcp_compute_subnetwork",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/google/cloud/gcp_compute_firewall_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "google.cloud.gcp_compute_firewall",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/google/cloud/gcp_storage_bucket_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "google.cloud.gcp_storage_bucket",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/google/cloud/gcp_storage_object_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "google.cloud.gcp_storage_object",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/google/cloud/gcp_iam_service_account_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "google.cloud.gcp_iam_service_account",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/google/cloud/gcp_iam_role_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "google.cloud.gcp_iam_role",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/google/cloud/gcp_pubsub_topic_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "google.cloud.gcp_pubsub_topic",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/google/cloud/gcp_pubsub_subscription_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "google.cloud.gcp_pubsub_subscription",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/google/cloud/gcp_dns_managed_zone_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "google.cloud.gcp_dns_managed_zone",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/google/cloud/gcp_container_cluster_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "google.cloud.gcp_container_cluster",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_lookup.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.file (lookup)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/env_lookup.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.env (lookup)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/pipe_lookup.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.pipe (lookup)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/password_lookup.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.password (lookup)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/vars_lookup.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.vars (lookup)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/varnames_lookup.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.varnames (lookup)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/ini_lookup.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.ini (lookup)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/csvfile_lookup.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.csvfile (lookup)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/fileglob_lookup.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.fileglob (lookup)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/lines_lookup.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.lines (lookup)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/dict_lookup.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.dict (lookup)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/items_lookup.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.items (lookup)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/list_lookup.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.list (lookup)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/nested_lookup.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.nested (lookup)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/sequence_lookup.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.sequence (lookup)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/template_lookup.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.template (lookup)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/url_lookup.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.url (lookup)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/first_found_lookup.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.first_found (lookup)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/inventory_hostnames_lookup.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.inventory_hostnames (lookup)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/subelements_lookup.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.subelements (lookup)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/hashi_vault_lookup.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.hashi_vault (lookup)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/aws_secret_lookup.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.aws_secret (lookup)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/aws_ssm_lookup.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.aws_ssm (lookup)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_lookup.html",
+          "claim_type": "cli_command_exists",
+          "subject": "kubernetes.core.k8s (lookup)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/ssh_connection.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.ssh (connection)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/local_connection.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.local (connection)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/paramiko_ssh_connection.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.paramiko_ssh (connection)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/docker/docker_connection.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.docker.docker (connection)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/kubernetes/core/kubectl_connection.html",
+          "claim_type": "cli_command_exists",
+          "subject": "kubernetes.core.kubectl (connection)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/containers/podman/podman_connection.html",
+          "claim_type": "cli_command_exists",
+          "subject": "containers.podman.podman (connection)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/default_callback.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.default (callback)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/debug_callback.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.debug (callback)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/json_callback.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.json (callback)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/yaml_callback.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.yaml (callback)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/oneline_callback.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.oneline (callback)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/profile_tasks_callback.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.profile_tasks (callback)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_general.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Developing custom Ansible modules (general)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_documenting.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Documenting custom modules (DOCUMENTATION block)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/dev_guide/developing_module_utilities.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Developing module utilities",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/dev_guide/developing_plugins.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Developing custom Ansible plugins",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/dev_guide/developing_inventory.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Developing custom inventory plugins",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/dev_guide/developing_collections.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Developing Ansible collections",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/dev_guide/testing.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Testing Ansible content (sanity, integration, units)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/dev_guide/testing_running_locally.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible-test running locally",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/dev_guide/style_guide/index.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Ansible style guide (writing docs, examples)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/json_query_filter.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.json_query (filter)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/rabbitmq/rabbitmq_user_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.rabbitmq.rabbitmq_user",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/chocolatey/chocolatey/win_chocolatey_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "chocolatey.chocolatey.win_chocolatey",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/windows/win_robocopy_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.windows.win_robocopy",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/windows/win_firewall_rule_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.windows.win_firewall_rule",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/windows/win_scheduled_task_module.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.windows.win_scheduled_task",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "ansible-playbook": {
+      "sources": [
+        {
+          "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_intro.html",
+          "claim_type": "cli_command_exists",
+          "subject": "playbook structure intro",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_loops.html",
+          "claim_type": "cli_command_exists",
+          "subject": "playbook loops",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_conditionals.html",
+          "claim_type": "cli_command_exists",
+          "subject": "playbook conditionals (when)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_handlers.html",
+          "claim_type": "cli_command_exists",
+          "subject": "playbook handlers",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_tags.html",
+          "claim_type": "cli_command_exists",
+          "subject": "playbook tags",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_blocks.html",
+          "claim_type": "cli_command_exists",
+          "subject": "playbook blocks (error handling)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html",
+          "claim_type": "cli_command_exists",
+          "subject": "playbook roles",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse.html",
+          "claim_type": "cli_command_exists",
+          "subject": "playbook includes and imports",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_templating.html",
+          "claim_type": "cli_command_exists",
+          "subject": "playbook templating (Jinja2)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_filters.html",
+          "claim_type": "cli_command_exists",
+          "subject": "playbook filters",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html",
+          "claim_type": "cli_command_exists",
+          "subject": "playbook variables and precedence",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_strategies.html",
+          "claim_type": "cli_command_exists",
+          "subject": "playbook strategies (linear, free, host_pinned)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_delegation.html",
+          "claim_type": "cli_command_exists",
+          "subject": "playbook delegation",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_async.html",
+          "claim_type": "cli_command_exists",
+          "subject": "playbook asynchronous tasks",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_checkmode.html",
+          "claim_type": "cli_command_exists",
+          "subject": "playbook check mode",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_error_handling.html",
+          "claim_type": "cli_command_exists",
+          "subject": "playbook error handling (rescue, ignore_errors)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_privilege_escalation.html",
+          "claim_type": "cli_command_exists",
+          "subject": "playbook privilege escalation (become)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_vars_facts.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Ansible facts (gather_facts, custom facts, fact caching)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_debugger.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Ansible playbook debugger",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_python_version.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Ansible Python interpreter selection (ansible_python_interpreter)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_lookups.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Ansible lookups in playbooks",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_environment.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Ansible task environment variables",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_special_topics.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Ansible playbook special topics",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_module_defaults.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Ansible module_defaults group",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_advanced_syntax.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Ansible advanced YAML syntax (anchors, !unsafe)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_prompts.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Ansible interactive prompts (vars_prompt)",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "ansible-inventory": {
+      "sources": [
+        {
+          "url": "https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html",
+          "claim_type": "cli_command_exists",
+          "subject": "inventory basics (INI, YAML, group_vars, host_vars)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/inventory_guide/intro_dynamic_inventory.html",
+          "claim_type": "cli_command_exists",
+          "subject": "dynamic inventory",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/inventory_guide/intro_patterns.html",
+          "claim_type": "cli_command_exists",
+          "subject": "inventory patterns and host selection",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/inventory_guide/connection_details.html",
+          "claim_type": "cli_command_exists",
+          "subject": "inventory connection details (ssh, local)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/amazon/aws/aws_ec2_inventory.html",
+          "claim_type": "cli_command_exists",
+          "subject": "amazon.aws.aws_ec2 (inventory)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/azure/azcollection/azure_rm_inventory.html",
+          "claim_type": "cli_command_exists",
+          "subject": "azure.azcollection.azure_rm (inventory)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/google/cloud/gcp_compute_inventory.html",
+          "claim_type": "cli_command_exists",
+          "subject": "google.cloud.gcp_compute (inventory)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_inventory.html",
+          "claim_type": "cli_command_exists",
+          "subject": "kubernetes.core.k8s (inventory)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/docker/docker_containers_inventory.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.docker.docker_containers (inventory)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/nmap_inventory.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.nmap (inventory)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/general/proxmox_inventory.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.general.proxmox (inventory)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/community/vmware/vmware_vm_inventory_inventory.html",
+          "claim_type": "cli_command_exists",
+          "subject": "community.vmware.vmware_vm_inventory (inventory)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/constructed_inventory.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.constructed (inventory)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/script_inventory.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.script (inventory)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/yaml_inventory.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.yaml (inventory)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/ini_inventory.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ansible.builtin.ini (inventory)",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "ansible-vault": {
+      "sources": [
+        {
+          "url": "https://docs.ansible.com/ansible/latest/vault_guide/index.html",
+          "claim_type": "cli_command_exists",
+          "subject": "vault overview",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/vault_guide/vault_encrypting_content.html",
+          "claim_type": "cli_command_exists",
+          "subject": "encrypting content with ansible-vault",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/vault_guide/vault_managing_passwords.html",
+          "claim_type": "cli_command_exists",
+          "subject": "managing vault passwords",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.ansible.com/ansible/latest/vault_guide/vault_using_encrypted_content.html",
+          "claim_type": "cli_command_exists",
+          "subject": "using vault-encrypted content in playbooks",
           "evidence_type": "official_docs"
         }
       ]

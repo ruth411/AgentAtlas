@@ -11,7 +11,13 @@
       "name": "Kubernetes CLI",
       "category": "container_orchestration",
       "urls": [
-        "https://kubernetes.io/docs/reference/kubectl/"
+        "https://kubernetes.io/docs/reference/kubectl/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_get/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_describe/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_apply/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_logs/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_exec/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_delete/"
       ]
     },
     {
@@ -19,7 +25,13 @@
       "name": "Terraform CLI",
       "category": "infrastructure_as_code",
       "urls": [
-        "https://developer.hashicorp.com/terraform/cli/commands"
+        "https://developer.hashicorp.com/terraform/cli/commands",
+        "https://developer.hashicorp.com/terraform/cli/commands/init",
+        "https://developer.hashicorp.com/terraform/cli/commands/plan",
+        "https://developer.hashicorp.com/terraform/cli/commands/apply",
+        "https://developer.hashicorp.com/terraform/cli/commands/destroy",
+        "https://developer.hashicorp.com/terraform/cli/commands/state",
+        "https://developer.hashicorp.com/terraform/cli/commands/import"
       ]
     },
     {
@@ -27,7 +39,13 @@
       "name": "Helm",
       "category": "container_orchestration",
       "urls": [
-        "https://helm.sh/docs/helm/helm/"
+        "https://helm.sh/docs/helm/helm/",
+        "https://helm.sh/docs/helm/helm_install/",
+        "https://helm.sh/docs/helm/helm_upgrade/",
+        "https://helm.sh/docs/helm/helm_uninstall/",
+        "https://helm.sh/docs/helm/helm_list/",
+        "https://helm.sh/docs/helm/helm_repo/",
+        "https://helm.sh/docs/helm/helm_template/"
       ]
     },
     {
@@ -35,7 +53,13 @@
       "name": "Ansible",
       "category": "configuration_management",
       "urls": [
-        "https://docs.ansible.com/ansible/latest/cli/ansible.html"
+        "https://docs.ansible.com/ansible/latest/cli/ansible.html",
+        "https://docs.ansible.com/ansible/latest/cli/ansible-playbook.html",
+        "https://docs.ansible.com/ansible/latest/cli/ansible-galaxy.html",
+        "https://docs.ansible.com/ansible/latest/cli/ansible-vault.html",
+        "https://docs.ansible.com/ansible/latest/cli/ansible-config.html",
+        "https://docs.ansible.com/ansible/latest/cli/ansible-inventory.html",
+        "https://docs.ansible.com/ansible/latest/cli/ansible-doc.html"
       ]
     },
     {
@@ -67,7 +91,13 @@
       "name": "pip",
       "category": "package_manager",
       "urls": [
-        "https://pip.pypa.io/en/stable/cli/"
+        "https://pip.pypa.io/en/stable/cli/",
+        "https://pip.pypa.io/en/stable/cli/pip_install/",
+        "https://pip.pypa.io/en/stable/cli/pip_uninstall/",
+        "https://pip.pypa.io/en/stable/cli/pip_list/",
+        "https://pip.pypa.io/en/stable/cli/pip_freeze/",
+        "https://pip.pypa.io/en/stable/cli/pip_show/",
+        "https://pip.pypa.io/en/stable/cli/pip_download/"
       ]
     },
     {

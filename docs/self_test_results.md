@@ -79,3 +79,95 @@ Treat v0.2 as **build cycle complete, depth pass pending**:
 The "build > publish" preference and the empirical evidence that the
 infrastructure works argue for (A). Track the depth pass as the first
 v0.2.x milestone.
+
+---
+
+## Run — 2026-05-27 (depth-pass attempt #1)
+
+**Graph state at run time.** Same bulk DB after the depth pass on 5
+high-traffic tools (kubectl, helm, terraform, pip, ansible). Each
+swapped its single index URL for 6 per-command URLs. Claim count
+**82 → 112** (+30 per-command claims). Failures during crawl: 1
+(gcloud, the known max_bytes case carried over from Stage 20.8).
+
+**Method.** Same 10-question demo notebook from Stage 22.1, no code
+changes. SDK shipped a small P0 fix in parallel: `_RiskLevel` Literal
+now accepts `"none"` (caught by the second-pass audit).
+
+**Result.** Same headline numbers as run #1: **USEFUL=2 / WEAK=5 / MISS=3**.
+
+| # | question | tool | top subject (NEW) | confidence | verdict | change vs run #1 |
+|---|---|---|---|---|---|---|
+| 1 | how do I delete a github repo with gh | github-cli | gh repo delete | 1.00 | USEFUL ✓ | unchanged |
+| 2 | what does git log do | git | git log | 0.69 | USEFUL ✓ | unchanged |
+| 3 | how do I list docker volumes | docker | docker-compose.yml: volumes | 0.35 | WEAK | matched a different docker claim |
+| 4 | how do I authenticate with the openai api | openai-api | POST /embeddings | 0.40 | WEAK | matched a different openai claim |
+| 5 | what does kubectl describe pod do | kubectl | **kubectl describe** | 0.45 | WEAK | **now per-command** (was: kubectl index) |
+| 6 | how do I install a helm chart | helm | **helm install** | 0.45 | WEAK | **now per-command** (was: helm index) |
+| 7 | how do I install a package with apt | apt | apt | 0.45 | WEAK | unchanged (no depth pass) |
+| 8 | how do I configure my ergonomic keyboard | — | — | — | MISS | unchanged |
+| 9 | what is the best programming language for embedded systems | — | — | — | MISS | unchanged |
+| 10 | what is the airspeed velocity of an unladen swallow | — | — | — | MISS | unchanged |
+
+### Key finding: depth worked at the matching layer, not the confidence layer
+
+The depth pass surfaced **per-command** claims for kubectl and helm
+(rows 5 and 6) — the matcher now returns the canonical
+`kubectl describe` claim and the canonical `helm install` claim
+instead of the generic index page. **Answer quality is meaningfully
+better**, but the token-overlap score still clusters at ~0.45, below
+the `is_useful` threshold of 0.6.
+
+### Next bottleneck: matcher calibration, not graph depth
+
+`_ASK_SCORE_THRESHOLD = 0.30` in
+[backend/app/services/query_engine.py](../backend/app/services/query_engine.py)
+admits an answer to the response set; `Answer.is_useful` in the SDK
+gates at `≥ 0.6`. The 0.30–0.60 band is the matcher's "found something
+that probably matches" zone, where the per-command claims now sit.
+
+To clear Gate 1 strictly, one of the following is needed (v0.2.x work,
+out of scope for this depth-pass plan):
+
+1. **Phrase-exact subject boost** — when a question contains the
+   subject as a contiguous substring (e.g. "kubectl describe" appears
+   in "what does kubectl describe pod do"), boost the confidence by
+   a calibration constant. Cheap to implement; addresses the headline
+   failure mode directly.
+2. **Recalibrate the `is_useful` threshold** — Stage 18 telemetry
+   was designed to enable exactly this. With real per-query confidence
+   distributions in hand, the 0.6 floor can be re-derived empirically
+   instead of guessed.
+3. **Hybrid retrieval (embeddings)** — the planned Stage 22-stretch
+   work. Would re-rank lexical candidates by semantic similarity.
+
+### Verdict on Gate 1 criterion 3
+
+Still **NOT cleared by the strict heuristic** (2/10 USEFUL).
+
+The depth-pass plan's stop conditions said "if USEFUL is still < 5/10
+after the crawl, don't iterate inside this plan; record the result,
+ship the partial improvement, and queue a follow-up plan." That's
+this section.
+
+The follow-up should target option (1) above — phrase-exact subject
+boost — because:
+- It's a self-contained matcher change with a small surface area.
+- It addresses the observed failure mode (right claim, low score).
+- It's testable with the existing self-test harness.
+
+After the matcher tweak, this same 10-question demo should run again.
+If USEFUL ≥ 7, Gate 1 closes. If not, the next bottleneck is harder
+(hybrid retrieval) and the launch / depth-pass trade-off resurfaces.
+
+### Side wins from this run
+
+- **30 new per-command claims** in the graph; future questions about
+  `kubectl get`, `helm upgrade`, `terraform apply`, etc. now have
+  canonical answers to surface even if confidence calibration is
+  pending.
+- **SDK P0-1 fixed** — `risk_level="none"` no longer crashes the
+  client.
+- **Lockstep mirrors validated** — depth-pass mutation kept
+  `contracts/` and `backend/app/contracts/` byte-identical, as
+  required by the Stage 14 lockstep contract.

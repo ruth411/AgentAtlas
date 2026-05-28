@@ -463,6 +463,36 @@
         "helm.sh"
       ],
       "source_repositories": []
+    },
+    "ansible-cli": {
+      "official_hosts": [
+        "docs.ansible.com"
+      ],
+      "source_repositories": []
+    },
+    "ansible-modules": {
+      "official_hosts": [
+        "docs.ansible.com"
+      ],
+      "source_repositories": []
+    },
+    "ansible-playbook": {
+      "official_hosts": [
+        "docs.ansible.com"
+      ],
+      "source_repositories": []
+    },
+    "ansible-inventory": {
+      "official_hosts": [
+        "docs.ansible.com"
+      ],
+      "source_repositories": []
+    },
+    "ansible-vault": {
+      "official_hosts": [
+        "docs.ansible.com"
+      ],
+      "source_repositories": []
     }
   }
 }
