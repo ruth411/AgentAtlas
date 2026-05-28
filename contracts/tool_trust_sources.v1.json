@@ -529,6 +529,12 @@
         "manpages.debian.org"
       ],
       "source_repositories": []
+    },
+    "apt-build": {
+      "official_hosts": [
+        "manpages.debian.org"
+      ],
+      "source_repositories": []
     }
   }
 }
