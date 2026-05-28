@@ -493,6 +493,12 @@
         "docs.ansible.com"
       ],
       "source_repositories": []
+    },
+    "ansible-errors": {
+      "official_hosts": [
+        "docs.ansible.com"
+      ],
+      "source_repositories": []
     }
   }
 }
