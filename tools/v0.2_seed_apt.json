@@ -1,0 +1,54 @@
+{
+  "_comment": "apt depth pass \u2014 covers apt, apt-get, apt-cache, apt-mark, dpkg, dpkg-* family, debconf, sources.list, apt_preferences, apt.conf",
+  "version": 1,
+  "defaults": {
+    "submitted_by": "apt-depth-pass",
+    "verify": true
+  },
+  "tools": [
+    {
+      "tool_id": "apt-cli",
+      "name": "Apt Cli",
+      "category": "package_manager",
+      "urls": [
+        "https://manpages.debian.org/bookworm/apt/apt.8.en.html",
+        "https://manpages.debian.org/bookworm/apt/apt-get.8.en.html",
+        "https://manpages.debian.org/bookworm/apt/apt-cache.8.en.html",
+        "https://manpages.debian.org/bookworm/apt/apt-mark.8.en.html",
+        "https://manpages.debian.org/bookworm/apt/apt-key.8.en.html",
+        "https://manpages.debian.org/bookworm/apt/apt-secure.8.en.html",
+        "https://manpages.debian.org/bookworm/apt/apt-cdrom.8.en.html",
+        "https://manpages.debian.org/bookworm/apt/apt-extracttemplates.1.en.html",
+        "https://manpages.debian.org/bookworm/apt/apt-sortpkgs.1.en.html",
+        "https://manpages.debian.org/bookworm/dpkg/dpkg.1.en.html",
+        "https://manpages.debian.org/bookworm/dpkg/dpkg-deb.1.en.html",
+        "https://manpages.debian.org/bookworm/dpkg/dpkg-query.1.en.html",
+        "https://manpages.debian.org/bookworm/dpkg/dpkg-divert.1.en.html",
+        "https://manpages.debian.org/bookworm/dpkg/dpkg-trigger.1.en.html",
+        "https://manpages.debian.org/bookworm/dpkg/update-alternatives.1.en.html",
+        "https://manpages.debian.org/bookworm/debconf/dpkg-reconfigure.8.en.html",
+        "https://manpages.debian.org/bookworm/software-properties-common/add-apt-repository.1.en.html",
+        "https://manpages.debian.org/bookworm/debconf/debconf-set-selections.1.en.html",
+        "https://manpages.debian.org/bookworm/debconf-doc/debconf.7.en.html",
+        "https://manpages.debian.org/bookworm/apt-listchanges/apt-listchanges.1.en.html"
+      ]
+    },
+    {
+      "tool_id": "apt-config",
+      "name": "Apt Config",
+      "category": "package_manager",
+      "urls": [
+        "https://manpages.debian.org/bookworm/apt/sources.list.5.en.html",
+        "https://manpages.debian.org/bookworm/apt/apt_preferences.5.en.html",
+        "https://manpages.debian.org/bookworm/apt/apt.conf.5.en.html",
+        "https://manpages.debian.org/bookworm/apt/apt_auth.conf.5.en.html",
+        "https://manpages.debian.org/bookworm/apt/apt-config.8.en.html",
+        "https://manpages.debian.org/bookworm/apt-listchanges/apt-listchanges.conf.5.en.html",
+        "https://manpages.debian.org/bookworm/unattended-upgrades/unattended-upgrade.8.en.html",
+        "https://manpages.debian.org/bookworm/dpkg/deb-control.5.en.html",
+        "https://manpages.debian.org/bookworm/dpkg/deb.5.en.html",
+        "https://manpages.debian.org/bookworm/dpkg/deb-postinst.5.en.html"
+      ]
+    }
+  ]
+}

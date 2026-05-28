@@ -4406,6 +4406,194 @@
           "evidence_type": "official_docs"
         }
       ]
+    },
+    "apt-cli": {
+      "sources": [
+        {
+          "url": "https://manpages.debian.org/bookworm/apt/apt.8.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "apt (high-level package management CLI)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://manpages.debian.org/bookworm/apt/apt-get.8.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "apt-get (script-oriented package CLI)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://manpages.debian.org/bookworm/apt/apt-cache.8.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "apt-cache (query the apt package cache)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://manpages.debian.org/bookworm/apt/apt-mark.8.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "apt-mark (mark packages auto/manual/hold)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://manpages.debian.org/bookworm/apt/apt-key.8.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "apt-key (manage apt's trusted keys \u2014 deprecated, prefer signed-by)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://manpages.debian.org/bookworm/apt/apt-secure.8.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "apt-secure (how apt validates downloaded packages)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://manpages.debian.org/bookworm/apt/apt-cdrom.8.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "apt-cdrom (manage CD/DVD media sources)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://manpages.debian.org/bookworm/apt/apt-extracttemplates.1.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "apt-extracttemplates",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://manpages.debian.org/bookworm/apt/apt-sortpkgs.1.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "apt-sortpkgs",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://manpages.debian.org/bookworm/dpkg/dpkg.1.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "dpkg (low-level Debian package tool)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://manpages.debian.org/bookworm/dpkg/dpkg-deb.1.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "dpkg-deb (inspect / extract .deb packages)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://manpages.debian.org/bookworm/dpkg/dpkg-query.1.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "dpkg-query (query installed package metadata)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://manpages.debian.org/bookworm/dpkg/dpkg-divert.1.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "dpkg-divert (re-route file installations)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://manpages.debian.org/bookworm/dpkg/dpkg-trigger.1.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "dpkg-trigger",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://manpages.debian.org/bookworm/dpkg/update-alternatives.1.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "update-alternatives (manage symlinks for default tools)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://manpages.debian.org/bookworm/debconf/dpkg-reconfigure.8.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "dpkg-reconfigure (re-run a package's debconf configure)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://manpages.debian.org/bookworm/software-properties-common/add-apt-repository.1.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "add-apt-repository (add a PPA or source.list entry)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://manpages.debian.org/bookworm/debconf/debconf-set-selections.1.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "debconf-set-selections (preseed package answers)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://manpages.debian.org/bookworm/debconf-doc/debconf.7.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "debconf (Debian package configuration system)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://manpages.debian.org/bookworm/apt-listchanges/apt-listchanges.1.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "apt-listchanges (show changelogs at upgrade time)",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "apt-config": {
+      "sources": [
+        {
+          "url": "https://manpages.debian.org/bookworm/apt/sources.list.5.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "sources.list (apt repository configuration)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://manpages.debian.org/bookworm/apt/apt_preferences.5.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "apt_preferences (apt pinning / priority)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://manpages.debian.org/bookworm/apt/apt.conf.5.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "apt.conf (apt main configuration file)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://manpages.debian.org/bookworm/apt/apt_auth.conf.5.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "apt_auth.conf (repository authentication credentials)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://manpages.debian.org/bookworm/apt/apt-config.8.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "apt-config (read/dump apt configuration values)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://manpages.debian.org/bookworm/apt-listchanges/apt-listchanges.conf.5.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "apt-listchanges.conf",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://manpages.debian.org/bookworm/unattended-upgrades/unattended-upgrade.8.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "unattended-upgrade (automatic security upgrades)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://manpages.debian.org/bookworm/dpkg/deb-control.5.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "deb-control (package control file format)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://manpages.debian.org/bookworm/dpkg/deb.5.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "deb (Debian binary package format)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://manpages.debian.org/bookworm/dpkg/deb-postinst.5.en.html",
+          "claim_type": "cli_command_exists",
+          "subject": "deb-postinst (post-installation script)",
+          "evidence_type": "official_docs"
+        }
+      ]
     }
   }
 }

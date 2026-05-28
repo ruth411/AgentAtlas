@@ -505,6 +505,30 @@
         "docs.ansible.com"
       ],
       "source_repositories": []
+    },
+    "apt-cli": {
+      "official_hosts": [
+        "manpages.debian.org"
+      ],
+      "source_repositories": []
+    },
+    "apt-config": {
+      "official_hosts": [
+        "manpages.debian.org"
+      ],
+      "source_repositories": []
+    },
+    "apt-errors": {
+      "official_hosts": [
+        "manpages.debian.org"
+      ],
+      "source_repositories": []
+    },
+    "apt-recipes": {
+      "official_hosts": [
+        "manpages.debian.org"
+      ],
+      "source_repositories": []
     }
   }
 }
