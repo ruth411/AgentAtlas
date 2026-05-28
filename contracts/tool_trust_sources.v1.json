@@ -499,6 +499,12 @@
         "docs.ansible.com"
       ],
       "source_repositories": []
+    },
+    "ansible-recipes": {
+      "official_hosts": [
+        "docs.ansible.com"
+      ],
+      "source_repositories": []
     }
   }
 }
