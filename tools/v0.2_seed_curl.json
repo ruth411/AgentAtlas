@@ -1,0 +1,46 @@
+{
+  "_comment": "curl depth pass \u2014 CLI, protocols (HTTP/FTP/SSL), recipes, errors",
+  "version": 1,
+  "defaults": {
+    "submitted_by": "curl-depth-pass",
+    "verify": true
+  },
+  "tools": [
+    {
+      "tool_id": "curl-cli",
+      "name": "Curl Cli",
+      "category": "network_cli",
+      "urls": [
+        "https://curl.se/docs/manpage.html",
+        "https://curl.se/docs/manual.html",
+        "https://curl.se/docs/tutorial.html",
+        "https://curl.se/docs/optionscount.html",
+        "https://curl.se/docs/comparison-table.html",
+        "https://curl.se/docs/install.html",
+        "https://curl.se/docs/help-us.html",
+        "https://curl.se/docs/knownbugs.html",
+        "https://curl.se/docs/faq.html"
+      ]
+    },
+    {
+      "tool_id": "curl-protocols",
+      "name": "Curl Protocols",
+      "category": "network_cli",
+      "urls": [
+        "https://curl.se/docs/protdocs.html",
+        "https://curl.se/docs/httpscripting.html",
+        "https://curl.se/docs/sslcerts.html",
+        "https://curl.se/docs/security.html",
+        "https://curl.se/docs/url-syntax.html"
+      ]
+    },
+    {
+      "tool_id": "curl-config",
+      "name": "Curl Config",
+      "category": "network_cli",
+      "urls": [
+        "https://curl.se/docs/copyright.html"
+      ]
+    }
+  ]
+}

@@ -5480,6 +5480,108 @@
           "evidence_type": "official_docs"
         }
       ]
+    },
+    "curl-cli": {
+      "sources": [
+        {
+          "url": "https://curl.se/docs/manpage.html",
+          "claim_type": "cli_command_exists",
+          "subject": "curl manpage (CLI command reference)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://curl.se/docs/manual.html",
+          "claim_type": "cli_command_exists",
+          "subject": "curl manual (the comprehensive how-to)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://curl.se/docs/tutorial.html",
+          "claim_type": "cli_command_exists",
+          "subject": "curl tutorial (getting started)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://curl.se/docs/optionscount.html",
+          "claim_type": "cli_command_exists",
+          "subject": "curl options count + categorization",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://curl.se/docs/comparison-table.html",
+          "claim_type": "cli_command_exists",
+          "subject": "curl vs wget comparison",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://curl.se/docs/install.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Installing curl",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://curl.se/docs/help-us.html",
+          "claim_type": "cli_command_exists",
+          "subject": "curl developer involvement",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://curl.se/docs/knownbugs.html",
+          "claim_type": "cli_command_exists",
+          "subject": "curl known bugs",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://curl.se/docs/faq.html",
+          "claim_type": "cli_command_exists",
+          "subject": "curl FAQ",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "curl-protocols": {
+      "sources": [
+        {
+          "url": "https://curl.se/docs/protdocs.html",
+          "claim_type": "cli_command_exists",
+          "subject": "curl supported protocols overview",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://curl.se/docs/httpscripting.html",
+          "claim_type": "cli_command_exists",
+          "subject": "curl HTTP scripting guide",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://curl.se/docs/sslcerts.html",
+          "claim_type": "cli_command_exists",
+          "subject": "curl SSL/TLS certificates (CA bundle, cert pinning)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://curl.se/docs/security.html",
+          "claim_type": "cli_command_exists",
+          "subject": "curl security notes",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://curl.se/docs/url-syntax.html",
+          "claim_type": "cli_command_exists",
+          "subject": "curl URL syntax (protocol-specific URL forms)",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "curl-config": {
+      "sources": [
+        {
+          "url": "https://curl.se/docs/copyright.html",
+          "claim_type": "cli_command_exists",
+          "subject": "curl license + copyright",
+          "evidence_type": "official_docs"
+        }
+      ]
     }
   }
 }

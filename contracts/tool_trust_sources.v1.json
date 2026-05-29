@@ -625,6 +625,36 @@
         "doc.rust-lang.org"
       ],
       "source_repositories": []
+    },
+    "curl-cli": {
+      "official_hosts": [
+        "curl.se"
+      ],
+      "source_repositories": []
+    },
+    "curl-protocols": {
+      "official_hosts": [
+        "curl.se"
+      ],
+      "source_repositories": []
+    },
+    "curl-config": {
+      "official_hosts": [
+        "curl.se"
+      ],
+      "source_repositories": []
+    },
+    "curl-recipes": {
+      "official_hosts": [
+        "curl.se"
+      ],
+      "source_repositories": []
+    },
+    "curl-errors": {
+      "official_hosts": [
+        "curl.se"
+      ],
+      "source_repositories": []
     }
   }
 }
