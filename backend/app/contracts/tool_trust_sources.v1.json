@@ -535,6 +535,36 @@
         "manpages.debian.org"
       ],
       "source_repositories": []
+    },
+    "awk-cli": {
+      "official_hosts": [
+        "www.gnu.org"
+      ],
+      "source_repositories": []
+    },
+    "awk-language": {
+      "official_hosts": [
+        "www.gnu.org"
+      ],
+      "source_repositories": []
+    },
+    "awk-builtins": {
+      "official_hosts": [
+        "www.gnu.org"
+      ],
+      "source_repositories": []
+    },
+    "awk-recipes": {
+      "official_hosts": [
+        "www.gnu.org"
+      ],
+      "source_repositories": []
+    },
+    "awk-errors": {
+      "official_hosts": [
+        "www.gnu.org"
+      ],
+      "source_repositories": []
     }
   }
 }

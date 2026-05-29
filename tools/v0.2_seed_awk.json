@@ -1,0 +1,98 @@
+{
+  "_comment": "awk depth pass \u2014 covers awk/gawk CLI, language (patterns, actions, regex, control), built-in functions + variables, sample programs",
+  "version": 1,
+  "defaults": {
+    "submitted_by": "awk-depth-pass",
+    "verify": true
+  },
+  "tools": [
+    {
+      "tool_id": "awk-cli",
+      "name": "Awk Cli",
+      "category": "text_processing",
+      "urls": [
+        "https://www.gnu.org/software/gawk/manual/html_node/Running-gawk.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Command-Line.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Options.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Other-Arguments.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Naming-Standard-Input.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Environment-Variables.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Exit-Status.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Include-Files.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Loading-Shared-Libraries.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Two_002dway-I_002fO.html"
+      ]
+    },
+    {
+      "tool_id": "awk-language",
+      "name": "Awk Language",
+      "category": "text_processing",
+      "urls": [
+        "https://www.gnu.org/software/gawk/manual/html_node/Getting-Started.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Comments.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Quoting.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Regexp.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Regexp-Operators.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Bracket-Expressions.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/GNU-Regexp-Operators.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Records.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Fields.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Field-Separators.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Multiple-Line.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Pattern_002fAction.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Patterns.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Action-Overview.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Expressions.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Statements.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Arrays.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Multidimensional.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Functions.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Constants.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Conversion.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Variables.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Arithmetic-Ops.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Concatenation.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Boolean-Ops.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Conditional-Exp.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Truth-Values.html"
+      ]
+    },
+    {
+      "tool_id": "awk-builtins",
+      "name": "Awk Builtins",
+      "category": "text_processing",
+      "urls": [
+        "https://www.gnu.org/software/gawk/manual/html_node/Built_002din.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/String-Functions.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Numeric-Functions.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/I_002fO-Functions.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Time-Functions.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Bitwise-Functions.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Built_002din-Variables.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/User_002dmodified.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Auto_002dset.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/ARGC-and-ARGV.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Print.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Printf.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Getline.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Delete.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Array-Sorting.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Split-Function.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Gory-Details.html"
+      ]
+    },
+    {
+      "tool_id": "awk-recipes",
+      "name": "Awk Recipes",
+      "category": "text_processing",
+      "urls": [
+        "https://www.gnu.org/software/gawk/manual/html_node/Sample-Programs.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Library-Functions.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Cut-Program.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Egrep-Program.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Uniq-Program.html",
+        "https://www.gnu.org/software/gawk/manual/html_node/Wc-Program.html"
+      ]
+    }
+  ]
+}

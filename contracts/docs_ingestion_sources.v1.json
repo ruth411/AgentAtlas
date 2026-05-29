@@ -4594,6 +4594,382 @@
           "evidence_type": "official_docs"
         }
       ]
+    },
+    "awk-cli": {
+      "sources": [
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Running-gawk.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Running awk / gawk overview",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Command-Line.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk command-line invocation",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Options.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk / gawk command-line options",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Other-Arguments.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk other arguments after the program",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Naming-Standard-Input.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk reading from standard input",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Environment-Variables.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk environment variables (AWKPATH, AWKLIBPATH)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Exit-Status.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk exit status semantics",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Include-Files.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk @include directive (gawk extension)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Loading-Shared-Libraries.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk @load shared library extensions (gawk)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Two_002dway-I_002fO.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk two-way I/O (gawk extension)",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "awk-language": {
+      "sources": [
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Getting-Started.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk getting started",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Comments.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk comments",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Quoting.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk shell quoting in single-quoted programs",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Regexp.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk regular expressions overview",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Regexp-Operators.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk regex operators (~ and !~)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Bracket-Expressions.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk regex bracket expressions",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/GNU-Regexp-Operators.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk GNU regex extensions",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Records.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk records (lines) and RS / ORS",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Fields.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk fields ($0, $1, $NF)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Field-Separators.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk field separators (FS)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Multiple-Line.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk multiple-line records (paragraph mode RS='')",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Pattern_002fAction.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk pattern-action pairs",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Patterns.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk patterns (regex, expression, range, BEGIN, END)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Action-Overview.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk action blocks overview",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Expressions.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk expressions and operators",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Statements.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk control statements (if, while, for, break)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Arrays.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk associative arrays",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Multidimensional.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk multidimensional arrays (SUBSEP)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Functions.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk user-defined functions",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Constants.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk string and numeric constants",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Conversion.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk implicit type conversion (string \u2194 number)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Variables.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk variables (scope, init)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Arithmetic-Ops.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk arithmetic operators",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Concatenation.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk string concatenation",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Boolean-Ops.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk boolean operators",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Conditional-Exp.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk conditional / ternary expression",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Truth-Values.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk truth values and conditionals",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "awk-builtins": {
+      "sources": [
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Built_002din.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk built-in functions overview",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/String-Functions.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk string functions (length, substr, split, sub, gsub, index, sprintf, tolower, toupper, match)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Numeric-Functions.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk numeric functions (int, sqrt, exp, log, sin, cos, atan2, rand, srand)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/I_002fO-Functions.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk I/O functions (getline, print, printf, close, system, fflush)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Time-Functions.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk time functions (systime, mktime, strftime)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Bitwise-Functions.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk bitwise functions (and, or, xor, lshift, rshift, compl)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Built_002din-Variables.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk built-in variables overview",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/User_002dmodified.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk user-modified variables (FS, OFS, RS, ORS, NF)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Auto_002dset.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk auto-set variables (NR, FNR, FILENAME, NF, $0)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/ARGC-and-ARGV.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk ARGC and ARGV (command-line argument access)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Print.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk print statement",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Printf.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk printf statement",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Getline.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk getline (read another line)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Delete.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk delete (remove array elements)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Array-Sorting.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk asort and asorti (gawk array sorting)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Split-Function.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk split function (string into array)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Gory-Details.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk regex match details (sub, gsub semantics)",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "awk-recipes": {
+      "sources": [
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Sample-Programs.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk sample programs (cut, wc, uniq, tee, split)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Library-Functions.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk library functions (reusable building blocks)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Cut-Program.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk implementing cut(1)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Egrep-Program.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk implementing egrep(1)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Uniq-Program.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk implementing uniq(1)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/gawk/manual/html_node/Wc-Program.html",
+          "claim_type": "cli_command_exists",
+          "subject": "awk implementing wc(1)",
+          "evidence_type": "official_docs"
+        }
+      ]
     }
   }
 }
