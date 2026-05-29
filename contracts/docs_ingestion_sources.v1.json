@@ -5684,6 +5684,384 @@
           "evidence_type": "official_docs"
         }
       ]
+    },
+    "docker-cli": {
+      "sources": [
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker CLI overview",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/container/run/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker run (create + start a new container)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/container/exec/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker exec (run command inside running container)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/container/logs/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker logs (view container logs)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/container/ps/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker ps (list containers)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/container/stop/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker stop (gracefully stop running container)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/container/kill/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker kill (force-stop a container)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/container/rm/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker rm (remove one or more containers)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/container/start/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker start (start a stopped container)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/container/restart/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker restart (stop + start a container)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/container/inspect/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker inspect (detailed container info JSON)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/container/cp/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker cp (copy files between container and host)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/container/stats/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker stats (live resource usage)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/container/top/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker top (list processes in container)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/container/commit/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker commit (create image from container changes)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/container/attach/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker attach (attach to running container's stdio)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/image/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker image (manage images: ls, rm, prune, etc.)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/image/build/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker build (build image from Dockerfile)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/image/pull/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker pull (pull image from registry)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/image/push/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker push (push image to registry)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/image/tag/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker tag (tag an image)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/image/ls/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker image ls (list images)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/image/rm/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker image rm (remove images)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/image/prune/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker image prune (remove unused images)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/image/save/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker save (export image to tarball)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/image/load/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker load (load image from tarball)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/image/history/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker history (show image layer history)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/volume/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker volume (manage volumes)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/network/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker network (manage networks)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/system/df/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker system df (disk usage by docker)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/system/prune/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker system prune (clean up unused data)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/system/info/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker system info",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/system/events/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker events (stream events from daemon)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/login/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker login (auth to a registry)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/logout/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker logout",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/search/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker search (search Docker Hub)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/compose/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker compose CLI overview",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/compose/up/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker compose up (start services)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/compose/down/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker compose down (stop + remove services)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/compose/build/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker compose build",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/compose/logs/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker compose logs",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/compose/exec/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker compose exec",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/cli/docker/compose/ps/",
+          "claim_type": "cli_command_exists",
+          "subject": "docker compose ps",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "docker-config": {
+      "sources": [
+        {
+          "url": "https://docs.docker.com/reference/dockerfile/",
+          "claim_type": "cli_command_exists",
+          "subject": "Dockerfile reference (instructions: FROM, RUN, CMD, COPY, etc.)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/compose-file/",
+          "claim_type": "cli_command_exists",
+          "subject": "Compose file reference (top-level structure)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/compose-file/services/",
+          "claim_type": "cli_command_exists",
+          "subject": "Compose file services section",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/compose-file/networks/",
+          "claim_type": "cli_command_exists",
+          "subject": "Compose file networks section",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/compose-file/volumes/",
+          "claim_type": "cli_command_exists",
+          "subject": "Compose file volumes section",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/compose-file/build/",
+          "claim_type": "cli_command_exists",
+          "subject": "Compose file build configuration",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/reference/compose-file/deploy/",
+          "claim_type": "cli_command_exists",
+          "subject": "Compose file deploy section (swarm-mode)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/engine/daemon/",
+          "claim_type": "cli_command_exists",
+          "subject": "Docker daemon configuration (daemon.json)",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "docker-build": {
+      "sources": [
+        {
+          "url": "https://docs.docker.com/build/concepts/overview/",
+          "claim_type": "cli_command_exists",
+          "subject": "Docker build overview",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/build/concepts/dockerfile/",
+          "claim_type": "cli_command_exists",
+          "subject": "Dockerfile (in build context)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/build/buildkit/",
+          "claim_type": "cli_command_exists",
+          "subject": "BuildKit (advanced builder)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/build/builders/",
+          "claim_type": "cli_command_exists",
+          "subject": "Docker builders (buildx)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/build/cache/",
+          "claim_type": "cli_command_exists",
+          "subject": "Docker build cache",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/build/cache/backends/",
+          "claim_type": "cli_command_exists",
+          "subject": "Build cache backends (registry, local, inline, S3)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/build/building/multi-platform/",
+          "claim_type": "cli_command_exists",
+          "subject": "Multi-platform builds (linux/amd64, linux/arm64)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/build/building/secrets/",
+          "claim_type": "cli_command_exists",
+          "subject": "Build secrets (BuildKit RUN --mount=type=secret)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/build/building/best-practices/",
+          "claim_type": "cli_command_exists",
+          "subject": "Dockerfile best practices",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.docker.com/build/building/multi-stage/",
+          "claim_type": "cli_command_exists",
+          "subject": "Multi-stage builds",
+          "evidence_type": "official_docs"
+        }
+      ]
     }
   }
 }

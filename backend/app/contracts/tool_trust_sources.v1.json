@@ -686,6 +686,36 @@
         "dnf.readthedocs.io"
       ],
       "source_repositories": []
+    },
+    "docker-cli": {
+      "official_hosts": [
+        "docs.docker.com"
+      ],
+      "source_repositories": []
+    },
+    "docker-config": {
+      "official_hosts": [
+        "docs.docker.com"
+      ],
+      "source_repositories": []
+    },
+    "docker-build": {
+      "official_hosts": [
+        "docs.docker.com"
+      ],
+      "source_repositories": []
+    },
+    "docker-recipes": {
+      "official_hosts": [
+        "docs.docker.com"
+      ],
+      "source_repositories": []
+    },
+    "docker-errors": {
+      "official_hosts": [
+        "docs.docker.com"
+      ],
+      "source_repositories": []
     }
   }
 }

@@ -1,0 +1,92 @@
+{
+  "_comment": "docker depth pass \u2014 CLI (incl. compose), config (Dockerfile + compose YAML + daemon), build (BuildKit/buildx), recipes, errors",
+  "version": 1,
+  "defaults": {
+    "submitted_by": "docker-depth-pass",
+    "verify": true
+  },
+  "tools": [
+    {
+      "tool_id": "docker-cli",
+      "name": "Docker Cli",
+      "category": "container_runtime",
+      "urls": [
+        "https://docs.docker.com/reference/cli/docker/",
+        "https://docs.docker.com/reference/cli/docker/container/run/",
+        "https://docs.docker.com/reference/cli/docker/container/exec/",
+        "https://docs.docker.com/reference/cli/docker/container/logs/",
+        "https://docs.docker.com/reference/cli/docker/container/ps/",
+        "https://docs.docker.com/reference/cli/docker/container/stop/",
+        "https://docs.docker.com/reference/cli/docker/container/kill/",
+        "https://docs.docker.com/reference/cli/docker/container/rm/",
+        "https://docs.docker.com/reference/cli/docker/container/start/",
+        "https://docs.docker.com/reference/cli/docker/container/restart/",
+        "https://docs.docker.com/reference/cli/docker/container/inspect/",
+        "https://docs.docker.com/reference/cli/docker/container/cp/",
+        "https://docs.docker.com/reference/cli/docker/container/stats/",
+        "https://docs.docker.com/reference/cli/docker/container/top/",
+        "https://docs.docker.com/reference/cli/docker/container/commit/",
+        "https://docs.docker.com/reference/cli/docker/container/attach/",
+        "https://docs.docker.com/reference/cli/docker/image/",
+        "https://docs.docker.com/reference/cli/docker/image/build/",
+        "https://docs.docker.com/reference/cli/docker/image/pull/",
+        "https://docs.docker.com/reference/cli/docker/image/push/",
+        "https://docs.docker.com/reference/cli/docker/image/tag/",
+        "https://docs.docker.com/reference/cli/docker/image/ls/",
+        "https://docs.docker.com/reference/cli/docker/image/rm/",
+        "https://docs.docker.com/reference/cli/docker/image/prune/",
+        "https://docs.docker.com/reference/cli/docker/image/save/",
+        "https://docs.docker.com/reference/cli/docker/image/load/",
+        "https://docs.docker.com/reference/cli/docker/image/history/",
+        "https://docs.docker.com/reference/cli/docker/volume/",
+        "https://docs.docker.com/reference/cli/docker/network/",
+        "https://docs.docker.com/reference/cli/docker/system/df/",
+        "https://docs.docker.com/reference/cli/docker/system/prune/",
+        "https://docs.docker.com/reference/cli/docker/system/info/",
+        "https://docs.docker.com/reference/cli/docker/system/events/",
+        "https://docs.docker.com/reference/cli/docker/login/",
+        "https://docs.docker.com/reference/cli/docker/logout/",
+        "https://docs.docker.com/reference/cli/docker/search/",
+        "https://docs.docker.com/reference/cli/docker/compose/",
+        "https://docs.docker.com/reference/cli/docker/compose/up/",
+        "https://docs.docker.com/reference/cli/docker/compose/down/",
+        "https://docs.docker.com/reference/cli/docker/compose/build/",
+        "https://docs.docker.com/reference/cli/docker/compose/logs/",
+        "https://docs.docker.com/reference/cli/docker/compose/exec/",
+        "https://docs.docker.com/reference/cli/docker/compose/ps/"
+      ]
+    },
+    {
+      "tool_id": "docker-config",
+      "name": "Docker Config",
+      "category": "container_runtime",
+      "urls": [
+        "https://docs.docker.com/reference/dockerfile/",
+        "https://docs.docker.com/reference/compose-file/",
+        "https://docs.docker.com/reference/compose-file/services/",
+        "https://docs.docker.com/reference/compose-file/networks/",
+        "https://docs.docker.com/reference/compose-file/volumes/",
+        "https://docs.docker.com/reference/compose-file/build/",
+        "https://docs.docker.com/reference/compose-file/deploy/",
+        "https://docs.docker.com/engine/daemon/"
+      ]
+    },
+    {
+      "tool_id": "docker-build",
+      "name": "Docker Build",
+      "category": "container_runtime",
+      "urls": [
+        "https://docs.docker.com/build/concepts/overview/",
+        "https://docs.docker.com/build/concepts/dockerfile/",
+        "https://docs.docker.com/build/buildkit/",
+        "https://docs.docker.com/build/builders/",
+        "https://docs.docker.com/build/cache/",
+        "https://docs.docker.com/build/cache/backends/",
+        "https://docs.docker.com/build/building/multi-platform/",
+        "https://docs.docker.com/build/building/secrets/",
+        "https://docs.docker.com/build/building/best-practices/",
+        "https://docs.docker.com/build/building/multi-stage/"
+      ]
+    }
+  ]
+}
