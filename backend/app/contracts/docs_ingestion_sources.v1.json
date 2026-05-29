@@ -4970,6 +4970,174 @@
           "evidence_type": "official_docs"
         }
       ]
+    },
+    "brew-cli": {
+      "sources": [
+        {
+          "url": "https://docs.brew.sh/Manpage",
+          "claim_type": "cli_command_exists",
+          "subject": "brew Manpage (CLI command reference)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.brew.sh/Installation",
+          "claim_type": "cli_command_exists",
+          "subject": "Installing Homebrew",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.brew.sh/Querying-Brew",
+          "claim_type": "cli_command_exists",
+          "subject": "Querying brew (info, deps, leaves, uses, search)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.brew.sh/Homebrew-on-Linux",
+          "claim_type": "cli_command_exists",
+          "subject": "Homebrew on Linux (Linuxbrew)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.brew.sh/Homebrew-on-Apple-Silicon",
+          "claim_type": "cli_command_exists",
+          "subject": "Homebrew on Apple Silicon (arm64 M1/M2/M3)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.brew.sh/Homebrew-on-Mac",
+          "claim_type": "cli_command_exists",
+          "subject": "Homebrew on macOS general",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.brew.sh/Tips-N-Tricks",
+          "claim_type": "cli_command_exists",
+          "subject": "Homebrew tips and tricks",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.brew.sh/FAQ",
+          "claim_type": "cli_command_exists",
+          "subject": "Homebrew FAQ",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.brew.sh/Common-Issues",
+          "claim_type": "cli_command_exists",
+          "subject": "Common issues with brew (troubleshooting)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.brew.sh/Anonymous-Aggregate-User-Behaviour-Analytics",
+          "claim_type": "cli_command_exists",
+          "subject": "brew analytics (opt-out, what's collected)",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "brew-config": {
+      "sources": [
+        {
+          "url": "https://docs.brew.sh/Brew-Bundle-and-Brewfile",
+          "claim_type": "cli_command_exists",
+          "subject": "Brewfile syntax + brew bundle",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.brew.sh/Taps",
+          "claim_type": "cli_command_exists",
+          "subject": "Taps (third-party formula repos)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.brew.sh/Manpage",
+          "claim_type": "cli_command_exists",
+          "subject": "HOMEBREW_* environment variables (in manpage)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.brew.sh/Versions",
+          "claim_type": "cli_command_exists",
+          "subject": "Homebrew versioning (live-on-master, no pinning)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.brew.sh/Bottles",
+          "claim_type": "cli_command_exists",
+          "subject": "Bottles (binary packages: cache locations, mirror config)",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "brew-formulae": {
+      "sources": [
+        {
+          "url": "https://docs.brew.sh/Formula-Cookbook",
+          "claim_type": "cli_command_exists",
+          "subject": "Formula Cookbook (writing brew formulae)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.brew.sh/Cask-Cookbook",
+          "claim_type": "cli_command_exists",
+          "subject": "Cask Cookbook (writing brew casks for GUI apps)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.brew.sh/Acceptable-Casks",
+          "claim_type": "cli_command_exists",
+          "subject": "Which Casks Will Be Accepted (Cask policy)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.brew.sh/Adding-Software-to-Homebrew",
+          "claim_type": "cli_command_exists",
+          "subject": "Adding software to homebrew (formulae acceptance criteria)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.brew.sh/Formula-Variations",
+          "claim_type": "cli_command_exists",
+          "subject": "Formula variations (head vs stable, fork, head only)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.brew.sh/Bottles",
+          "claim_type": "cli_command_exists",
+          "subject": "Building bottles (binary packages for distribution)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.brew.sh/External-Commands",
+          "claim_type": "cli_command_exists",
+          "subject": "External commands (brew subcommand extensions)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.brew.sh/Versions",
+          "claim_type": "cli_command_exists",
+          "subject": "Maintaining versioned formulae (foo@1.5, foo@2.0)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.brew.sh/Maintainer-Guidelines",
+          "claim_type": "cli_command_exists",
+          "subject": "Maintainer guidelines",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.brew.sh/Python-for-Formula-Authors",
+          "claim_type": "cli_command_exists",
+          "subject": "Python formulae authoring",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://docs.brew.sh/Node-for-Formula-Authors",
+          "claim_type": "cli_command_exists",
+          "subject": "Node.js formulae authoring",
+          "evidence_type": "official_docs"
+        }
+      ]
     }
   }
 }

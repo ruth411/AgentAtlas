@@ -1,0 +1,57 @@
+{
+  "_comment": "brew depth pass \u2014 CLI, config, formula/cask authoring, recipes, errors",
+  "version": 1,
+  "defaults": {
+    "submitted_by": "brew-depth-pass",
+    "verify": true
+  },
+  "tools": [
+    {
+      "tool_id": "brew-cli",
+      "name": "Brew Cli",
+      "category": "package_manager",
+      "urls": [
+        "https://docs.brew.sh/Manpage",
+        "https://docs.brew.sh/Installation",
+        "https://docs.brew.sh/Querying-Brew",
+        "https://docs.brew.sh/Homebrew-on-Linux",
+        "https://docs.brew.sh/Homebrew-on-Apple-Silicon",
+        "https://docs.brew.sh/Homebrew-on-Mac",
+        "https://docs.brew.sh/Tips-N-Tricks",
+        "https://docs.brew.sh/FAQ",
+        "https://docs.brew.sh/Common-Issues",
+        "https://docs.brew.sh/Anonymous-Aggregate-User-Behaviour-Analytics"
+      ]
+    },
+    {
+      "tool_id": "brew-config",
+      "name": "Brew Config",
+      "category": "package_manager",
+      "urls": [
+        "https://docs.brew.sh/Brew-Bundle-and-Brewfile",
+        "https://docs.brew.sh/Taps",
+        "https://docs.brew.sh/Manpage",
+        "https://docs.brew.sh/Versions",
+        "https://docs.brew.sh/Bottles"
+      ]
+    },
+    {
+      "tool_id": "brew-formulae",
+      "name": "Brew Formulae",
+      "category": "package_manager",
+      "urls": [
+        "https://docs.brew.sh/Formula-Cookbook",
+        "https://docs.brew.sh/Cask-Cookbook",
+        "https://docs.brew.sh/Acceptable-Casks",
+        "https://docs.brew.sh/Adding-Software-to-Homebrew",
+        "https://docs.brew.sh/Formula-Variations",
+        "https://docs.brew.sh/Bottles",
+        "https://docs.brew.sh/External-Commands",
+        "https://docs.brew.sh/Versions",
+        "https://docs.brew.sh/Maintainer-Guidelines",
+        "https://docs.brew.sh/Python-for-Formula-Authors",
+        "https://docs.brew.sh/Node-for-Formula-Authors"
+      ]
+    }
+  ]
+}

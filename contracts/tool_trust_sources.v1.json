@@ -565,6 +565,36 @@
         "www.gnu.org"
       ],
       "source_repositories": []
+    },
+    "brew-cli": {
+      "official_hosts": [
+        "docs.brew.sh"
+      ],
+      "source_repositories": []
+    },
+    "brew-config": {
+      "official_hosts": [
+        "docs.brew.sh"
+      ],
+      "source_repositories": []
+    },
+    "brew-formulae": {
+      "official_hosts": [
+        "docs.brew.sh"
+      ],
+      "source_repositories": []
+    },
+    "brew-recipes": {
+      "official_hosts": [
+        "docs.brew.sh"
+      ],
+      "source_repositories": []
+    },
+    "brew-errors": {
+      "official_hosts": [
+        "docs.brew.sh"
+      ],
+      "source_repositories": []
     }
   }
 }
