@@ -1,0 +1,46 @@
+{
+  "_comment": "dnf depth pass \u2014 CLI, config (dnf.conf/repos/modularity), RPM packaging (rpmbuild + spec), recipes, errors",
+  "version": 1,
+  "defaults": {
+    "submitted_by": "dnf-depth-pass",
+    "verify": true
+  },
+  "tools": [
+    {
+      "tool_id": "dnf-cli",
+      "name": "Dnf Cli",
+      "category": "package_manager",
+      "urls": [
+        "https://dnf.readthedocs.io/en/latest/command_ref.html",
+        "https://dnf.readthedocs.io/en/latest/cli_usage.html",
+        "https://dnf.readthedocs.io/en/latest/use_cases.html",
+        "https://dnf.readthedocs.io/en/latest/release_notes.html"
+      ]
+    },
+    {
+      "tool_id": "dnf-config",
+      "name": "Dnf Config",
+      "category": "package_manager",
+      "urls": [
+        "https://dnf.readthedocs.io/en/latest/conf_ref.html",
+        "https://dnf.readthedocs.io/en/latest/automatic.html",
+        "https://dnf.readthedocs.io/en/latest/modularity.html"
+      ]
+    },
+    {
+      "tool_id": "dnf-build",
+      "name": "Dnf Build",
+      "category": "package_manager",
+      "urls": [
+        "https://rpm-packaging-guide.github.io/",
+        "https://rpm-packaging-guide.github.io/chapters/getting-started.html",
+        "https://rpm-packaging-guide.github.io/chapters/why-build-rpms.html",
+        "https://rpm-packaging-guide.github.io/chapters/what-is-an-rpm.html",
+        "https://rpm-packaging-guide.github.io/chapters/working-with-spec-files.html",
+        "https://rpm-packaging-guide.github.io/chapters/practical-software-packaging.html",
+        "https://rpm-packaging-guide.github.io/chapters/advanced-topics.html",
+        "https://rpm-packaging-guide.github.io/chapters/signing-packages.html"
+      ]
+    }
+  ]
+}

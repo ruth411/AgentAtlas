@@ -655,6 +655,37 @@
         "curl.se"
       ],
       "source_repositories": []
+    },
+    "dnf-cli": {
+      "official_hosts": [
+        "dnf.readthedocs.io"
+      ],
+      "source_repositories": []
+    },
+    "dnf-config": {
+      "official_hosts": [
+        "dnf.readthedocs.io"
+      ],
+      "source_repositories": []
+    },
+    "dnf-build": {
+      "official_hosts": [
+        "rpm-packaging-guide.github.io",
+        "dnf.readthedocs.io"
+      ],
+      "source_repositories": []
+    },
+    "dnf-recipes": {
+      "official_hosts": [
+        "dnf.readthedocs.io"
+      ],
+      "source_repositories": []
+    },
+    "dnf-errors": {
+      "official_hosts": [
+        "dnf.readthedocs.io"
+      ],
+      "source_repositories": []
     }
   }
 }

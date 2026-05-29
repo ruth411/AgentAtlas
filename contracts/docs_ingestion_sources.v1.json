@@ -5582,6 +5582,108 @@
           "evidence_type": "official_docs"
         }
       ]
+    },
+    "dnf-cli": {
+      "sources": [
+        {
+          "url": "https://dnf.readthedocs.io/en/latest/command_ref.html",
+          "claim_type": "cli_command_exists",
+          "subject": "dnf command reference (full CLI manual)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://dnf.readthedocs.io/en/latest/cli_usage.html",
+          "claim_type": "cli_command_exists",
+          "subject": "dnf CLI usage (intro + common operations)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://dnf.readthedocs.io/en/latest/use_cases.html",
+          "claim_type": "cli_command_exists",
+          "subject": "dnf common use cases",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://dnf.readthedocs.io/en/latest/release_notes.html",
+          "claim_type": "cli_command_exists",
+          "subject": "dnf release notes (changes per version)",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "dnf-config": {
+      "sources": [
+        {
+          "url": "https://dnf.readthedocs.io/en/latest/conf_ref.html",
+          "claim_type": "cli_command_exists",
+          "subject": "dnf.conf and repository configuration reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://dnf.readthedocs.io/en/latest/automatic.html",
+          "claim_type": "cli_command_exists",
+          "subject": "dnf-automatic (scheduled updates)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://dnf.readthedocs.io/en/latest/modularity.html",
+          "claim_type": "cli_command_exists",
+          "subject": "dnf modularity (module streams + profiles)",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "dnf-build": {
+      "sources": [
+        {
+          "url": "https://rpm-packaging-guide.github.io/",
+          "claim_type": "cli_command_exists",
+          "subject": "RPM packaging guide (overview)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://rpm-packaging-guide.github.io/chapters/getting-started.html",
+          "claim_type": "cli_command_exists",
+          "subject": "RPM packaging getting started",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://rpm-packaging-guide.github.io/chapters/why-build-rpms.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Why build RPM packages",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://rpm-packaging-guide.github.io/chapters/what-is-an-rpm.html",
+          "claim_type": "cli_command_exists",
+          "subject": "What is an RPM package",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://rpm-packaging-guide.github.io/chapters/working-with-spec-files.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Working with RPM spec files",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://rpm-packaging-guide.github.io/chapters/practical-software-packaging.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Practical RPM packaging",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://rpm-packaging-guide.github.io/chapters/advanced-topics.html",
+          "claim_type": "cli_command_exists",
+          "subject": "RPM advanced topics (macros, conditionals)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://rpm-packaging-guide.github.io/chapters/signing-packages.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Signing RPM packages",
+          "evidence_type": "official_docs"
+        }
+      ]
     }
   }
 }
