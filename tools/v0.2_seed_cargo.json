@@ -1,0 +1,86 @@
+{
+  "_comment": "cargo depth pass \u2014 CLI, config (Cargo.toml/profiles/features/workspaces), build scripts, recipes, errors",
+  "version": 1,
+  "defaults": {
+    "submitted_by": "cargo-depth-pass",
+    "verify": true
+  },
+  "tools": [
+    {
+      "tool_id": "cargo-cli",
+      "name": "Cargo Cli",
+      "category": "package_manager",
+      "urls": [
+        "https://doc.rust-lang.org/cargo/getting-started/installation.html",
+        "https://doc.rust-lang.org/cargo/getting-started/first-steps.html",
+        "https://doc.rust-lang.org/cargo/commands/index.html",
+        "https://doc.rust-lang.org/cargo/commands/cargo-new.html",
+        "https://doc.rust-lang.org/cargo/commands/cargo-init.html",
+        "https://doc.rust-lang.org/cargo/commands/cargo-build.html",
+        "https://doc.rust-lang.org/cargo/commands/cargo-run.html",
+        "https://doc.rust-lang.org/cargo/commands/cargo-check.html",
+        "https://doc.rust-lang.org/cargo/commands/cargo-test.html",
+        "https://doc.rust-lang.org/cargo/commands/cargo-bench.html",
+        "https://doc.rust-lang.org/cargo/commands/cargo-add.html",
+        "https://doc.rust-lang.org/cargo/commands/cargo-remove.html",
+        "https://doc.rust-lang.org/cargo/commands/cargo-update.html",
+        "https://doc.rust-lang.org/cargo/commands/cargo-search.html",
+        "https://doc.rust-lang.org/cargo/commands/cargo-install.html",
+        "https://doc.rust-lang.org/cargo/commands/cargo-uninstall.html",
+        "https://doc.rust-lang.org/cargo/commands/cargo-publish.html",
+        "https://doc.rust-lang.org/cargo/commands/cargo-package.html",
+        "https://doc.rust-lang.org/cargo/commands/cargo-clean.html",
+        "https://doc.rust-lang.org/cargo/commands/cargo-doc.html",
+        "https://doc.rust-lang.org/cargo/commands/cargo-tree.html",
+        "https://doc.rust-lang.org/cargo/commands/cargo-vendor.html",
+        "https://doc.rust-lang.org/cargo/commands/cargo-fetch.html",
+        "https://doc.rust-lang.org/cargo/commands/cargo-fix.html",
+        "https://doc.rust-lang.org/cargo/commands/cargo-locate-project.html",
+        "https://doc.rust-lang.org/cargo/commands/cargo-metadata.html",
+        "https://doc.rust-lang.org/cargo/commands/cargo-login.html",
+        "https://doc.rust-lang.org/cargo/commands/cargo-logout.html",
+        "https://doc.rust-lang.org/cargo/commands/cargo-owner.html",
+        "https://doc.rust-lang.org/cargo/commands/cargo-yank.html"
+      ]
+    },
+    {
+      "tool_id": "cargo-config",
+      "name": "Cargo Config",
+      "category": "package_manager",
+      "urls": [
+        "https://doc.rust-lang.org/cargo/reference/manifest.html",
+        "https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html",
+        "https://doc.rust-lang.org/cargo/reference/cargo-targets.html",
+        "https://doc.rust-lang.org/cargo/reference/workspaces.html",
+        "https://doc.rust-lang.org/cargo/reference/features.html",
+        "https://doc.rust-lang.org/cargo/reference/profiles.html",
+        "https://doc.rust-lang.org/cargo/reference/config.html",
+        "https://doc.rust-lang.org/cargo/reference/environment-variables.html",
+        "https://doc.rust-lang.org/cargo/reference/overriding-dependencies.html",
+        "https://doc.rust-lang.org/cargo/reference/source-replacement.html",
+        "https://doc.rust-lang.org/cargo/reference/registries.html",
+        "https://doc.rust-lang.org/cargo/reference/registry-authentication.html",
+        "https://doc.rust-lang.org/cargo/reference/registry-web-api.html",
+        "https://doc.rust-lang.org/cargo/reference/external-tools.html",
+        "https://doc.rust-lang.org/cargo/reference/unstable.html",
+        "https://doc.rust-lang.org/cargo/reference/resolver.html"
+      ]
+    },
+    {
+      "tool_id": "cargo-build",
+      "name": "Cargo Build",
+      "category": "package_manager",
+      "urls": [
+        "https://doc.rust-lang.org/cargo/reference/build-scripts.html",
+        "https://doc.rust-lang.org/cargo/reference/build-script-examples.html",
+        "https://doc.rust-lang.org/cargo/reference/publishing.html",
+        "https://doc.rust-lang.org/cargo/reference/lints.html",
+        "https://doc.rust-lang.org/cargo/guide/tests.html",
+        "https://doc.rust-lang.org/cargo/guide/continuous-integration.html",
+        "https://doc.rust-lang.org/cargo/guide/project-layout.html",
+        "https://doc.rust-lang.org/cargo/guide/dependencies.html",
+        "https://doc.rust-lang.org/cargo/guide/cargo-toml-vs-cargo-lock.html"
+      ]
+    }
+  ]
+}

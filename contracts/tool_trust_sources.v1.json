@@ -595,6 +595,36 @@
         "docs.brew.sh"
       ],
       "source_repositories": []
+    },
+    "cargo-cli": {
+      "official_hosts": [
+        "doc.rust-lang.org"
+      ],
+      "source_repositories": []
+    },
+    "cargo-config": {
+      "official_hosts": [
+        "doc.rust-lang.org"
+      ],
+      "source_repositories": []
+    },
+    "cargo-build": {
+      "official_hosts": [
+        "doc.rust-lang.org"
+      ],
+      "source_repositories": []
+    },
+    "cargo-recipes": {
+      "official_hosts": [
+        "doc.rust-lang.org"
+      ],
+      "source_repositories": []
+    },
+    "cargo-errors": {
+      "official_hosts": [
+        "doc.rust-lang.org"
+      ],
+      "source_repositories": []
     }
   }
 }

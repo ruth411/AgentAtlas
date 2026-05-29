@@ -5138,6 +5138,348 @@
           "evidence_type": "official_docs"
         }
       ]
+    },
+    "cargo-cli": {
+      "sources": [
+        {
+          "url": "https://doc.rust-lang.org/cargo/getting-started/installation.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Installing Cargo (with rustup)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/getting-started/first-steps.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Cargo first steps (new project + run)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/commands/index.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Cargo commands overview",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/commands/cargo-new.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cargo new (create a new package)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/commands/cargo-init.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cargo init (initialize a package in existing dir)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/commands/cargo-build.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cargo build (compile current package)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/commands/cargo-run.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cargo run (build + run binary)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/commands/cargo-check.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cargo check (typecheck without producing binary)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/commands/cargo-test.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cargo test (run unit + integration tests)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/commands/cargo-bench.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cargo bench (run benchmarks)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/commands/cargo-add.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cargo add (add a dependency to Cargo.toml)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/commands/cargo-remove.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cargo remove (remove a dependency)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/commands/cargo-update.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cargo update (update Cargo.lock)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/commands/cargo-search.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cargo search (search crates.io)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/commands/cargo-install.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cargo install (install a binary from crates.io)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/commands/cargo-uninstall.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cargo uninstall",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/commands/cargo-publish.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cargo publish (publish a crate to a registry)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/commands/cargo-package.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cargo package (create distributable .crate archive)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/commands/cargo-clean.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cargo clean (remove target/ directory)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/commands/cargo-doc.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cargo doc (build documentation)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/commands/cargo-tree.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cargo tree (display dependency tree)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/commands/cargo-vendor.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cargo vendor (vendor dependencies into vendor/ dir)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/commands/cargo-fetch.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cargo fetch (fetch dependencies)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/commands/cargo-fix.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cargo fix (apply rustfix suggestions)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/commands/cargo-locate-project.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cargo locate-project",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/commands/cargo-metadata.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cargo metadata (machine-readable project info)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/commands/cargo-login.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cargo login (save registry token)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/commands/cargo-logout.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cargo logout",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/commands/cargo-owner.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cargo owner (manage crate owners on registry)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/commands/cargo-yank.html",
+          "claim_type": "cli_command_exists",
+          "subject": "cargo yank (remove a published version from index)",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "cargo-config": {
+      "sources": [
+        {
+          "url": "https://doc.rust-lang.org/cargo/reference/manifest.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Cargo.toml manifest format reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Specifying dependencies (version, path, git, registry)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/reference/cargo-targets.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Cargo targets ([[bin]], [lib], [[example]], [[test]], [[bench]])",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/reference/workspaces.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Cargo workspaces",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/reference/features.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Cargo features (optional dependencies, conditional compilation)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/reference/profiles.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Cargo build profiles (dev, release, test, bench, custom)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/reference/config.html",
+          "claim_type": "cli_command_exists",
+          "subject": ".cargo/config.toml (cargo configuration)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/reference/environment-variables.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Cargo environment variables",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/reference/overriding-dependencies.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Overriding dependencies (patch, replace)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/reference/source-replacement.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Source replacement (mirror crates.io)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/reference/registries.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Custom registries",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/reference/registry-authentication.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Registry authentication",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/reference/registry-web-api.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Registry HTTP API",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/reference/external-tools.html",
+          "claim_type": "cli_command_exists",
+          "subject": "External tools (integration via cargo metadata)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/reference/unstable.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Unstable / nightly cargo features",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/reference/resolver.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Cargo dependency resolver",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "cargo-build": {
+      "sources": [
+        {
+          "url": "https://doc.rust-lang.org/cargo/reference/build-scripts.html",
+          "claim_type": "cli_command_exists",
+          "subject": "build.rs build scripts",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/reference/build-script-examples.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Build script examples (link a C library, generate code)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/reference/publishing.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Publishing on crates.io",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/reference/lints.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Lints configuration in Cargo.toml",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/guide/tests.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Tests guide",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/guide/continuous-integration.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Cargo in CI",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/guide/project-layout.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Cargo project layout",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/guide/dependencies.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Working with dependencies",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/cargo/guide/cargo-toml-vs-cargo-lock.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Cargo.toml vs Cargo.lock",
+          "evidence_type": "official_docs"
+        }
+      ]
     }
   }
 }
