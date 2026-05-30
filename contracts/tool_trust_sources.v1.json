@@ -368,6 +368,36 @@
       ],
       "source_repositories": []
     },
+    "ffmpeg-cli": {
+      "official_hosts": [
+        "ffmpeg.org"
+      ],
+      "source_repositories": []
+    },
+    "ffmpeg-config": {
+      "official_hosts": [
+        "ffmpeg.org"
+      ],
+      "source_repositories": []
+    },
+    "ffmpeg-filters": {
+      "official_hosts": [
+        "ffmpeg.org"
+      ],
+      "source_repositories": []
+    },
+    "ffmpeg-recipes": {
+      "official_hosts": [
+        "ffmpeg.org"
+      ],
+      "source_repositories": []
+    },
+    "ffmpeg-errors": {
+      "official_hosts": [
+        "ffmpeg.org"
+      ],
+      "source_repositories": []
+    },
     "imagemagick": {
       "official_hosts": [
         "imagemagick.org"

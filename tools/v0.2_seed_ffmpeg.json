@@ -1,0 +1,32 @@
+{
+  "tools": [
+    {
+      "tool_id": "ffmpeg-cli",
+      "urls": [
+        "https://ffmpeg.org/ffmpeg.html",
+        "https://ffmpeg.org/ffprobe.html",
+        "https://ffmpeg.org/ffplay.html",
+        "https://ffmpeg.org/ffmpeg-all.html"
+      ]
+    },
+    {
+      "tool_id": "ffmpeg-config",
+      "urls": [
+        "https://ffmpeg.org/ffmpeg-formats.html",
+        "https://ffmpeg.org/ffmpeg-codecs.html",
+        "https://ffmpeg.org/ffmpeg-protocols.html",
+        "https://ffmpeg.org/ffmpeg-devices.html",
+        "https://ffmpeg.org/ffmpeg-utils.html",
+        "https://ffmpeg.org/ffmpeg-resampler.html",
+        "https://ffmpeg.org/ffmpeg-scaler.html"
+      ]
+    },
+    {
+      "tool_id": "ffmpeg-filters",
+      "urls": [
+        "https://ffmpeg.org/ffmpeg-filters.html",
+        "https://ffmpeg.org/ffmpeg-bitstream-filters.html"
+      ]
+    }
+  ]
+}

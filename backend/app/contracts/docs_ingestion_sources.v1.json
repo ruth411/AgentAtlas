@@ -6062,6 +6062,96 @@
           "evidence_type": "official_docs"
         }
       ]
+    },
+    "ffmpeg-cli": {
+      "sources": [
+        {
+          "url": "https://ffmpeg.org/ffmpeg.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ffmpeg CLI reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://ffmpeg.org/ffprobe.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ffprobe (media inspector) CLI",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://ffmpeg.org/ffplay.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ffplay (lightweight player) CLI",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://ffmpeg.org/ffmpeg-all.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ffmpeg complete reference",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "ffmpeg-config": {
+      "sources": [
+        {
+          "url": "https://ffmpeg.org/ffmpeg-formats.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ffmpeg muxer / demuxer formats",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://ffmpeg.org/ffmpeg-codecs.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ffmpeg encoders / decoders codecs",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://ffmpeg.org/ffmpeg-protocols.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ffmpeg I/O protocols (file/http/rtmp/udp)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://ffmpeg.org/ffmpeg-devices.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ffmpeg input / output devices",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://ffmpeg.org/ffmpeg-utils.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ffmpeg shared utility syntax",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://ffmpeg.org/ffmpeg-resampler.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ffmpeg audio resampler config",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://ffmpeg.org/ffmpeg-scaler.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ffmpeg video scaler config",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "ffmpeg-filters": {
+      "sources": [
+        {
+          "url": "https://ffmpeg.org/ffmpeg-filters.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ffmpeg audio / video filters",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://ffmpeg.org/ffmpeg-bitstream-filters.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ffmpeg bitstream filters",
+          "evidence_type": "official_docs"
+        }
+      ]
     }
   }
 }
