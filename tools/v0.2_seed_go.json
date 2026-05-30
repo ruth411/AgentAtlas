@@ -1,0 +1,60 @@
+{
+  "tools": [
+    {
+      "tool_id": "go-cli",
+      "urls": [
+        "https://go.dev/cmd/go/",
+        "https://go.dev/doc/code",
+        "https://go.dev/doc/tutorial/getting-started",
+        "https://go.dev/doc/tutorial/create-module",
+        "https://go.dev/doc/tutorial/add-a-test",
+        "https://go.dev/doc/tutorial/compile-install"
+      ]
+    },
+    {
+      "tool_id": "go-config",
+      "urls": [
+        "https://go.dev/ref/mod",
+        "https://go.dev/doc/modules/managing-dependencies",
+        "https://go.dev/doc/modules/gomod-ref",
+        "https://go.dev/doc/modules/version-numbers",
+        "https://go.dev/doc/modules/release-workflow"
+      ]
+    },
+    {
+      "tool_id": "go-stdlib",
+      "urls": [
+        "https://pkg.go.dev/net/http",
+        "https://pkg.go.dev/encoding/json",
+        "https://pkg.go.dev/context",
+        "https://pkg.go.dev/sync",
+        "https://pkg.go.dev/os",
+        "https://pkg.go.dev/io",
+        "https://pkg.go.dev/fmt",
+        "https://pkg.go.dev/errors",
+        "https://pkg.go.dev/strings",
+        "https://pkg.go.dev/strconv",
+        "https://pkg.go.dev/time",
+        "https://pkg.go.dev/database/sql",
+        "https://pkg.go.dev/log",
+        "https://pkg.go.dev/log/slog",
+        "https://pkg.go.dev/testing",
+        "https://pkg.go.dev/regexp",
+        "https://pkg.go.dev/bytes",
+        "https://pkg.go.dev/path/filepath",
+        "https://pkg.go.dev/encoding/csv",
+        "https://pkg.go.dev/encoding/base64",
+        "https://pkg.go.dev/crypto/sha256",
+        "https://pkg.go.dev/net/url",
+        "https://pkg.go.dev/sort",
+        "https://pkg.go.dev/slices",
+        "https://pkg.go.dev/maps",
+        "https://pkg.go.dev/encoding/xml",
+        "https://pkg.go.dev/io/fs",
+        "https://pkg.go.dev/bufio",
+        "https://pkg.go.dev/os/exec",
+        "https://pkg.go.dev/flag"
+      ]
+    }
+  ]
+}

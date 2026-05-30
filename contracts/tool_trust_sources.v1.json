@@ -327,6 +327,39 @@
       ],
       "source_repositories": []
     },
+    "go-cli": {
+      "official_hosts": [
+        "go.dev"
+      ],
+      "source_repositories": []
+    },
+    "go-config": {
+      "official_hosts": [
+        "go.dev"
+      ],
+      "source_repositories": []
+    },
+    "go-stdlib": {
+      "official_hosts": [
+        "pkg.go.dev",
+        "go.dev"
+      ],
+      "source_repositories": []
+    },
+    "go-recipes": {
+      "official_hosts": [
+        "go.dev",
+        "pkg.go.dev"
+      ],
+      "source_repositories": []
+    },
+    "go-errors": {
+      "official_hosts": [
+        "go.dev",
+        "pkg.go.dev"
+      ],
+      "source_repositories": []
+    },
     "rust": {
       "official_hosts": [
         "rust-lang.github.io"

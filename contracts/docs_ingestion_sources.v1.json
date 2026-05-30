@@ -6782,6 +6782,264 @@
           "evidence_type": "official_docs"
         }
       ]
+    },
+    "go-cli": {
+      "sources": [
+        {
+          "url": "https://go.dev/cmd/go/",
+          "claim_type": "cli_command_exists",
+          "subject": "go command reference (build, test, run, mod, get, install, fmt, vet, doc, env)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://go.dev/doc/code",
+          "claim_type": "cli_command_exists",
+          "subject": "how to organize and write Go code",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://go.dev/doc/tutorial/getting-started",
+          "claim_type": "cli_command_exists",
+          "subject": "go tutorial: getting started (write your first program)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://go.dev/doc/tutorial/create-module",
+          "claim_type": "cli_command_exists",
+          "subject": "go tutorial: create a module",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://go.dev/doc/tutorial/add-a-test",
+          "claim_type": "cli_command_exists",
+          "subject": "go tutorial: add a unit test",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://go.dev/doc/tutorial/compile-install",
+          "claim_type": "cli_command_exists",
+          "subject": "go tutorial: compile and install",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "go-config": {
+      "sources": [
+        {
+          "url": "https://go.dev/ref/mod",
+          "claim_type": "cli_command_exists",
+          "subject": "go modules reference (go.mod, go.sum, MVS, proxy)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://go.dev/doc/modules/managing-dependencies",
+          "claim_type": "cli_command_exists",
+          "subject": "managing dependencies with go modules",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://go.dev/doc/modules/gomod-ref",
+          "claim_type": "cli_command_exists",
+          "subject": "go.mod file reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://go.dev/doc/modules/version-numbers",
+          "claim_type": "cli_command_exists",
+          "subject": "go semantic version numbers",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://go.dev/doc/modules/release-workflow",
+          "claim_type": "cli_command_exists",
+          "subject": "go module release workflow",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "go-stdlib": {
+      "sources": [
+        {
+          "url": "https://pkg.go.dev/net/http",
+          "claim_type": "cli_command_exists",
+          "subject": "net/http (HTTP client/server)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pkg.go.dev/encoding/json",
+          "claim_type": "cli_command_exists",
+          "subject": "encoding/json (JSON encoder/decoder)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pkg.go.dev/context",
+          "claim_type": "cli_command_exists",
+          "subject": "context (cancellation, deadlines, request-scoped values)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pkg.go.dev/sync",
+          "claim_type": "cli_command_exists",
+          "subject": "sync (mutex, waitgroup, once, pool, map)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pkg.go.dev/os",
+          "claim_type": "cli_command_exists",
+          "subject": "os (file I/O, env, args, process)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pkg.go.dev/io",
+          "claim_type": "cli_command_exists",
+          "subject": "io (reader/writer interfaces)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pkg.go.dev/fmt",
+          "claim_type": "cli_command_exists",
+          "subject": "fmt (formatted I/O \u2014 Println, Printf, Sprintf)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pkg.go.dev/errors",
+          "claim_type": "cli_command_exists",
+          "subject": "errors (error wrapping, Is, As, New)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pkg.go.dev/strings",
+          "claim_type": "cli_command_exists",
+          "subject": "strings (string utilities)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pkg.go.dev/strconv",
+          "claim_type": "cli_command_exists",
+          "subject": "strconv (string/number conversion)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pkg.go.dev/time",
+          "claim_type": "cli_command_exists",
+          "subject": "time (Time, Duration, parse, format)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pkg.go.dev/database/sql",
+          "claim_type": "cli_command_exists",
+          "subject": "database/sql (generic SQL interface)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pkg.go.dev/log",
+          "claim_type": "cli_command_exists",
+          "subject": "log (basic logging)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pkg.go.dev/log/slog",
+          "claim_type": "cli_command_exists",
+          "subject": "log/slog (structured logging \u2014 Go 1.21+)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pkg.go.dev/testing",
+          "claim_type": "cli_command_exists",
+          "subject": "testing (unit tests, benchmarks, fuzz)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pkg.go.dev/regexp",
+          "claim_type": "cli_command_exists",
+          "subject": "regexp (regular expressions, RE2 syntax)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pkg.go.dev/bytes",
+          "claim_type": "cli_command_exists",
+          "subject": "bytes (byte slice utilities)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pkg.go.dev/path/filepath",
+          "claim_type": "cli_command_exists",
+          "subject": "path/filepath (OS-aware file path manipulation)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pkg.go.dev/encoding/csv",
+          "claim_type": "cli_command_exists",
+          "subject": "encoding/csv (CSV reader/writer)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pkg.go.dev/encoding/base64",
+          "claim_type": "cli_command_exists",
+          "subject": "encoding/base64 (base64 encoding)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pkg.go.dev/crypto/sha256",
+          "claim_type": "cli_command_exists",
+          "subject": "crypto/sha256 (SHA-256 hashing)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pkg.go.dev/net/url",
+          "claim_type": "cli_command_exists",
+          "subject": "net/url (URL parsing + building)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pkg.go.dev/sort",
+          "claim_type": "cli_command_exists",
+          "subject": "sort (sorting slices and user-defined collections)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pkg.go.dev/slices",
+          "claim_type": "cli_command_exists",
+          "subject": "slices (generic slice utilities \u2014 Go 1.21+)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pkg.go.dev/maps",
+          "claim_type": "cli_command_exists",
+          "subject": "maps (generic map utilities \u2014 Go 1.21+)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pkg.go.dev/encoding/xml",
+          "claim_type": "cli_command_exists",
+          "subject": "encoding/xml (XML encoder/decoder)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pkg.go.dev/io/fs",
+          "claim_type": "cli_command_exists",
+          "subject": "io/fs (file system abstraction)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pkg.go.dev/bufio",
+          "claim_type": "cli_command_exists",
+          "subject": "bufio (buffered I/O)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pkg.go.dev/os/exec",
+          "claim_type": "cli_command_exists",
+          "subject": "os/exec (run external commands)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pkg.go.dev/flag",
+          "claim_type": "cli_command_exists",
+          "subject": "flag (command-line flag parsing)",
+          "evidence_type": "official_docs"
+        }
+      ]
     }
   }
 }
