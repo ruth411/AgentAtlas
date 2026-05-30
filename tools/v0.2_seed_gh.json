@@ -1,0 +1,80 @@
+{
+  "tools": [
+    {
+      "tool_id": "gh-cli",
+      "urls": [
+        "https://cli.github.com/manual/gh",
+        "https://cli.github.com/manual/gh_auth_login",
+        "https://cli.github.com/manual/gh_auth_logout",
+        "https://cli.github.com/manual/gh_auth_status",
+        "https://cli.github.com/manual/gh_auth_token",
+        "https://cli.github.com/manual/gh_repo_create",
+        "https://cli.github.com/manual/gh_repo_clone",
+        "https://cli.github.com/manual/gh_repo_fork",
+        "https://cli.github.com/manual/gh_repo_view",
+        "https://cli.github.com/manual/gh_repo_edit",
+        "https://cli.github.com/manual/gh_repo_list",
+        "https://cli.github.com/manual/gh_repo_delete",
+        "https://cli.github.com/manual/gh_pr_create",
+        "https://cli.github.com/manual/gh_pr_list",
+        "https://cli.github.com/manual/gh_pr_view",
+        "https://cli.github.com/manual/gh_pr_checkout",
+        "https://cli.github.com/manual/gh_pr_merge",
+        "https://cli.github.com/manual/gh_pr_close",
+        "https://cli.github.com/manual/gh_pr_review",
+        "https://cli.github.com/manual/gh_pr_diff",
+        "https://cli.github.com/manual/gh_pr_checks",
+        "https://cli.github.com/manual/gh_pr_status",
+        "https://cli.github.com/manual/gh_issue_create",
+        "https://cli.github.com/manual/gh_issue_list",
+        "https://cli.github.com/manual/gh_issue_view",
+        "https://cli.github.com/manual/gh_issue_close",
+        "https://cli.github.com/manual/gh_issue_comment",
+        "https://cli.github.com/manual/gh_release_create",
+        "https://cli.github.com/manual/gh_release_list",
+        "https://cli.github.com/manual/gh_release_view",
+        "https://cli.github.com/manual/gh_release_download",
+        "https://cli.github.com/manual/gh_gist_create",
+        "https://cli.github.com/manual/gh_gist_list",
+        "https://cli.github.com/manual/gh_search_repos",
+        "https://cli.github.com/manual/gh_search_prs",
+        "https://cli.github.com/manual/gh_search_issues",
+        "https://cli.github.com/manual/gh_search_code",
+        "https://cli.github.com/manual/gh_browse",
+        "https://cli.github.com/manual/gh_api"
+      ]
+    },
+    {
+      "tool_id": "gh-config",
+      "urls": [
+        "https://cli.github.com/manual/gh_config",
+        "https://cli.github.com/manual/gh_config_set",
+        "https://cli.github.com/manual/gh_config_get",
+        "https://cli.github.com/manual/gh_config_list",
+        "https://cli.github.com/manual/gh_alias_set",
+        "https://cli.github.com/manual/gh_alias_list",
+        "https://cli.github.com/manual/gh_extension_install",
+        "https://cli.github.com/manual/gh_extension_list"
+      ]
+    },
+    {
+      "tool_id": "gh-workflows",
+      "urls": [
+        "https://cli.github.com/manual/gh_workflow_run",
+        "https://cli.github.com/manual/gh_workflow_list",
+        "https://cli.github.com/manual/gh_workflow_view",
+        "https://cli.github.com/manual/gh_run_list",
+        "https://cli.github.com/manual/gh_run_view",
+        "https://cli.github.com/manual/gh_run_watch",
+        "https://cli.github.com/manual/gh_run_cancel",
+        "https://cli.github.com/manual/gh_run_rerun",
+        "https://cli.github.com/manual/gh_secret_set",
+        "https://cli.github.com/manual/gh_secret_list",
+        "https://cli.github.com/manual/gh_variable_set",
+        "https://cli.github.com/manual/gh_variable_list",
+        "https://cli.github.com/manual/gh_codespace_create",
+        "https://cli.github.com/manual/gh_codespace_list"
+      ]
+    }
+  ]
+}

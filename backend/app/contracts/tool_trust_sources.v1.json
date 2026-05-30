@@ -104,6 +104,37 @@
         }
       ]
     },
+    "gh-cli": {
+      "official_hosts": [
+        "cli.github.com"
+      ],
+      "source_repositories": []
+    },
+    "gh-config": {
+      "official_hosts": [
+        "cli.github.com"
+      ],
+      "source_repositories": []
+    },
+    "gh-workflows": {
+      "official_hosts": [
+        "cli.github.com",
+        "docs.github.com"
+      ],
+      "source_repositories": []
+    },
+    "gh-recipes": {
+      "official_hosts": [
+        "cli.github.com"
+      ],
+      "source_repositories": []
+    },
+    "gh-errors": {
+      "official_hosts": [
+        "cli.github.com"
+      ],
+      "source_repositories": []
+    },
     "openai-api": {
       "official_hosts": [
         "api.openai.com",

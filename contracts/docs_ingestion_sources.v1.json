@@ -6404,6 +6404,384 @@
           "evidence_type": "official_docs"
         }
       ]
+    },
+    "gh-cli": {
+      "sources": [
+        {
+          "url": "https://cli.github.com/manual/gh",
+          "claim_type": "cli_command_exists",
+          "subject": "gh CLI overview",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_auth_login",
+          "claim_type": "cli_command_exists",
+          "subject": "gh auth login (authenticate to GitHub)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_auth_logout",
+          "claim_type": "cli_command_exists",
+          "subject": "gh auth logout (remove credentials)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_auth_status",
+          "claim_type": "cli_command_exists",
+          "subject": "gh auth status (view authentication state)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_auth_token",
+          "claim_type": "cli_command_exists",
+          "subject": "gh auth token (print stored token)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_repo_create",
+          "claim_type": "cli_command_exists",
+          "subject": "gh repo create (create new repository)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_repo_clone",
+          "claim_type": "cli_command_exists",
+          "subject": "gh repo clone (clone a repository)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_repo_fork",
+          "claim_type": "cli_command_exists",
+          "subject": "gh repo fork (fork a repository)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_repo_view",
+          "claim_type": "cli_command_exists",
+          "subject": "gh repo view (show repo details)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_repo_edit",
+          "claim_type": "cli_command_exists",
+          "subject": "gh repo edit (modify repo settings)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_repo_list",
+          "claim_type": "cli_command_exists",
+          "subject": "gh repo list (list repositories)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_repo_delete",
+          "claim_type": "cli_command_exists",
+          "subject": "gh repo delete (delete a repository)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_pr_create",
+          "claim_type": "cli_command_exists",
+          "subject": "gh pr create (open a pull request)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_pr_list",
+          "claim_type": "cli_command_exists",
+          "subject": "gh pr list (list pull requests)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_pr_view",
+          "claim_type": "cli_command_exists",
+          "subject": "gh pr view (show PR details)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_pr_checkout",
+          "claim_type": "cli_command_exists",
+          "subject": "gh pr checkout (check out a PR branch locally)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_pr_merge",
+          "claim_type": "cli_command_exists",
+          "subject": "gh pr merge (merge a PR)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_pr_close",
+          "claim_type": "cli_command_exists",
+          "subject": "gh pr close (close a PR)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_pr_review",
+          "claim_type": "cli_command_exists",
+          "subject": "gh pr review (approve/request changes/comment)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_pr_diff",
+          "claim_type": "cli_command_exists",
+          "subject": "gh pr diff (view PR diff)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_pr_checks",
+          "claim_type": "cli_command_exists",
+          "subject": "gh pr checks (show CI check status)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_pr_status",
+          "claim_type": "cli_command_exists",
+          "subject": "gh pr status (your PR summary)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_issue_create",
+          "claim_type": "cli_command_exists",
+          "subject": "gh issue create (open an issue)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_issue_list",
+          "claim_type": "cli_command_exists",
+          "subject": "gh issue list (list issues)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_issue_view",
+          "claim_type": "cli_command_exists",
+          "subject": "gh issue view (show issue details)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_issue_close",
+          "claim_type": "cli_command_exists",
+          "subject": "gh issue close (close an issue)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_issue_comment",
+          "claim_type": "cli_command_exists",
+          "subject": "gh issue comment (post a comment)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_release_create",
+          "claim_type": "cli_command_exists",
+          "subject": "gh release create (publish a release)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_release_list",
+          "claim_type": "cli_command_exists",
+          "subject": "gh release list (list releases)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_release_view",
+          "claim_type": "cli_command_exists",
+          "subject": "gh release view (show release details)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_release_download",
+          "claim_type": "cli_command_exists",
+          "subject": "gh release download (fetch release assets)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_gist_create",
+          "claim_type": "cli_command_exists",
+          "subject": "gh gist create (create a gist)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_gist_list",
+          "claim_type": "cli_command_exists",
+          "subject": "gh gist list (list your gists)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_search_repos",
+          "claim_type": "cli_command_exists",
+          "subject": "gh search repos (search repositories)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_search_prs",
+          "claim_type": "cli_command_exists",
+          "subject": "gh search prs (search PRs across GitHub)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_search_issues",
+          "claim_type": "cli_command_exists",
+          "subject": "gh search issues (search issues)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_search_code",
+          "claim_type": "cli_command_exists",
+          "subject": "gh search code (search code)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_browse",
+          "claim_type": "cli_command_exists",
+          "subject": "gh browse (open repo/PR/issue in browser)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_api",
+          "claim_type": "cli_command_exists",
+          "subject": "gh api (raw GitHub REST/GraphQL API call)",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "gh-config": {
+      "sources": [
+        {
+          "url": "https://cli.github.com/manual/gh_config",
+          "claim_type": "cli_command_exists",
+          "subject": "gh config (manage CLI configuration)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_config_set",
+          "claim_type": "cli_command_exists",
+          "subject": "gh config set (set a config value)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_config_get",
+          "claim_type": "cli_command_exists",
+          "subject": "gh config get (read a config value)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_config_list",
+          "claim_type": "cli_command_exists",
+          "subject": "gh config list (show all config values)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_alias_set",
+          "claim_type": "cli_command_exists",
+          "subject": "gh alias set (create a CLI alias)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_alias_list",
+          "claim_type": "cli_command_exists",
+          "subject": "gh alias list (list aliases)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_extension_install",
+          "claim_type": "cli_command_exists",
+          "subject": "gh extension install (install an extension)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_extension_list",
+          "claim_type": "cli_command_exists",
+          "subject": "gh extension list (list installed extensions)",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "gh-workflows": {
+      "sources": [
+        {
+          "url": "https://cli.github.com/manual/gh_workflow_run",
+          "claim_type": "cli_command_exists",
+          "subject": "gh workflow run (trigger a workflow)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_workflow_list",
+          "claim_type": "cli_command_exists",
+          "subject": "gh workflow list (list workflows)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_workflow_view",
+          "claim_type": "cli_command_exists",
+          "subject": "gh workflow view (show workflow details)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_run_list",
+          "claim_type": "cli_command_exists",
+          "subject": "gh run list (list workflow runs)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_run_view",
+          "claim_type": "cli_command_exists",
+          "subject": "gh run view (show run details/logs)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_run_watch",
+          "claim_type": "cli_command_exists",
+          "subject": "gh run watch (live-tail a run)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_run_cancel",
+          "claim_type": "cli_command_exists",
+          "subject": "gh run cancel (cancel a running workflow)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_run_rerun",
+          "claim_type": "cli_command_exists",
+          "subject": "gh run rerun (re-run a failed workflow)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_secret_set",
+          "claim_type": "cli_command_exists",
+          "subject": "gh secret set (create/update a repo secret)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_secret_list",
+          "claim_type": "cli_command_exists",
+          "subject": "gh secret list (list repo secrets)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_variable_set",
+          "claim_type": "cli_command_exists",
+          "subject": "gh variable set (create/update a repo variable)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_variable_list",
+          "claim_type": "cli_command_exists",
+          "subject": "gh variable list (list repo variables)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_codespace_create",
+          "claim_type": "cli_command_exists",
+          "subject": "gh codespace create (create a codespace)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_codespace_list",
+          "claim_type": "cli_command_exists",
+          "subject": "gh codespace list (list codespaces)",
+          "evidence_type": "official_docs"
+        }
+      ]
     }
   }
 }
