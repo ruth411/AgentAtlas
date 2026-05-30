@@ -255,6 +255,36 @@
       ],
       "source_repositories": []
     },
+    "helm-cli": {
+      "official_hosts": [
+        "helm.sh"
+      ],
+      "source_repositories": []
+    },
+    "helm-config": {
+      "official_hosts": [
+        "helm.sh"
+      ],
+      "source_repositories": []
+    },
+    "helm-charts": {
+      "official_hosts": [
+        "helm.sh"
+      ],
+      "source_repositories": []
+    },
+    "helm-recipes": {
+      "official_hosts": [
+        "helm.sh"
+      ],
+      "source_repositories": []
+    },
+    "helm-errors": {
+      "official_hosts": [
+        "helm.sh"
+      ],
+      "source_repositories": []
+    },
     "ansible": {
       "official_hosts": [
         "docs.ansible.com"

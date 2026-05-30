@@ -7172,6 +7172,354 @@
           "evidence_type": "official_docs"
         }
       ]
+    },
+    "helm-cli": {
+      "sources": [
+        {
+          "url": "https://helm.sh/docs/helm/helm/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm CLI overview",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_install/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm install (deploy a chart)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_upgrade/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm upgrade (update a release)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_uninstall/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm uninstall (delete a release)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_rollback/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm rollback (revert to previous revision)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_list/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm list (list releases)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_status/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm status (show release state)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_history/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm history (show revision history)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_get_values/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm get values (current values for a release)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_get_manifest/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm get manifest (rendered yaml)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_get_notes/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm get notes (NOTES.txt for a release)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_get_hooks/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm get hooks (hooks for a release)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_show_chart/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm show chart (Chart.yaml content)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_show_values/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm show values (default values.yaml)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_show_readme/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm show readme (chart README)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_repo/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm repo (manage chart repositories)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_repo_add/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm repo add (add a chart repository)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_repo_update/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm repo update (refresh local indexes)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_repo_list/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm repo list (list configured repos)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_repo_remove/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm repo remove (remove a chart repo)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_search_repo/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm search repo (search local repo cache)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_search_hub/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm search hub (search Artifact Hub)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_pull/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm pull (download a chart)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_create/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm create (scaffold a new chart)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_lint/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm lint (validate chart)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_template/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm template (render templates locally)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_package/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm package (package chart into .tgz)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_dependency/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm dependency (manage chart dependencies)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_dependency_update/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm dependency update (fetch deps)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_dependency_build/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm dependency build (use lockfile)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_test/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm test (run chart tests)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_version/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm version (show helm version)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_env/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm env (show helm environment vars)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_plugin/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm plugin (manage helm plugins)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/helm/helm_completion/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm completion (shell completion)",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "helm-config": {
+      "sources": [
+        {
+          "url": "https://helm.sh/docs/topics/charts/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm chart structure (Chart.yaml, templates/, values.yaml)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/topics/chart_repository/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm chart repository concept",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/topics/registries/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm OCI registry support",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/topics/charts_hooks/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm hooks (pre-install, post-upgrade, etc.)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/topics/library_charts/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm library charts (reusable templates)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/topics/chart_tests/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm chart tests",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/topics/provenance/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm provenance and integrity (signed charts)",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "helm-charts": {
+      "sources": [
+        {
+          "url": "https://helm.sh/docs/chart_template_guide/getting_started/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm template guide: getting started",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/chart_template_guide/values_files/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm template guide: values files",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/chart_template_guide/builtin_objects/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm template guide: built-in objects (.Values, .Release, .Chart)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/chart_template_guide/functions_and_pipelines/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm template guide: functions + pipelines",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/chart_template_guide/control_structures/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm template guide: if/range/with",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/chart_template_guide/variables/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm template guide: variables ($name)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/chart_template_guide/named_templates/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm template guide: named templates (define + include)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/chart_template_guide/accessing_files/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm template guide: accessing files (.Files.Get)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/chart_template_guide/notes_files/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm template guide: NOTES.txt",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/chart_template_guide/subcharts_and_globals/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm template guide: subcharts + globals",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/chart_best_practices/general/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm chart best practices: general",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/chart_best_practices/values/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm chart best practices: values",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/chart_best_practices/templates/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm chart best practices: templates",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://helm.sh/docs/chart_best_practices/labels/",
+          "claim_type": "cli_command_exists",
+          "subject": "helm chart best practices: labels + selectors",
+          "evidence_type": "official_docs"
+        }
+      ]
     }
   }
 }

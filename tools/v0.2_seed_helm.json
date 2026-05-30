@@ -1,0 +1,75 @@
+{
+  "tools": [
+    {
+      "tool_id": "helm-cli",
+      "urls": [
+        "https://helm.sh/docs/helm/helm/",
+        "https://helm.sh/docs/helm/helm_install/",
+        "https://helm.sh/docs/helm/helm_upgrade/",
+        "https://helm.sh/docs/helm/helm_uninstall/",
+        "https://helm.sh/docs/helm/helm_rollback/",
+        "https://helm.sh/docs/helm/helm_list/",
+        "https://helm.sh/docs/helm/helm_status/",
+        "https://helm.sh/docs/helm/helm_history/",
+        "https://helm.sh/docs/helm/helm_get_values/",
+        "https://helm.sh/docs/helm/helm_get_manifest/",
+        "https://helm.sh/docs/helm/helm_get_notes/",
+        "https://helm.sh/docs/helm/helm_get_hooks/",
+        "https://helm.sh/docs/helm/helm_show_chart/",
+        "https://helm.sh/docs/helm/helm_show_values/",
+        "https://helm.sh/docs/helm/helm_show_readme/",
+        "https://helm.sh/docs/helm/helm_repo/",
+        "https://helm.sh/docs/helm/helm_repo_add/",
+        "https://helm.sh/docs/helm/helm_repo_update/",
+        "https://helm.sh/docs/helm/helm_repo_list/",
+        "https://helm.sh/docs/helm/helm_repo_remove/",
+        "https://helm.sh/docs/helm/helm_search_repo/",
+        "https://helm.sh/docs/helm/helm_search_hub/",
+        "https://helm.sh/docs/helm/helm_pull/",
+        "https://helm.sh/docs/helm/helm_create/",
+        "https://helm.sh/docs/helm/helm_lint/",
+        "https://helm.sh/docs/helm/helm_template/",
+        "https://helm.sh/docs/helm/helm_package/",
+        "https://helm.sh/docs/helm/helm_dependency/",
+        "https://helm.sh/docs/helm/helm_dependency_update/",
+        "https://helm.sh/docs/helm/helm_dependency_build/",
+        "https://helm.sh/docs/helm/helm_test/",
+        "https://helm.sh/docs/helm/helm_version/",
+        "https://helm.sh/docs/helm/helm_env/",
+        "https://helm.sh/docs/helm/helm_plugin/",
+        "https://helm.sh/docs/helm/helm_completion/"
+      ]
+    },
+    {
+      "tool_id": "helm-config",
+      "urls": [
+        "https://helm.sh/docs/topics/charts/",
+        "https://helm.sh/docs/topics/chart_repository/",
+        "https://helm.sh/docs/topics/registries/",
+        "https://helm.sh/docs/topics/charts_hooks/",
+        "https://helm.sh/docs/topics/library_charts/",
+        "https://helm.sh/docs/topics/chart_tests/",
+        "https://helm.sh/docs/topics/provenance/"
+      ]
+    },
+    {
+      "tool_id": "helm-charts",
+      "urls": [
+        "https://helm.sh/docs/chart_template_guide/getting_started/",
+        "https://helm.sh/docs/chart_template_guide/values_files/",
+        "https://helm.sh/docs/chart_template_guide/builtin_objects/",
+        "https://helm.sh/docs/chart_template_guide/functions_and_pipelines/",
+        "https://helm.sh/docs/chart_template_guide/control_structures/",
+        "https://helm.sh/docs/chart_template_guide/variables/",
+        "https://helm.sh/docs/chart_template_guide/named_templates/",
+        "https://helm.sh/docs/chart_template_guide/accessing_files/",
+        "https://helm.sh/docs/chart_template_guide/notes_files/",
+        "https://helm.sh/docs/chart_template_guide/subcharts_and_globals/",
+        "https://helm.sh/docs/chart_best_practices/general/",
+        "https://helm.sh/docs/chart_best_practices/values/",
+        "https://helm.sh/docs/chart_best_practices/templates/",
+        "https://helm.sh/docs/chart_best_practices/labels/"
+      ]
+    }
+  ]
+}
