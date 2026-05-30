@@ -7724,6 +7724,34 @@
           "evidence_type": "official_docs"
         }
       ]
+    },
+    "jq-cli": {
+      "sources": [
+        {
+          "url": "https://jqlang.org/manual/",
+          "claim_type": "cli_command_exists",
+          "subject": "jq manual (filters, operators, functions)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://jqlang.org/tutorial/",
+          "claim_type": "cli_command_exists",
+          "subject": "jq tutorial (introduction with examples)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://jqlang.github.io/jq/manual/",
+          "claim_type": "cli_command_exists",
+          "subject": "jq manual (GitHub Pages mirror)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://jqlang.github.io/jq/tutorial/",
+          "claim_type": "cli_command_exists",
+          "subject": "jq tutorial (GitHub Pages mirror)",
+          "evidence_type": "official_docs"
+        }
+      ]
     }
   }
 }

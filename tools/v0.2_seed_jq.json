@@ -1,0 +1,13 @@
+{
+  "tools": [
+    {
+      "tool_id": "jq-cli",
+      "urls": [
+        "https://jqlang.org/manual/",
+        "https://jqlang.org/tutorial/",
+        "https://jqlang.github.io/jq/manual/",
+        "https://jqlang.github.io/jq/tutorial/"
+      ]
+    }
+  ]
+}

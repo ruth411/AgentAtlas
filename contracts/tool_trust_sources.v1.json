@@ -456,6 +456,41 @@
       ],
       "source_repositories": []
     },
+    "jq-cli": {
+      "official_hosts": [
+        "jqlang.org",
+        "jqlang.github.io"
+      ],
+      "source_repositories": []
+    },
+    "jq-filters": {
+      "official_hosts": [
+        "jqlang.org",
+        "jqlang.github.io"
+      ],
+      "source_repositories": []
+    },
+    "jq-functions": {
+      "official_hosts": [
+        "jqlang.org",
+        "jqlang.github.io"
+      ],
+      "source_repositories": []
+    },
+    "jq-recipes": {
+      "official_hosts": [
+        "jqlang.org",
+        "jqlang.github.io"
+      ],
+      "source_repositories": []
+    },
+    "jq-errors": {
+      "official_hosts": [
+        "jqlang.org",
+        "jqlang.github.io"
+      ],
+      "source_repositories": []
+    },
     "yq": {
       "official_hosts": [
         "mikefarah.gitbook.io"
