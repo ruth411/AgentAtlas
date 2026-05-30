@@ -1,0 +1,39 @@
+{
+  "tools": [
+    {
+      "tool_id": "gpg-cli",
+      "urls": [
+        "https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG.html",
+        "https://www.gnupg.org/documentation/manuals/gnupg/GPG-Commands.html",
+        "https://www.gnupg.org/documentation/manuals/gnupg/GPG-Options.html",
+        "https://www.gnupg.org/documentation/manuals/gnupg/GPG-Input-and-Output.html",
+        "https://www.gnupg.org/documentation/manuals/gnupg/GPG-Examples.html",
+        "https://www.gnupg.org/documentation/manuals/gnupg/OpenPGP-Options.html",
+        "https://www.gnupg.org/documentation/manuals/gnupg/Compliance-Options.html"
+      ]
+    },
+    {
+      "tool_id": "gpg-config",
+      "urls": [
+        "https://www.gnupg.org/documentation/manuals/gnupg/GPG-Configuration.html",
+        "https://www.gnupg.org/documentation/manuals/gnupg/GPG-Configuration-Options.html",
+        "https://www.gnupg.org/documentation/manuals/gnupg/Trust-Model-Configuration.html",
+        "https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG_002dAGENT.html",
+        "https://www.gnupg.org/documentation/manuals/gnupg/Agent-Options.html",
+        "https://www.gnupg.org/documentation/manuals/gnupg/Invoking-DIRMNGR.html",
+        "https://www.gnupg.org/documentation/manuals/gnupg/Dirmngr-Options.html"
+      ]
+    },
+    {
+      "tool_id": "gpg-keys",
+      "urls": [
+        "https://www.gnupg.org/documentation/manuals/gnupg/Operational-GPG-Commands.html",
+        "https://www.gnupg.org/documentation/manuals/gnupg/Key-related-Options.html",
+        "https://www.gnupg.org/documentation/manuals/gnupg/Key-listing-options.html",
+        "https://www.gnupg.org/documentation/manuals/gnupg/Howto-Specify-a-User-ID.html",
+        "https://www.gnupg.org/gph/en/manual/c14.html",
+        "https://www.gnupg.org/gph/en/manual/c235.html"
+      ]
+    }
+  ]
+}

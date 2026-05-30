@@ -510,6 +510,36 @@
       ],
       "source_repositories": []
     },
+    "gpg-cli": {
+      "official_hosts": [
+        "www.gnupg.org"
+      ],
+      "source_repositories": []
+    },
+    "gpg-config": {
+      "official_hosts": [
+        "www.gnupg.org"
+      ],
+      "source_repositories": []
+    },
+    "gpg-keys": {
+      "official_hosts": [
+        "www.gnupg.org"
+      ],
+      "source_repositories": []
+    },
+    "gpg-recipes": {
+      "official_hosts": [
+        "www.gnupg.org"
+      ],
+      "source_repositories": []
+    },
+    "gpg-errors": {
+      "official_hosts": [
+        "www.gnupg.org"
+      ],
+      "source_repositories": []
+    },
     "systemctl": {
       "official_hosts": [
         "www.freedesktop.org"

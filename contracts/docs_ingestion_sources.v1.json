@@ -7040,6 +7040,138 @@
           "evidence_type": "official_docs"
         }
       ]
+    },
+    "gpg-cli": {
+      "sources": [
+        {
+          "url": "https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG.html",
+          "claim_type": "cli_command_exists",
+          "subject": "gpg CLI invocation reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnupg.org/documentation/manuals/gnupg/GPG-Commands.html",
+          "claim_type": "cli_command_exists",
+          "subject": "gpg commands (encrypt, decrypt, sign, verify, list-keys, gen-key)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnupg.org/documentation/manuals/gnupg/GPG-Options.html",
+          "claim_type": "cli_command_exists",
+          "subject": "gpg command-line options",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnupg.org/documentation/manuals/gnupg/GPG-Input-and-Output.html",
+          "claim_type": "cli_command_exists",
+          "subject": "gpg input/output options",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnupg.org/documentation/manuals/gnupg/GPG-Examples.html",
+          "claim_type": "cli_command_exists",
+          "subject": "gpg usage examples",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnupg.org/documentation/manuals/gnupg/OpenPGP-Options.html",
+          "claim_type": "cli_command_exists",
+          "subject": "gpg OpenPGP-specific options",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnupg.org/documentation/manuals/gnupg/Compliance-Options.html",
+          "claim_type": "cli_command_exists",
+          "subject": "gpg compliance options (rfc4880, openpgp, etc.)",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "gpg-config": {
+      "sources": [
+        {
+          "url": "https://www.gnupg.org/documentation/manuals/gnupg/GPG-Configuration.html",
+          "claim_type": "cli_command_exists",
+          "subject": "gpg configuration file (gpg.conf)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnupg.org/documentation/manuals/gnupg/GPG-Configuration-Options.html",
+          "claim_type": "cli_command_exists",
+          "subject": "gpg configuration options reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnupg.org/documentation/manuals/gnupg/Trust-Model-Configuration.html",
+          "claim_type": "cli_command_exists",
+          "subject": "gpg trust model configuration",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG_002dAGENT.html",
+          "claim_type": "cli_command_exists",
+          "subject": "gpg-agent (passphrase + SSH agent daemon)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnupg.org/documentation/manuals/gnupg/Agent-Options.html",
+          "claim_type": "cli_command_exists",
+          "subject": "gpg-agent configuration options",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnupg.org/documentation/manuals/gnupg/Invoking-DIRMNGR.html",
+          "claim_type": "cli_command_exists",
+          "subject": "dirmngr (network access for keys and CRLs)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnupg.org/documentation/manuals/gnupg/Dirmngr-Options.html",
+          "claim_type": "cli_command_exists",
+          "subject": "dirmngr configuration options",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "gpg-keys": {
+      "sources": [
+        {
+          "url": "https://www.gnupg.org/documentation/manuals/gnupg/Operational-GPG-Commands.html",
+          "claim_type": "cli_command_exists",
+          "subject": "gpg operational commands (key management)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnupg.org/documentation/manuals/gnupg/Key-related-Options.html",
+          "claim_type": "cli_command_exists",
+          "subject": "gpg key-related options",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnupg.org/documentation/manuals/gnupg/Key-listing-options.html",
+          "claim_type": "cli_command_exists",
+          "subject": "gpg key listing options",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnupg.org/documentation/manuals/gnupg/Howto-Specify-a-User-ID.html",
+          "claim_type": "cli_command_exists",
+          "subject": "how to specify a user ID for gpg commands",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnupg.org/gph/en/manual/c14.html",
+          "claim_type": "cli_command_exists",
+          "subject": "GnuPG handbook: concepts of public-key cryptography",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnupg.org/gph/en/manual/c235.html",
+          "claim_type": "cli_command_exists",
+          "subject": "GnuPG handbook: key management and signing",
+          "evidence_type": "official_docs"
+        }
+      ]
     }
   }
 }
