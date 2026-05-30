@@ -612,6 +612,36 @@
       ],
       "source_repositories": []
     },
+    "journalctl-cli": {
+      "official_hosts": [
+        "www.freedesktop.org"
+      ],
+      "source_repositories": []
+    },
+    "journalctl-config": {
+      "official_hosts": [
+        "www.freedesktop.org"
+      ],
+      "source_repositories": []
+    },
+    "journalctl-fields": {
+      "official_hosts": [
+        "www.freedesktop.org"
+      ],
+      "source_repositories": []
+    },
+    "journalctl-recipes": {
+      "official_hosts": [
+        "www.freedesktop.org"
+      ],
+      "source_repositories": []
+    },
+    "journalctl-errors": {
+      "official_hosts": [
+        "www.freedesktop.org"
+      ],
+      "source_repositories": []
+    },
     "brew": {
       "official_hosts": [
         "docs.brew.sh"

@@ -7664,6 +7664,66 @@
           "evidence_type": "official_docs"
         }
       ]
+    },
+    "journalctl-cli": {
+      "sources": [
+        {
+          "url": "https://www.freedesktop.org/software/systemd/man/journalctl.html",
+          "claim_type": "cli_command_exists",
+          "subject": "journalctl CLI reference (query systemd journal)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.freedesktop.org/software/systemd/man/latest/journalctl.html",
+          "claim_type": "cli_command_exists",
+          "subject": "journalctl latest version reference",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "journalctl-config": {
+      "sources": [
+        {
+          "url": "https://www.freedesktop.org/software/systemd/man/journald.conf.html",
+          "claim_type": "cli_command_exists",
+          "subject": "journald.conf (systemd-journald daemon config)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.freedesktop.org/software/systemd/man/systemd-journald.service.html",
+          "claim_type": "cli_command_exists",
+          "subject": "systemd-journald service unit",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.freedesktop.org/software/systemd/man/journal-upload.conf.html",
+          "claim_type": "cli_command_exists",
+          "subject": "journal-upload.conf (forward journals to remote)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.freedesktop.org/software/systemd/man/systemd-journal-remote.service.html",
+          "claim_type": "cli_command_exists",
+          "subject": "systemd-journal-remote (receive remote journals)",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "journalctl-fields": {
+      "sources": [
+        {
+          "url": "https://www.freedesktop.org/software/systemd/man/systemd.journal-fields.html",
+          "claim_type": "cli_command_exists",
+          "subject": "systemd.journal-fields (well-known journal field names)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.freedesktop.org/software/systemd/man/sd_journal_print.html",
+          "claim_type": "cli_command_exists",
+          "subject": "sd_journal_print (write structured entries from C)",
+          "evidence_type": "official_docs"
+        }
+      ]
     }
   }
 }

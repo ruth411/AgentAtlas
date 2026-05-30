@@ -1,0 +1,27 @@
+{
+  "tools": [
+    {
+      "tool_id": "journalctl-cli",
+      "urls": [
+        "https://www.freedesktop.org/software/systemd/man/journalctl.html",
+        "https://www.freedesktop.org/software/systemd/man/latest/journalctl.html"
+      ]
+    },
+    {
+      "tool_id": "journalctl-config",
+      "urls": [
+        "https://www.freedesktop.org/software/systemd/man/journald.conf.html",
+        "https://www.freedesktop.org/software/systemd/man/systemd-journald.service.html",
+        "https://www.freedesktop.org/software/systemd/man/journal-upload.conf.html",
+        "https://www.freedesktop.org/software/systemd/man/systemd-journal-remote.service.html"
+      ]
+    },
+    {
+      "tool_id": "journalctl-fields",
+      "urls": [
+        "https://www.freedesktop.org/software/systemd/man/systemd.journal-fields.html",
+        "https://www.freedesktop.org/software/systemd/man/sd_journal_print.html"
+      ]
+    }
+  ]
+}
