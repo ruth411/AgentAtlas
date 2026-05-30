@@ -62,6 +62,36 @@
         }
       ]
     },
+    "git-cli": {
+      "official_hosts": [
+        "git-scm.com"
+      ],
+      "source_repositories": []
+    },
+    "git-config": {
+      "official_hosts": [
+        "git-scm.com"
+      ],
+      "source_repositories": []
+    },
+    "git-workflows": {
+      "official_hosts": [
+        "git-scm.com"
+      ],
+      "source_repositories": []
+    },
+    "git-recipes": {
+      "official_hosts": [
+        "git-scm.com"
+      ],
+      "source_repositories": []
+    },
+    "git-errors": {
+      "official_hosts": [
+        "git-scm.com"
+      ],
+      "source_repositories": []
+    },
     "github-cli": {
       "official_hosts": [
         "cli.github.com",

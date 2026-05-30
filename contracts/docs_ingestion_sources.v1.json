@@ -6152,6 +6152,258 @@
           "evidence_type": "official_docs"
         }
       ]
+    },
+    "git-cli": {
+      "sources": [
+        {
+          "url": "https://git-scm.com/docs/git-init",
+          "claim_type": "cli_command_exists",
+          "subject": "git init (create new repository)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/git-clone",
+          "claim_type": "cli_command_exists",
+          "subject": "git clone (copy a repository)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/git-add",
+          "claim_type": "cli_command_exists",
+          "subject": "git add (stage changes)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/git-commit",
+          "claim_type": "cli_command_exists",
+          "subject": "git commit (record snapshot)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/git-status",
+          "claim_type": "cli_command_exists",
+          "subject": "git status (show working tree state)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/git-diff",
+          "claim_type": "cli_command_exists",
+          "subject": "git diff (show changes between commits/files/index)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/git-log",
+          "claim_type": "cli_command_exists",
+          "subject": "git log (show commit history)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/git-show",
+          "claim_type": "cli_command_exists",
+          "subject": "git show (display object info)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/git-branch",
+          "claim_type": "cli_command_exists",
+          "subject": "git branch (list/create/delete branches)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/git-checkout",
+          "claim_type": "cli_command_exists",
+          "subject": "git checkout (switch branches or restore files \u2014 legacy)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/git-switch",
+          "claim_type": "cli_command_exists",
+          "subject": "git switch (switch branches \u2014 modern)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/git-restore",
+          "claim_type": "cli_command_exists",
+          "subject": "git restore (restore working tree files \u2014 modern)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/git-merge",
+          "claim_type": "cli_command_exists",
+          "subject": "git merge (join development histories)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/git-rebase",
+          "claim_type": "cli_command_exists",
+          "subject": "git rebase (reapply commits on another base)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/git-cherry-pick",
+          "claim_type": "cli_command_exists",
+          "subject": "git cherry-pick (apply specific commits)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/git-reset",
+          "claim_type": "cli_command_exists",
+          "subject": "git reset (reset HEAD to a state)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/git-revert",
+          "claim_type": "cli_command_exists",
+          "subject": "git revert (create undo commit)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/git-pull",
+          "claim_type": "cli_command_exists",
+          "subject": "git pull (fetch + merge)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/git-push",
+          "claim_type": "cli_command_exists",
+          "subject": "git push (publish commits to remote)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/git-fetch",
+          "claim_type": "cli_command_exists",
+          "subject": "git fetch (download from remote without merge)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/git-remote",
+          "claim_type": "cli_command_exists",
+          "subject": "git remote (manage remote repositories)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/git-stash",
+          "claim_type": "cli_command_exists",
+          "subject": "git stash (save dirty working state)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/git-tag",
+          "claim_type": "cli_command_exists",
+          "subject": "git tag (create/list/delete refs)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/git-rm",
+          "claim_type": "cli_command_exists",
+          "subject": "git rm (remove from working tree + index)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/git-mv",
+          "claim_type": "cli_command_exists",
+          "subject": "git mv (move/rename files)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/git-blame",
+          "claim_type": "cli_command_exists",
+          "subject": "git blame (show last-modified-by per line)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/git-bisect",
+          "claim_type": "cli_command_exists",
+          "subject": "git bisect (binary search for bad commit)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/git-reflog",
+          "claim_type": "cli_command_exists",
+          "subject": "git reflog (show reference log)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/git-clean",
+          "claim_type": "cli_command_exists",
+          "subject": "git clean (remove untracked files)",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "git-config": {
+      "sources": [
+        {
+          "url": "https://git-scm.com/docs/git-config",
+          "claim_type": "cli_command_exists",
+          "subject": "git config (set/get configuration)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/gitignore",
+          "claim_type": "cli_command_exists",
+          "subject": ".gitignore file (untracked-file patterns)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/gitattributes",
+          "claim_type": "cli_command_exists",
+          "subject": ".gitattributes file (per-path attributes)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/git-credential",
+          "claim_type": "cli_command_exists",
+          "subject": "git credential (retrieve/store credentials)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/gitcredentials",
+          "claim_type": "cli_command_exists",
+          "subject": "git credential storage configuration",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "git-workflows": {
+      "sources": [
+        {
+          "url": "https://git-scm.com/docs/gitworkflows",
+          "claim_type": "cli_command_exists",
+          "subject": "git workflows (recommended workflows)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/githooks",
+          "claim_type": "cli_command_exists",
+          "subject": "git hooks (custom scripts on events)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/gitsubmodules",
+          "claim_type": "cli_command_exists",
+          "subject": "git submodules (nested repositories)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/giteveryday",
+          "claim_type": "cli_command_exists",
+          "subject": "everyday git (most-used commands)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/gittutorial",
+          "claim_type": "cli_command_exists",
+          "subject": "git tutorial (introduction)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://git-scm.com/docs/gitglossary",
+          "claim_type": "cli_command_exists",
+          "subject": "git glossary (term definitions)",
+          "evidence_type": "official_docs"
+        }
+      ]
     }
   }
 }

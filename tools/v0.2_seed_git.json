@@ -1,0 +1,59 @@
+{
+  "tools": [
+    {
+      "tool_id": "git-cli",
+      "urls": [
+        "https://git-scm.com/docs/git-init",
+        "https://git-scm.com/docs/git-clone",
+        "https://git-scm.com/docs/git-add",
+        "https://git-scm.com/docs/git-commit",
+        "https://git-scm.com/docs/git-status",
+        "https://git-scm.com/docs/git-diff",
+        "https://git-scm.com/docs/git-log",
+        "https://git-scm.com/docs/git-show",
+        "https://git-scm.com/docs/git-branch",
+        "https://git-scm.com/docs/git-checkout",
+        "https://git-scm.com/docs/git-switch",
+        "https://git-scm.com/docs/git-restore",
+        "https://git-scm.com/docs/git-merge",
+        "https://git-scm.com/docs/git-rebase",
+        "https://git-scm.com/docs/git-cherry-pick",
+        "https://git-scm.com/docs/git-reset",
+        "https://git-scm.com/docs/git-revert",
+        "https://git-scm.com/docs/git-pull",
+        "https://git-scm.com/docs/git-push",
+        "https://git-scm.com/docs/git-fetch",
+        "https://git-scm.com/docs/git-remote",
+        "https://git-scm.com/docs/git-stash",
+        "https://git-scm.com/docs/git-tag",
+        "https://git-scm.com/docs/git-rm",
+        "https://git-scm.com/docs/git-mv",
+        "https://git-scm.com/docs/git-blame",
+        "https://git-scm.com/docs/git-bisect",
+        "https://git-scm.com/docs/git-reflog",
+        "https://git-scm.com/docs/git-clean"
+      ]
+    },
+    {
+      "tool_id": "git-config",
+      "urls": [
+        "https://git-scm.com/docs/git-config",
+        "https://git-scm.com/docs/gitignore",
+        "https://git-scm.com/docs/gitattributes",
+        "https://git-scm.com/docs/git-credential",
+        "https://git-scm.com/docs/gitcredentials"
+      ]
+    },
+    {
+      "tool_id": "git-workflows",
+      "urls": [
+        "https://git-scm.com/docs/gitworkflows",
+        "https://git-scm.com/docs/githooks",
+        "https://git-scm.com/docs/gitsubmodules",
+        "https://git-scm.com/docs/giteveryday",
+        "https://git-scm.com/docs/gittutorial",
+        "https://git-scm.com/docs/gitglossary"
+      ]
+    }
+  ]
+}

@@ -1,3 +1,7 @@
+# Local graph viz (not part of project)
+ayiru_graph_3d.html
+tools/scripts/graph_view_3d.py
+
 # OS / editor junk
 .DS_Store
 Thumbs.db
