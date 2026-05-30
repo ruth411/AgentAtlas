@@ -528,6 +528,36 @@
       ],
       "source_repositories": []
     },
+    "imagemagick-cli": {
+      "official_hosts": [
+        "imagemagick.org"
+      ],
+      "source_repositories": []
+    },
+    "imagemagick-config": {
+      "official_hosts": [
+        "imagemagick.org"
+      ],
+      "source_repositories": []
+    },
+    "imagemagick-effects": {
+      "official_hosts": [
+        "imagemagick.org"
+      ],
+      "source_repositories": []
+    },
+    "imagemagick-recipes": {
+      "official_hosts": [
+        "imagemagick.org"
+      ],
+      "source_repositories": []
+    },
+    "imagemagick-errors": {
+      "official_hosts": [
+        "imagemagick.org"
+      ],
+      "source_repositories": []
+    },
     "openssl": {
       "official_hosts": [
         "docs.openssl.org"

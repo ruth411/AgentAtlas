@@ -7520,6 +7520,150 @@
           "evidence_type": "official_docs"
         }
       ]
+    },
+    "imagemagick-cli": {
+      "sources": [
+        {
+          "url": "https://imagemagick.org/script/command-line-tools.php",
+          "claim_type": "cli_command_exists",
+          "subject": "imagemagick command-line tools overview",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://imagemagick.org/script/magick.php",
+          "claim_type": "cli_command_exists",
+          "subject": "magick (unified CLI in IM7)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://imagemagick.org/script/identify.php",
+          "claim_type": "cli_command_exists",
+          "subject": "identify (image metadata + properties)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://imagemagick.org/script/mogrify.php",
+          "claim_type": "cli_command_exists",
+          "subject": "mogrify (in-place batch conversion)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://imagemagick.org/script/montage.php",
+          "claim_type": "cli_command_exists",
+          "subject": "montage (combine images into grid)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://imagemagick.org/script/composite.php",
+          "claim_type": "cli_command_exists",
+          "subject": "composite (overlay one image on another)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://imagemagick.org/script/compare.php",
+          "claim_type": "cli_command_exists",
+          "subject": "compare (visual diff between images)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://imagemagick.org/script/convert.php",
+          "claim_type": "cli_command_exists",
+          "subject": "convert (legacy IM6 \u2014 replaced by magick in IM7)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://imagemagick.org/script/command-line-processing.php",
+          "claim_type": "cli_command_exists",
+          "subject": "imagemagick command-line processing rules",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://imagemagick.org/script/command-line-options.php",
+          "claim_type": "cli_command_exists",
+          "subject": "imagemagick command-line options reference",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "imagemagick-config": {
+      "sources": [
+        {
+          "url": "https://imagemagick.org/script/resources.php",
+          "claim_type": "cli_command_exists",
+          "subject": "imagemagick resource limits (memory, disk, threads)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://imagemagick.org/script/security-policy.php",
+          "claim_type": "cli_command_exists",
+          "subject": "imagemagick security policy (policy.xml)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://imagemagick.org/script/architecture.php",
+          "claim_type": "cli_command_exists",
+          "subject": "imagemagick architecture (pipelines, magickwand, magickcore)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://imagemagick.org/script/install-source.php",
+          "claim_type": "cli_command_exists",
+          "subject": "install imagemagick from source",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://imagemagick.org/script/binary-releases.php",
+          "claim_type": "cli_command_exists",
+          "subject": "install imagemagick from binary releases",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "imagemagick-effects": {
+      "sources": [
+        {
+          "url": "https://imagemagick.org/script/formats.php",
+          "claim_type": "cli_command_exists",
+          "subject": "imagemagick supported formats (read/write delegates)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://imagemagick.org/script/color.php",
+          "claim_type": "cli_command_exists",
+          "subject": "imagemagick color specifications",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://imagemagick.org/script/color-management.php",
+          "claim_type": "cli_command_exists",
+          "subject": "imagemagick color management (ICC profiles)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://imagemagick.org/script/quantize.php",
+          "claim_type": "cli_command_exists",
+          "subject": "imagemagick color quantization / palette reduction",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://imagemagick.org/script/fx.php",
+          "claim_type": "cli_command_exists",
+          "subject": "imagemagick fx expressions (pixel-by-pixel formulas)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://imagemagick.org/script/morphology.php",
+          "claim_type": "cli_command_exists",
+          "subject": "imagemagick morphology (erode, dilate, edge detection)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://imagemagick.org/script/fourier-transforms.php",
+          "claim_type": "cli_command_exists",
+          "subject": "imagemagick fourier transforms (FFT)",
+          "evidence_type": "official_docs"
+        }
+      ]
     }
   }
 }

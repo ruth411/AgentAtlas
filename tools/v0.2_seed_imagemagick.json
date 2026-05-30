@@ -1,0 +1,41 @@
+{
+  "tools": [
+    {
+      "tool_id": "imagemagick-cli",
+      "urls": [
+        "https://imagemagick.org/script/command-line-tools.php",
+        "https://imagemagick.org/script/magick.php",
+        "https://imagemagick.org/script/identify.php",
+        "https://imagemagick.org/script/mogrify.php",
+        "https://imagemagick.org/script/montage.php",
+        "https://imagemagick.org/script/composite.php",
+        "https://imagemagick.org/script/compare.php",
+        "https://imagemagick.org/script/convert.php",
+        "https://imagemagick.org/script/command-line-processing.php",
+        "https://imagemagick.org/script/command-line-options.php"
+      ]
+    },
+    {
+      "tool_id": "imagemagick-config",
+      "urls": [
+        "https://imagemagick.org/script/resources.php",
+        "https://imagemagick.org/script/security-policy.php",
+        "https://imagemagick.org/script/architecture.php",
+        "https://imagemagick.org/script/install-source.php",
+        "https://imagemagick.org/script/binary-releases.php"
+      ]
+    },
+    {
+      "tool_id": "imagemagick-effects",
+      "urls": [
+        "https://imagemagick.org/script/formats.php",
+        "https://imagemagick.org/script/color.php",
+        "https://imagemagick.org/script/color-management.php",
+        "https://imagemagick.org/script/quantize.php",
+        "https://imagemagick.org/script/fx.php",
+        "https://imagemagick.org/script/morphology.php",
+        "https://imagemagick.org/script/fourier-transforms.php"
+      ]
+    }
+  ]
+}
