@@ -1,0 +1,76 @@
+{
+  "tools": [
+    {
+      "tool_id": "kubectl-cli",
+      "urls": [
+        "https://kubernetes.io/docs/reference/kubectl/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_get/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_describe/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_apply/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_create/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_delete/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_edit/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_run/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_logs/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_exec/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_port-forward/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_cp/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_rollout/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_scale/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_expose/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_label/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_annotate/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_patch/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_replace/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_top/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_cordon/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_uncordon/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_drain/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_taint/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_explain/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_diff/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_wait/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_attach/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_api-resources/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_api-versions/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_version/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_cluster-info/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_proxy/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_auth/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_certificate/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_debug/"
+      ]
+    },
+    {
+      "tool_id": "kubectl-config",
+      "urls": [
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_config/",
+        "https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/",
+        "https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_config_set-context/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_config_use-context/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_config_view/",
+        "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_config_current-context/"
+      ]
+    },
+    {
+      "tool_id": "kubectl-resources",
+      "urls": [
+        "https://kubernetes.io/docs/concepts/workloads/pods/",
+        "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/",
+        "https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/",
+        "https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/",
+        "https://kubernetes.io/docs/concepts/workloads/controllers/job/",
+        "https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/",
+        "https://kubernetes.io/docs/concepts/services-networking/service/",
+        "https://kubernetes.io/docs/concepts/services-networking/ingress/",
+        "https://kubernetes.io/docs/concepts/configuration/configmap/",
+        "https://kubernetes.io/docs/concepts/configuration/secret/",
+        "https://kubernetes.io/docs/concepts/storage/persistent-volumes/",
+        "https://kubernetes.io/docs/concepts/security/rbac-good-practices/",
+        "https://kubernetes.io/docs/reference/access-authn-authz/rbac/",
+        "https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/"
+      ]
+    }
+  ]
+}

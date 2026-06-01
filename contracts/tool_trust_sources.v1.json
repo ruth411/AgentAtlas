@@ -243,6 +243,36 @@
       ],
       "source_repositories": []
     },
+    "kubectl-cli": {
+      "official_hosts": [
+        "kubernetes.io"
+      ],
+      "source_repositories": []
+    },
+    "kubectl-config": {
+      "official_hosts": [
+        "kubernetes.io"
+      ],
+      "source_repositories": []
+    },
+    "kubectl-resources": {
+      "official_hosts": [
+        "kubernetes.io"
+      ],
+      "source_repositories": []
+    },
+    "kubectl-recipes": {
+      "official_hosts": [
+        "kubernetes.io"
+      ],
+      "source_repositories": []
+    },
+    "kubectl-errors": {
+      "official_hosts": [
+        "kubernetes.io"
+      ],
+      "source_repositories": []
+    },
     "terraform": {
       "official_hosts": [
         "developer.hashicorp.com"

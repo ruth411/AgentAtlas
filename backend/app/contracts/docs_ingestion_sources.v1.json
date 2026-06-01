@@ -7752,6 +7752,360 @@
           "evidence_type": "official_docs"
         }
       ]
+    },
+    "kubectl-cli": {
+      "sources": [
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl CLI overview",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_get/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl get (list resources)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_describe/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl describe (show resource details + events)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_apply/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl apply (declarative create/update)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_create/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl create (imperative create)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_delete/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl delete (remove resources)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_edit/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl edit (edit a resource in $EDITOR)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_run/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl run (start a pod imperatively)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_logs/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl logs (pod logs)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_exec/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl exec (run command inside container)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_port-forward/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl port-forward (local port \u2192 pod port)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_cp/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl cp (copy files into/out of containers)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_rollout/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl rollout (manage deployment rollouts + history)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_scale/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl scale (change replica count)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_expose/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl expose (create Service from existing resource)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_label/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl label (add/update labels)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_annotate/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl annotate (add/update annotations)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_patch/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl patch (JSON patch a resource)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_replace/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl replace (replace resource from file)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_top/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl top (pod/node CPU + memory metrics)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_cordon/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl cordon (mark node unschedulable)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_uncordon/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl uncordon (mark node schedulable)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_drain/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl drain (evict pods for node maintenance)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_taint/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl taint (add taint to nodes)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_explain/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl explain (resource schema docs from API)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_diff/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl diff (preview apply changes)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_wait/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl wait (block until condition met)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_attach/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl attach (attach to running container)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_api-resources/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl api-resources (list known resource types)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_api-versions/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl api-versions (list API groups + versions)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_version/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl version (client + server versions)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_cluster-info/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl cluster-info (cluster endpoint + services)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_proxy/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl proxy (local HTTP proxy to API server)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_auth/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl auth (auth checks: can-i, whoami)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_certificate/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl certificate (approve/deny CSRs)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_debug/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl debug (ephemeral debug container)",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "kubectl-config": {
+      "sources": [
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_config/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl config (kubeconfig management)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/",
+          "claim_type": "cli_command_exists",
+          "subject": "organizing cluster access via kubeconfig",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/",
+          "claim_type": "cli_command_exists",
+          "subject": "configure access to multiple clusters",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_config_set-context/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl config set-context",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_config_use-context/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl config use-context (switch active context)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_config_view/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl config view (show merged kubeconfig)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/kubectl/generated/kubectl_config_current-context/",
+          "claim_type": "cli_command_exists",
+          "subject": "kubectl config current-context",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "kubectl-resources": {
+      "sources": [
+        {
+          "url": "https://kubernetes.io/docs/concepts/workloads/pods/",
+          "claim_type": "cli_command_exists",
+          "subject": "Pods (smallest deployable units)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/",
+          "claim_type": "cli_command_exists",
+          "subject": "Deployment (declarative replica management)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/",
+          "claim_type": "cli_command_exists",
+          "subject": "StatefulSet (stateful workloads with stable IDs)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/",
+          "claim_type": "cli_command_exists",
+          "subject": "DaemonSet (one pod per node)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/concepts/workloads/controllers/job/",
+          "claim_type": "cli_command_exists",
+          "subject": "Job (run-to-completion workloads)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/",
+          "claim_type": "cli_command_exists",
+          "subject": "CronJob (scheduled jobs)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/concepts/services-networking/service/",
+          "claim_type": "cli_command_exists",
+          "subject": "Service (stable network endpoint)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/concepts/services-networking/ingress/",
+          "claim_type": "cli_command_exists",
+          "subject": "Ingress (HTTP/HTTPS routing)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/concepts/configuration/configmap/",
+          "claim_type": "cli_command_exists",
+          "subject": "ConfigMap (non-sensitive config data)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/concepts/configuration/secret/",
+          "claim_type": "cli_command_exists",
+          "subject": "Secret (sensitive data)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/concepts/storage/persistent-volumes/",
+          "claim_type": "cli_command_exists",
+          "subject": "PersistentVolume + PersistentVolumeClaim",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/concepts/security/rbac-good-practices/",
+          "claim_type": "cli_command_exists",
+          "subject": "RBAC good practices",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/reference/access-authn-authz/rbac/",
+          "claim_type": "cli_command_exists",
+          "subject": "Role-Based Access Control (RBAC)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/",
+          "claim_type": "cli_command_exists",
+          "subject": "Namespaces (logical cluster partitioning)",
+          "evidence_type": "official_docs"
+        }
+      ]
     }
   }
 }
