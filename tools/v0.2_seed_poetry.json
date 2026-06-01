@@ -1,0 +1,52 @@
+{
+  "tools": [
+    {
+      "tool_id": "poetry-cli",
+      "urls": [
+        "https://python-poetry.org/docs/cli/",
+        "https://python-poetry.org/docs/cli/#init",
+        "https://python-poetry.org/docs/cli/#new",
+        "https://python-poetry.org/docs/cli/#install",
+        "https://python-poetry.org/docs/cli/#add",
+        "https://python-poetry.org/docs/cli/#remove",
+        "https://python-poetry.org/docs/cli/#update",
+        "https://python-poetry.org/docs/cli/#show",
+        "https://python-poetry.org/docs/cli/#search",
+        "https://python-poetry.org/docs/cli/#lock",
+        "https://python-poetry.org/docs/cli/#sync",
+        "https://python-poetry.org/docs/cli/#check",
+        "https://python-poetry.org/docs/cli/#run",
+        "https://python-poetry.org/docs/cli/#shell",
+        "https://python-poetry.org/docs/cli/#env",
+        "https://python-poetry.org/docs/cli/#build",
+        "https://python-poetry.org/docs/cli/#publish",
+        "https://python-poetry.org/docs/cli/#export",
+        "https://python-poetry.org/docs/cli/#cache",
+        "https://python-poetry.org/docs/cli/#self",
+        "https://python-poetry.org/docs/cli/#version",
+        "https://python-poetry.org/docs/cli/#about",
+        "https://python-poetry.org/docs/cli/#config"
+      ]
+    },
+    {
+      "tool_id": "poetry-config",
+      "urls": [
+        "https://python-poetry.org/docs/configuration/",
+        "https://python-poetry.org/docs/repositories/",
+        "https://python-poetry.org/docs/managing-environments/",
+        "https://python-poetry.org/docs/basic-usage/"
+      ]
+    },
+    {
+      "tool_id": "poetry-pyproject",
+      "urls": [
+        "https://python-poetry.org/docs/pyproject/",
+        "https://python-poetry.org/docs/dependency-specification/",
+        "https://python-poetry.org/docs/managing-dependencies/",
+        "https://python-poetry.org/docs/libraries/",
+        "https://python-poetry.org/docs/plugins/",
+        "https://python-poetry.org/docs/pre-commit-hooks/"
+      ]
+    }
+  ]
+}

@@ -9026,6 +9026,216 @@
           "evidence_type": "official_docs"
         }
       ]
+    },
+    "poetry-cli": {
+      "sources": [
+        {
+          "url": "https://python-poetry.org/docs/cli/",
+          "claim_type": "cli_command_exists",
+          "subject": "poetry CLI commands overview",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://python-poetry.org/docs/cli/#init",
+          "claim_type": "cli_command_exists",
+          "subject": "poetry init (create pyproject.toml interactively)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://python-poetry.org/docs/cli/#new",
+          "claim_type": "cli_command_exists",
+          "subject": "poetry new (scaffold a project)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://python-poetry.org/docs/cli/#install",
+          "claim_type": "cli_command_exists",
+          "subject": "poetry install (install deps from lockfile)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://python-poetry.org/docs/cli/#add",
+          "claim_type": "cli_command_exists",
+          "subject": "poetry add (add a package)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://python-poetry.org/docs/cli/#remove",
+          "claim_type": "cli_command_exists",
+          "subject": "poetry remove (uninstall a package)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://python-poetry.org/docs/cli/#update",
+          "claim_type": "cli_command_exists",
+          "subject": "poetry update (upgrade packages)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://python-poetry.org/docs/cli/#show",
+          "claim_type": "cli_command_exists",
+          "subject": "poetry show (display package info / tree)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://python-poetry.org/docs/cli/#search",
+          "claim_type": "cli_command_exists",
+          "subject": "poetry search (search PyPI)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://python-poetry.org/docs/cli/#lock",
+          "claim_type": "cli_command_exists",
+          "subject": "poetry lock (regenerate lockfile)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://python-poetry.org/docs/cli/#sync",
+          "claim_type": "cli_command_exists",
+          "subject": "poetry sync (install exactly lockfile content)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://python-poetry.org/docs/cli/#check",
+          "claim_type": "cli_command_exists",
+          "subject": "poetry check (validate pyproject.toml)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://python-poetry.org/docs/cli/#run",
+          "claim_type": "cli_command_exists",
+          "subject": "poetry run (run a command in the env)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://python-poetry.org/docs/cli/#shell",
+          "claim_type": "cli_command_exists",
+          "subject": "poetry shell (activate env in subshell)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://python-poetry.org/docs/cli/#env",
+          "claim_type": "cli_command_exists",
+          "subject": "poetry env (manage virtualenvs)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://python-poetry.org/docs/cli/#build",
+          "claim_type": "cli_command_exists",
+          "subject": "poetry build (build sdist + wheel)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://python-poetry.org/docs/cli/#publish",
+          "claim_type": "cli_command_exists",
+          "subject": "poetry publish (upload to PyPI)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://python-poetry.org/docs/cli/#export",
+          "claim_type": "cli_command_exists",
+          "subject": "poetry export (export requirements.txt)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://python-poetry.org/docs/cli/#cache",
+          "claim_type": "cli_command_exists",
+          "subject": "poetry cache (manage cache)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://python-poetry.org/docs/cli/#self",
+          "claim_type": "cli_command_exists",
+          "subject": "poetry self (manage poetry itself)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://python-poetry.org/docs/cli/#version",
+          "claim_type": "cli_command_exists",
+          "subject": "poetry version (show/bump project version)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://python-poetry.org/docs/cli/#about",
+          "claim_type": "cli_command_exists",
+          "subject": "poetry about (show poetry info)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://python-poetry.org/docs/cli/#config",
+          "claim_type": "cli_command_exists",
+          "subject": "poetry config (view/edit configuration)",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "poetry-config": {
+      "sources": [
+        {
+          "url": "https://python-poetry.org/docs/configuration/",
+          "claim_type": "cli_command_exists",
+          "subject": "poetry configuration reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://python-poetry.org/docs/repositories/",
+          "claim_type": "cli_command_exists",
+          "subject": "poetry repositories (private indexes, mirrors)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://python-poetry.org/docs/managing-environments/",
+          "claim_type": "cli_command_exists",
+          "subject": "managing Python environments with poetry",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://python-poetry.org/docs/basic-usage/",
+          "claim_type": "cli_command_exists",
+          "subject": "poetry basic usage walkthrough",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "poetry-pyproject": {
+      "sources": [
+        {
+          "url": "https://python-poetry.org/docs/pyproject/",
+          "claim_type": "cli_command_exists",
+          "subject": "pyproject.toml reference (poetry-specific fields)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://python-poetry.org/docs/dependency-specification/",
+          "claim_type": "cli_command_exists",
+          "subject": "poetry dependency specification syntax",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://python-poetry.org/docs/managing-dependencies/",
+          "claim_type": "cli_command_exists",
+          "subject": "managing dependencies (groups, extras, optionals)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://python-poetry.org/docs/libraries/",
+          "claim_type": "cli_command_exists",
+          "subject": "building libraries with poetry",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://python-poetry.org/docs/plugins/",
+          "claim_type": "cli_command_exists",
+          "subject": "poetry plugins (extending the CLI)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://python-poetry.org/docs/pre-commit-hooks/",
+          "claim_type": "cli_command_exists",
+          "subject": "poetry pre-commit hooks",
+          "evidence_type": "official_docs"
+        }
+      ]
     }
   }
 }

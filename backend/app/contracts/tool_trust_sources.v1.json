@@ -465,6 +465,36 @@
       ],
       "source_repositories": []
     },
+    "poetry-cli": {
+      "official_hosts": [
+        "python-poetry.org"
+      ],
+      "source_repositories": []
+    },
+    "poetry-config": {
+      "official_hosts": [
+        "python-poetry.org"
+      ],
+      "source_repositories": []
+    },
+    "poetry-pyproject": {
+      "official_hosts": [
+        "python-poetry.org"
+      ],
+      "source_repositories": []
+    },
+    "poetry-recipes": {
+      "official_hosts": [
+        "python-poetry.org"
+      ],
+      "source_repositories": []
+    },
+    "poetry-errors": {
+      "official_hosts": [
+        "python-poetry.org"
+      ],
+      "source_repositories": []
+    },
     "uv": {
       "official_hosts": [
         "docs.astral.sh"
