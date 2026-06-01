@@ -8762,6 +8762,270 @@
           "evidence_type": "official_docs"
         }
       ]
+    },
+    "pnpm-cli": {
+      "sources": [
+        {
+          "url": "https://pnpm.io/cli/install",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm install (install all deps from package.json)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/cli/add",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm add (add a package)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/cli/remove",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm remove (uninstall a package)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/cli/update",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm update (upgrade packages)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/cli/outdated",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm outdated (list packages with newer versions)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/cli/list",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm list (list installed packages)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/cli/why",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm why (show why a package is installed)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/cli/audit",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm audit (security audit)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/cli/dlx",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm dlx (run a package without installing)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/cli/exec",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm exec (run a command from node_modules/.bin)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/cli/run",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm run (run a script from package.json)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/cli/test",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm test (shortcut for 'run test')",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/cli/start",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm start (shortcut for 'run start')",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/cli/import",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm import (convert npm/yarn lockfile)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/cli/rebuild",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm rebuild (rebuild native modules)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/cli/prune",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm prune (remove extraneous packages)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/cli/store",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm store (manage the content-addressable store)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/cli/publish",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm publish (publish to npm registry)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/cli/pack",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm pack (create a tarball)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/cli/link",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm link (symlink a local package)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/cli/unlink",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm unlink (remove a symlink)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/cli/init",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm init (create a package.json)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/cli/create",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm create (run a create-* package)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/cli/setup",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm setup (install pnpm and configure shell)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/cli/env",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm env (manage Node.js versions)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/cli/patch",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm patch (edit a dependency in-place)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/cli/patch-commit",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm patch-commit (save patch from pnpm patch)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/cli/deploy",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm deploy (deploy workspace package with deps)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/cli/licenses",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm licenses (list dep licenses)",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "pnpm-config": {
+      "sources": [
+        {
+          "url": "https://pnpm.io/configuring",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm configuration overview",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/npmrc",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm .npmrc settings reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/package_json",
+          "claim_type": "cli_command_exists",
+          "subject": "package.json fields pnpm reads",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/settings",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm settings reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/feature-comparison",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm vs npm vs yarn feature comparison",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/symlinked-node-modules-structure",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm's symlinked node_modules layout",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/limitations",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm limitations + caveats",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "pnpm-workspaces": {
+      "sources": [
+        {
+          "url": "https://pnpm.io/workspaces",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm workspaces overview",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/filtering",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm workspace filtering (--filter)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/pnpm-workspace_yaml",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm-workspace.yaml reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/cli/recursive",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm recursive (-r) for monorepos",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/catalogs",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm catalogs (single-source version pinning)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pnpm.io/aliases",
+          "claim_type": "cli_command_exists",
+          "subject": "pnpm package aliasing",
+          "evidence_type": "official_docs"
+        }
+      ]
     }
   }
 }

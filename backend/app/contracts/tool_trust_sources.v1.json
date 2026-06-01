@@ -386,6 +386,36 @@
       ],
       "source_repositories": []
     },
+    "pnpm-cli": {
+      "official_hosts": [
+        "pnpm.io"
+      ],
+      "source_repositories": []
+    },
+    "pnpm-config": {
+      "official_hosts": [
+        "pnpm.io"
+      ],
+      "source_repositories": []
+    },
+    "pnpm-workspaces": {
+      "official_hosts": [
+        "pnpm.io"
+      ],
+      "source_repositories": []
+    },
+    "pnpm-recipes": {
+      "official_hosts": [
+        "pnpm.io"
+      ],
+      "source_repositories": []
+    },
+    "pnpm-errors": {
+      "official_hosts": [
+        "pnpm.io"
+      ],
+      "source_repositories": []
+    },
     "yarn": {
       "official_hosts": [
         "yarnpkg.com"
