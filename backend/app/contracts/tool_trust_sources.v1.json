@@ -147,6 +147,41 @@
         }
       ]
     },
+    "openai-endpoints": {
+      "official_hosts": [
+        "platform.openai.com",
+        "developers.openai.com"
+      ],
+      "source_repositories": []
+    },
+    "openai-models": {
+      "official_hosts": [
+        "platform.openai.com",
+        "developers.openai.com"
+      ],
+      "source_repositories": []
+    },
+    "openai-sdks": {
+      "official_hosts": [
+        "platform.openai.com",
+        "developers.openai.com"
+      ],
+      "source_repositories": []
+    },
+    "openai-recipes": {
+      "official_hosts": [
+        "platform.openai.com",
+        "developers.openai.com"
+      ],
+      "source_repositories": []
+    },
+    "openai-errors": {
+      "official_hosts": [
+        "platform.openai.com",
+        "developers.openai.com"
+      ],
+      "source_repositories": []
+    },
     "vercel": {
       "official_hosts": [
         "vercel.com"

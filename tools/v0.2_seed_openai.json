@@ -1,0 +1,58 @@
+{
+  "tools": [
+    {
+      "tool_id": "openai-endpoints",
+      "urls": [
+        "https://platform.openai.com/docs/api-reference/introduction",
+        "https://platform.openai.com/docs/api-reference/chat",
+        "https://platform.openai.com/docs/api-reference/responses",
+        "https://platform.openai.com/docs/api-reference/embeddings",
+        "https://platform.openai.com/docs/api-reference/images",
+        "https://platform.openai.com/docs/api-reference/audio",
+        "https://platform.openai.com/docs/api-reference/files",
+        "https://platform.openai.com/docs/api-reference/fine-tuning",
+        "https://platform.openai.com/docs/api-reference/batch",
+        "https://platform.openai.com/docs/api-reference/moderations",
+        "https://platform.openai.com/docs/api-reference/assistants",
+        "https://platform.openai.com/docs/api-reference/threads",
+        "https://platform.openai.com/docs/api-reference/runs",
+        "https://platform.openai.com/docs/api-reference/messages"
+      ]
+    },
+    {
+      "tool_id": "openai-models",
+      "urls": [
+        "https://platform.openai.com/docs/models",
+        "https://platform.openai.com/docs/models/gpt-4o",
+        "https://platform.openai.com/docs/models/gpt-4o-mini",
+        "https://platform.openai.com/docs/models/o3",
+        "https://platform.openai.com/docs/models/o3-mini",
+        "https://platform.openai.com/docs/models/embeddings",
+        "https://platform.openai.com/docs/models/whisper",
+        "https://platform.openai.com/docs/models/dall-e",
+        "https://platform.openai.com/docs/models/tts"
+      ]
+    },
+    {
+      "tool_id": "openai-sdks",
+      "urls": [
+        "https://platform.openai.com/docs/libraries",
+        "https://platform.openai.com/docs/quickstart",
+        "https://platform.openai.com/docs/guides/text-generation",
+        "https://platform.openai.com/docs/guides/function-calling",
+        "https://platform.openai.com/docs/guides/structured-outputs",
+        "https://platform.openai.com/docs/guides/embeddings",
+        "https://platform.openai.com/docs/guides/vision",
+        "https://platform.openai.com/docs/guides/speech-to-text",
+        "https://platform.openai.com/docs/guides/text-to-speech",
+        "https://platform.openai.com/docs/guides/images",
+        "https://platform.openai.com/docs/guides/batch",
+        "https://platform.openai.com/docs/guides/fine-tuning",
+        "https://platform.openai.com/docs/guides/rate-limits",
+        "https://platform.openai.com/docs/guides/error-codes",
+        "https://platform.openai.com/docs/guides/production-best-practices",
+        "https://platform.openai.com/docs/guides/safety-best-practices"
+      ]
+    }
+  ]
+}

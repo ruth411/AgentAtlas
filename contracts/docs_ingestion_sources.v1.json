@@ -8096,6 +8096,252 @@
           "evidence_type": "official_docs"
         }
       ]
+    },
+    "openai-endpoints": {
+      "sources": [
+        {
+          "url": "https://platform.openai.com/docs/api-reference/introduction",
+          "claim_type": "cli_command_exists",
+          "subject": "OpenAI API reference introduction",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/api-reference/chat",
+          "claim_type": "cli_command_exists",
+          "subject": "Chat Completions endpoint reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/api-reference/responses",
+          "claim_type": "cli_command_exists",
+          "subject": "Responses API endpoint reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/api-reference/embeddings",
+          "claim_type": "cli_command_exists",
+          "subject": "Embeddings endpoint reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/api-reference/images",
+          "claim_type": "cli_command_exists",
+          "subject": "Images endpoint reference (DALL-E + GPT-Image)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/api-reference/audio",
+          "claim_type": "cli_command_exists",
+          "subject": "Audio endpoint reference (Whisper + TTS)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/api-reference/files",
+          "claim_type": "cli_command_exists",
+          "subject": "Files endpoint reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/api-reference/fine-tuning",
+          "claim_type": "cli_command_exists",
+          "subject": "Fine-tuning endpoint reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/api-reference/batch",
+          "claim_type": "cli_command_exists",
+          "subject": "Batch endpoint reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/api-reference/moderations",
+          "claim_type": "cli_command_exists",
+          "subject": "Moderations endpoint reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/api-reference/assistants",
+          "claim_type": "cli_command_exists",
+          "subject": "Assistants endpoint reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/api-reference/threads",
+          "claim_type": "cli_command_exists",
+          "subject": "Threads endpoint reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/api-reference/runs",
+          "claim_type": "cli_command_exists",
+          "subject": "Runs endpoint reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/api-reference/messages",
+          "claim_type": "cli_command_exists",
+          "subject": "Messages endpoint reference",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "openai-models": {
+      "sources": [
+        {
+          "url": "https://platform.openai.com/docs/models",
+          "claim_type": "cli_command_exists",
+          "subject": "OpenAI models catalog overview",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/models/gpt-4o",
+          "claim_type": "cli_command_exists",
+          "subject": "gpt-4o model (multimodal flagship)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/models/gpt-4o-mini",
+          "claim_type": "cli_command_exists",
+          "subject": "gpt-4o-mini model (cheaper multimodal)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/models/o3",
+          "claim_type": "cli_command_exists",
+          "subject": "o3 model (reasoning)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/models/o3-mini",
+          "claim_type": "cli_command_exists",
+          "subject": "o3-mini model (cheap reasoning)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/models/embeddings",
+          "claim_type": "cli_command_exists",
+          "subject": "embedding models (text-embedding-3-small/large)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/models/whisper",
+          "claim_type": "cli_command_exists",
+          "subject": "whisper model (speech-to-text)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/models/dall-e",
+          "claim_type": "cli_command_exists",
+          "subject": "DALL-E image generation models",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/models/tts",
+          "claim_type": "cli_command_exists",
+          "subject": "tts-1 and tts-1-hd (text-to-speech)",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "openai-sdks": {
+      "sources": [
+        {
+          "url": "https://platform.openai.com/docs/libraries",
+          "claim_type": "cli_command_exists",
+          "subject": "OpenAI official client libraries (python, node, etc.)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/quickstart",
+          "claim_type": "cli_command_exists",
+          "subject": "OpenAI API quickstart",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/guides/text-generation",
+          "claim_type": "cli_command_exists",
+          "subject": "text generation guide",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/guides/function-calling",
+          "claim_type": "cli_command_exists",
+          "subject": "function calling guide",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/guides/structured-outputs",
+          "claim_type": "cli_command_exists",
+          "subject": "structured outputs (JSON Schema) guide",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/guides/embeddings",
+          "claim_type": "cli_command_exists",
+          "subject": "embeddings guide",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/guides/vision",
+          "claim_type": "cli_command_exists",
+          "subject": "vision (image input) guide",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/guides/speech-to-text",
+          "claim_type": "cli_command_exists",
+          "subject": "speech-to-text guide",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/guides/text-to-speech",
+          "claim_type": "cli_command_exists",
+          "subject": "text-to-speech guide",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/guides/images",
+          "claim_type": "cli_command_exists",
+          "subject": "image generation guide",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/guides/batch",
+          "claim_type": "cli_command_exists",
+          "subject": "Batch API guide",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/guides/fine-tuning",
+          "claim_type": "cli_command_exists",
+          "subject": "fine-tuning guide",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/guides/rate-limits",
+          "claim_type": "cli_command_exists",
+          "subject": "rate limits guide",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/guides/error-codes",
+          "claim_type": "cli_command_exists",
+          "subject": "API error codes guide",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/guides/production-best-practices",
+          "claim_type": "cli_command_exists",
+          "subject": "production best practices",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://platform.openai.com/docs/guides/safety-best-practices",
+          "claim_type": "cli_command_exists",
+          "subject": "safety best practices",
+          "evidence_type": "official_docs"
+        }
+      ]
     }
   }
 }
