@@ -664,6 +664,36 @@
       ],
       "source_repositories": []
     },
+    "openssl-cli": {
+      "official_hosts": [
+        "docs.openssl.org"
+      ],
+      "source_repositories": []
+    },
+    "openssl-config": {
+      "official_hosts": [
+        "docs.openssl.org"
+      ],
+      "source_repositories": []
+    },
+    "openssl-ciphers": {
+      "official_hosts": [
+        "docs.openssl.org"
+      ],
+      "source_repositories": []
+    },
+    "openssl-recipes": {
+      "official_hosts": [
+        "docs.openssl.org"
+      ],
+      "source_repositories": []
+    },
+    "openssl-errors": {
+      "official_hosts": [
+        "docs.openssl.org"
+      ],
+      "source_repositories": []
+    },
     "gpg": {
       "official_hosts": [
         "www.gnupg.org"

@@ -1,0 +1,52 @@
+{
+  "tools": [
+    {
+      "tool_id": "openssl-cli",
+      "urls": [
+        "https://docs.openssl.org/master/man1/openssl/",
+        "https://docs.openssl.org/master/man1/openssl-genrsa/",
+        "https://docs.openssl.org/master/man1/openssl-genpkey/",
+        "https://docs.openssl.org/master/man1/openssl-req/",
+        "https://docs.openssl.org/master/man1/openssl-x509/",
+        "https://docs.openssl.org/master/man1/openssl-rsa/",
+        "https://docs.openssl.org/master/man1/openssl-pkey/",
+        "https://docs.openssl.org/master/man1/openssl-pkcs12/",
+        "https://docs.openssl.org/master/man1/openssl-pkcs7/",
+        "https://docs.openssl.org/master/man1/openssl-pkcs8/",
+        "https://docs.openssl.org/master/man1/openssl-dgst/",
+        "https://docs.openssl.org/master/man1/openssl-enc/",
+        "https://docs.openssl.org/master/man1/openssl-rand/",
+        "https://docs.openssl.org/master/man1/openssl-passwd/",
+        "https://docs.openssl.org/master/man1/openssl-s_client/",
+        "https://docs.openssl.org/master/man1/openssl-s_server/",
+        "https://docs.openssl.org/master/man1/openssl-verify/",
+        "https://docs.openssl.org/master/man1/openssl-ca/",
+        "https://docs.openssl.org/master/man1/openssl-crl/",
+        "https://docs.openssl.org/master/man1/openssl-dhparam/",
+        "https://docs.openssl.org/master/man1/openssl-ecparam/",
+        "https://docs.openssl.org/master/man1/openssl-version/",
+        "https://docs.openssl.org/master/man1/openssl-asn1parse/",
+        "https://docs.openssl.org/master/man1/openssl-prime/",
+        "https://docs.openssl.org/master/man1/openssl-speed/",
+        "https://docs.openssl.org/master/man1/openssl-smime/",
+        "https://docs.openssl.org/master/man1/openssl-cms/"
+      ]
+    },
+    {
+      "tool_id": "openssl-config",
+      "urls": [
+        "https://docs.openssl.org/master/man5/config/",
+        "https://docs.openssl.org/master/man5/x509v3_config/",
+        "https://docs.openssl.org/master/man5/fips_config/"
+      ]
+    },
+    {
+      "tool_id": "openssl-ciphers",
+      "urls": [
+        "https://docs.openssl.org/master/man1/openssl-ciphers/",
+        "https://docs.openssl.org/master/man3/SSL_CTX_set_cipher_list/",
+        "https://docs.openssl.org/master/man3/SSL_CTX_set_ciphersuites/"
+      ]
+    }
+  ]
+}
