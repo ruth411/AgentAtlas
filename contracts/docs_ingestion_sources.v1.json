@@ -418,7 +418,139 @@
         {
           "url": "https://www.postgresql.org/docs/current/app-psql.html",
           "claim_type": "cli_command_exists",
-          "subject": "psql",
+          "subject": "psql (PostgreSQL interactive terminal)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/app-pgdump.html",
+          "claim_type": "cli_command_exists",
+          "subject": "pg_dump (logical backup of a database)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/app-pgrestore.html",
+          "claim_type": "cli_command_exists",
+          "subject": "pg_restore (restore from pg_dump custom/tar/directory)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/app-pg-dumpall.html",
+          "claim_type": "cli_command_exists",
+          "subject": "pg_dumpall (logical backup of cluster + roles)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/app-createdb.html",
+          "claim_type": "cli_command_exists",
+          "subject": "createdb (create a new database)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/app-dropdb.html",
+          "claim_type": "cli_command_exists",
+          "subject": "dropdb (remove a database)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/app-createuser.html",
+          "claim_type": "cli_command_exists",
+          "subject": "createuser (create a new PostgreSQL role)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/app-dropuser.html",
+          "claim_type": "cli_command_exists",
+          "subject": "dropuser (remove a PostgreSQL role)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/app-pgbasebackup.html",
+          "claim_type": "cli_command_exists",
+          "subject": "pg_basebackup (physical base backup of cluster)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/app-pg-isready.html",
+          "claim_type": "cli_command_exists",
+          "subject": "pg_isready (server connection probe)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/app-pg-ctl.html",
+          "claim_type": "cli_command_exists",
+          "subject": "pg_ctl (start/stop/restart the server)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/app-vacuumdb.html",
+          "claim_type": "cli_command_exists",
+          "subject": "vacuumdb (garbage-collect + analyze a database)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/app-reindexdb.html",
+          "claim_type": "cli_command_exists",
+          "subject": "reindexdb (rebuild indexes)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/app-clusterdb.html",
+          "claim_type": "cli_command_exists",
+          "subject": "clusterdb (cluster table according to an index)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/app-pgcontroldata.html",
+          "claim_type": "cli_command_exists",
+          "subject": "pg_controldata (display cluster control info)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/app-pgresetwal.html",
+          "claim_type": "cli_command_exists",
+          "subject": "pg_resetwal (reset write-ahead log \u2014 DANGEROUS)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/app-pgrewind.html",
+          "claim_type": "cli_command_exists",
+          "subject": "pg_rewind (resync server with another)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/pgupgrade.html",
+          "claim_type": "cli_command_exists",
+          "subject": "pg_upgrade (in-place major version upgrade)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/app-pgreceivewal.html",
+          "claim_type": "cli_command_exists",
+          "subject": "pg_receivewal (stream WAL to disk)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/app-pgrecvlogical.html",
+          "claim_type": "cli_command_exists",
+          "subject": "pg_recvlogical (logical decoding stream)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/app-pgverifybackup.html",
+          "claim_type": "cli_command_exists",
+          "subject": "pg_verifybackup (verify a base backup)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/app-pgconfig.html",
+          "claim_type": "cli_command_exists",
+          "subject": "pg_config (installed PostgreSQL build info)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/reference-client.html",
+          "claim_type": "cli_command_exists",
+          "subject": "PostgreSQL client applications overview",
           "evidence_type": "official_docs"
         }
       ]
@@ -709,16 +841,6 @@
           "url": "https://docs.stripe.com/stripe-cli",
           "claim_type": "cli_command_exists",
           "subject": "stripe",
-          "evidence_type": "official_docs"
-        }
-      ]
-    },
-    "psql-postgres": {
-      "sources": [
-        {
-          "url": "https://www.postgresql.org/docs/current/app-psql.html#APP-PSQL-META-COMMANDS",
-          "claim_type": "cli_command_exists",
-          "subject": "psql meta-commands",
           "evidence_type": "official_docs"
         }
       ]
@@ -9233,6 +9355,92 @@
           "url": "https://python-poetry.org/docs/pre-commit-hooks/",
           "claim_type": "cli_command_exists",
           "subject": "poetry pre-commit hooks",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "postgresql-config": {
+      "sources": [
+        {
+          "url": "https://www.postgresql.org/docs/current/config-setting.html",
+          "claim_type": "cli_command_exists",
+          "subject": "setting parameters in postgresql.conf",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/runtime-config.html",
+          "claim_type": "cli_command_exists",
+          "subject": "server runtime configuration overview",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/runtime-config-connection.html",
+          "claim_type": "cli_command_exists",
+          "subject": "connection settings (listen_addresses, max_connections, SSL)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/runtime-config-resource.html",
+          "claim_type": "cli_command_exists",
+          "subject": "resource usage (shared_buffers, work_mem, effective_cache_size)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/runtime-config-wal.html",
+          "claim_type": "cli_command_exists",
+          "subject": "write-ahead log config (wal_level, archive_mode)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/runtime-config-replication.html",
+          "claim_type": "cli_command_exists",
+          "subject": "replication settings (max_wal_senders, hot_standby)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/runtime-config-query.html",
+          "claim_type": "cli_command_exists",
+          "subject": "query planner config (random_page_cost, jit)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/runtime-config-logging.html",
+          "claim_type": "cli_command_exists",
+          "subject": "logging config (log_statement, log_min_duration_statement)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/auth-pg-hba-conf.html",
+          "claim_type": "cli_command_exists",
+          "subject": "pg_hba.conf (host-based authentication)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/auth-password.html",
+          "claim_type": "cli_command_exists",
+          "subject": "password authentication methods (md5, scram-sha-256)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/libpq-envars.html",
+          "claim_type": "cli_command_exists",
+          "subject": "libpq environment variables (PGHOST, PGUSER, PGPASSWORD)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.postgresql.org/docs/current/libpq-pgservice.html",
+          "claim_type": "cli_command_exists",
+          "subject": "pg_service.conf (connection profiles)",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "postgresql-psql": {
+      "sources": [
+        {
+          "url": "https://www.postgresql.org/docs/current/app-psql.html",
+          "claim_type": "cli_command_exists",
+          "subject": "psql full reference (meta-commands, variables, formatting)",
           "evidence_type": "official_docs"
         }
       ]

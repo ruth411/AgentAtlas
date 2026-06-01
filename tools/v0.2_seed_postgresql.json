@@ -1,0 +1,55 @@
+{
+  "tools": [
+    {
+      "tool_id": "postgresql-cli",
+      "urls": [
+        "https://www.postgresql.org/docs/current/app-psql.html",
+        "https://www.postgresql.org/docs/current/app-pgdump.html",
+        "https://www.postgresql.org/docs/current/app-pgrestore.html",
+        "https://www.postgresql.org/docs/current/app-pg-dumpall.html",
+        "https://www.postgresql.org/docs/current/app-createdb.html",
+        "https://www.postgresql.org/docs/current/app-dropdb.html",
+        "https://www.postgresql.org/docs/current/app-createuser.html",
+        "https://www.postgresql.org/docs/current/app-dropuser.html",
+        "https://www.postgresql.org/docs/current/app-pgbasebackup.html",
+        "https://www.postgresql.org/docs/current/app-pg-isready.html",
+        "https://www.postgresql.org/docs/current/app-pg-ctl.html",
+        "https://www.postgresql.org/docs/current/app-vacuumdb.html",
+        "https://www.postgresql.org/docs/current/app-reindexdb.html",
+        "https://www.postgresql.org/docs/current/app-clusterdb.html",
+        "https://www.postgresql.org/docs/current/app-pgcontroldata.html",
+        "https://www.postgresql.org/docs/current/app-pgresetwal.html",
+        "https://www.postgresql.org/docs/current/app-pgrewind.html",
+        "https://www.postgresql.org/docs/current/pgupgrade.html",
+        "https://www.postgresql.org/docs/current/app-pgreceivewal.html",
+        "https://www.postgresql.org/docs/current/app-pgrecvlogical.html",
+        "https://www.postgresql.org/docs/current/app-pgverifybackup.html",
+        "https://www.postgresql.org/docs/current/app-pgconfig.html",
+        "https://www.postgresql.org/docs/current/reference-client.html"
+      ]
+    },
+    {
+      "tool_id": "postgresql-config",
+      "urls": [
+        "https://www.postgresql.org/docs/current/config-setting.html",
+        "https://www.postgresql.org/docs/current/runtime-config.html",
+        "https://www.postgresql.org/docs/current/runtime-config-connection.html",
+        "https://www.postgresql.org/docs/current/runtime-config-resource.html",
+        "https://www.postgresql.org/docs/current/runtime-config-wal.html",
+        "https://www.postgresql.org/docs/current/runtime-config-replication.html",
+        "https://www.postgresql.org/docs/current/runtime-config-query.html",
+        "https://www.postgresql.org/docs/current/runtime-config-logging.html",
+        "https://www.postgresql.org/docs/current/auth-pg-hba-conf.html",
+        "https://www.postgresql.org/docs/current/auth-password.html",
+        "https://www.postgresql.org/docs/current/libpq-envars.html",
+        "https://www.postgresql.org/docs/current/libpq-pgservice.html"
+      ]
+    },
+    {
+      "tool_id": "postgresql-psql",
+      "urls": [
+        "https://www.postgresql.org/docs/current/app-psql.html"
+      ]
+    }
+  ]
+}

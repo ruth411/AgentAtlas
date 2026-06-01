@@ -558,6 +558,30 @@
       ],
       "source_repositories": []
     },
+    "postgresql-config": {
+      "official_hosts": [
+        "www.postgresql.org"
+      ],
+      "source_repositories": []
+    },
+    "postgresql-psql": {
+      "official_hosts": [
+        "www.postgresql.org"
+      ],
+      "source_repositories": []
+    },
+    "postgresql-recipes": {
+      "official_hosts": [
+        "www.postgresql.org"
+      ],
+      "source_repositories": []
+    },
+    "postgresql-errors": {
+      "official_hosts": [
+        "www.postgresql.org"
+      ],
+      "source_repositories": []
+    },
     "mysql-cli": {
       "official_hosts": [
         "dev.mysql.com"
@@ -914,12 +938,6 @@
     "stripe-cli": {
       "official_hosts": [
         "docs.stripe.com"
-      ],
-      "source_repositories": []
-    },
-    "psql-postgres": {
-      "official_hosts": [
-        "www.postgresql.org"
       ],
       "source_repositories": []
     },
