@@ -8552,6 +8552,216 @@
           "evidence_type": "official_docs"
         }
       ]
+    },
+    "pip-cli": {
+      "sources": [
+        {
+          "url": "https://pip.pypa.io/en/stable/cli/",
+          "claim_type": "cli_command_exists",
+          "subject": "pip CLI commands overview",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/cli/pip_install/",
+          "claim_type": "cli_command_exists",
+          "subject": "pip install (install packages)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/cli/pip_uninstall/",
+          "claim_type": "cli_command_exists",
+          "subject": "pip uninstall (remove packages)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/cli/pip_list/",
+          "claim_type": "cli_command_exists",
+          "subject": "pip list (list installed packages)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/cli/pip_freeze/",
+          "claim_type": "cli_command_exists",
+          "subject": "pip freeze (requirements.txt format output)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/cli/pip_show/",
+          "claim_type": "cli_command_exists",
+          "subject": "pip show (package metadata)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/cli/pip_download/",
+          "claim_type": "cli_command_exists",
+          "subject": "pip download (download without installing)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/cli/pip_wheel/",
+          "claim_type": "cli_command_exists",
+          "subject": "pip wheel (build wheel archives)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/cli/pip_check/",
+          "claim_type": "cli_command_exists",
+          "subject": "pip check (verify installed deps consistent)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/cli/pip_index/",
+          "claim_type": "cli_command_exists",
+          "subject": "pip index (query package indexes)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/cli/pip_inspect/",
+          "claim_type": "cli_command_exists",
+          "subject": "pip inspect (JSON report of environment)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/cli/pip_cache/",
+          "claim_type": "cli_command_exists",
+          "subject": "pip cache (manage local download/wheel cache)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/cli/pip_config/",
+          "claim_type": "cli_command_exists",
+          "subject": "pip config (view/edit pip configuration)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/cli/pip_debug/",
+          "claim_type": "cli_command_exists",
+          "subject": "pip debug (print debug info about pip env)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/cli/pip_hash/",
+          "claim_type": "cli_command_exists",
+          "subject": "pip hash (compute hashes for --hash mode)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/cli/pip_help/",
+          "claim_type": "cli_command_exists",
+          "subject": "pip help (per-command help)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/cli/pip_search/",
+          "claim_type": "cli_command_exists",
+          "subject": "pip search (removed in modern pip \u2014 see PyPI web)",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "pip-config": {
+      "sources": [
+        {
+          "url": "https://pip.pypa.io/en/stable/topics/configuration/",
+          "claim_type": "cli_command_exists",
+          "subject": "pip configuration files (pip.conf / pip.ini)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/topics/repeatable-installs/",
+          "claim_type": "cli_command_exists",
+          "subject": "repeatable installs (pinning, hashes, lockfiles)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/topics/dependency-resolution/",
+          "claim_type": "cli_command_exists",
+          "subject": "pip dependency resolution algorithm",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/topics/caching/",
+          "claim_type": "cli_command_exists",
+          "subject": "pip cache behavior (wheels + HTTP)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/topics/local-project-installs/",
+          "claim_type": "cli_command_exists",
+          "subject": "installing local projects (editable, source)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/topics/secure-installs/",
+          "claim_type": "cli_command_exists",
+          "subject": "secure installs (require-hashes, signed wheels)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/reference/requirements-file-format/",
+          "claim_type": "cli_command_exists",
+          "subject": "requirements.txt format reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/reference/installation-report/",
+          "claim_type": "cli_command_exists",
+          "subject": "installation report JSON spec",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/reference/inspect-report/",
+          "claim_type": "cli_command_exists",
+          "subject": "inspect report JSON spec",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "pip-packaging": {
+      "sources": [
+        {
+          "url": "https://pip.pypa.io/en/stable/reference/build-system/",
+          "claim_type": "cli_command_exists",
+          "subject": "PEP 517/518/660 build system support",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/topics/vcs-support/",
+          "claim_type": "cli_command_exists",
+          "subject": "VCS install support (git+https, hg+ssh, etc.)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://pip.pypa.io/en/stable/topics/python-option/",
+          "claim_type": "cli_command_exists",
+          "subject": "selecting Python interpreter for pip",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://packaging.python.org/en/latest/tutorials/installing-packages/",
+          "claim_type": "cli_command_exists",
+          "subject": "Python Packaging Authority: installing packages",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://packaging.python.org/en/latest/tutorials/packaging-projects/",
+          "claim_type": "cli_command_exists",
+          "subject": "PyPA: packaging projects tutorial",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/",
+          "claim_type": "cli_command_exists",
+          "subject": "distributing packages with setuptools",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://packaging.python.org/en/latest/guides/using-testpypi/",
+          "claim_type": "cli_command_exists",
+          "subject": "using TestPyPI before publishing",
+          "evidence_type": "official_docs"
+        }
+      ]
     }
   }
 }

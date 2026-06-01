@@ -1,0 +1,52 @@
+{
+  "tools": [
+    {
+      "tool_id": "pip-cli",
+      "urls": [
+        "https://pip.pypa.io/en/stable/cli/",
+        "https://pip.pypa.io/en/stable/cli/pip_install/",
+        "https://pip.pypa.io/en/stable/cli/pip_uninstall/",
+        "https://pip.pypa.io/en/stable/cli/pip_list/",
+        "https://pip.pypa.io/en/stable/cli/pip_freeze/",
+        "https://pip.pypa.io/en/stable/cli/pip_show/",
+        "https://pip.pypa.io/en/stable/cli/pip_download/",
+        "https://pip.pypa.io/en/stable/cli/pip_wheel/",
+        "https://pip.pypa.io/en/stable/cli/pip_check/",
+        "https://pip.pypa.io/en/stable/cli/pip_index/",
+        "https://pip.pypa.io/en/stable/cli/pip_inspect/",
+        "https://pip.pypa.io/en/stable/cli/pip_cache/",
+        "https://pip.pypa.io/en/stable/cli/pip_config/",
+        "https://pip.pypa.io/en/stable/cli/pip_debug/",
+        "https://pip.pypa.io/en/stable/cli/pip_hash/",
+        "https://pip.pypa.io/en/stable/cli/pip_help/",
+        "https://pip.pypa.io/en/stable/cli/pip_search/"
+      ]
+    },
+    {
+      "tool_id": "pip-config",
+      "urls": [
+        "https://pip.pypa.io/en/stable/topics/configuration/",
+        "https://pip.pypa.io/en/stable/topics/repeatable-installs/",
+        "https://pip.pypa.io/en/stable/topics/dependency-resolution/",
+        "https://pip.pypa.io/en/stable/topics/caching/",
+        "https://pip.pypa.io/en/stable/topics/local-project-installs/",
+        "https://pip.pypa.io/en/stable/topics/secure-installs/",
+        "https://pip.pypa.io/en/stable/reference/requirements-file-format/",
+        "https://pip.pypa.io/en/stable/reference/installation-report/",
+        "https://pip.pypa.io/en/stable/reference/inspect-report/"
+      ]
+    },
+    {
+      "tool_id": "pip-packaging",
+      "urls": [
+        "https://pip.pypa.io/en/stable/reference/build-system/",
+        "https://pip.pypa.io/en/stable/topics/vcs-support/",
+        "https://pip.pypa.io/en/stable/topics/python-option/",
+        "https://packaging.python.org/en/latest/tutorials/installing-packages/",
+        "https://packaging.python.org/en/latest/tutorials/packaging-projects/",
+        "https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/",
+        "https://packaging.python.org/en/latest/guides/using-testpypi/"
+      ]
+    }
+  ]
+}

@@ -398,6 +398,37 @@
       ],
       "source_repositories": []
     },
+    "pip-cli": {
+      "official_hosts": [
+        "pip.pypa.io"
+      ],
+      "source_repositories": []
+    },
+    "pip-config": {
+      "official_hosts": [
+        "pip.pypa.io"
+      ],
+      "source_repositories": []
+    },
+    "pip-packaging": {
+      "official_hosts": [
+        "pip.pypa.io",
+        "packaging.python.org"
+      ],
+      "source_repositories": []
+    },
+    "pip-recipes": {
+      "official_hosts": [
+        "pip.pypa.io"
+      ],
+      "source_repositories": []
+    },
+    "pip-errors": {
+      "official_hosts": [
+        "pip.pypa.io"
+      ],
+      "source_repositories": []
+    },
     "poetry": {
       "official_hosts": [
         "python-poetry.org"
