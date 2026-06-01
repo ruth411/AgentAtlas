@@ -723,16 +723,6 @@
         }
       ]
     },
-    "kubernetes-helm": {
-      "sources": [
-        {
-          "url": "https://helm.sh/docs/topics/charts/",
-          "claim_type": "cli_command_exists",
-          "subject": "helm charts",
-          "evidence_type": "official_docs"
-        }
-      ]
-    },
     "ansible-cli": {
       "sources": [
         {

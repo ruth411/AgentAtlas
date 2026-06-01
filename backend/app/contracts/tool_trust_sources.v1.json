@@ -767,12 +767,6 @@
       ],
       "source_repositories": []
     },
-    "kubernetes-helm": {
-      "official_hosts": [
-        "helm.sh"
-      ],
-      "source_repositories": []
-    },
     "ansible-cli": {
       "official_hosts": [
         "docs.ansible.com"
