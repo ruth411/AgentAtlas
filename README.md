@@ -2,17 +2,18 @@
 
 # Ayiru
 
-**A verified, machine-readable knowledge layer for AI agents.**
+**The verified knowledge graph for AI agent tooling.**
 
-Wikipedia tells humans what things are. Ayiru tells AI agents what tools can do, how to use them, and whether they're safe.
+When an agent reaches for a CLI or API, Ayiru gives it cited, evidence-graded answers from a curated catalog — not a guess from training data, not a scraped web page that might be a prompt-injection vector.
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/downloads/)
-[![Tests](https://img.shields.io/badge/tests-699%20passing-2EA44F)](#validation)
+[![Tests](https://img.shields.io/badge/tests-790%20passing-2EA44F)](#validation)
 [![Ruff](https://img.shields.io/badge/lint-ruff%20clean-FCC21B)](https://docs.astral.sh/ruff/)
+[![Claims](https://img.shields.io/badge/claims-2.7k%2B-7C3AED)](#tool-catalog)
+[![Tools](https://img.shields.io/badge/tools-30%2B%20with%20depth-0EA5E9)](#tool-catalog)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-[![Status](https://img.shields.io/badge/stage-15%20complete-7C3AED)](docs/stage_report.md)
 
-[Quick Start](#quick-start) · [What's Built](#whats-built) · [MCP Integration](#mcp-integration) · [Architecture](#architecture) · [Roadmap](ROADMAP.md)
+[Quick Start](#quick-start) · [Tool Catalog](#tool-catalog) · [How Agents Use It](#how-agents-use-it) · [MCP Integration](#mcp-integration) · [Architecture](#architecture)
 
 </div>
 
@@ -40,32 +41,88 @@ agent.run("gh repo delete my-org/production-critical --yes")
 A structured, evidence-backed knowledge graph that an agent queries *before* it acts.
 
 ```python
-verdict = atlas.validate_command(
-    tool_id="github-cli",
-    command="gh repo delete my-org/production-critical --yes",
-)
-# {
-#   "safe_to_auto_execute": false,
-#   "risk_level": "critical",
-#   "requires_human_confirmation": true,
-#   "verification_level": "L2_source_verified",
-#   "confidence": 1.0,
-#   "confidence_band": "strong",
-#   "matched_claim_id": "claim_…",
-#   "match_method": "prefix",
-#   "reasons": [
-#     "Deleting a GitHub repository is an irreversible remote mutation.",
-#     "Safety policy blocks auto-execution at risk level 'critical'."
-#   ],
-#   "evidence": [
-#     {"evidence_type": "official_docs",
-#      "source_uri": "https://docs.github.com/en/manual/gh_repo_delete",
-#      "trust_level": "high"}
-#   ]
-# }
+from ayiru_client import Ayiru
+
+with Ayiru(base_url="http://localhost:8000") as a:
+    # Natural-language question → ranked, cited answer
+    ans = a.ask("how do I copy files between docker containers")
+    if ans.is_useful:
+        print(ans.top.statement)          # actionable answer
+        print(ans.top.evidence[0].source_uri)  # citation
+    # Safety verdict for a specific command
+    v = a.validate_command("github-cli", "gh repo delete my-org/x --yes")
+    assert not v.safe_to_auto_execute     # default-deny, critical, requires human
 ```
 
-Every fact Ayiru serves is backed by **cited, captured evidence** — not LLM reasoning. Every command is **classified for risk** by a deterministic engine, not a chatbot. Every claim is **traceable** to the byte of the source document that grounded it.
+Every fact Ayiru serves is backed by **cited, captured evidence** — not LLM reasoning. Every command is **classified for risk** by a deterministic engine, not a chatbot. Every claim is **traceable** to the source document that grounded it.
+
+## Tool Catalog
+
+Ayiru currently indexes **2,700+ claims across 30+ tools** with full per-command depth, plus a wider thin-coverage tail. Each "deep" tool is decomposed into **five surfaces** so an agent's query can target the right slice:
+
+| Surface | What's on it |
+|---|---|
+| **`{tool}-cli`** | Per-command pages from official docs (e.g. `docker run`, `git rebase`) |
+| **`{tool}-config`** | Config-file format, environment, runtime options |
+| **`{tool}-recipes`** | Real-world workflows: "trim a video without re-encoding", "force-push safely" |
+| **`{tool}-errors`** | The actual error messages users hit, with diagnosis + fix steps |
+| **`{tool}-{topic}`** | Tool-specific extras: `docker-build`, `git-workflows`, `kubectl-resources`, `openssl-ciphers`, `go-stdlib`, `ansible-modules`, … |
+
+### Tools with full depth-pass coverage
+
+Each tool below has been crawled from official docs, supplemented with synthesized error/recipe claims, and probed end-to-end. The "probe" column is the fraction of representative agent-style questions that returned an actionable answer (confidence ≥ 0.6, evidence-graded).
+
+| Tool family | Claims | Probe | Notes |
+|---|---:|---:|---|
+| `ansible` (5 surfaces) | 634 | 25/25 | Modules (499), playbook, inventory, vault, errors, recipes |
+| `docker` | 136 | 44/45 | CLI + Dockerfile + buildx + compose + errors |
+| `gh` (GitHub CLI) | 129 | 49/50 | auth, repo/pr/issue/release, workflows, codespaces |
+| `kubectl` | 127 | 50/50 | 43 per-command pages + 14 resources + RBAC + debugging |
+| `helm` | 128 | 48/50 | Chart authoring + template guide + OCI registry |
+| `openai-api` | 125 | 50/50 | Chat/responses/embeddings/vision/whisper/TTS/batch/fine-tune |
+| `git` | 109 | 46/50 | 31 per-command + workflows + hooks + submodules + sign |
+| `go` | 108 | 50/50 | 30 stdlib pages + modules + generics + reasoning models |
+| `pip` | 105 | 49/50 | PEP 668, hash-pinning, pip-tools, uv migration |
+| `cargo` | 105 | 40/40 | build profiles, workspaces, features, registries |
+| `openssl` | 100 | 50/50 | Keys, certs, CSR, PKCS#12, TLS debugging, FIPS |
+| `apt` | 164 | 49/49 | Cli + sources.list + dpkg interop + errors |
+| `awk` | 118 | 40/40 | Language + builtins + regex + scripting patterns |
+| `ffmpeg` | 92 | 38/45 | Filters + codecs + recipes (trim, hwaccel, GIF, HLS) |
+| `imagemagick` | 86 | 43/45 | Resize, crop, batch, watermarks, formats, PDF→PNG |
+| `gpg` | 82 | 42/45 | Key gen, sign/verify, encrypt, smartcard, gpg-agent |
+| `journalctl` | 75 | 44/45 | Filters, fields, persistent storage, rate-limit |
+| `jq` | 74 | 45/45 | Filters, functions, control flow, real-world pipes |
+| `curl` | 73 | 40/40 | Protocols, auth, file transfer, debugging |
+| `brew` | 71 | 33/33 | Formulae, taps, cleanup, troubleshooting |
+| `dnf` | 57 | 37/37 | Repos, history, modules, troubleshooting |
+
+Plus thin-coverage tool_ids carried from earlier seeding: `terraform`, `vercel`, `postgresql`/`psql-postgres`, `ssh`, `systemctl`, `rsync`, `wget`, `sed`, `vim`, `tmux`, `sqlite3`, `pnpm`, `poetry`, `yarn`, `uv`, `rust`, `supabase`. These return *something* on `ask()` but at lower confidence — they're the next depth-pass targets.
+
+### Querying the catalog
+
+```bash
+# CLI — for humans
+ayiru query --tool github-cli --command 'gh repo delete my-org/x --yes'
+# BLOCK  risk=critical  confidence=1.00
+#   Deleting a GitHub repository is an irreversible remote mutation.
+
+# HTTP — for agents
+curl -X POST http://localhost:8000/v1/query/ask \
+  -H 'Content-Type: application/json' \
+  -d '{"question": "trim a clip without re-encoding", "tool_id_hint": "ffmpeg-recipes"}'
+```
+
+The HTTP `/v1/query/ask` endpoint returns ranked answers with confidence, verification level, and evidence URIs — agents that call it from their `BaseTool` (LangChain, Cursor, Claude Desktop via MCP) save the round-trip cost of `web_search` for stable technical questions.
+
+## How Agents Use It
+
+Three integration paths, same underlying graph:
+
+1. **MCP server** (Claude Desktop, Cursor, Cline, Continue) — point the client at `ayiru mcp` and the agent gets seven tools: `ask`, `validate_command`, `get_tool_spec`, `search_tools`, `explain_risk`, `get_safe_workflow`, `submit_claim`. See [MCP Integration](#mcp-integration).
+2. **HTTP API** (any framework) — POST to `/v1/query/ask` for natural-language Q&A, `/v1/query/validate-command` for safety verdicts. Live OpenAPI docs at <http://localhost:8000/docs>.
+3. **Python SDK** (`ayiru-client`) — typed Pydantic-returning client with sync + async flavors and a drop-in LangChain `BaseTool`. See [clients/python/](clients/python/).
+
+The `Answer.is_useful` heuristic (`confidence ≥ 0.6 AND verification_level != "L0_unverified"`) is the boundary agent code should respect: a USEFUL answer can be returned verbatim; anything else should escalate to `web_search`.
 
 ## How It Works
 
@@ -73,31 +130,26 @@ Every fact Ayiru serves is backed by **cited, captured evidence** — not LLM re
 flowchart LR
     subgraph Sources["Sources"]
         CLI[CLI --help]
-        DOCS[Docs]
+        DOCS[Official Docs]
         OAS[OpenAPI]
         JSON[JSON Schema]
         GQL[GraphQL SDL]
         MCP[MCP Servers]
     end
 
-    subgraph Ingestion["Ingestion (SSRF-safe)"]
-        L1[CLI runner]
-        L2[Docs fetcher]
-        L3[OpenAPI fetcher]
-        L4[JSON Schema fetcher]
-        L5[GraphQL fetcher]
-        L6[MCP stdio runner]
+    subgraph Lanes["Ingestion Lanes (6)"]
+        L1[CLI capture] & L2[Docs fetch + sanitize] & L3[OpenAPI parser]
+        L4[JSON Schema parser] & L5[GraphQL parser] & L6[MCP metadata]
     end
 
-    subgraph Pipeline["Verification Pipeline"]
-        ORCH[Canon Orchestrator]
-        RISK[Risk Engine]
-        CONF[Confidence Scorer]
-        SAND[Runtime Sandbox]
+    subgraph Engine["Orchestrator"]
+        ORCH[Validate · Dedup · Conflict-detect]
+        RISK[Risk engine]
+        CONF[Confidence scoring]
+        SAND[Runtime sandbox]
     end
 
-    GRAPH[(Knowledge Graph<br/>L0 through L3 claims)]
-
+    GRAPH[("Knowledge graph<br/>2.7k+ claims, cited")]
     AGENT[AI Agent]
 
     CLI --> L1 --> ORCH
@@ -112,17 +164,13 @@ flowchart LR
     ORCH --> GRAPH
     SAND -.->|L3 promotion| GRAPH
 
-    AGENT -->|validate_command| GRAPH
-    GRAPH -->|structured verdict| AGENT
+    AGENT -->|ask · validate · search| GRAPH
+    GRAPH -->|cited answer + verdict| AGENT
 ```
 
 Six ingestion lanes pull evidence from trusted sources. A deterministic orchestrator validates schema, classifies risk, scores confidence, deduplicates, and detects conflicts. Accepted claims compile into canonical `ToolSpec` and `WorkflowSpec` records. A runtime sandbox verifies safe checks (e.g. `git --version`) and promotes claims to `L3_runtime_verified`. Agents query the result.
 
 ## Quick Start
-
-Three install paths land you on a working `ayiru` binary. The repo checkout is the recommended dev path. The standalone wheel install is the production path once PyPI publication ships (scheduled for v0.2; see [plan_v02.md](plan_v02.md) §Stage 16.2). The Docker image is the zero-setup path with auto-seeding on first run.
-
-### From a checkout (recommended for development)
 
 ```bash
 git clone https://github.com/ruth411/ayiru.git
@@ -130,38 +178,33 @@ cd ayiru
 python3.12 -m venv backend/.venv
 source backend/.venv/bin/activate
 pip install -e 'backend[dev]'
-
-ayiru seed --reset       # populate the demo graph (~5s, offline-safe)
-ayiru serve --reload     # API on http://localhost:8000
 ```
 
-OpenAPI docs at <http://localhost:8000/docs>.
-
-After `ayiru seed --reset`, the local graph holds **47 claims** across 5 tools (`git`, `github-cli`, `docker`, `vercel-cli`, `openai-api`) and **4 published ToolSpecs** (`git`, `github-cli`, `docker`, `vercel-cli` — `openai-api`'s OpenAPI-derived claims stay pending review). The headline demo then resolves immediately:
+Two ways to run:
 
 ```bash
-ayiru query --tool github-cli --command 'gh repo delete my-org/x --yes'
-# BLOCK  risk=critical  confidence=1.00
-#   matched_claim=claim_…  verification_level=L2_source_verified
-#   - Matched claim 'gh repo delete' by prefix.
-#   - Safety policy blocks auto-execution at risk level 'critical'.
-#   - Deleting a GitHub repository is an irreversible remote mutation.
+# (A) Demo graph — small + offline-safe (~47 claims across 5 tools)
+ayiru seed --reset
+ayiru serve --reload         # http://localhost:8000
+
+# (B) Full catalog — 2.7k claims, 30+ tools with depth
+AYIRU_DATABASE_URL="sqlite:///$(pwd)/backend/ayiru_v0.2_bulk.db" ayiru serve --reload
 ```
 
-### Standalone wheel install (Stage 14)
-
-The wheel bundles the trust contracts, seed artifacts, and alembic migrations, so an isolated install produces a fully-functional package — no checkout required.
+Then ask it something:
 
 ```bash
-python3.12 -m venv ~/venv-ayiru
-~/venv-ayiru/bin/pip install /path/to/ayiru/backend   # local source build
-ayiru seed --reset                                    # uses the bundled demo data
-ayiru serve                                           # auto-migrates the schema first
+curl -X POST http://localhost:8000/v1/query/ask \
+  -H 'Content-Type: application/json' \
+  -d '{"question": "force-push safely after rebase"}'
+# {"answers":[{"statement":"`git push --force-with-lease`...",
+#              "tool_id":"git-recipes","confidence":0.94,
+#              "verification_level":"L2_source_verified",
+#              "evidence":[{"source_uri":"https://git-scm.com/docs/git-push", ...}]}],
+#  "fallback_recommended": false}
 ```
 
-> **Note on PyPI.** `pip install ayiru` is not yet a working command — the PyPI publication is part of the v0.2 release plan (see [plan_v02.md](plan_v02.md) §Stage 16.2). For now, install from a local source build as shown above, or from a GitHub release wheel attached to the [v0.1.0 release](https://github.com/ruth411/ayiru/releases/tag/v0.1.0).
-
-### With Docker
+### Docker
 
 ```bash
 docker build -t ayiru .
@@ -169,32 +212,21 @@ docker run --rm -p 8000:8000 ayiru         # serve the API
 docker run --rm -i ayiru mcp               # MCP stdio bridge
 ```
 
-The image bundles the same seed + contracts as the wheel and ships the `ayiru` binary as its entrypoint.
+The image bundles the demo seed + contracts. To use the bulk catalog inside Docker, mount the DB file and point `AYIRU_DATABASE_URL` at it.
 
 ### CLI reference
 
 | Command | Purpose |
 |---|---|
-| `ayiru serve [--host --port --reload --no-migrate]` | Run the FastAPI app under uvicorn; auto-migrates the schema on first start unless `--no-migrate` is passed |
+| `ayiru serve [--host --port --reload --no-migrate]` | Run the FastAPI app under uvicorn; auto-migrates the schema on first start |
 | `ayiru mcp` | Speak MCP/JSON-RPC over stdio (for Claude Desktop, Cursor, …) |
-| `ayiru seed [--reset --database-url URL]` | Replay `data/seed_artifacts/` into the DB |
+| `ayiru seed [--reset --database-url URL]` | Replay `data/seed_artifacts/` into the DB (demo graph) |
+| `ayiru ingest --tool-list <file.json> [--source docs --resume]` | Bulk-crawl official docs into the graph (this is how the catalog grows) |
 | `ayiru migrate [--database-url URL]` | `alembic upgrade head` |
 | `ayiru query --tool ID --command STR [--json]` | Ask the engine if a command is safe (exits 0 on ALLOW, 2 on BLOCK) |
 | `ayiru verify --claim-id ID` | Run the runtime verifier; promote L2 → L3 when it passes |
 | `ayiru tools [--json]` | List every published tool spec |
 | `ayiru --version` | Print the package version |
-
-### Run the dashboard (optional)
-
-Stage 11b ships a minimal Next.js dashboard for visual exploration and the demo video. Requires Node.js 18+.
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Open <http://localhost:3000>. The dashboard proxies `/api/*` to the FastAPI backend on `localhost:8000` (override with `AYIRU_API_URL`), so the browser only talks to its own origin and no CORS configuration is needed.
 
 ## Core Principles
 
@@ -209,118 +241,76 @@ These are non-negotiable. They're tested.
 | **Provenance is preserved** | Every canonical spec traces back to the source claims and the source bytes. |
 | **Sources are data, not instructions** | Docs, CLI output, MCP metadata are scanned; any instructions they contain are never executed. |
 
-## What's Built
-
-| Stage | Capability | Status |
-|---|---|---|
-| 0 — Trust contract | Locked tool scope, evidence types, risk model | ✓ |
-| 1 — Persistence | Pydantic + SQLAlchemy + Alembic, drift-locked | ✓ |
-| 2 — Claim API | Submit / list / retrieve with evidence policy | ✓ |
-| 3 — Orchestrator | Schema validation, dedup, conflict detection | ✓ |
-| 4 — Confidence | Weighted scoring, caps, conflict penalties | ✓ |
-| 5 — Risk engine | Deterministic, dimension-based, contract-backed | ✓ |
-| 6 — Canonical specs | `ToolSpec` / `WorkflowSpec` compilation with provenance | ✓ |
-| 7a — CLI ingestion | Safe subprocess capture with argv allowlist | ✓ |
-| 7b — Docs ingestion | HTTPS-only fetch with SSRF guard + sanitization | ✓ |
-| 7c.1 — OpenAPI | Per-endpoint claims with JSON Pointer provenance | ✓ |
-| 7c.2 — JSON Schema | Per-field claims, dialect-aware validation | ✓ |
-| 7c.3 — GraphQL SDL | Per-root-field claims with destructive detection | ✓ |
-| 7d — MCP metadata | Local stdio spawn + `tools/list` capture | ✓ |
-| 8 — Runtime verification | L2 → L3 promotion via safe sandboxed checks | ✓ |
-| 9 — Agent query surface | `validate_command`, `search_tools`, `explain_risk`, `safe_workflow`, `get_tool_spec` | ✓ |
-| 10 — MCP server (outbound) | Expose 6 query / write tools to Claude Desktop / Cursor over stdio JSON-RPC | ✓ |
-| 11a — Seed dataset | `scripts/seed_examples.py` replays pre-captured artifacts; ~47 claims across 5 tools | ✓ |
-| 11b — Demo dashboard | Minimal Next.js UI: landing + tools list + tool detail + query playground | ✓ |
-| 12 — CLI + Docker | One `ayiru` binary on PATH; one-stage Dockerfile | ✓ |
-| 13 — Human review + audit | `L5_human_audited` promotion path; append-only audit log; review queue; per-claim history endpoint | ✓ |
-| 14 — Hardening | Wheel bundles contracts + seed + migrations; `/v1/` API versioning; observability + request ids; optional API-key auth + reviewer registry; auto-init on serve; Postgres dialect smoke; GitHub Actions CI; LICENSE / CONTRIBUTING / SECURITY | ✓ |
-
-See [docs/stage_report.md](docs/stage_report.md) for the full per-stage report including required artifacts, pass-case audit, quality bar, audit log, and what each stage explicitly defers.
-
 ## Architecture
 
 ```
-Ayiru/
+ayiru/
 ├── backend/
 │   ├── app/
 │   │   ├── api/             # FastAPI routes (claims, canonical, ingestion, verification, query)
-│   │   ├── mcp_server/      # Stage 10 — stdio JSON-RPC MCP server (6 tools)
+│   │   ├── mcp_server/      # stdio JSON-RPC MCP server (7 tools)
 │   │   ├── schemas/         # Pydantic v2 typed models
 │   │   ├── services/        # Orchestrator, risk engine, ingestion lanes, runtime verifier, query engine
 │   │   ├── db/              # SQLAlchemy 2.0 models + session
-│   │   ├── cli.py           # Stage 12 — the `ayiru` console script
-│   │   └── main.py          # FastAPI app + middleware (body size guard, structured errors)
+│   │   ├── cli.py           # The `ayiru` console script
+│   │   └── main.py          # FastAPI app + middleware
 │   ├── alembic/             # Migrations (drift-locked against models)
-│   └── tests/               # 699 tests; ruff clean; hermetic
-├── frontend/                # Stage 11b — Next.js demo dashboard (4 pages)
-├── data/seed_artifacts/     # Stage 11a — pre-captured artifacts for offline-safe seeding
-├── scripts/                 # seed_examples.py and other operator tools
+│   ├── ayiru_v0.2_bulk.db   # The full catalog DB (2.7k claims, 30+ tools)
+│   └── tests/               # 790 tests; ruff clean; hermetic
+├── clients/python/          # ayiru-client SDK (sync + async) + LangChain adapter
+├── data/seed_artifacts/     # Pre-captured artifacts for offline-safe demo seeding
+├── tools/                   # Bulk-ingest URL lists + synthesized claim seed scripts (per tool)
 ├── contracts/               # Versioned JSON contracts (trust sources, ingestion allowlists, risk taxonomy)
-├── docs/                    # Stage report, product lock, trust contract, demo scenarios
-├── Dockerfile               # Stage 12 — one-stage image
-└── ROADMAP.md
+├── scripts/                 # seed_examples.py and other operator tools
+├── docs/                    # Stage report, trust contract, self-test results
+└── Dockerfile
 ```
 
 ### Key design decisions
 
-- **Contracts as ground truth.** Trust allowlists, ingestion sources, and risk taxonomies are versioned JSON files in `contracts/`. They're loaded once, validated, and cached. They cannot drift from the code without a test failing.
+- **Contracts as ground truth.** Trust allowlists, ingestion sources, and risk taxonomies are versioned JSON files in `contracts/`. They're loaded once, validated, and cached. They cannot drift from the code without a test failing. The same files are mirrored into `backend/app/contracts/` (bundled into wheels) — a `diff` check in CI keeps them byte-identical.
+- **Five-surface tool decomposition.** Each major tool is split into `-cli`, `-config`, `-recipes`, `-errors`, and one topic-specific surface (e.g. `-modules`, `-stdlib`). This lets agents direct their queries (`tool_id_hint="docker-errors"`) and lets the matcher rank within the right neighborhood.
 - **Protocol-based dependency injection.** Every external dependency (HTTP client, MCP runner, sandbox runner) is a `typing.Protocol`. Tests inject fakes; production injects the real thing. The suite is hermetic — no real network or subprocess execution in CI.
 - **Migrations match models.** [tests/test_alembic_metadata_alignment.py](backend/tests/test_alembic_metadata_alignment.py) fails on any drift.
 - **Structured errors everywhere.** All API errors return `{"error": {"code": "…", "message": "…", "details": {…}}}` with a typed `ErrorCode` enum.
 - **Adversarial tests, not happy-path tests.** Every ingestion lane has tests for SSRF, redirect attacks, oversized responses, malformed inputs, content-type bypasses, cache hits with deleted artifacts, and structured 422s.
+- **Semantic re-rank via fastembed.** Hybrid lexical + cosine using `BAAI/bge-small-en-v1.5` (~130 MB ONNX, no torch). Embeddings are stored per-claim and re-ranked on top of the lexical first pass.
 
 ## API Surface
 
 Every endpoint returns typed JSON; errors are structured.
 
-**Claims**
-- `POST /claims` — submit a structured claim with evidence
-- `GET /claims` — paginated list with filters
-- `GET /claims/{claim_id}` — retrieve a single claim
-- `POST /claims/{claim_id}/verify` — re-run the orchestrator
-- `GET /claims/{claim_id}/verification` — latest verification result
-
-**Canonical Specs**
-- `POST /canonical/tools/{tool_id}/publish` — compile accepted claims into a `ToolSpec`
-- `GET /canonical/tools/{tool_id}` — retrieve the published spec
-- `POST /canonical/workflows/{workflow_id}/publish`
-- `GET /canonical/workflows/{workflow_id}`
-
-**Ingestion**
-- `POST /ingestion/cli` · `POST /ingestion/cli/tools/{tool_id}` — Stage 7a
-- `POST /ingestion/docs` · `POST /ingestion/docs/tools/{tool_id}` — Stage 7b
-- `POST /ingestion/openapi` · `POST /ingestion/openapi/tools/{tool_id}` — Stage 7c.1
-- `POST /ingestion/json_schema` · `POST /ingestion/json_schema/tools/{tool_id}` — Stage 7c.2
-- `POST /ingestion/graphql` · `POST /ingestion/graphql/tools/{tool_id}` — Stage 7c.3
-- `POST /ingestion/mcp` · `POST /ingestion/mcp/publishers/{publisher}` — Stage 7d
-- `GET /ingestion/runs/{run_id}` — inspect a run
-- `GET /ingestion/artifacts/{artifact_id}` — byte-stable raw evidence
-
-**Runtime Verification**
-- `POST /verification/runtime` — promote a claim to L3 via a safe check
-- `POST /verification/runtime/tools/{tool_id}` — bulk-verify all claims for a tool
-
-**Human Review** (Stage 13)
-- `POST /verification/human-review` — file an `APPROVED` / `REJECTED` / `NEEDS_CHANGES` decision; `APPROVED` against an L3+ claim promotes it to `L5_human_audited`.
-- `GET /verification/review-queue` — paginated list of claims awaiting a human decision (`verification_status=requires_human_review`).
-
-**Audit Log** (Stage 13 — append-only)
-- `GET /audit/events` — paginated query with filters by `entity_type`, `entity_id`, `event_type`, `actor`, and timestamp range.
-- `GET /audit/claims/{claim_id}` — full chronological history of every event recorded against one claim.
-
-**Agent Query Surface** (the agent-facing API)
-- `POST /v1/query/ask` — *the v0.2 headline retrieval surface.* Natural-language question in, ranked + cited answers out from the verified knowledge graph. Returns `{answers: [{claim_id, subject, statement, tool_id, confidence, verification_level, evidence, match_reason}], fallback_recommended, estimated_tokens_saved}`. On a miss, `fallback_recommended=True` signals the agent should escalate to web_search.
-- `POST /v1/query/validate-command` — Returns a structured `{safe_to_auto_execute, risk_level, requires_human_confirmation, reasons, evidence, verification_level, confidence}` verdict. Default-deny on no match.
+**Agent Query Surface** (the agent-facing API, under `/v1/query/`)
+- `POST /v1/query/ask` — *the headline retrieval surface.* Natural-language question in, ranked + cited answers out. Returns `{answers: [{claim_id, subject, statement, tool_id, confidence, verification_level, evidence, match_reason}], fallback_recommended, estimated_tokens_saved}`. On a miss, `fallback_recommended=True` signals the agent should escalate to `web_search`.
+- `POST /v1/query/validate-command` — Structured `{safe_to_auto_execute, risk_level, requires_human_confirmation, reasons, evidence, verification_level, confidence}` verdict. Default-deny on no match.
 - `GET /v1/query/tools/{tool_id}` — canonical `ToolSpec` retrieval; 404 if no spec published.
 - `GET /v1/query/search-tools?q=&limit=&offset=` — tiered substring search across published tools.
 - `POST /v1/query/explain-risk` — deterministic risk classification with dimensions + citing claim ids.
 - `POST /v1/query/safe-workflow` — published workflows matching a goal, sorted safest-first.
 
+**Claims & Ingestion** (used by operators + ingestion pipelines)
+- `POST /claims` · `GET /claims` · `GET /claims/{id}` · `POST /claims/{id}/verify` · `GET /claims/{id}/verification`
+- `POST /ingestion/{cli,docs,openapi,json_schema,graphql,mcp}` — one route per ingestion lane (plus `/tools/{tool_id}` and `/publishers/{publisher}` variants where applicable)
+- `GET /ingestion/runs/{run_id}` · `GET /ingestion/artifacts/{artifact_id}` (byte-stable raw evidence)
+
+**Canonical Specs**
+- `POST /canonical/tools/{tool_id}/publish` · `GET /canonical/tools/{tool_id}`
+- `POST /canonical/workflows/{workflow_id}/publish` · `GET /canonical/workflows/{workflow_id}`
+
+**Runtime Verification & Human Review**
+- `POST /verification/runtime` — promote a claim to L3 via a safe check
+- `POST /verification/human-review` — file an `APPROVED` / `REJECTED` / `NEEDS_CHANGES` decision; `APPROVED` against an L3+ claim promotes it to `L5_human_audited`
+- `GET /verification/review-queue` — paginated list of claims awaiting a human decision
+
+**Audit Log** (append-only)
+- `GET /audit/events` — paginated query with filters by `entity_type`, `entity_id`, `event_type`, `actor`, timestamp range
+- `GET /audit/claims/{claim_id}` — full chronological history of every event recorded against one claim
+
 Live interactive docs at <http://localhost:8000/docs> when the server is running.
 
 ## Python SDK
 
-Agents that prefer a typed Python client over raw HTTP can pip-install `ayiru-client` from [clients/python/](clients/python/). Both blocking and async flavors expose the same five methods — `ask`, `validate_command`, `get_tool_spec`, `search_tools`, `savings` — and return Pydantic models.
+Agents that prefer a typed Python client over raw HTTP can install `ayiru-client` from [clients/python/](clients/python/). Both blocking and async flavors expose the same five methods — `ask`, `validate_command`, `get_tool_spec`, `search_tools`, `savings` — and return Pydantic models.
 
 ```python
 from ayiru_client import Ayiru
@@ -334,29 +324,17 @@ with Ayiru(base_url="http://localhost:8000") as client:
         ...
 ```
 
-`Answer.is_useful` is the convenience heuristic Stage 21.2 calls out: `confidence ≥ 0.6 AND verification_level != "L0_unverified"`. See [clients/python/README.md](clients/python/README.md) for the full method reference, the async variant, error handling, and auth.
+`Answer.is_useful` is the convenience heuristic: `confidence ≥ 0.6 AND verification_level != "L0_unverified"`. See [clients/python/README.md](clients/python/README.md) for the full method reference, the async variant, error handling, and auth.
 
-### LangChain adapter (Stage 22.1)
+### LangChain adapter
 
-A drop-in `BaseTool` for LangChain agents lives at [clients/python/ayiru_client/langchain.py](clients/python/ayiru_client/langchain.py). The tool's LLM-facing `description` is the load-bearing piece — it overrides the default "only use tools when uncertain" meta-policy so the agent actually picks `ask` over web_search for stable technical questions.
+A drop-in `BaseTool` for LangChain agents lives at [clients/python/ayiru_client/langchain.py](clients/python/ayiru_client/langchain.py). The tool's LLM-facing `description` is the load-bearing piece — it overrides the default "only use tools when uncertain" meta-policy so the agent actually picks `ask` over `web_search` for stable technical questions.
 
 ```bash
-# v0.2.5 will ship to PyPI; until then install from a checkout:
 pip install -e 'clients/python[langchain]'
 ```
 
-A runnable 10-question demo notebook at [clients/python/examples/langchain_demo.ipynb](clients/python/examples/langchain_demo.ipynb) ends with a `/v1/stats/savings`-derived token-savings footer. See *Coverage today* below for the honest framing of what to expect.
-
-### Coverage today (v0.2)
-
-The graph indexes **40 tools** but the depth varies sharply:
-
-- **5 tools curated to depth** (the Stage 0 hand-built layer): `docker`, `git`, `github-cli`, `vercel-cli`, `openai-api`. These produce high-confidence (`≥ 0.6`), `L2_source_verified` answers and have published canonical `ToolSpec`s suitable for `validate_command`.
-- **35 tools with one thin index-page claim each** (the Stage 20 bulk-ingest layer): `kubectl`, `terraform`, `helm`, GNU CLIs, package managers, etc. These return *something* on `ask()` but at low confidence (~0.30–0.50, L1/L2 mix) because the seed URL is the docs *index*, not per-command pages. They do **not** have a published `ToolSpec` — `validate_command` won't find them.
-
-The v0.2.x depth work is to expand each bulk-ingest tool's seed list from one index URL to a handful of per-command URLs (e.g. `kubectl describe`, `kubectl logs`, …) and re-run `ayiru ingest --resume`. Track that work in [tools/v0.2_seed_keep.json](tools/v0.2_seed_keep.json).
-
-`Answer.is_useful` (`confidence ≥ 0.6 AND verification_level != "L0_unverified"`) is the right boundary for agent code: an USEFUL answer can be returned verbatim; anything else should escalate to `web_search`.
+A runnable demo notebook at [clients/python/examples/langchain_demo.ipynb](clients/python/examples/langchain_demo.ipynb).
 
 ## MCP Integration
 
@@ -366,7 +344,7 @@ Ayiru ships with a built-in MCP server that exposes the query surface plus claim
 
 | Tool | What it does |
 |---|---|
-| `ask` | **v0.2 headline.** Natural-language question → ranked, cited answers from the verified knowledge graph. The agent's first stop before `web_search`. Returns `fallback_recommended=True` on a miss. |
+| `ask` | **Headline.** Natural-language question → ranked, cited answers from the verified knowledge graph. The agent's first stop before `web_search`. Returns `fallback_recommended=True` on a miss. |
 | `validate_command` | Safety verdict for `{tool_id, command}`. Default-deny on no match. |
 | `get_tool_spec` | Full canonical `ToolSpec` for a known tool. |
 | `search_tools` | Tiered substring search across published tools. |
@@ -393,23 +371,35 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS):
       "command": "/absolute/path/to/ayiru",
       "args": ["mcp"],
       "env": {
-        "AYIRU_DATABASE_URL": "sqlite:////absolute/path/to/ayiru.db"
+        "AYIRU_DATABASE_URL": "sqlite:////absolute/path/to/ayiru_v0.2_bulk.db"
       }
     }
   }
 }
 ```
 
-Run `which ayiru` inside the activated venv to get the absolute path. Restart Claude Desktop and the 6 Ayiru tools appear in the tool list. Ask Claude `"Is it safe to run gh repo delete?"` and the verdict comes back inline with cited evidence.
+Run `which ayiru` inside the activated venv to get the absolute path. Restart Claude Desktop and the Ayiru tools appear in the tool list.
 
 **Cursor / other MCP clients** — the config shape is the same; consult the client's docs for where to register MCP servers.
 
 ### Design notes
 
-- Server is hand-rolled (no `mcp` SDK dependency). The codebase is sync-throughout; the SDK is async. Stage 7d already implemented the inverse (an MCP *client*) so the protocol is well-understood.
+- Server is hand-rolled (no `mcp` SDK dependency). The codebase is sync-throughout; the SDK is async.
 - Every tool's `inputSchema` declares `additionalProperties: false` so client typos surface as clean rejections instead of silently dropping fields.
-- Tool execution failures surface as MCP `isError: True` content blocks (per the MCP spec). Protocol-level failures (parse error, unknown method, unknown tool) surface as JSON-RPC `error` responses. The two paths are kept distinct so clients can write defensive code that treats them differently.
+- Tool execution failures surface as MCP `isError: True` content blocks. Protocol-level failures (parse error, unknown method, unknown tool) surface as JSON-RPC `error` responses. The two paths are kept distinct so clients can write defensive code that treats them differently.
 - The server returns both a `content[]` text block (for older clients that string-parse) AND a `structuredContent` object (for newer clients that natively understand structured tool results).
+
+## Growing the Catalog
+
+Adding a new tool follows a five-step pattern that's repeatable in ~30 minutes per tool:
+
+1. **Add the tool to the trust contract** (`contracts/tool_trust_sources.v1.json`) — declare official hosts.
+2. **Build a URL list** in `tools/v0.2_seed_<tool>.json` covering CLI commands, config, and any topic-specific pages.
+3. **Patch `contracts/docs_ingestion_sources.v1.json`** with the URLs + subjects (a small script does both mirrors at once).
+4. **Crawl**: `ayiru ingest --tool-list tools/v0.2_seed_<tool>.json --source docs --resume`.
+5. **Synthesize errors + recipes** via a `tools/scripts/seed_<tool>_errors_recipes.py` (typically 30 errors + 35 recipes per tool, hand-written from real-world experience).
+
+After each tool: probe with ~45 representative questions, check `tests` + `ruff`, commit. See `tools/scripts/seed_*_errors_recipes.py` for the pattern in practice across 21 tools.
 
 ## Submitting claims and ingesting docs
 
@@ -441,7 +431,7 @@ Or ingest a whole documentation page automatically:
 ```bash
 curl -X POST http://localhost:8000/ingestion/docs \
   -H 'Content-Type: application/json' \
-  -d '{"tool_id": "git", "url": "https://git-scm.com/docs/git-status"}'
+  -d '{"tool_id": "git-cli", "url": "https://git-scm.com/docs/git-status"}'
 ```
 
 ## Validation
@@ -449,7 +439,7 @@ curl -X POST http://localhost:8000/ingestion/docs \
 ```bash
 cd backend
 
-# Test suite (699 tests, hermetic, ~25s)
+# Test suite (790 tests, hermetic, ~55s)
 .venv/bin/python -m pytest -q
 
 # Lint
@@ -464,7 +454,7 @@ DATABASE_URL=sqlite:////tmp/ayiru-smoke.db .venv/bin/alembic upgrade head
 
 ## Security model
 
-Auth in v0.1 is intentionally narrow. Two surfaces, two postures:
+Two surfaces, two postures:
 
 - **HTTP API.** When `AYIRU_API_KEY` is set, every state-changing request (`POST` / `PUT` / `PATCH` / `DELETE`) must carry `Authorization: Bearer <key>`. Read endpoints stay public so agents can query freely without coordinating credentials with their orchestrator. The check is timing-safe (`hmac.compare_digest`).
 - **MCP stdio (`ayiru mcp`).** The stdio JSON-RPC server is **unauthenticated by design**. It assumes the caller is a local process the user already has exec rights to (Claude Desktop, Cursor, Cline, Continue — the typical MCP host configurations spawn the server as their own subprocess). The `AYIRU_API_KEY` middleware does not apply here because there is no transport layer to attach credentials to.
@@ -477,34 +467,33 @@ See [SECURITY.md](SECURITY.md) for the full threat model and known residual risk
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `AYIRU_DATABASE_URL` | `sqlite:///./ayiru.db` | SQLAlchemy URL. SQLite is the test-matrix dialect; Stage 14 verified the schema also compiles cleanly under the Postgres dialect (no live Postgres in CI yet). |
+| `AYIRU_DATABASE_URL` | `sqlite:///./ayiru.db` | SQLAlchemy URL. Point it at `backend/ayiru_v0.2_bulk.db` to use the full catalog. SQLite is the test-matrix dialect; the schema also compiles cleanly under Postgres. |
 | `AYIRU_ALEMBIC_INI` | autodetected | Optional override path to `alembic.ini`. The CLI resolver tries env-var → source-tree `backend/alembic.ini` → bundled `app/_alembic/` (wheel install) in order. |
 | `AYIRU_SEED_SCRIPT` | autodetected | Optional override path to a `seed_examples.py` fork. Without it, `ayiru seed` uses the in-package `app.seed_data.runner`. |
-| `AYIRU_API_KEY` | unset (auth off) | When set, Stage 14 enables Bearer-token auth on every state-changing endpoint. Read endpoints stay public regardless. Health endpoints stay public. |
+| `AYIRU_API_KEY` | unset (auth off) | When set, enables Bearer-token auth on every state-changing endpoint. Read endpoints stay public regardless. Health endpoints stay public. |
 | `AYIRU_REVIEWER_REGISTRY` | unset (open) | Comma-separated allowlist of `reviewer_id` values for `POST /verification/human-review`. When set, unlisted reviewers receive a structured 403. |
-| `AYIRU_STRICT_TOOL_LOCK` | unset (relaxed) | When `1`/`true`/`yes`/`on`, restores the v0.1 hard-reject behavior — claims with tool_ids not in the v2 contract's curated set are refused at `POST /claims`. Default (relaxed) lets unknown tools persist at `L0_UNVERIFIED` so Stage 20's bulk ingest can land without contract bumps. Set this in compliance contexts where unknown tools must never silently accumulate. |
-| `AYIRU_API_URL` (frontend) | `http://localhost:8000` | Where the dashboard's `/api/*` rewrite points. |
+| `AYIRU_STRICT_TOOL_LOCK` | unset (relaxed) | When `1`/`true`/`yes`/`on`, restores hard-reject behavior — claims with tool_ids not in the v2 contract's curated set are refused at `POST /claims`. Default (relaxed) lets unknown tools persist at `L0_UNVERIFIED` so bulk ingest can land without contract bumps. |
 
 ## What This Isn't (Yet)
 
-Being honest about the gaps that remain after Stage 15:
+Being honest about gaps:
 
-- **Stage 0 scope is narrow.** Initial tool coverage: `git`, `github-cli`, `docker`, `vercel-cli`, `openai-api` plus 5 MCP servers. Adding tools is a contract change, not code. The v0.2 plan ([plan_v02.md](plan_v02.md) §Stage 19/20) relaxes this with a curated/uncurated split and bulk-ingests ≥ 35 more tools.
-- **No PyPI upload yet.** The wheel works (Stage 14 bundled everything), but `pip install ayiru` still points at a local build. The PyPI publication ships with v0.2 ([plan_v02.md](plan_v02.md) §Stage 16.2).
-- **SQLite is the only tested backend.** SQLAlchemy targets Postgres + the schema is dialect-portable (Stage 14 added an offline DDL smoke), but no `testcontainers`-style live Postgres tests run in CI. v1.1 adds them.
-- **No external auth provider integration.** Stage 14 ships an optional API-key gate via env var — solid for protecting a deployment behind a reverse proxy, not a substitute for SSO. OAuth / OIDC integration is v1.1.
+- **The catalog is broad, not exhaustive.** ~30 tool families have full depth-pass treatment; another ~15 have thin coverage from earlier seeding. New tools land in ~30 minutes each via the pattern in [Growing the Catalog](#growing-the-catalog) — but real-world coverage of a tool's full surface (every flag, every edge case) is a long tail.
+- **Freshness story is manual.** Re-running `ayiru ingest --resume` re-fetches changed pages, but there's no automated detection of upstream changes. v1.1 adds change-feed monitoring.
+- **No PyPI upload yet.** Install from a local source build or a GitHub release wheel. `pip install ayiru` and `pip install ayiru-client` are the next release.
+- **SQLite is the only tested backend.** SQLAlchemy targets Postgres + the schema is dialect-portable (an offline DDL smoke test runs in CI), but no `testcontainers`-style live Postgres tests run in CI yet.
+- **No external auth provider integration.** Bearer-token auth via env var is solid for protecting a deployment behind a reverse proxy, not a substitute for SSO. OAuth / OIDC is v1.1.
 - **No rate limiting.** Deploy behind a reverse proxy (nginx, Caddy) that enforces rate limits. Native rate-limiting is v1.1.
 - **Reviewer auth is identity-by-string.** `AYIRU_REVIEWER_REGISTRY` is a name allowlist; per-reviewer cryptographic identity (Ed25519 keys, signed reviews) is v1.1.
 
 ## Documentation
 
-- [Stage report](docs/stage_report.md) — per-stage audit with quality bar, pass cases, deferred items, and audit log
-- [Roadmap](ROADMAP.md) — what each stage exists to prove
-- [Product lock](docs/product_lock.md) — what Ayiru is, what it isn't, and the principles that hold for v1
+- [Stage report](docs/stage_report.md) — historical per-stage audit with quality bar, pass cases, deferred items, audit log
 - [Trust contract](docs/trust_contract.md) — claim taxonomy, evidence taxonomy, verification rules, risk semantics
-- [Demo scenarios](docs/demo_scenarios.md) — the headline queries the project promises to answer correctly
+- [Self-test results](docs/self_test_results.md) — headline-demo scoring history
 - [Contributing](CONTRIBUTING.md) — local setup, PR checklist, code style
-- [Security policy](SECURITY.md) — vulnerability reporting, what we treat as a vuln, disclosure timeline
+- [Security policy](SECURITY.md) — vulnerability reporting, what counts as a vuln, disclosure timeline
+- [SDK README](clients/python/README.md) — full method reference, async client, error handling, LangChain adapter
 
 ## Contributing
 
@@ -527,6 +516,7 @@ Non-negotiables for any PR:
 - Migrations stay reversible (`alembic downgrade -1` must work).
 - Contract changes are versioned (`*.v1.json` is locked; new versions get a new file).
 - Safety rules never weaken — never expand `allowed_commands`, never widen SSRF guards, never demote evidence-trust requirements.
+- Lockstep mirrors stay byte-identical: `diff contracts/*.json backend/app/contracts/*.json` must be empty.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the full PR checklist and [SECURITY.md](SECURITY.md) for the vulnerability-reporting path.
 
@@ -536,4 +526,4 @@ MIT — see [LICENSE](LICENSE).
 
 ## Acknowledgements
 
-Built on FastAPI, Pydantic v2, SQLAlchemy 2, Alembic, httpx, `openapi-spec-validator`, `jsonschema`, and `graphql-core`. The MCP protocol implementation follows the [Model Context Protocol](https://modelcontextprotocol.io/) specification.
+Built on FastAPI, Pydantic v2, SQLAlchemy 2, Alembic, httpx, `openapi-spec-validator`, `jsonschema`, `graphql-core`, and `fastembed` (ONNX-backed `BAAI/bge-small-en-v1.5` for semantic re-rank). The MCP protocol implementation follows the [Model Context Protocol](https://modelcontextprotocol.io/) specification.
