@@ -630,6 +630,41 @@
       ],
       "source_repositories": []
     },
+    "rsync-cli": {
+      "official_hosts": [
+        "download.samba.org",
+        "rsync.samba.org"
+      ],
+      "source_repositories": []
+    },
+    "rsync-config": {
+      "official_hosts": [
+        "download.samba.org",
+        "rsync.samba.org"
+      ],
+      "source_repositories": []
+    },
+    "rsync-protocols": {
+      "official_hosts": [
+        "download.samba.org",
+        "rsync.samba.org"
+      ],
+      "source_repositories": []
+    },
+    "rsync-recipes": {
+      "official_hosts": [
+        "download.samba.org",
+        "rsync.samba.org"
+      ],
+      "source_repositories": []
+    },
+    "rsync-errors": {
+      "official_hosts": [
+        "download.samba.org",
+        "rsync.samba.org"
+      ],
+      "source_repositories": []
+    },
     "jq": {
       "official_hosts": [
         "jqlang.org"

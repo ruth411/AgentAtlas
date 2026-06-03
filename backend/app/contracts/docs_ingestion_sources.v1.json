@@ -9444,6 +9444,36 @@
           "evidence_type": "official_docs"
         }
       ]
+    },
+    "rsync-cli": {
+      "sources": [
+        {
+          "url": "https://download.samba.org/pub/rsync/rsync.html",
+          "claim_type": "cli_command_exists",
+          "subject": "rsync (file transfer + sync) CLI reference",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "rsync-config": {
+      "sources": [
+        {
+          "url": "https://download.samba.org/pub/rsync/rsyncd.conf.html",
+          "claim_type": "cli_command_exists",
+          "subject": "rsyncd.conf (rsync daemon configuration)",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "rsync-protocols": {
+      "sources": [
+        {
+          "url": "https://download.samba.org/pub/rsync/rsync-ssl.html",
+          "claim_type": "cli_command_exists",
+          "subject": "rsync-ssl wrapper (TLS-protected rsync daemon)",
+          "evidence_type": "official_docs"
+        }
+      ]
     }
   }
 }

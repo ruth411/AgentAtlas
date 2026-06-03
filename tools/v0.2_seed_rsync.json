@@ -1,0 +1,22 @@
+{
+  "tools": [
+    {
+      "tool_id": "rsync-cli",
+      "urls": [
+        "https://download.samba.org/pub/rsync/rsync.html"
+      ]
+    },
+    {
+      "tool_id": "rsync-config",
+      "urls": [
+        "https://download.samba.org/pub/rsync/rsyncd.conf.html"
+      ]
+    },
+    {
+      "tool_id": "rsync-protocols",
+      "urls": [
+        "https://download.samba.org/pub/rsync/rsync-ssl.html"
+      ]
+    }
+  ]
+}
