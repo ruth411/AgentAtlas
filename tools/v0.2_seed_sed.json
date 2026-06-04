@@ -1,0 +1,36 @@
+{
+  "tools": [
+    {
+      "tool_id": "sed-cli",
+      "urls": [
+        "https://www.gnu.org/software/sed/manual/sed.html",
+        "https://www.gnu.org/software/sed/manual/html_node/index.html",
+        "https://www.gnu.org/software/sed/manual/html_node/Invoking-sed.html",
+        "https://www.gnu.org/software/sed/manual/html_node/Overview.html",
+        "https://www.gnu.org/software/sed/manual/html_node/sed-Program-Overview.html",
+        "https://www.gnu.org/software/sed/manual/html_node/sed-commands-list.html"
+      ]
+    },
+    {
+      "tool_id": "sed-language",
+      "urls": [
+        "https://www.gnu.org/software/sed/manual/html_node/Common-Commands.html",
+        "https://www.gnu.org/software/sed/manual/html_node/The-_0022s_0022-Command.html",
+        "https://www.gnu.org/software/sed/manual/html_node/Addresses.html",
+        "https://www.gnu.org/software/sed/manual/html_node/Other-Commands.html",
+        "https://www.gnu.org/software/sed/manual/html_node/Programming-Commands.html",
+        "https://www.gnu.org/software/sed/manual/html_node/Extended-Commands.html"
+      ]
+    },
+    {
+      "tool_id": "sed-regex",
+      "urls": [
+        "https://www.gnu.org/software/sed/manual/html_node/Regular-Expressions.html",
+        "https://www.gnu.org/software/sed/manual/html_node/BRE-vs-ERE.html",
+        "https://www.gnu.org/software/sed/manual/html_node/regexp-extensions.html",
+        "https://www.gnu.org/software/sed/manual/html_node/Back_002dreferences-and-Subexpressions.html",
+        "https://www.gnu.org/software/sed/manual/html_node/Character-Classes-and-Bracket-Expressions.html"
+      ]
+    }
+  ]
+}

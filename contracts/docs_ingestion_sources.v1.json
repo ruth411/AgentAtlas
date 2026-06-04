@@ -9750,6 +9750,120 @@
           "evidence_type": "official_docs"
         }
       ]
+    },
+    "sed-cli": {
+      "sources": [
+        {
+          "url": "https://www.gnu.org/software/sed/manual/sed.html",
+          "claim_type": "cli_command_exists",
+          "subject": "GNU sed manual (single-page)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/sed/manual/html_node/index.html",
+          "claim_type": "cli_command_exists",
+          "subject": "GNU sed manual (multi-page index)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/sed/manual/html_node/Invoking-sed.html",
+          "claim_type": "cli_command_exists",
+          "subject": "invoking sed (command-line options)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/sed/manual/html_node/Overview.html",
+          "claim_type": "cli_command_exists",
+          "subject": "sed overview",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/sed/manual/html_node/sed-Program-Overview.html",
+          "claim_type": "cli_command_exists",
+          "subject": "sed program overview",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/sed/manual/html_node/sed-commands-list.html",
+          "claim_type": "cli_command_exists",
+          "subject": "sed commands list reference",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "sed-language": {
+      "sources": [
+        {
+          "url": "https://www.gnu.org/software/sed/manual/html_node/Common-Commands.html",
+          "claim_type": "cli_command_exists",
+          "subject": "sed common commands (s, d, p, q)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/sed/manual/html_node/The-_0022s_0022-Command.html",
+          "claim_type": "cli_command_exists",
+          "subject": "sed `s` substitute command",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/sed/manual/html_node/Addresses.html",
+          "claim_type": "cli_command_exists",
+          "subject": "sed addresses (line ranges, patterns)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/sed/manual/html_node/Other-Commands.html",
+          "claim_type": "cli_command_exists",
+          "subject": "sed other commands (a, i, c, r, w, n, N)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/sed/manual/html_node/Programming-Commands.html",
+          "claim_type": "cli_command_exists",
+          "subject": "sed programming commands (b, t, :, =, hold/pattern space)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/sed/manual/html_node/Extended-Commands.html",
+          "claim_type": "cli_command_exists",
+          "subject": "sed extended commands (GNU extensions: T, F, Q, z, e)",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "sed-regex": {
+      "sources": [
+        {
+          "url": "https://www.gnu.org/software/sed/manual/html_node/Regular-Expressions.html",
+          "claim_type": "cli_command_exists",
+          "subject": "sed regular expressions overview",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/sed/manual/html_node/BRE-vs-ERE.html",
+          "claim_type": "cli_command_exists",
+          "subject": "sed BRE vs ERE (basic vs extended regex)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/sed/manual/html_node/regexp-extensions.html",
+          "claim_type": "cli_command_exists",
+          "subject": "sed GNU regex extensions",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/sed/manual/html_node/Back_002dreferences-and-Subexpressions.html",
+          "claim_type": "cli_command_exists",
+          "subject": "sed backreferences (\\1..\\9) + subexpressions",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://www.gnu.org/software/sed/manual/html_node/Character-Classes-and-Bracket-Expressions.html",
+          "claim_type": "cli_command_exists",
+          "subject": "sed character classes + bracket expressions",
+          "evidence_type": "official_docs"
+        }
+      ]
     }
   }
 }

@@ -753,6 +753,36 @@
       ],
       "source_repositories": []
     },
+    "sed-cli": {
+      "official_hosts": [
+        "www.gnu.org"
+      ],
+      "source_repositories": []
+    },
+    "sed-language": {
+      "official_hosts": [
+        "www.gnu.org"
+      ],
+      "source_repositories": []
+    },
+    "sed-regex": {
+      "official_hosts": [
+        "www.gnu.org"
+      ],
+      "source_repositories": []
+    },
+    "sed-recipes": {
+      "official_hosts": [
+        "www.gnu.org"
+      ],
+      "source_repositories": []
+    },
+    "sed-errors": {
+      "official_hosts": [
+        "www.gnu.org"
+      ],
+      "source_repositories": []
+    },
     "awk": {
       "official_hosts": [
         "www.gnu.org"
