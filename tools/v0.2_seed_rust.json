@@ -1,0 +1,63 @@
+{
+  "tools": [
+    {
+      "tool_id": "rust-cli",
+      "urls": [
+        "https://doc.rust-lang.org/rustc/",
+        "https://doc.rust-lang.org/rustc/command-line-arguments.html",
+        "https://doc.rust-lang.org/rustc/codegen-options/index.html",
+        "https://doc.rust-lang.org/rustc/lints/levels.html",
+        "https://rust-lang.github.io/rustup/",
+        "https://rust-lang.github.io/rustup/concepts/toolchains.html",
+        "https://rust-lang.github.io/rustup/concepts/channels.html",
+        "https://rust-lang.github.io/rustup/concepts/components.html",
+        "https://rust-lang.github.io/rustup/concepts/profiles.html",
+        "https://rust-lang.github.io/rustup/overrides.html",
+        "https://doc.rust-lang.org/edition-guide/",
+        "https://doc.rust-lang.org/rustdoc/"
+      ]
+    },
+    {
+      "tool_id": "rust-language",
+      "urls": [
+        "https://doc.rust-lang.org/book/",
+        "https://doc.rust-lang.org/book/ch04-00-understanding-ownership.html",
+        "https://doc.rust-lang.org/book/ch10-00-generics.html",
+        "https://doc.rust-lang.org/book/ch10-02-traits.html",
+        "https://doc.rust-lang.org/book/ch10-03-lifetime-syntax.html",
+        "https://doc.rust-lang.org/book/ch15-00-smart-pointers.html",
+        "https://doc.rust-lang.org/book/ch16-00-concurrency.html",
+        "https://doc.rust-lang.org/book/ch19-06-macros.html",
+        "https://doc.rust-lang.org/reference/",
+        "https://doc.rust-lang.org/reference/expressions.html",
+        "https://doc.rust-lang.org/reference/types.html",
+        "https://doc.rust-lang.org/reference/lifetime-elision.html"
+      ]
+    },
+    {
+      "tool_id": "rust-stdlib",
+      "urls": [
+        "https://doc.rust-lang.org/std/",
+        "https://doc.rust-lang.org/std/option/",
+        "https://doc.rust-lang.org/std/result/",
+        "https://doc.rust-lang.org/std/vec/struct.Vec.html",
+        "https://doc.rust-lang.org/std/collections/struct.HashMap.html",
+        "https://doc.rust-lang.org/std/collections/struct.BTreeMap.html",
+        "https://doc.rust-lang.org/std/string/struct.String.html",
+        "https://doc.rust-lang.org/std/boxed/struct.Box.html",
+        "https://doc.rust-lang.org/std/rc/struct.Rc.html",
+        "https://doc.rust-lang.org/std/sync/struct.Arc.html",
+        "https://doc.rust-lang.org/std/sync/struct.Mutex.html",
+        "https://doc.rust-lang.org/std/sync/struct.RwLock.html",
+        "https://doc.rust-lang.org/std/cell/struct.RefCell.html",
+        "https://doc.rust-lang.org/std/cell/struct.Cell.html",
+        "https://doc.rust-lang.org/std/io/index.html",
+        "https://doc.rust-lang.org/std/fs/index.html",
+        "https://doc.rust-lang.org/std/process/index.html",
+        "https://doc.rust-lang.org/std/thread/index.html",
+        "https://doc.rust-lang.org/std/iter/trait.Iterator.html",
+        "https://doc.rust-lang.org/std/error/trait.Error.html"
+      ]
+    }
+  ]
+}

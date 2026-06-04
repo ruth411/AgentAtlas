@@ -552,6 +552,41 @@
       ],
       "source_repositories": []
     },
+    "rust-cli": {
+      "official_hosts": [
+        "doc.rust-lang.org",
+        "rust-lang.github.io",
+        "www.rust-lang.org"
+      ],
+      "source_repositories": []
+    },
+    "rust-language": {
+      "official_hosts": [
+        "doc.rust-lang.org",
+        "rust-lang.github.io"
+      ],
+      "source_repositories": []
+    },
+    "rust-stdlib": {
+      "official_hosts": [
+        "doc.rust-lang.org"
+      ],
+      "source_repositories": []
+    },
+    "rust-recipes": {
+      "official_hosts": [
+        "doc.rust-lang.org",
+        "rust-lang.github.io"
+      ],
+      "source_repositories": []
+    },
+    "rust-errors": {
+      "official_hosts": [
+        "doc.rust-lang.org",
+        "rust-lang.github.io"
+      ],
+      "source_repositories": []
+    },
     "postgresql-cli": {
       "official_hosts": [
         "www.postgresql.org"

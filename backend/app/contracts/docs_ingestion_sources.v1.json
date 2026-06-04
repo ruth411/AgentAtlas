@@ -9474,6 +9474,282 @@
           "evidence_type": "official_docs"
         }
       ]
+    },
+    "rust-cli": {
+      "sources": [
+        {
+          "url": "https://doc.rust-lang.org/rustc/",
+          "claim_type": "cli_command_exists",
+          "subject": "rustc compiler reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/rustc/command-line-arguments.html",
+          "claim_type": "cli_command_exists",
+          "subject": "rustc command-line arguments",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/rustc/codegen-options/index.html",
+          "claim_type": "cli_command_exists",
+          "subject": "rustc -C codegen options",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/rustc/lints/levels.html",
+          "claim_type": "cli_command_exists",
+          "subject": "rustc lint levels (allow/warn/deny/forbid)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://rust-lang.github.io/rustup/",
+          "claim_type": "cli_command_exists",
+          "subject": "rustup toolchain manager",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://rust-lang.github.io/rustup/concepts/toolchains.html",
+          "claim_type": "cli_command_exists",
+          "subject": "rustup toolchains concept",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://rust-lang.github.io/rustup/concepts/channels.html",
+          "claim_type": "cli_command_exists",
+          "subject": "rustup channels (stable/beta/nightly)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://rust-lang.github.io/rustup/concepts/components.html",
+          "claim_type": "cli_command_exists",
+          "subject": "rustup components (clippy, rustfmt, rust-analyzer)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://rust-lang.github.io/rustup/concepts/profiles.html",
+          "claim_type": "cli_command_exists",
+          "subject": "rustup profiles (default/minimal/complete)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://rust-lang.github.io/rustup/overrides.html",
+          "claim_type": "cli_command_exists",
+          "subject": "rustup directory overrides + rust-toolchain.toml",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/edition-guide/",
+          "claim_type": "cli_command_exists",
+          "subject": "Rust edition guide (2015/2018/2021/2024)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/rustdoc/",
+          "claim_type": "cli_command_exists",
+          "subject": "rustdoc \u2014 Rust documentation generator",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "rust-language": {
+      "sources": [
+        {
+          "url": "https://doc.rust-lang.org/book/",
+          "claim_type": "cli_command_exists",
+          "subject": "The Rust Programming Language book",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/book/ch04-00-understanding-ownership.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Rust ownership + borrowing rules",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/book/ch10-00-generics.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Rust generics overview",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/book/ch10-02-traits.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Rust traits (interfaces)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/book/ch10-03-lifetime-syntax.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Rust lifetimes syntax",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/book/ch15-00-smart-pointers.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Rust smart pointers (Box/Rc/RefCell)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/book/ch16-00-concurrency.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Rust fearless concurrency",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/book/ch19-06-macros.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Rust macros (declarative + procedural)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/reference/",
+          "claim_type": "cli_command_exists",
+          "subject": "Rust language reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/reference/expressions.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Rust expressions reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/reference/types.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Rust types reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/reference/lifetime-elision.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Rust lifetime elision rules",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "rust-stdlib": {
+      "sources": [
+        {
+          "url": "https://doc.rust-lang.org/std/",
+          "claim_type": "cli_command_exists",
+          "subject": "Rust standard library overview",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/std/option/",
+          "claim_type": "cli_command_exists",
+          "subject": "std::option (Option<T>)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/std/result/",
+          "claim_type": "cli_command_exists",
+          "subject": "std::result (Result<T,E>)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/std/vec/struct.Vec.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Vec<T> \u2014 growable array",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/std/collections/struct.HashMap.html",
+          "claim_type": "cli_command_exists",
+          "subject": "HashMap<K,V> \u2014 hash table",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/std/collections/struct.BTreeMap.html",
+          "claim_type": "cli_command_exists",
+          "subject": "BTreeMap<K,V> \u2014 ordered map",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/std/string/struct.String.html",
+          "claim_type": "cli_command_exists",
+          "subject": "String \u2014 owned UTF-8",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/std/boxed/struct.Box.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Box<T> \u2014 heap allocation",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/std/rc/struct.Rc.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Rc<T> \u2014 single-threaded reference counting",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/std/sync/struct.Arc.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Arc<T> \u2014 thread-safe reference counting",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/std/sync/struct.Mutex.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Mutex<T> \u2014 mutual exclusion",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/std/sync/struct.RwLock.html",
+          "claim_type": "cli_command_exists",
+          "subject": "RwLock<T> \u2014 multiple-reader single-writer lock",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/std/cell/struct.RefCell.html",
+          "claim_type": "cli_command_exists",
+          "subject": "RefCell<T> \u2014 interior mutability (runtime borrow check)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/std/cell/struct.Cell.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Cell<T> \u2014 interior mutability (Copy types)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/std/io/index.html",
+          "claim_type": "cli_command_exists",
+          "subject": "std::io \u2014 I/O traits + helpers",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/std/fs/index.html",
+          "claim_type": "cli_command_exists",
+          "subject": "std::fs \u2014 filesystem operations",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/std/process/index.html",
+          "claim_type": "cli_command_exists",
+          "subject": "std::process \u2014 child processes + exit",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/std/thread/index.html",
+          "claim_type": "cli_command_exists",
+          "subject": "std::thread \u2014 OS-thread spawning",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/std/iter/trait.Iterator.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Iterator trait + adapters",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://doc.rust-lang.org/std/error/trait.Error.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Error trait (std::error::Error)",
+          "evidence_type": "official_docs"
+        }
+      ]
     }
   }
 }
