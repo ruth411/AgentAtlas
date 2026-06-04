@@ -1076,6 +1076,30 @@
       ],
       "source_repositories": []
     },
+    "supabase-config": {
+      "official_hosts": [
+        "supabase.com"
+      ],
+      "source_repositories": []
+    },
+    "supabase-db": {
+      "official_hosts": [
+        "supabase.com"
+      ],
+      "source_repositories": []
+    },
+    "supabase-recipes": {
+      "official_hosts": [
+        "supabase.com"
+      ],
+      "source_repositories": []
+    },
+    "supabase-errors": {
+      "official_hosts": [
+        "supabase.com"
+      ],
+      "source_repositories": []
+    },
     "fly-cli": {
       "official_hosts": [
         "fly.io"

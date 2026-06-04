@@ -790,7 +790,127 @@
         {
           "url": "https://supabase.com/docs/reference/cli/introduction",
           "claim_type": "cli_command_exists",
-          "subject": "supabase",
+          "subject": "supabase CLI introduction",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/reference/cli/installing-and-updating",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase CLI install + update",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/reference/cli/supabase-init",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase init (scaffold a project)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/reference/cli/supabase-login",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase login (authenticate to Supabase Cloud)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/reference/cli/supabase-link",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase link (link local to cloud project)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/reference/cli/supabase-start",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase start (run local stack via Docker)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/reference/cli/supabase-stop",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase stop (shut down local stack)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/reference/cli/supabase-status",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase status (show local-stack info)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/reference/cli/supabase-projects-list",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase projects list (cloud projects)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/reference/cli/supabase-projects-create",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase projects create",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/reference/cli/supabase-secrets-set",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase secrets set (function env vars)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/reference/cli/supabase-secrets-list",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase secrets list",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/reference/cli/supabase-functions-new",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase functions new (scaffold edge function)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/reference/cli/supabase-functions-serve",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase functions serve (run locally)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/reference/cli/supabase-functions-deploy",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase functions deploy",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/reference/cli/supabase-functions-list",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase functions list",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/reference/cli/supabase-functions-delete",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase functions delete",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/reference/cli/supabase-gen-types",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase gen types (generate TypeScript types)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/reference/cli/supabase-storage-cp",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase storage cp (copy files to/from buckets)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/reference/cli/supabase-storage-ls",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase storage ls (list bucket contents)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/reference/cli/supabase-storage-rm",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase storage rm (remove from bucket)",
           "evidence_type": "official_docs"
         }
       ]
@@ -10125,6 +10245,98 @@
           "url": "https://man.openbsd.org/ssh-keygen.1",
           "claim_type": "cli_command_exists",
           "subject": "ssh-keygen (key generation, fingerprints, conversions)",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "supabase-config": {
+      "sources": [
+        {
+          "url": "https://supabase.com/docs/guides/local-development",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase local development overview",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/guides/local-development/cli/config",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase config.toml reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/guides/local-development/cli/getting-started",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase CLI getting started",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "supabase-db": {
+      "sources": [
+        {
+          "url": "https://supabase.com/docs/reference/cli/supabase-db-pull",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase db pull (sync remote schema down)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/reference/cli/supabase-db-push",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase db push (apply local migrations to remote)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/reference/cli/supabase-db-reset",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase db reset (wipe + re-apply migrations)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/reference/cli/supabase-db-diff",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase db diff (generate migration from schema changes)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/reference/cli/supabase-db-dump",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase db dump (pg_dump for Supabase)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/reference/cli/supabase-db-lint",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase db lint (find issues in schema)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/reference/cli/supabase-migration-new",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase migration new (create migration file)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/reference/cli/supabase-migration-up",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase migration up (apply pending migrations)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/reference/cli/supabase-migration-list",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase migration list",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/reference/cli/supabase-migration-repair",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase migration repair",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://supabase.com/docs/reference/cli/supabase-seed-buckets",
+          "claim_type": "cli_command_exists",
+          "subject": "supabase seed buckets",
           "evidence_type": "official_docs"
         }
       ]

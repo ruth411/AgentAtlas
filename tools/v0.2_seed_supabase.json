@@ -1,0 +1,54 @@
+{
+  "tools": [
+    {
+      "tool_id": "supabase-cli",
+      "urls": [
+        "https://supabase.com/docs/reference/cli/introduction",
+        "https://supabase.com/docs/reference/cli/installing-and-updating",
+        "https://supabase.com/docs/reference/cli/supabase-init",
+        "https://supabase.com/docs/reference/cli/supabase-login",
+        "https://supabase.com/docs/reference/cli/supabase-link",
+        "https://supabase.com/docs/reference/cli/supabase-start",
+        "https://supabase.com/docs/reference/cli/supabase-stop",
+        "https://supabase.com/docs/reference/cli/supabase-status",
+        "https://supabase.com/docs/reference/cli/supabase-projects-list",
+        "https://supabase.com/docs/reference/cli/supabase-projects-create",
+        "https://supabase.com/docs/reference/cli/supabase-secrets-set",
+        "https://supabase.com/docs/reference/cli/supabase-secrets-list",
+        "https://supabase.com/docs/reference/cli/supabase-functions-new",
+        "https://supabase.com/docs/reference/cli/supabase-functions-serve",
+        "https://supabase.com/docs/reference/cli/supabase-functions-deploy",
+        "https://supabase.com/docs/reference/cli/supabase-functions-list",
+        "https://supabase.com/docs/reference/cli/supabase-functions-delete",
+        "https://supabase.com/docs/reference/cli/supabase-gen-types",
+        "https://supabase.com/docs/reference/cli/supabase-storage-cp",
+        "https://supabase.com/docs/reference/cli/supabase-storage-ls",
+        "https://supabase.com/docs/reference/cli/supabase-storage-rm"
+      ]
+    },
+    {
+      "tool_id": "supabase-config",
+      "urls": [
+        "https://supabase.com/docs/guides/local-development",
+        "https://supabase.com/docs/guides/local-development/cli/config",
+        "https://supabase.com/docs/guides/local-development/cli/getting-started"
+      ]
+    },
+    {
+      "tool_id": "supabase-db",
+      "urls": [
+        "https://supabase.com/docs/reference/cli/supabase-db-pull",
+        "https://supabase.com/docs/reference/cli/supabase-db-push",
+        "https://supabase.com/docs/reference/cli/supabase-db-reset",
+        "https://supabase.com/docs/reference/cli/supabase-db-diff",
+        "https://supabase.com/docs/reference/cli/supabase-db-dump",
+        "https://supabase.com/docs/reference/cli/supabase-db-lint",
+        "https://supabase.com/docs/reference/cli/supabase-migration-new",
+        "https://supabase.com/docs/reference/cli/supabase-migration-up",
+        "https://supabase.com/docs/reference/cli/supabase-migration-list",
+        "https://supabase.com/docs/reference/cli/supabase-migration-repair",
+        "https://supabase.com/docs/reference/cli/supabase-seed-buckets"
+      ]
+    }
+  ]
+}
