@@ -9864,6 +9864,198 @@
           "evidence_type": "official_docs"
         }
       ]
+    },
+    "sqlite3-cli": {
+      "sources": [
+        {
+          "url": "https://sqlite.org/cli.html",
+          "claim_type": "cli_command_exists",
+          "subject": "sqlite3 CLI shell (dot-commands + invocation)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://sqlite.org/backup.html",
+          "claim_type": "cli_command_exists",
+          "subject": "sqlite3 backup API + online backup",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://sqlite.org/limits.html",
+          "claim_type": "cli_command_exists",
+          "subject": "sqlite3 hard + soft limits",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "sqlite3-sql": {
+      "sources": [
+        {
+          "url": "https://sqlite.org/lang.html",
+          "claim_type": "cli_command_exists",
+          "subject": "sqlite3 SQL language overview",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://sqlite.org/lang_select.html",
+          "claim_type": "cli_command_exists",
+          "subject": "SELECT statement reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://sqlite.org/lang_insert.html",
+          "claim_type": "cli_command_exists",
+          "subject": "INSERT statement reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://sqlite.org/lang_update.html",
+          "claim_type": "cli_command_exists",
+          "subject": "UPDATE statement reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://sqlite.org/lang_delete.html",
+          "claim_type": "cli_command_exists",
+          "subject": "DELETE statement reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://sqlite.org/lang_createtable.html",
+          "claim_type": "cli_command_exists",
+          "subject": "CREATE TABLE reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://sqlite.org/lang_altertable.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ALTER TABLE reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://sqlite.org/lang_droptable.html",
+          "claim_type": "cli_command_exists",
+          "subject": "DROP TABLE reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://sqlite.org/lang_createindex.html",
+          "claim_type": "cli_command_exists",
+          "subject": "CREATE INDEX reference",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://sqlite.org/lang_attach.html",
+          "claim_type": "cli_command_exists",
+          "subject": "ATTACH DATABASE (multi-database)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://sqlite.org/lang_transaction.html",
+          "claim_type": "cli_command_exists",
+          "subject": "BEGIN / COMMIT / ROLLBACK transactions",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://sqlite.org/lang_savepoint.html",
+          "claim_type": "cli_command_exists",
+          "subject": "SAVEPOINT (nested transactions)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://sqlite.org/lang_upsert.html",
+          "claim_type": "cli_command_exists",
+          "subject": "INSERT ... ON CONFLICT (UPSERT)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://sqlite.org/lang_explain.html",
+          "claim_type": "cli_command_exists",
+          "subject": "EXPLAIN + EXPLAIN QUERY PLAN",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://sqlite.org/lang_with.html",
+          "claim_type": "cli_command_exists",
+          "subject": "WITH clause (Common Table Expressions)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://sqlite.org/lang_vacuum.html",
+          "claim_type": "cli_command_exists",
+          "subject": "VACUUM (defragment + reclaim space)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://sqlite.org/lang_corefunc.html",
+          "claim_type": "cli_command_exists",
+          "subject": "core scalar functions (abs, coalesce, ifnull, length)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://sqlite.org/lang_datefunc.html",
+          "claim_type": "cli_command_exists",
+          "subject": "date/time functions (datetime, strftime, julianday)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://sqlite.org/lang_aggfunc.html",
+          "claim_type": "cli_command_exists",
+          "subject": "aggregate functions (sum, avg, count, group_concat)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://sqlite.org/windowfunctions.html",
+          "claim_type": "cli_command_exists",
+          "subject": "window functions (OVER, PARTITION BY, ROW_NUMBER)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://sqlite.org/datatype3.html",
+          "claim_type": "cli_command_exists",
+          "subject": "sqlite3 type system (storage classes, type affinity)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://sqlite.org/lang_naming.html",
+          "claim_type": "cli_command_exists",
+          "subject": "identifier naming + quoting rules",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://sqlite.org/json1.html",
+          "claim_type": "cli_command_exists",
+          "subject": "JSON1 extension (json_extract, ->, ->>)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://sqlite.org/fts5.html",
+          "claim_type": "cli_command_exists",
+          "subject": "FTS5 full-text search extension",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://sqlite.org/rtree.html",
+          "claim_type": "cli_command_exists",
+          "subject": "R*Tree spatial index extension",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "sqlite3-pragmas": {
+      "sources": [
+        {
+          "url": "https://sqlite.org/pragma.html",
+          "claim_type": "cli_command_exists",
+          "subject": "PRAGMA statements reference (foreign_keys, journal_mode, cache_size)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://sqlite.org/wal.html",
+          "claim_type": "cli_command_exists",
+          "subject": "Write-Ahead Logging (WAL) mode",
+          "evidence_type": "official_docs"
+        }
+      ]
     }
   }
 }

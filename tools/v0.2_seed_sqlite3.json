@@ -1,0 +1,49 @@
+{
+  "tools": [
+    {
+      "tool_id": "sqlite3-cli",
+      "urls": [
+        "https://sqlite.org/cli.html",
+        "https://sqlite.org/backup.html",
+        "https://sqlite.org/limits.html"
+      ]
+    },
+    {
+      "tool_id": "sqlite3-sql",
+      "urls": [
+        "https://sqlite.org/lang.html",
+        "https://sqlite.org/lang_select.html",
+        "https://sqlite.org/lang_insert.html",
+        "https://sqlite.org/lang_update.html",
+        "https://sqlite.org/lang_delete.html",
+        "https://sqlite.org/lang_createtable.html",
+        "https://sqlite.org/lang_altertable.html",
+        "https://sqlite.org/lang_droptable.html",
+        "https://sqlite.org/lang_createindex.html",
+        "https://sqlite.org/lang_attach.html",
+        "https://sqlite.org/lang_transaction.html",
+        "https://sqlite.org/lang_savepoint.html",
+        "https://sqlite.org/lang_upsert.html",
+        "https://sqlite.org/lang_explain.html",
+        "https://sqlite.org/lang_with.html",
+        "https://sqlite.org/lang_vacuum.html",
+        "https://sqlite.org/lang_corefunc.html",
+        "https://sqlite.org/lang_datefunc.html",
+        "https://sqlite.org/lang_aggfunc.html",
+        "https://sqlite.org/windowfunctions.html",
+        "https://sqlite.org/datatype3.html",
+        "https://sqlite.org/lang_naming.html",
+        "https://sqlite.org/json1.html",
+        "https://sqlite.org/fts5.html",
+        "https://sqlite.org/rtree.html"
+      ]
+    },
+    {
+      "tool_id": "sqlite3-pragmas",
+      "urls": [
+        "https://sqlite.org/pragma.html",
+        "https://sqlite.org/wal.html"
+      ]
+    }
+  ]
+}

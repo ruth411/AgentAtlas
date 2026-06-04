@@ -641,6 +641,41 @@
       ],
       "source_repositories": []
     },
+    "sqlite3-cli": {
+      "official_hosts": [
+        "sqlite.org",
+        "www.sqlite.org"
+      ],
+      "source_repositories": []
+    },
+    "sqlite3-sql": {
+      "official_hosts": [
+        "sqlite.org",
+        "www.sqlite.org"
+      ],
+      "source_repositories": []
+    },
+    "sqlite3-pragmas": {
+      "official_hosts": [
+        "sqlite.org",
+        "www.sqlite.org"
+      ],
+      "source_repositories": []
+    },
+    "sqlite3-recipes": {
+      "official_hosts": [
+        "sqlite.org",
+        "www.sqlite.org"
+      ],
+      "source_repositories": []
+    },
+    "sqlite3-errors": {
+      "official_hosts": [
+        "sqlite.org",
+        "www.sqlite.org"
+      ],
+      "source_repositories": []
+    },
     "curl": {
       "official_hosts": [
         "curl.se"
