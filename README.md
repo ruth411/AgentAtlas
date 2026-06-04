@@ -478,21 +478,17 @@ Plus thin-coverage entries carried from earlier seeding: `terraform`, `vercel`, 
 
 ```mermaid
 flowchart LR
-    subgraph Sources["Sources"]
-        CLI["CLI --help"]
-        DOCS["Official Docs"]
-        OAS["OpenAPI"]
-        MCP["MCP Servers"]
-    end
+    CLI[CLI help]
+    DOCS[Official Docs]
+    OAS[OpenAPI]
+    MCP[MCP Servers]
 
-    subgraph Engine["Orchestrator"]
-        ORCH["Validate / Dedup / Conflicts"]
-        RISK["Risk engine"]
-        CONF["Confidence scoring"]
-    end
+    ORCH[Orchestrator]
+    RISK[Risk engine]
+    CONF[Confidence scoring]
 
-    GRAPH[("Knowledge graph<br/>2,800+ cited claims")]
-    AGENT["AI Agent"]
+    GRAPH[(Knowledge graph)]
+    AGENT[AI Agent]
 
     CLI --> ORCH
     DOCS --> ORCH
@@ -503,8 +499,8 @@ flowchart LR
     ORCH --> CONF
     ORCH --> GRAPH
 
-    AGENT -->|"ask / validate / search"| GRAPH
-    GRAPH -->|"cited answer + verdict"| AGENT
+    AGENT -->|ask| GRAPH
+    GRAPH -->|cited answer| AGENT
 ```
 
 **Six ingestion lanes** pull evidence from trusted sources. A **deterministic orchestrator** validates schema, classifies risk, scores confidence, deduplicates, and detects conflicts. Accepted claims compile into canonical `ToolSpec` records. A **runtime sandbox** verifies safe checks (e.g. `git --version`) and promotes claims. **Agents query the result.**
