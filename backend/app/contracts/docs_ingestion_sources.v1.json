@@ -10056,6 +10056,78 @@
           "evidence_type": "official_docs"
         }
       ]
+    },
+    "ssh-cli": {
+      "sources": [
+        {
+          "url": "https://man.openbsd.org/ssh.1",
+          "claim_type": "cli_command_exists",
+          "subject": "ssh (OpenSSH client)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://man.openbsd.org/scp.1",
+          "claim_type": "cli_command_exists",
+          "subject": "scp (secure copy over SSH)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://man.openbsd.org/sftp.1",
+          "claim_type": "cli_command_exists",
+          "subject": "sftp (secure file transfer)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://man.openbsd.org/ssh-add.1",
+          "claim_type": "cli_command_exists",
+          "subject": "ssh-add (add identities to ssh-agent)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://man.openbsd.org/ssh-agent.1",
+          "claim_type": "cli_command_exists",
+          "subject": "ssh-agent (authentication agent)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://man.openbsd.org/ssh-keyscan.1",
+          "claim_type": "cli_command_exists",
+          "subject": "ssh-keyscan (gather public host keys)",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "ssh-config": {
+      "sources": [
+        {
+          "url": "https://man.openbsd.org/ssh_config.5",
+          "claim_type": "cli_command_exists",
+          "subject": "ssh_config (client configuration)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://man.openbsd.org/sshd_config.5",
+          "claim_type": "cli_command_exists",
+          "subject": "sshd_config (server configuration)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://man.openbsd.org/sshd.8",
+          "claim_type": "cli_command_exists",
+          "subject": "sshd (OpenSSH server daemon)",
+          "evidence_type": "official_docs"
+        }
+      ]
+    },
+    "ssh-keys": {
+      "sources": [
+        {
+          "url": "https://man.openbsd.org/ssh-keygen.1",
+          "claim_type": "cli_command_exists",
+          "subject": "ssh-keygen (key generation, fingerprints, conversions)",
+          "evidence_type": "official_docs"
+        }
+      ]
     }
   }
 }

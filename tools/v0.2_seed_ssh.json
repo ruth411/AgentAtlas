@@ -1,0 +1,29 @@
+{
+  "tools": [
+    {
+      "tool_id": "ssh-cli",
+      "urls": [
+        "https://man.openbsd.org/ssh.1",
+        "https://man.openbsd.org/scp.1",
+        "https://man.openbsd.org/sftp.1",
+        "https://man.openbsd.org/ssh-add.1",
+        "https://man.openbsd.org/ssh-agent.1",
+        "https://man.openbsd.org/ssh-keyscan.1"
+      ]
+    },
+    {
+      "tool_id": "ssh-config",
+      "urls": [
+        "https://man.openbsd.org/ssh_config.5",
+        "https://man.openbsd.org/sshd_config.5",
+        "https://man.openbsd.org/sshd.8"
+      ]
+    },
+    {
+      "tool_id": "ssh-keys",
+      "urls": [
+        "https://man.openbsd.org/ssh-keygen.1"
+      ]
+    }
+  ]
+}

@@ -694,6 +694,36 @@
       ],
       "source_repositories": []
     },
+    "ssh-cli": {
+      "official_hosts": [
+        "man.openbsd.org"
+      ],
+      "source_repositories": []
+    },
+    "ssh-config": {
+      "official_hosts": [
+        "man.openbsd.org"
+      ],
+      "source_repositories": []
+    },
+    "ssh-keys": {
+      "official_hosts": [
+        "man.openbsd.org"
+      ],
+      "source_repositories": []
+    },
+    "ssh-recipes": {
+      "official_hosts": [
+        "man.openbsd.org"
+      ],
+      "source_repositories": []
+    },
+    "ssh-errors": {
+      "official_hosts": [
+        "man.openbsd.org"
+      ],
+      "source_repositories": []
+    },
     "rsync": {
       "official_hosts": [
         "download.samba.org"
