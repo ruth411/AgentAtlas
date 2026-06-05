@@ -282,21 +282,64 @@ class QueryEngine:
         if tool_id_hint is not None:
             normalized_hint = tool_id_hint.strip().lower() or None
 
+        # Resolve coarse hints (e.g. "ffmpeg") to the surface-decomposed
+        # tool_ids that actually exist in the graph (ffmpeg-cli /
+        # ffmpeg-recipes / …). Returns the original hint unchanged when
+        # it matches an existing tool_id exactly, or the empty list when
+        # nothing matches at all (preserves the "honest miss" path).
+        effective_tool_ids = self._resolve_tool_id_hint(normalized_hint)
+
         # Stage 19: pull both ACCEPTED (curated, full-orchestrator-blessed)
         # claims AND PENDING claims (uncurated L0 state — Stage 20's bulk
         # ingest lands here). REJECTED / CONFLICT_DETECTED claims are
         # excluded downstream via the latest-verification lookup so the
         # matcher never surfaces "the orchestrator said no" content.
         # validate_command stays strict — it requires L2+ via command_matcher.
-        candidates = _paginate_all(
-            lambda lim, off: self._store.list(
-                tool_id=normalized_hint,
-                limit=lim,
-                offset=off,
-            ),
-            page_size=int(_query_policy()["default_search_limit"]),
-            hard_cap=10_000,
-        )
+        if effective_tool_ids is None:
+            # No hint — fetch everything.
+            candidates = _paginate_all(
+                lambda lim, off: self._store.list(
+                    tool_id=None,
+                    limit=lim,
+                    offset=off,
+                ),
+                page_size=int(_query_policy()["default_search_limit"]),
+                hard_cap=10_000,
+            )
+        elif len(effective_tool_ids) == 0:
+            # Hint given but matched nothing — force-miss. Don't widen
+            # to the whole graph; the caller explicitly asked for a
+            # tool that doesn't exist.
+            candidates = []
+        elif len(effective_tool_ids) == 1:
+            # Exact tool_id match — push the filter into the SQL layer.
+            candidates = _paginate_all(
+                lambda lim, off: self._store.list(
+                    tool_id=effective_tool_ids[0],
+                    limit=lim,
+                    offset=off,
+                ),
+                page_size=int(_query_policy()["default_search_limit"]),
+                hard_cap=10_000,
+            )
+        else:
+            # Multi-surface expansion — union of all surfaces for the
+            # given family. Fetch each separately and concatenate; per-
+            # surface counts are small (typically 5–50 claims) so this
+            # stays well under the 10k hard cap.
+            candidates = []
+            for surface_id in effective_tool_ids:
+                candidates.extend(
+                    _paginate_all(
+                        lambda lim, off, sid=surface_id: self._store.list(
+                            tool_id=sid,
+                            limit=lim,
+                            offset=off,
+                        ),
+                        page_size=int(_query_policy()["default_search_limit"]),
+                        hard_cap=10_000,
+                    )
+                )
 
         # Stage 19: uncurated tools (not in the v2 contract's curated set)
         # surface with a marker in match_reason so the caller can tell
@@ -383,6 +426,49 @@ class QueryEngine:
             estimated_tokens_saved=estimated_savings,
             generated_at=generated_at,
         )
+
+    def _resolve_tool_id_hint(
+        self,
+        normalized_hint: str | None,
+    ) -> list[str] | None:
+        """Resolve a coarse ``tool_id_hint`` to the surface tool_ids that
+        actually exist in the graph.
+
+        The Stage 20 five-surface decomposition split monolithic tools
+        like ``ffmpeg`` into ``ffmpeg-cli``, ``ffmpeg-config``,
+        ``ffmpeg-filters``, ``ffmpeg-recipes``, ``ffmpeg-errors``. MCP
+        clients (and humans) naturally hint with the family name; before
+        this expansion the matcher would filter to zero claims and miss.
+
+        Return value semantics (four distinct states):
+          * ``None`` — no hint given. Caller should fetch unfiltered.
+          * ``[]`` — hint was given but matched no existing tool_id
+            and no surface prefix. Caller must force a miss: an
+            explicit hint at an unknown tool should not silently widen
+            to the whole graph.
+          * ``[exact_id]`` — the hint matched an existing tool_id
+            directly. Caller pushes the single-id filter into SQL.
+          * ``[id1, id2, ...]`` — the hint was a family prefix that
+            expanded to multiple surfaces. Caller unions the
+            per-surface candidate lists.
+
+        Resolution order:
+          1. Exact match on an existing tool_id → ``[hint]``.
+          2. Prefix match of ``<hint>-*`` against existing tool_ids →
+             the matched surface list.
+          3. No match → ``[]`` (force-miss).
+        """
+        if normalized_hint is None:
+            return None
+        existing = set(self._store.list_distinct_tool_ids())
+        if normalized_hint in existing:
+            return [normalized_hint]
+        prefix = f"{normalized_hint}-"
+        matching = sorted(t for t in existing if t.startswith(prefix))
+        if matching:
+            return matching
+        # Hint given but no exact or prefix match — honest miss.
+        return []
 
     def _semantic_rerank(
         self,

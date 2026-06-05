@@ -438,6 +438,90 @@ def test_ask_tool_id_hint_narrows_to_one_tool(
     assert response.answers[0].claim_id == target.claim_id
 
 
+def test_ask_tool_id_hint_expands_family_to_surfaces(
+    engine: QueryEngine, store: ClaimStore
+) -> None:
+    """A coarse hint like 'ffmpeg' (no exact match) must expand to all
+    surface tool_ids whose name starts with 'ffmpeg-' — otherwise the
+    Stage-20 five-surface decomposition silently breaks MCP clients
+    that hint with the family name."""
+    target_cli = _add_claim(
+        store,
+        subject="ffmpeg trim video",
+        statement="ffmpeg -ss start -to end -c copy out.mp4 trims without re-encode.",
+        tool_id="ffmpeg-cli",
+    )
+    target_recipes = _add_claim(
+        store,
+        subject="ffmpeg recipe: trim without re-encoding",
+        statement="Cut a clip instantly with -c copy — see trim recipe.",
+        tool_id="ffmpeg-recipes",
+    )
+    # Different family — must NOT surface under the ffmpeg hint.
+    _add_claim(
+        store,
+        subject="docker trim image layers",
+        statement="strong lexical match on 'trim' but wrong family.",
+        tool_id="docker-cli",
+    )
+
+    response = engine.ask(question="trim video without re-encode", tool_id_hint="ffmpeg")
+
+    assert response.fallback_recommended is False
+    surfaced_ids = {a.tool_id for a in response.answers}
+    assert surfaced_ids <= {"ffmpeg-cli", "ffmpeg-recipes"}
+    surfaced_claim_ids = {a.claim_id for a in response.answers}
+    assert {target_cli.claim_id, target_recipes.claim_id} & surfaced_claim_ids
+
+
+def test_ask_tool_id_hint_exact_match_takes_precedence_over_prefix(
+    engine: QueryEngine, store: ClaimStore
+) -> None:
+    """If a tool_id matches the hint exactly, the matcher must use it
+    directly — don't try to prefix-expand and pull in unrelated
+    surfaces like 'docker-cli' when 'docker' itself exists."""
+    target = _add_claim(
+        store,
+        subject="docker rm",
+        statement="exact-tool-id claim.",
+        tool_id="docker",
+    )
+    _add_claim(
+        store,
+        subject="docker-cli rm",
+        statement="surface-tool-id claim.",
+        tool_id="docker-cli",
+    )
+
+    response = engine.ask(question="docker rm container", tool_id_hint="docker")
+
+    assert response.fallback_recommended is False
+    assert all(a.tool_id == "docker" for a in response.answers)
+    assert response.answers[0].claim_id == target.claim_id
+
+
+def test_ask_tool_id_hint_unknown_returns_honest_miss(
+    engine: QueryEngine, store: ClaimStore
+) -> None:
+    """Hint that matches no existing tool_id and no surface prefix
+    must NOT silently widen to the whole graph — return the standard
+    miss so the caller can fall back to web_search."""
+    _add_claim(
+        store,
+        subject="docker rm",
+        statement="some real claim — should not surface for an unrelated hint.",
+        tool_id="docker-cli",
+    )
+
+    response = engine.ask(
+        question="how do I deploy to mythical-tool",
+        tool_id_hint="mythical-tool",
+    )
+
+    assert response.fallback_recommended is True
+    assert response.answers == []
+
+
 # ---------------------------------------------------------------------------
 # Telemetry-adjacent
 # ---------------------------------------------------------------------------

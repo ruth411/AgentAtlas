@@ -288,6 +288,21 @@ class ClaimStore:
             ).one_or_none()
             return _record_to_claim(record) if record else None
 
+    def list_distinct_tool_ids(self) -> list[str]:
+        """Return every tool_id that currently has at least one claim.
+
+        Used by ``QueryEngine`` to expand a coarse ``tool_id_hint`` (e.g.
+        ``"ffmpeg"``) into the actual multi-surface tool_ids that exist
+        in the graph (``"ffmpeg-cli"``, ``"ffmpeg-recipes"``, …) — the
+        Stage-20 five-surface decomposition means agents rarely know the
+        exact tool_id to hint with.
+        """
+        with self._session_factory() as session:
+            rows = session.execute(
+                select(KnowledgeClaimRecord.tool_id).distinct()
+            ).all()
+            return sorted(row[0] for row in rows)
+
     # ------------------------------------------------------------------
     # Stage 22-stretch — semantic embedding read/write helpers
     # ------------------------------------------------------------------
