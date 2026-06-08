@@ -46,10 +46,20 @@ _REVIEWER_REGISTRY_ENV = "AYIRU_REVIEWER_REGISTRY"
 # Read endpoints exempt from auth even when AYIRU_API_KEY is set.
 _READ_METHODS: frozenset[str] = frozenset({"GET", "HEAD", "OPTIONS"})
 
-# Audit responses include actor / reviewer identifiers and orchestrator
-# decisions, so they are treated as sensitive reads when auth is enabled.
+# Reads that expose more than the public "answer" surface are gated when
+# auth is enabled:
+#   - /audit               : actor / reviewer identifiers, orchestrator
+#                            decisions.
+#   - /ingestion           : raw fetched page bodies and sandbox
+#                            stdout/stderr live in ingestion artifacts.
+#   - /verification-results: bulk list of decisions, reasons, and risk
+#                            assessments — same sensitivity as /audit.
+# The queryable knowledge surface (/claims, /evidence, /query, /canonical)
+# stays public by design — that is the point of Ayiru.
 _AUTH_REQUIRED_READ_PREFIXES: tuple[str, ...] = (
     "/audit",
+    "/ingestion",
+    "/verification-results",
 )
 
 # Paths that are always public regardless of method. Health checks need

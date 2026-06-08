@@ -143,6 +143,40 @@ def test_audit_reads_require_token_when_auth_enabled(client) -> None:
     )
 
 
+def test_ingestion_reads_require_token_when_auth_enabled(client) -> None:
+    """Ingestion artifacts carry raw fetched page bodies and sandbox
+    stdout/stderr, so ingestion reads are gated once auth is enabled (P2-3)."""
+    test_client, monkeypatch = client
+    monkeypatch.setenv("AYIRU_API_KEY", "secret-key")
+
+    assert test_client.get("/ingestion/runs").status_code == 401
+    assert test_client.get("/v1/ingestion/runs").status_code == 401
+    assert (
+        test_client.get(
+            "/ingestion/runs",
+            headers={"Authorization": "Bearer secret-key"},
+        ).status_code
+        == 200
+    )
+
+
+def test_verification_results_require_token_when_auth_enabled(client) -> None:
+    """The verification-results list exposes decisions, reasons, and risk
+    assessments — same sensitivity as /audit — so it is gated too (P2-3)."""
+    test_client, monkeypatch = client
+    monkeypatch.setenv("AYIRU_API_KEY", "secret-key")
+
+    assert test_client.get("/verification-results").status_code == 401
+    assert test_client.get("/v1/verification-results").status_code == 401
+    assert (
+        test_client.get(
+            "/verification-results",
+            headers={"Authorization": "Bearer secret-key"},
+        ).status_code
+        == 200
+    )
+
+
 def test_health_stays_public_when_auth_enabled(client) -> None:
     test_client, monkeypatch = client
     monkeypatch.setenv("AYIRU_API_KEY", "secret-key")
