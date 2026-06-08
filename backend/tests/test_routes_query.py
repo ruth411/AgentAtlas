@@ -20,7 +20,7 @@ from datetime import datetime, timezone
 import pytest
 from fastapi.testclient import TestClient
 
-from app.main import app
+from app.main import AskRateLimitMiddleware, app
 from app.schemas.enums import (
     ClaimType,
     ConfidenceBand,
@@ -54,6 +54,15 @@ from tests.helpers import risk_assessment, valid_sha256
 FIXED_TIME = datetime(2026, 5, 18, tzinfo=timezone.utc)
 
 
+def _ask_rate_limit_middleware() -> AskRateLimitMiddleware:
+    current = app.middleware_stack
+    while current is not None:
+        if isinstance(current, AskRateLimitMiddleware):
+            return current
+        current = getattr(current, "app", None)
+    raise AssertionError("AskRateLimitMiddleware not present on app.middleware_stack")
+
+
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
@@ -65,12 +74,20 @@ def store(tmp_path) -> ClaimStore:
 
 
 @pytest.fixture
-def http(store: ClaimStore):
+def http(store: ClaimStore, monkeypatch):
+    monkeypatch.delenv("AYIRU_ASK_RATE_LIMIT_REQUESTS", raising=False)
+    monkeypatch.delenv("AYIRU_ASK_RATE_LIMIT_WINDOW_SECONDS", raising=False)
     app.dependency_overrides[get_claim_store] = lambda: store
+
+    def _clear_rate_limit_state() -> None:
+        _ask_rate_limit_middleware()._seen_at.clear()
+
     try:
         with TestClient(app) as client:
+            _clear_rate_limit_state()
             yield client
     finally:
+        _clear_rate_limit_state()
         app.dependency_overrides.clear()
 
 
@@ -256,6 +273,83 @@ def test_validate_command_rejects_bad_tool_id_format(http) -> None:
     )
     assert r.status_code == 422
     assert "error" in r.json()
+
+
+def test_ask_rate_limit_disabled_by_default(http, store: ClaimStore) -> None:
+    _accept_claim(store, subject="git status", confidence=0.92)
+
+    first = http.post("/query/ask", json={"question": "git status"})
+    second = http.post("/query/ask", json={"question": "git status"})
+
+    assert first.status_code == 200
+    assert second.status_code == 200
+
+
+def test_ask_rate_limit_returns_structured_429(http, store: ClaimStore, monkeypatch) -> None:
+    _accept_claim(store, subject="git status", confidence=0.92)
+    monkeypatch.setenv("AYIRU_ASK_RATE_LIMIT_REQUESTS", "1")
+    monkeypatch.setenv("AYIRU_ASK_RATE_LIMIT_WINDOW_SECONDS", "60")
+
+    first = http.post("/query/ask", json={"question": "git status"})
+    second = http.post("/query/ask", json={"question": "git status"})
+
+    assert first.status_code == 200
+    assert second.status_code == 429
+    assert second.headers["Retry-After"] == "60"
+    body = second.json()["error"]
+    assert body["code"] == "RATE_LIMITED"
+    assert body["details"]["limit"] == 1
+    assert body["details"]["window_seconds"] == 60
+    assert body["details"]["retry_after_seconds"] == 60
+
+
+def test_ask_rate_limit_applies_to_v1_mount_too(
+    http, store: ClaimStore, monkeypatch
+) -> None:
+    _accept_claim(store, subject="git status", confidence=0.92)
+    monkeypatch.setenv("AYIRU_ASK_RATE_LIMIT_REQUESTS", "1")
+
+    first = http.post("/v1/query/ask", json={"question": "git status"})
+    second = http.post("/v1/query/ask", json={"question": "git status"})
+
+    assert first.status_code == 200
+    assert second.status_code == 429
+
+
+def test_ask_rate_limit_uses_forwarded_for_as_client_key(
+    http, store: ClaimStore, monkeypatch
+) -> None:
+    _accept_claim(store, subject="git status", confidence=0.92)
+    monkeypatch.setenv("AYIRU_ASK_RATE_LIMIT_REQUESTS", "1")
+
+    first = http.post(
+        "/query/ask",
+        json={"question": "git status"},
+        headers={"X-Forwarded-For": "203.0.113.10, 10.0.0.1"},
+    )
+    second = http.post(
+        "/query/ask",
+        json={"question": "git status"},
+        headers={"X-Forwarded-For": "203.0.113.10, 10.0.0.2"},
+    )
+
+    assert first.status_code == 200
+    assert second.status_code == 429
+    assert second.json()["error"]["details"]["client_id"] == "203.0.113.10"
+
+
+def test_ask_rate_limit_window_expires(http, store: ClaimStore, monkeypatch) -> None:
+    _accept_claim(store, subject="git status", confidence=0.92)
+    monkeypatch.setenv("AYIRU_ASK_RATE_LIMIT_REQUESTS", "1")
+    monkeypatch.setenv("AYIRU_ASK_RATE_LIMIT_WINDOW_SECONDS", "10")
+
+    first = http.post("/query/ask", json={"question": "git status"})
+    middleware = _ask_rate_limit_middleware()
+    middleware._seen_at["testclient"].clear()
+    second = http.post("/query/ask", json={"question": "git status"})
+
+    assert first.status_code == 200
+    assert second.status_code == 200
 
 
 def test_validate_command_rejects_oversized_command(http) -> None:

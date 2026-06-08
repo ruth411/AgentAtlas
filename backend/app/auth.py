@@ -1,11 +1,12 @@
 """Stage 14: optional API-key authentication.
 
 Off by default. When `AYIRU_API_KEY` is set to a non-empty value,
-all **state-changing** requests (POST / PUT / PATCH / DELETE) must carry
-`Authorization: Bearer <api-key>`; read requests stay public so the
-demo dashboard and `ayiru query` keep working unchanged.
+all state-changing requests (POST / PUT / PATCH / DELETE) plus the
+audit-log read surface must carry `Authorization: Bearer <api-key>`.
+Everything else on the read side stays public so the demo dashboard and
+`ayiru query` keep working unchanged.
 
-The choice to gate writes only is deliberate for v1.0:
+The choice to keep most reads public is deliberate for v1.0:
 
 - Read endpoints serve cached, deterministic verdicts. Exposing them
   publicly is the *point* — agents are supposed to query them freely.
@@ -30,12 +31,12 @@ import os
 from typing import Iterable
 
 from fastapi import status
+from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
 
 from app.api.errors import ErrorCode, error_payload
-from fastapi.responses import JSONResponse
 
 
 _API_KEY_ENV = "AYIRU_API_KEY"
@@ -44,6 +45,12 @@ _REVIEWER_REGISTRY_ENV = "AYIRU_REVIEWER_REGISTRY"
 
 # Read endpoints exempt from auth even when AYIRU_API_KEY is set.
 _READ_METHODS: frozenset[str] = frozenset({"GET", "HEAD", "OPTIONS"})
+
+# Audit responses include actor / reviewer identifiers and orchestrator
+# decisions, so they are treated as sensitive reads when auth is enabled.
+_AUTH_REQUIRED_READ_PREFIXES: tuple[str, ...] = (
+    "/audit",
+)
 
 # Paths that are always public regardless of method. Health checks need
 # to succeed for orchestration probes (k8s liveness/readiness) without
@@ -104,14 +111,16 @@ class ApiKeyAuthMiddleware(BaseHTTPMiddleware):
             # Auth disabled — preserve dev ergonomics.
             return await call_next(request)
 
-        if request.method in _READ_METHODS:
-            return await call_next(request)
-
         path = request.url.path
         # Strip the optional `/v1` prefix so the same public list works
         # for both the canonical and legacy mounts.
         normalized = path[len("/v1"):] if path.startswith("/v1/") else path
         if any(normalized.startswith(prefix) for prefix in self._public_prefixes):
+            return await call_next(request)
+
+        if request.method in _READ_METHODS and not any(
+            normalized.startswith(prefix) for prefix in _AUTH_REQUIRED_READ_PREFIXES
+        ):
             return await call_next(request)
 
         header = request.headers.get("authorization", "")
@@ -142,7 +151,7 @@ def _unauthorized() -> JSONResponse:
         content=error_payload(
             code=ErrorCode.HTTP_ERROR,
             message=(
-                "Write endpoints require an Authorization: Bearer "
+                "Protected endpoints require an Authorization: Bearer "
                 "<api-key> header when AYIRU_API_KEY is configured."
             ),
         ),

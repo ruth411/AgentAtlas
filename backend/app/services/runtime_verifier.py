@@ -78,7 +78,8 @@ from app.services.confidence_scorer import (
 from app.services.evidence_trust import _trust_sources
 from app.services.http_safety import (
     HttpFetchError,
-    assert_url_is_safe,
+    resolve_url_for_safe_fetch,
+    safe_https_request,
 )
 from app.services.ids import (
     generate_evidence_id,
@@ -277,25 +278,24 @@ def _terminate(proc: subprocess.Popen[bytes]) -> None:
 
 class HttpHeadClient(Protocol):
     def head(
-        self, url: str, *, timeout: float, max_redirects: int
-    ) -> httpx.Response:
+        self, url: str, *, timeout: float, max_redirects: int, resolution
+    ):
         ...
 
 
 class HttpxHeadClient:
     def head(
-        self, url: str, *, timeout: float, max_redirects: int
-    ) -> httpx.Response:
-        # follow_redirects=False on purpose. Following redirects here would
-        # bypass the shared SSRF guard — a server in the official_hosts
-        # allowlist could redirect to a private/internal address that the
-        # guard would reject on a direct request. The contract treats 3xx
-        # status codes as "endpoint exists" proof, so we don't need to chase
-        # the redirect to verify the URL.
-        return httpx.head(
-            url,
+        self, url: str, *, timeout: float, max_redirects: int, resolution
+    ):
+        # Redirects are not followed on purpose. The verifier treats 3xx as
+        # "endpoint exists" proof, so we can pin the connect step to the
+        # already-vetted IP and still avoid chasing a Location header into an
+        # unvalidated host.
+        return safe_https_request(
+            "HEAD",
+            resolution=resolution,
+            headers={},
             timeout=timeout,
-            follow_redirects=False,
         )
 
 
@@ -537,7 +537,9 @@ class _ApiEndpointExistsVerifier:
 
         allowed_hosts = _official_hosts_for_tool(claim.tool_id)
         try:
-            assert_url_is_safe(evidence_url, allowed_hosts=allowed_hosts)
+            resolution = resolve_url_for_safe_fetch(
+                evidence_url, allowed_hosts=allowed_hosts
+            )
         except HttpFetchError as exc:
             return VerifierOutcome(
                 skipped=True,
@@ -554,6 +556,7 @@ class _ApiEndpointExistsVerifier:
                 evidence_url,
                 timeout=float(cfg.get("timeout_seconds", 5)),
                 max_redirects=int(cfg.get("max_redirects", 3)),
+                resolution=resolution,
             )
             status_code: int = response.status_code
             error: str | None = None

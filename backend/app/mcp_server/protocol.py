@@ -25,6 +25,7 @@ INTERNAL_ERROR = -32603
 # Application-specific (MCP layer). Reserved range: -32000 to -32099.
 TOOL_NOT_FOUND = -32001
 TOOL_EXECUTION_ERROR = -32002
+AUTHENTICATION_REQUIRED = -32003
 
 
 # Protocol version we advertise on initialize. Matches the MCP spec
@@ -128,6 +129,7 @@ def make_error(
 
 
 __all__ = [
+    "AUTHENTICATION_REQUIRED",
     "INTERNAL_ERROR",
     "INVALID_PARAMS",
     "INVALID_REQUEST",

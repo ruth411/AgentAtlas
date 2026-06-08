@@ -65,7 +65,8 @@ from app.services.claim_store import (
 from app.services.evidence_trust import _trust_sources, schema_aggregator_hosts
 from app.services.http_safety import (
     HttpFetchError,
-    assert_url_is_safe,
+    resolve_url_for_safe_fetch,
+    safe_https_request,
 )
 from app.services.ids import (
     generate_claim_id,
@@ -127,12 +128,13 @@ class JsonSchemaHttpClient(Protocol):
         *,
         headers: dict[str, str],
         timeout: float,
-    ) -> httpx.Response:
+        resolution,
+    ):
         """Issue a single GET. Must NOT follow redirects automatically."""
 
 
 class HttpxJsonSchemaClient:
-    """Production client. Disables automatic redirects."""
+    """Production client. Pins the request to the already-vetted IP."""
 
     def get(
         self,
@@ -140,8 +142,14 @@ class HttpxJsonSchemaClient:
         *,
         headers: dict[str, str],
         timeout: float,
-    ) -> httpx.Response:
-        return httpx.get(url, headers=headers, timeout=timeout, follow_redirects=False)
+        resolution,
+    ):
+        return safe_https_request(
+            "GET",
+            resolution=resolution,
+            headers=headers,
+            timeout=timeout,
+        )
 
 
 # -------- Service --------
@@ -359,7 +367,9 @@ class JsonSchemaIngestionService:
         allowed_hosts = _allowed_hosts_for_tool(spec.tool_id)
         for hop in range(spec.max_redirects + 1):
             try:
-                assert_url_is_safe(url, allowed_hosts=allowed_hosts)
+                resolution = resolve_url_for_safe_fetch(
+                    url, allowed_hosts=allowed_hosts
+                )
             except HttpFetchError as exc:
                 raise JsonSchemaIngestionError(str(exc)) from exc
 
@@ -375,13 +385,16 @@ class JsonSchemaIngestionService:
 
             try:
                 response = self._client.get(
-                    url, headers=headers, timeout=float(spec.timeout_seconds)
+                    url,
+                    headers=headers,
+                    timeout=float(spec.timeout_seconds),
+                    resolution=resolution,
                 )
             except httpx.TimeoutException as exc:
                 raise JsonSchemaIngestionError(
                     f"JSON Schema fetch timed out after {spec.timeout_seconds}s."
                 ) from exc
-            except httpx.RequestError as exc:
+            except (httpx.RequestError, HttpFetchError) as exc:
                 raise JsonSchemaIngestionError(
                     f"JSON Schema fetch failed: {exc}"
                 ) from exc

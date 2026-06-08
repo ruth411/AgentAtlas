@@ -20,7 +20,9 @@ failures (bad JSON, unknown method) are returned as JSON-RPC errors.
 
 from __future__ import annotations
 
+import hmac
 import json
+import os
 import sys
 from typing import Any, TextIO
 
@@ -30,8 +32,10 @@ from app.services.claim_store import ClaimStore, get_claim_store
 
 
 class McpServer:
-    def __init__(self, store: ClaimStore) -> None:
+    def __init__(self, store: ClaimStore, *, shared_secret: str | None = None) -> None:
         self._store = store
+        self._shared_secret = shared_secret
+        self._authenticated = shared_secret is None
 
     # -------- Public API --------
 
@@ -93,6 +97,14 @@ class McpServer:
     def _dispatch_request(
         self, request: proto.JsonRpcRequest
     ) -> proto.JsonRpcResponse:
+        if request.method != "initialize" and not self._authenticated:
+            return proto.make_error(
+                request.id,
+                proto.AUTHENTICATION_REQUIRED,
+                "This MCP session requires a successful initialize request with "
+                "params.ayiru_shared_secret before calling other methods.",
+                data={"param": "ayiru_shared_secret"},
+            )
         if request.method == "initialize":
             return self._handle_initialize(request)
         if request.method == "tools/list":
@@ -123,6 +135,19 @@ class McpServer:
     def _handle_initialize(
         self, request: proto.JsonRpcRequest
     ) -> proto.JsonRpcResponse:
+        if self._shared_secret is not None:
+            provided = request.params.get("ayiru_shared_secret")
+            if not isinstance(provided, str) or not hmac.compare_digest(
+                provided, self._shared_secret
+            ):
+                return proto.make_error(
+                    request.id,
+                    proto.AUTHENTICATION_REQUIRED,
+                    "initialize requires params.ayiru_shared_secret matching the "
+                    "server's MCP shared secret.",
+                    data={"param": "ayiru_shared_secret"},
+                )
+            self._authenticated = True
         return proto.make_result(
             request.id,
             {
@@ -256,10 +281,19 @@ def _error_content(message: str) -> dict[str, Any]:
 def build_default_server() -> McpServer:
     """Factory for the production entry point: pulls the ClaimStore
     dependency the same way every other route layer does."""
-    return McpServer(get_claim_store())
+    return McpServer(
+        get_claim_store(),
+        shared_secret=configured_mcp_shared_secret(),
+    )
+
+
+def configured_mcp_shared_secret() -> str | None:
+    value = os.environ.get("AYIRU_MCP_SHARED_SECRET", "").strip()
+    return value or None
 
 
 __all__ = [
     "McpServer",
     "build_default_server",
+    "configured_mcp_shared_secret",
 ]

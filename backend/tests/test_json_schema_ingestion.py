@@ -97,7 +97,12 @@ class FakeJsonSchemaClient:
         self.calls: list[tuple[str, dict[str, str]]] = []
 
     def get(
-        self, url: str, *, headers: dict[str, str], timeout: float
+        self,
+        url: str,
+        *,
+        headers: dict[str, str],
+        timeout: float,
+        resolution=None,
     ) -> httpx.Response:
         self.calls.append((url, dict(headers)))
         if not self._responses:
@@ -572,11 +577,11 @@ def test_bulk_ingest_unknown_tool_raises(store: ClaimStore) -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_httpx_json_schema_client_disables_redirects() -> None:
+def test_httpx_json_schema_client_uses_pinned_transport() -> None:
     import inspect
 
     src = inspect.getsource(HttpxJsonSchemaClient.get)
-    assert "follow_redirects=False" in src
+    assert "safe_https_request" in src
 
 
 # ---------------------------------------------------------------------------

@@ -62,8 +62,9 @@ from app.services.claim_store import (
 from app.services.evidence_trust import _trust_sources
 from app.services.http_safety import (
     HttpFetchError,
-    assert_url_is_safe,
     host_in_allowlist,
+    resolve_url_for_safe_fetch,
+    safe_https_request,
 )
 from app.services.ids import (
     generate_claim_id,
@@ -131,12 +132,13 @@ class OpenApiHttpClient(Protocol):
         *,
         headers: dict[str, str],
         timeout: float,
-    ) -> httpx.Response:
+        resolution,
+    ):
         """Issue a single GET. Must NOT follow redirects automatically."""
 
 
 class HttpxOpenApiClient:
-    """Production client. Disables automatic redirects."""
+    """Production client. Pins the request to the already-vetted IP."""
 
     def get(
         self,
@@ -144,8 +146,14 @@ class HttpxOpenApiClient:
         *,
         headers: dict[str, str],
         timeout: float,
-    ) -> httpx.Response:
-        return httpx.get(url, headers=headers, timeout=timeout, follow_redirects=False)
+        resolution,
+    ):
+        return safe_https_request(
+            "GET",
+            resolution=resolution,
+            headers=headers,
+            timeout=timeout,
+        )
 
 
 # -------- Service --------
@@ -361,7 +369,7 @@ class OpenApiIngestionService:
         redirect_chain: list[str] = []
         for hop in range(spec.max_redirects + 1):
             try:
-                assert_url_is_safe(
+                resolution = resolve_url_for_safe_fetch(
                     url, allowed_hosts=_official_hosts_for_tool(spec.tool_id)
                 )
             except HttpFetchError as exc:
@@ -379,13 +387,16 @@ class OpenApiIngestionService:
 
             try:
                 response = self._client.get(
-                    url, headers=headers, timeout=float(spec.timeout_seconds)
+                    url,
+                    headers=headers,
+                    timeout=float(spec.timeout_seconds),
+                    resolution=resolution,
                 )
             except httpx.TimeoutException as exc:
                 raise OpenApiIngestionError(
                     f"OpenAPI fetch timed out after {spec.timeout_seconds}s."
                 ) from exc
-            except httpx.RequestError as exc:
+            except (httpx.RequestError, HttpFetchError) as exc:
                 raise OpenApiIngestionError(f"OpenAPI fetch failed: {exc}") from exc
 
             if response.status_code in (301, 302, 303, 307, 308):

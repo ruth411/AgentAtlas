@@ -198,7 +198,14 @@ class FakeHeadClient:
         self._raise = raise_exc
         self.calls: list[str] = []
 
-    def head(self, url: str, *, timeout: float, max_redirects: int) -> httpx.Response:
+    def head(
+        self,
+        url: str,
+        *,
+        timeout: float,
+        max_redirects: int,
+        resolution=None,
+    ) -> httpx.Response:
         self.calls.append(url)
         if self._raise is not None:
             raise self._raise
@@ -595,16 +602,16 @@ def test_api_endpoint_exists_skips_when_evidence_url_not_in_allowlist(
     assert head.calls == []
 
 
-def test_httpx_head_client_disables_redirects() -> None:
-    """Regression guard for the SSRF-bypass bug: the production HEAD client
-    must not follow redirects, because a redirect target wouldn't be
-    re-checked against the per-tool host allowlist."""
+def test_httpx_head_client_uses_pinned_transport() -> None:
+    """Regression guard for the DNS-rebinding bug: the production HEAD
+    client must reuse the already-vetted resolution rather than letting a
+    downstream HTTP client resolve again."""
     import inspect
 
     from app.services.runtime_verifier import HttpxHeadClient
 
     src = inspect.getsource(HttpxHeadClient.head)
-    assert "follow_redirects=False" in src
+    assert "safe_https_request" in src
 
 
 def test_api_endpoint_exists_skips_when_no_http_evidence(store: ClaimStore) -> None:

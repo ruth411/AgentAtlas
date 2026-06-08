@@ -65,6 +65,8 @@ from app.services.http_safety import (
     HttpFetchError,
     assert_url_is_safe,
     host_in_allowlist,
+    resolve_url_for_safe_fetch,
+    safe_https_request,
 )
 from app.services.ids import (
     generate_claim_id,
@@ -106,20 +108,20 @@ def _default_robots_fetch(host: str) -> str | None:
 
     url = f"https://{host}/robots.txt"
     try:
-        assert_url_is_safe(url, allowed_hosts=frozenset({host}))
+        resolution = resolve_url_for_safe_fetch(url, allowed_hosts=frozenset({host}))
     except HttpFetchError:
         # Host failed the SSRF gate (e.g. resolved to a private IP).
         # Permit-by-default semantics still apply: the docs fetch for
         # the same host will fail too, with a more useful error.
         return None
     try:
-        response = httpx.get(
-            url,
+        response = safe_https_request(
+            "GET",
+            resolution=resolution,
             headers={"User-Agent": _USER_AGENT},
             timeout=_ROBOTS_FETCH_TIMEOUT_SECONDS,
-            follow_redirects=False,
         )
-    except httpx.RequestError:
+    except HttpFetchError:
         return None
     # Manual redirect handling so we never silently follow a Location:
     # header into an unvalidated host. Three hops is enough for the
@@ -137,17 +139,19 @@ def _default_robots_fetch(host: str) -> str | None:
             # Refuse cross-host robots redirects — they could exfil.
             return None
         try:
-            assert_url_is_safe(next_url, allowed_hosts=frozenset({host}))
+            resolution = resolve_url_for_safe_fetch(
+                next_url, allowed_hosts=frozenset({host})
+            )
         except HttpFetchError:
             return None
         try:
-            response = httpx.get(
-                next_url,
+            response = safe_https_request(
+                "GET",
+                resolution=resolution,
                 headers={"User-Agent": _USER_AGENT},
                 timeout=_ROBOTS_FETCH_TIMEOUT_SECONDS,
-                follow_redirects=False,
             )
-        except httpx.RequestError:
+        except HttpFetchError:
             return None
     if response.status_code >= 400:
         return None
@@ -218,12 +222,13 @@ class DocsHttpClient(Protocol):
         *,
         headers: dict[str, str],
         timeout: float,
-    ) -> httpx.Response:
+        resolution,
+    ):
         """Issue a single GET. Must NOT follow redirects automatically."""
 
 
 class HttpxDocsClient:
-    """Production client. Disables automatic redirects."""
+    """Production client. Pins the request to the already-vetted IP."""
 
     def get(
         self,
@@ -231,8 +236,14 @@ class HttpxDocsClient:
         *,
         headers: dict[str, str],
         timeout: float,
-    ) -> httpx.Response:
-        return httpx.get(url, headers=headers, timeout=timeout, follow_redirects=False)
+        resolution,
+    ):
+        return safe_https_request(
+            "GET",
+            resolution=resolution,
+            headers=headers,
+            timeout=timeout,
+        )
 
 
 class DocsIngestionService:
@@ -446,7 +457,7 @@ class DocsIngestionService:
         redirect_chain: list[str] = []
         for hop in range(spec.max_redirects + 1):
             try:
-                assert_url_is_safe(
+                resolution = resolve_url_for_safe_fetch(
                     url, allowed_hosts=_official_hosts_for_tool(spec.tool_id)
                 )
             except HttpFetchError as exc:
@@ -476,12 +487,13 @@ class DocsIngestionService:
                     url,
                     headers=headers,
                     timeout=float(spec.timeout_seconds),
+                    resolution=resolution,
                 )
             except httpx.TimeoutException as exc:
                 raise DocsIngestionError(
                     f"Docs fetch timed out after {spec.timeout_seconds}s."
                 ) from exc
-            except httpx.RequestError as exc:
+            except (httpx.RequestError, HttpFetchError) as exc:
                 raise DocsIngestionError(f"Docs fetch failed: {exc}") from exc
 
             if response.status_code in (301, 302, 303, 307, 308):

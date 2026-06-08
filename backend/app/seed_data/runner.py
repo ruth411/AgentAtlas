@@ -19,8 +19,10 @@ subcommand is used instead).
 from __future__ import annotations
 
 import argparse
+from contextlib import contextmanager
 import json
 import os
+import socket
 from datetime import datetime, timezone
 from hashlib import sha256
 from importlib import resources
@@ -83,7 +85,14 @@ class _SingleResponseClient:
         self._content_type = content_type
         self._used = False
 
-    def get(self, url: str, *, headers: dict[str, str], timeout: float) -> httpx.Response:
+    def get(
+        self,
+        url: str,
+        *,
+        headers: dict[str, str],
+        timeout: float,
+        resolution=None,
+    ) -> httpx.Response:
         if self._used:
             raise AssertionError(
                 "seed client was called twice for the same URL — the ingestion "
@@ -100,17 +109,47 @@ class _StubResponse:
         self.headers = {"content-type": content_type}
 
 
+@contextmanager
+def _offline_seed_dns():
+    """Resolve known seed-doc hosts without depending on external DNS.
+
+    The seed runner replays byte-stable artifacts through the real
+    ingestion services so the same parsing / verification code paths are
+    exercised in dev, tests, and wheel installs. Those services call the
+    SSRF guard before issuing the fake HTTP request, which normally means
+    a `socket.getaddrinfo` lookup. In offline or sandboxed environments
+    that DNS dependency breaks the replay before the local artifact body is
+    even consulted.
+
+    The seed URLs are fixed, contract-allowlisted official-docs hosts; the
+    only thing we bypass here is the external DNS dependency. The SSRF
+    policy itself still runs against the original HTTPS URL / hostname.
+    """
+
+    original_getaddrinfo = socket.getaddrinfo
+
+    def fake_getaddrinfo(host, port, *args, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", port))]
+
+    socket.getaddrinfo = fake_getaddrinfo
+    try:
+        yield
+    finally:
+        socket.getaddrinfo = original_getaddrinfo
+
+
 # -------- Seed steps --------
 
 
 def _seed_openapi(store: ClaimStore) -> dict[str, Any]:
     body = _artifact_bytes("openapi", "openai_api.json").decode("utf-8")
     client = _SingleResponseClient(body=body)
-    response = OpenApiIngestionService(store, client=client).ingest(
-        tool_id="openai-api",
-        url="https://api.openai.com/v1/openapi.json",
-        submitted_by="ayiru-seed",
-    )
+    with _offline_seed_dns():
+        response = OpenApiIngestionService(store, client=client).ingest(
+            tool_id="openai-api",
+            url="https://api.openai.com/v1/openapi.json",
+            submitted_by="ayiru-seed",
+        )
     return {
         "artifact": "openapi/openai_api.json",
         "status": response.status.value,
@@ -122,11 +161,12 @@ def _seed_openapi(store: ClaimStore) -> dict[str, Any]:
 def _seed_json_schema(store: ClaimStore) -> dict[str, Any]:
     body = _artifact_bytes("json_schema", "docker_compose.json").decode("utf-8")
     client = _SingleResponseClient(body=body)
-    response = JsonSchemaIngestionService(store, client=client).ingest(
-        tool_id="docker",
-        url="https://json.schemastore.org/docker-compose.json",
-        submitted_by="ayiru-seed",
-    )
+    with _offline_seed_dns():
+        response = JsonSchemaIngestionService(store, client=client).ingest(
+            tool_id="docker",
+            url="https://json.schemastore.org/docker-compose.json",
+            submitted_by="ayiru-seed",
+        )
     return {
         "artifact": "json_schema/docker_compose.json",
         "status": response.status.value,

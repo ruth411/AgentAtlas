@@ -1,9 +1,15 @@
+import os
+import threading
+import time
+from collections import deque
+from math import ceil
+
 from fastapi import FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
-from starlette.types import ASGIApp
+from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 from app.api.errors import ErrorCode, json_error_response
 from app.auth import ApiKeyAuthMiddleware
@@ -23,41 +29,101 @@ from app.api.routes_verification import router as verification_router
 # records × 8000-char excerpt = ~400 KiB worst case) while still blocking
 # resource-exhaustion attacks via gigabyte-scale POST bodies.
 DEFAULT_MAX_REQUEST_BYTES = 1 * 1024 * 1024
+_ASK_RATE_LIMIT_ENV = "AYIRU_ASK_RATE_LIMIT_REQUESTS"
+_ASK_RATE_LIMIT_WINDOW_ENV = "AYIRU_ASK_RATE_LIMIT_WINDOW_SECONDS"
+_DEFAULT_ASK_RATE_LIMIT_WINDOW_SECONDS = 60
+_TRUSTED_HOSTS_ENV = "AYIRU_TRUSTED_HOSTS"
 
 
-class RequestBodySizeLimitMiddleware(BaseHTTPMiddleware):
+class RequestBodySizeLimitMiddleware:
     """Reject requests whose declared or streamed body exceeds `max_bytes`.
 
-    Checks the `Content-Length` header up front, and falls back to a streaming
-    counter if no header is provided. Returns the structured error envelope so
-    consumers get a `REQUEST_BODY_TOO_LARGE` code rather than a 500.
+    The middleware checks `Content-Length` up front when present, then buffers
+    the incoming request stream up to the limit before handing control to
+    FastAPI. That closes the `Transfer-Encoding: chunked` gap where a client
+    omits Content-Length and streams arbitrarily large bodies into the parser.
     """
 
     def __init__(self, app: ASGIApp, max_bytes: int = DEFAULT_MAX_REQUEST_BYTES) -> None:
-        super().__init__(app)
+        self.app = app
         self._max_bytes = max_bytes
 
-    async def dispatch(self, request: Request, call_next):  # type: ignore[override]
-        declared = request.headers.get("content-length")
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+
+        declared = self._header_value(scope, b"content-length")
         if declared is not None:
             try:
                 if int(declared) > self._max_bytes:
-                    return self._too_large(declared)
+                    await self._too_large(declared_bytes=declared)(scope, receive, send)
+                    return
             except ValueError:
                 # Malformed Content-Length: fall through; FastAPI will reject
                 # the request later as part of normal parsing.
                 pass
-        return await call_next(request)
 
-    def _too_large(self, declared: str) -> JSONResponse:
+        buffered_messages: list[Message] = []
+        streamed_bytes = 0
+        while True:
+            message = await receive()
+            buffered_messages.append(message)
+            if message["type"] != "http.request":
+                break
+            streamed_bytes += len(message.get("body", b""))
+            if streamed_bytes > self._max_bytes:
+                await self._too_large(streamed_bytes=streamed_bytes)(scope, receive, send)
+                return
+            if not message.get("more_body", False):
+                break
+
+        replay_receive = self._replay_receive(buffered_messages)
+        await self.app(scope, replay_receive, send)
+
+    def _header_value(self, scope: Scope, name: bytes) -> str | None:
+        for header_name, header_value in scope.get("headers", []):
+            if header_name.lower() == name:
+                return header_value.decode("latin-1")
+        return None
+
+    def _replay_receive(self, buffered_messages: list[Message]) -> Receive:
+        index = 0
+
+        async def replay() -> Message:
+            nonlocal index
+            if index < len(buffered_messages):
+                message = buffered_messages[index]
+                index += 1
+                return message
+            return {"type": "http.request", "body": b"", "more_body": False}
+
+        return replay
+
+    def _too_large(
+        self,
+        *,
+        declared_bytes: str | None = None,
+        streamed_bytes: int | None = None,
+    ) -> JSONResponse:
+        details = {"max_bytes": self._max_bytes}
+        if declared_bytes is not None:
+            details["declared_bytes"] = declared_bytes
+            message = (
+                f"Request body of {declared_bytes} bytes exceeds the "
+                f"{self._max_bytes}-byte limit."
+            )
+        else:
+            details["streamed_bytes"] = streamed_bytes
+            message = (
+                f"Request body exceeded the {self._max_bytes}-byte limit "
+                f"while streaming ({streamed_bytes} bytes read)."
+            )
         return json_error_response(
             413,
             code=ErrorCode.REQUEST_BODY_TOO_LARGE,
-            message=(
-                f"Request body of {declared} bytes exceeds the "
-                f"{self._max_bytes}-byte limit."
-            ),
-            details={"max_bytes": self._max_bytes, "declared_bytes": declared},
+            message=message,
+            details=details,
         )
 
 
@@ -95,6 +161,155 @@ class LegacyDeprecationHeaderMiddleware(BaseHTTPMiddleware):
         return response
 
 
+class AskRateLimitMiddleware(BaseHTTPMiddleware):
+    """Optionally rate-limit the public `ask()` endpoint per client.
+
+    Disabled by default. When `AYIRU_ASK_RATE_LIMIT_REQUESTS` is set to a
+    positive integer, the middleware enforces a fixed-window quota over
+    `POST /query/ask` and `POST /v1/query/ask`, keyed by client IP (or the
+    first `X-Forwarded-For` hop when present). This keeps the public read
+    surface open while giving operators a low-friction abuse brake.
+    """
+
+    _ASK_PATHS = frozenset({"/query/ask", "/v1/query/ask"})
+
+    def __init__(self, app: ASGIApp) -> None:
+        super().__init__(app)
+        self._lock = threading.Lock()
+        self._seen_at: dict[str, deque[float]] = {}
+
+    async def dispatch(self, request: Request, call_next):  # type: ignore[override]
+        limit = self._configured_limit()
+        if limit is None or request.method != "POST" or request.url.path not in self._ASK_PATHS:
+            return await call_next(request)
+
+        window_seconds = self._configured_window_seconds()
+        client_id = self._client_id(request)
+        now = time.monotonic()
+        retry_after_seconds = self._consume_or_retry_after(
+            client_id=client_id,
+            now=now,
+            limit=limit,
+            window_seconds=window_seconds,
+        )
+        if retry_after_seconds is not None:
+            return json_error_response(
+                429,
+                code=ErrorCode.RATE_LIMITED,
+                message=(
+                    f"Rate limit exceeded for ask(). Max {limit} request(s) per "
+                    f"{window_seconds} second window."
+                ),
+                details={
+                    "client_id": client_id,
+                    "limit": limit,
+                    "window_seconds": window_seconds,
+                    "retry_after_seconds": retry_after_seconds,
+                },
+                headers={"Retry-After": str(retry_after_seconds)},
+            )
+        return await call_next(request)
+
+    def _configured_limit(self) -> int | None:
+        raw = os.environ.get(_ASK_RATE_LIMIT_ENV, "").strip()
+        if not raw:
+            return None
+        try:
+            limit = int(raw)
+        except ValueError:
+            return None
+        return limit if limit > 0 else None
+
+    def _configured_window_seconds(self) -> int:
+        raw = os.environ.get(_ASK_RATE_LIMIT_WINDOW_ENV, "").strip()
+        if not raw:
+            return _DEFAULT_ASK_RATE_LIMIT_WINDOW_SECONDS
+        try:
+            window = int(raw)
+        except ValueError:
+            return _DEFAULT_ASK_RATE_LIMIT_WINDOW_SECONDS
+        return window if window > 0 else _DEFAULT_ASK_RATE_LIMIT_WINDOW_SECONDS
+
+    def _client_id(self, request: Request) -> str:
+        forwarded_for = request.headers.get("x-forwarded-for", "").strip()
+        if forwarded_for:
+            return forwarded_for.split(",", 1)[0].strip()
+        if request.client and request.client.host:
+            return request.client.host
+        return "unknown"
+
+    def _consume_or_retry_after(
+        self,
+        *,
+        client_id: str,
+        now: float,
+        limit: int,
+        window_seconds: int,
+    ) -> int | None:
+        cutoff = now - float(window_seconds)
+        with self._lock:
+            bucket = self._seen_at.setdefault(client_id, deque())
+            while bucket and bucket[0] <= cutoff:
+                bucket.popleft()
+            if len(bucket) >= limit:
+                retry_after = max(1, ceil(window_seconds - (now - bucket[0])))
+                return retry_after
+            bucket.append(now)
+            if not bucket:
+                self._seen_at.pop(client_id, None)
+            return None
+
+
+class TrustedHostGuardMiddleware(BaseHTTPMiddleware):
+    """Optionally reject requests whose Host header is not allowlisted.
+
+    Disabled by default. When `AYIRU_TRUSTED_HOSTS` is set to a comma-separated
+    list, requests must present a matching host (port ignored). Supports exact
+    entries, `*.example.com` wildcard entries, and `*` to allow any host.
+    """
+
+    async def dispatch(self, request: Request, call_next):  # type: ignore[override]
+        allowed = self._configured_hosts()
+        if allowed is None:
+            return await call_next(request)
+
+        host = (request.url.hostname or "").lower()
+        if not host or not any(self._host_matches(host, pattern) for pattern in allowed):
+            return json_error_response(
+                400,
+                code=ErrorCode.HTTP_ERROR,
+                message=f"Host {host or '<missing>'!r} is not in AYIRU_TRUSTED_HOSTS.",
+                details={"host": host or "", "allowed_hosts": sorted(allowed)},
+            )
+        return await call_next(request)
+
+    def _configured_hosts(self) -> frozenset[str] | None:
+        raw = os.environ.get(_TRUSTED_HOSTS_ENV, "").strip()
+        if not raw:
+            return None
+        hosts = frozenset(item.strip().lower() for item in raw.split(",") if item.strip())
+        return hosts or None
+
+    def _host_matches(self, host: str, pattern: str) -> bool:
+        if pattern == "*":
+            return True
+        if pattern.startswith("*."):
+            suffix = pattern[1:]
+            return host.endswith(suffix) and host != pattern[2:]
+        return host == pattern
+
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    """Stamp baseline browser-facing security headers on every response."""
+
+    async def dispatch(self, request: Request, call_next):  # type: ignore[override]
+        response = await call_next(request)
+        response.headers.setdefault("Referrer-Policy", "no-referrer")
+        response.headers.setdefault("X-Content-Type-Options", "nosniff")
+        response.headers.setdefault("X-Frame-Options", "DENY")
+        return response
+
+
 _API_ROUTERS = (
     claims_router,
     canonical_router,
@@ -110,10 +325,14 @@ _API_ROUTERS = (
 app = FastAPI(title="Ayiru", version="0.1.0")
 app.add_middleware(RequestBodySizeLimitMiddleware)
 app.add_middleware(LegacyDeprecationHeaderMiddleware)
+app.add_middleware(AskRateLimitMiddleware)
 # Auth gate. No-op when `AYIRU_API_KEY` is unset (dev default).
 app.add_middleware(ApiKeyAuthMiddleware)
+app.add_middleware(TrustedHostGuardMiddleware)
+app.add_middleware(SecurityHeadersMiddleware)
 # Observability is registered last so it wraps every other middleware
-# layer — request IDs cover body-size, deprecation, and auth paths too.
+# layer — request IDs cover body-size, deprecation, auth, and host-guard
+# paths too.
 app.add_middleware(RequestObservabilityMiddleware)
 
 # Health is universal; never versioned.

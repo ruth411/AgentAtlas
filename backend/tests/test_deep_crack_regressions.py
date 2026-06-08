@@ -3,6 +3,7 @@
 Each test pins one crack so future refactors cannot silently reintroduce it.
 """
 
+import asyncio
 from datetime import datetime, timezone
 
 import pytest
@@ -364,6 +365,96 @@ def test_oversized_content_length_is_rejected_with_413(client) -> None:
     response = client.post("/claims", content=b"{}", headers=headers)
     assert response.status_code == 413
     assert response.json()["error"]["code"] == "REQUEST_BODY_TOO_LARGE"
+
+
+def test_chunked_request_body_over_limit_is_rejected_before_app() -> None:
+    from app.main import RequestBodySizeLimitMiddleware
+
+    app_called: list[bool] = []
+    sent_messages: list[dict] = []
+    chunks = [
+        {"type": "http.request", "body": b"a" * 700_000, "more_body": True},
+        {"type": "http.request", "body": b"b" * 400_000, "more_body": False},
+    ]
+
+    async def fake_app(scope, receive, send) -> None:
+        app_called.append(True)
+        await send(
+            {
+                "type": "http.response.start",
+                "status": 200,
+                "headers": [],
+            }
+        )
+        await send({"type": "http.response.body", "body": b"ok", "more_body": False})
+
+    async def receive():
+        return chunks.pop(0)
+
+    async def send(message):
+        sent_messages.append(message)
+
+    scope = {
+        "type": "http",
+        "method": "POST",
+        "path": "/claims",
+        "headers": [],
+    }
+    middleware = RequestBodySizeLimitMiddleware(fake_app)
+
+    asyncio.run(middleware(scope, receive, send))
+
+    assert app_called == []
+    assert sent_messages[0]["type"] == "http.response.start"
+    assert sent_messages[0]["status"] == 413
+
+
+def test_chunked_request_body_within_limit_is_replayed_to_app() -> None:
+    from app.main import RequestBodySizeLimitMiddleware
+
+    received_bodies: list[bytes] = []
+    sent_messages: list[dict] = []
+    chunks = [
+        {"type": "http.request", "body": b"hello ", "more_body": True},
+        {"type": "http.request", "body": b"world", "more_body": False},
+    ]
+
+    async def fake_app(scope, receive, send) -> None:
+        body = bytearray()
+        while True:
+            message = await receive()
+            assert message["type"] == "http.request"
+            body.extend(message.get("body", b""))
+            if not message.get("more_body", False):
+                break
+        received_bodies.append(bytes(body))
+        await send(
+            {
+                "type": "http.response.start",
+                "status": 200,
+                "headers": [],
+            }
+        )
+        await send({"type": "http.response.body", "body": b"ok", "more_body": False})
+
+    async def receive():
+        return chunks.pop(0)
+
+    async def send(message):
+        sent_messages.append(message)
+
+    scope = {
+        "type": "http",
+        "method": "POST",
+        "path": "/claims",
+        "headers": [],
+    }
+    middleware = RequestBodySizeLimitMiddleware(fake_app)
+
+    asyncio.run(middleware(scope, receive, send))
+
+    assert received_bodies == [b"hello world"]
+    assert sent_messages[0]["status"] == 200
 
 
 def test_normal_sized_request_passes_middleware(client) -> None:

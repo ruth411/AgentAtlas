@@ -29,6 +29,7 @@ class ErrorCode(StrEnum):
     OPENAPI_INGESTION_FAILED = "OPENAPI_INGESTION_FAILED"
     REJECTED_PRIMARY_EVIDENCE = "REJECTED_PRIMARY_EVIDENCE"
     REQUEST_BODY_TOO_LARGE = "REQUEST_BODY_TOO_LARGE"
+    RATE_LIMITED = "RATE_LIMITED"
     RUNTIME_VERIFICATION_FAILED = "RUNTIME_VERIFICATION_FAILED"
     TOOL_NOT_ALLOWED = "TOOL_NOT_ALLOWED"
     VERIFICATION_RESULT_NOT_FOUND = "VERIFICATION_RESULT_NOT_FOUND"
@@ -54,6 +55,7 @@ ERROR_RESPONSES = {
     404: {"model": ApiErrorResponse},
     409: {"model": ApiErrorResponse},
     413: {"model": ApiErrorResponse},
+    429: {"model": ApiErrorResponse},
     422: {"model": ApiErrorResponse},
 }
 
@@ -95,8 +97,10 @@ def json_error_response(
     code: ErrorCode,
     message: str,
     details: dict[str, Any] | None = None,
+    headers: dict[str, str] | None = None,
 ) -> JSONResponse:
     return JSONResponse(
         status_code=status_code,
         content=error_payload(code=code, message=message, details=details),
+        headers=headers,
     )

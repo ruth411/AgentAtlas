@@ -68,7 +68,14 @@ class FakeDocsClient:
         self._responses = list(responses)
         self.calls: list[tuple[str, dict[str, str]]] = []
 
-    def get(self, url: str, *, headers: dict[str, str], timeout: float) -> httpx.Response:
+    def get(
+        self,
+        url: str,
+        *,
+        headers: dict[str, str],
+        timeout: float,
+        resolution=None,
+    ) -> httpx.Response:
         self.calls.append((url, dict(headers)))
         if not self._responses:
             raise AssertionError(f"FakeDocsClient out of scripted responses for {url}")

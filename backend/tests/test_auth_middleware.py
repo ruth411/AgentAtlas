@@ -126,6 +126,23 @@ def test_reads_remain_public_when_auth_enabled(client) -> None:
     assert test_client.get("/v1/claims").status_code == 200
 
 
+def test_audit_reads_require_token_when_auth_enabled(client) -> None:
+    """Audit history can contain actor / reviewer identifiers, so it is
+    not part of the public read surface once auth is enabled."""
+    test_client, monkeypatch = client
+    monkeypatch.setenv("AYIRU_API_KEY", "secret-key")
+
+    assert test_client.get("/audit/events").status_code == 401
+    assert test_client.get("/v1/audit/events").status_code == 401
+    assert (
+        test_client.get(
+            "/audit/events",
+            headers={"Authorization": "Bearer secret-key"},
+        ).status_code
+        == 200
+    )
+
+
 def test_health_stays_public_when_auth_enabled(client) -> None:
     test_client, monkeypatch = client
     monkeypatch.setenv("AYIRU_API_KEY", "secret-key")
