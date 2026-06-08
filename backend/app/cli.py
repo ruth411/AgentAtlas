@@ -328,11 +328,12 @@ def _cmd_serve(args: argparse.Namespace) -> int:
             _auto_migrate()
         except Exception as exc:  # pragma: no cover - defensive
             print(
-                f"ayiru serve: skipping auto-migration ({exc}). "
-                "Run `ayiru migrate` manually or pass --no-migrate "
-                "to silence this warning.",
+                f"ayiru serve: auto-migration failed ({exc}). "
+                "Run `ayiru migrate` manually, fix the migration error, "
+                "or pass --no-migrate if you manage schema changes out of band.",
                 file=sys.stderr,
             )
+            return 1
 
     # Stage 15.5: when --auto-seed is passed and the DB has zero claims,
     # replay the bundled seed artifacts so the headline demo works on
@@ -430,22 +431,26 @@ def _auto_migrate() -> None:
 
 
 def _cmd_mcp(_args: argparse.Namespace) -> int:
-    from app.mcp_server.server import build_default_server
+    from app.mcp_server.server import (
+        build_default_server,
+        configured_mcp_shared_secret,
+    )
 
-    # Stage 15.8 — disclose the MCP-stdio-no-auth asymmetry at startup.
-    # When the operator has bothered to set AYIRU_API_KEY, they almost
-    # certainly mean for it to apply everywhere. It does not: the stdio
-    # transport has no place to attach credentials, so the JSON-RPC
-    # surface accepts every framed request. We log the residual risk
-    # rather than silently widening the trust boundary. Goes to stderr
-    # so it doesn't corrupt the JSON-RPC stdout stream.
-    if os.environ.get("AYIRU_API_KEY", "").strip():
+    # Stage 15.8 / 15.10 — disclose the auth asymmetry only when the
+    # operator set AYIRU_API_KEY but left MCP stdio ungated. With
+    # AYIRU_MCP_SHARED_SECRET configured, the stdio path requires the
+    # caller to present `params.ayiru_shared_secret` in initialize.
+    if (
+        os.environ.get("AYIRU_API_KEY", "").strip()
+        and configured_mcp_shared_secret() is None
+    ):
         sys.stderr.write(
             "WARNING: AYIRU_API_KEY is set, but it does not gate the MCP "
-            "stdio path — only the HTTP API. The stdio JSON-RPC server "
-            "accepts all framed requests, including writes (submit_claim). "
-            "Ensure only trusted local callers can reach this process. "
-            "See SECURITY.md §Known residual risks.\n"
+            "stdio path unless AYIRU_MCP_SHARED_SECRET is also configured. "
+            "Without that secret, the stdio JSON-RPC server accepts all "
+            "framed requests, including writes (submit_claim). Ensure only "
+            "trusted local callers can reach this process, or set "
+            "AYIRU_MCP_SHARED_SECRET. See SECURITY.md §Known residual risks.\n"
         )
         sys.stderr.flush()
     build_default_server().serve()

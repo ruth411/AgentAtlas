@@ -136,13 +136,12 @@ def test_serve_no_migrate_flag_skips_auto_migration(
     assert migrate_calls == []
 
 
-def test_serve_continues_when_auto_migrate_raises(
+def test_serve_fails_when_auto_migrate_raises(
     monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
-    """Auto-migration failures shouldn't prevent the server from
-    starting (e.g. operator already migrated manually with a custom
-    URL). The CLI surfaces a clear warning on stderr but proceeds."""
+    """Serving against an unmigrated schema is worse than failing fast:
+    writes break later and the operator misses the root cause."""
     def boom() -> None:
         raise RuntimeError("no alembic.ini visible")
 
@@ -152,10 +151,10 @@ def test_serve_continues_when_auto_migrate_raises(
     monkeypatch.setitem(sys.modules, "uvicorn", fake_uvicorn)
     monkeypatch.setattr(cli_module, "_auto_migrate", boom)
 
-    assert main(["serve"]) == 0
-    assert uvicorn_called == [True]
+    assert main(["serve"]) == 1
+    assert uvicorn_called == []
     err = capsys.readouterr().err
-    assert "skipping auto-migration" in err
+    assert "auto-migration failed" in err
 
 
 def test_serve_auto_seed_runs_when_db_is_empty(
@@ -298,6 +297,7 @@ def test_mcp_subcommand_warns_when_api_key_is_set(
     the asymmetry visible."""
 
     monkeypatch.setenv("AYIRU_API_KEY", "secret-token")
+    monkeypatch.delenv("AYIRU_MCP_SHARED_SECRET", raising=False)
 
     class FakeServer:
         def serve(self) -> None:
@@ -324,6 +324,27 @@ def test_mcp_subcommand_silent_when_no_api_key(
     """Without AYIRU_API_KEY the disclosure is noise; emit nothing."""
 
     monkeypatch.delenv("AYIRU_API_KEY", raising=False)
+
+    class FakeServer:
+        def serve(self) -> None:
+            return None
+
+    monkeypatch.setattr(
+        "app.mcp_server.server.build_default_server",
+        lambda: FakeServer(),
+    )
+    assert main(["mcp"]) == 0
+    captured = capsys.readouterr()
+    assert captured.err == ""
+    assert captured.out == ""
+
+
+def test_mcp_subcommand_silent_when_shared_secret_is_configured(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    monkeypatch.setenv("AYIRU_API_KEY", "secret-token")
+    monkeypatch.setenv("AYIRU_MCP_SHARED_SECRET", "local-shared-secret")
 
     class FakeServer:
         def serve(self) -> None:

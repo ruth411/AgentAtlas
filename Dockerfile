@@ -11,7 +11,8 @@ FROM python:3.12-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PIP_NO_CACHE_DIR=1
+    PIP_NO_CACHE_DIR=1 \
+    AYIRU_STRICT_TOOL_LOCK=1
 
 WORKDIR /app
 
@@ -31,7 +32,9 @@ COPY README.md /app/README.md
 RUN pip install /app/backend
 
 # Default to the API server; override with `docker run ... ayiru <cmd>`
-# (e.g. `mcp`, `seed`, `migrate`, `query`).
+# (e.g. `mcp`, `seed`, `migrate`, `query`). The container also defaults
+# `AYIRU_STRICT_TOOL_LOCK=1` so a network-exposed deployment refuses
+# unknown tool_ids unless the operator explicitly opts out.
 EXPOSE 8000
 ENTRYPOINT ["ayiru"]
 # --auto-seed populates an empty graph from the bundled artifacts on the
