@@ -316,26 +316,83 @@ def test_ask_rate_limit_applies_to_v1_mount_too(
     assert second.status_code == 429
 
 
-def test_ask_rate_limit_uses_forwarded_for_as_client_key(
+def test_ask_rate_limit_ignores_forwarded_for_by_default(
     http, store: ClaimStore, monkeypatch
 ) -> None:
+    """X-Forwarded-For is client-controlled. By default the limiter keys on
+    the socket peer, so an attacker can't rotate the header to mint a fresh
+    quota per request (P1-2)."""
     _accept_claim(store, subject="git status", confidence=0.92)
     monkeypatch.setenv("AYIRU_ASK_RATE_LIMIT_REQUESTS", "1")
 
     first = http.post(
         "/query/ask",
         json={"question": "git status"},
-        headers={"X-Forwarded-For": "203.0.113.10, 10.0.0.1"},
+        headers={"X-Forwarded-For": "203.0.113.10"},
     )
     second = http.post(
+        "/query/ask",
+        json={"question": "git status"},
+        headers={"X-Forwarded-For": "203.0.113.99"},  # rotated spoofed hop
+    )
+
+    assert first.status_code == 200
+    assert second.status_code == 429
+    # Keyed by the socket peer, not the spoofable header.
+    assert second.json()["error"]["details"]["client_id"] == "testclient"
+
+
+def test_ask_rate_limit_trusts_forwarded_for_when_enabled(
+    http, store: ClaimStore, monkeypatch
+) -> None:
+    """When the operator opts in (running behind a trusted proxy), the
+    limiter keys on the first X-Forwarded-For hop so per-client quotas
+    work as intended (P1-2)."""
+    _accept_claim(store, subject="git status", confidence=0.92)
+    monkeypatch.setenv("AYIRU_ASK_RATE_LIMIT_REQUESTS", "1")
+    monkeypatch.setenv("AYIRU_RATE_LIMIT_TRUST_FORWARDED_FOR", "1")
+
+    first = http.post(
+        "/query/ask",
+        json={"question": "git status"},
+        headers={"X-Forwarded-For": "203.0.113.10, 10.0.0.1"},
+    )
+    # Different first hop → its own quota → allowed.
+    second = http.post(
+        "/query/ask",
+        json={"question": "git status"},
+        headers={"X-Forwarded-For": "203.0.113.20, 10.0.0.1"},
+    )
+    # Same first hop as `first` → shares its quota → blocked.
+    third = http.post(
         "/query/ask",
         json={"question": "git status"},
         headers={"X-Forwarded-For": "203.0.113.10, 10.0.0.2"},
     )
 
     assert first.status_code == 200
-    assert second.status_code == 429
-    assert second.json()["error"]["details"]["client_id"] == "203.0.113.10"
+    assert second.status_code == 200
+    assert third.status_code == 429
+    assert third.json()["error"]["details"]["client_id"] == "203.0.113.10"
+
+
+def test_ask_rate_limit_sweeps_idle_buckets() -> None:
+    """The bucket table must stay bounded: once it crosses the sweep
+    threshold, fully-expired idle clients are evicted so the limiter can't
+    be turned into a memory-exhaustion vector (P1-2)."""
+    from collections import deque
+
+    mw = AskRateLimitMiddleware(app)
+    mw._SWEEP_THRESHOLD = 5
+    for i in range(10):
+        mw._seen_at[f"client-{i}"] = deque([0.0])  # long-expired timestamps
+
+    retry = mw._consume_or_retry_after(
+        client_id="new-client", now=1000.0, limit=5, window_seconds=60
+    )
+
+    assert retry is None
+    assert set(mw._seen_at) == {"new-client"}
 
 
 def test_ask_rate_limit_window_expires(http, store: ClaimStore, monkeypatch) -> None:

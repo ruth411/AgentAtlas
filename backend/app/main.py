@@ -32,6 +32,12 @@ DEFAULT_MAX_REQUEST_BYTES = 1 * 1024 * 1024
 _ASK_RATE_LIMIT_ENV = "AYIRU_ASK_RATE_LIMIT_REQUESTS"
 _ASK_RATE_LIMIT_WINDOW_ENV = "AYIRU_ASK_RATE_LIMIT_WINDOW_SECONDS"
 _DEFAULT_ASK_RATE_LIMIT_WINDOW_SECONDS = 60
+# Only honour `X-Forwarded-For` for rate-limit keying when the operator
+# opts in (i.e. they actually run behind a trusted reverse proxy). The
+# header is client-controlled, so trusting it unconditionally would let
+# anyone rotate it to mint a fresh quota per request — the rate limit
+# would be a no-op against a deliberate attacker.
+_RATE_LIMIT_TRUST_FORWARDED_FOR_ENV = "AYIRU_RATE_LIMIT_TRUST_FORWARDED_FOR"
 _TRUSTED_HOSTS_ENV = "AYIRU_TRUSTED_HOSTS"
 
 
@@ -172,6 +178,9 @@ class AskRateLimitMiddleware(BaseHTTPMiddleware):
     """
 
     _ASK_PATHS = frozenset({"/query/ask", "/v1/query/ask"})
+    # Sweep idle client buckets once the table grows past this many keys,
+    # so the limiter can't be turned into a memory-exhaustion vector.
+    _SWEEP_THRESHOLD = 10_000
 
     def __init__(self, app: ASGIApp) -> None:
         super().__init__(app)
@@ -231,12 +240,17 @@ class AskRateLimitMiddleware(BaseHTTPMiddleware):
         return window if window > 0 else _DEFAULT_ASK_RATE_LIMIT_WINDOW_SECONDS
 
     def _client_id(self, request: Request) -> str:
-        forwarded_for = request.headers.get("x-forwarded-for", "").strip()
-        if forwarded_for:
-            return forwarded_for.split(",", 1)[0].strip()
+        if self._trust_forwarded_for():
+            forwarded_for = request.headers.get("x-forwarded-for", "").strip()
+            if forwarded_for:
+                return forwarded_for.split(",", 1)[0].strip()
         if request.client and request.client.host:
             return request.client.host
         return "unknown"
+
+    def _trust_forwarded_for(self) -> bool:
+        raw = os.environ.get(_RATE_LIMIT_TRUST_FORWARDED_FOR_ENV, "").strip().lower()
+        return raw in ("1", "true", "yes", "on")
 
     def _consume_or_retry_after(
         self,
@@ -248,6 +262,7 @@ class AskRateLimitMiddleware(BaseHTTPMiddleware):
     ) -> int | None:
         cutoff = now - float(window_seconds)
         with self._lock:
+            self._sweep_expired(cutoff)
             bucket = self._seen_at.setdefault(client_id, deque())
             while bucket and bucket[0] <= cutoff:
                 bucket.popleft()
@@ -255,9 +270,25 @@ class AskRateLimitMiddleware(BaseHTTPMiddleware):
                 retry_after = max(1, ceil(window_seconds - (now - bucket[0])))
                 return retry_after
             bucket.append(now)
-            if not bucket:
-                self._seen_at.pop(client_id, None)
             return None
+
+    def _sweep_expired(self, cutoff: float) -> None:
+        """Drop fully-expired idle buckets so `_seen_at` stays bounded.
+
+        Runs under the caller's lock and only once the table is large, so
+        the cost is amortised. Without this, a client rotating its key
+        (e.g. a spoofed X-Forwarded-For when trusted) would grow the dict
+        without limit — turning the abuse brake into a DoS vector.
+        """
+        if len(self._seen_at) < self._SWEEP_THRESHOLD:
+            return
+        stale = [
+            cid
+            for cid, bucket in self._seen_at.items()
+            if not bucket or bucket[-1] <= cutoff
+        ]
+        for cid in stale:
+            self._seen_at.pop(cid, None)
 
 
 class TrustedHostGuardMiddleware(BaseHTTPMiddleware):
