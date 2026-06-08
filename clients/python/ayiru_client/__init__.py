@@ -17,8 +17,7 @@ from ayiru_client._models import (
     ToolSpec,
     ValidateCommandResponse,
 )
-
-__version__ = "0.2.0"
+from ayiru_client._version import __version__
 
 __all__ = [
     "Answer",

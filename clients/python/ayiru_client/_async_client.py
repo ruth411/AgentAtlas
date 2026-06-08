@@ -18,9 +18,9 @@ from ayiru_client._models import (
     ToolSpec,
     ValidateCommandResponse,
 )
+from ayiru_client._version import USER_AGENT
 
 _DEFAULT_TIMEOUT = httpx.Timeout(connect=5.0, read=30.0, write=10.0, pool=5.0)
-_USER_AGENT = "ayiru-client-py/0.2.0"
 
 
 class AsyncAyiru:
@@ -50,7 +50,7 @@ class AsyncAyiru:
     ) -> None:
         self._base_url = base_url.rstrip("/")
         self._api_key = api_key
-        headers = {"User-Agent": _USER_AGENT, "Accept": "application/json"}
+        headers = {"User-Agent": USER_AGENT, "Accept": "application/json"}
         if api_key:
             headers["Authorization"] = f"Bearer {api_key}"
         self._http = httpx.AsyncClient(

@@ -22,6 +22,7 @@ from ayiru_client import (
     AyiruError,
     SearchToolsResponse,
     ValidateCommandResponse,
+    __version__,
 )
 
 # ---------------------------------------------------------------------------
@@ -137,28 +138,70 @@ def test_sync_savings_returns_typed_response(base_url) -> None:
     assert resp.total_queries_served >= 0
 
 
-def test_sync_api_key_attaches_bearer_header(base_url) -> None:
-    client = Ayiru(base_url=base_url, api_key="test-key")
+def test_sync_api_key_attaches_bearer_header() -> None:
+    client = Ayiru(base_url="http://localhost:8000", api_key="test-key")
     try:
         assert client._http.headers["Authorization"] == "Bearer test-key"
     finally:
         client.close()
 
 
-def test_sync_no_api_key_omits_bearer_header(base_url) -> None:
-    client = Ayiru(base_url=base_url)
+def test_sync_no_api_key_omits_bearer_header() -> None:
+    client = Ayiru(base_url="http://localhost:8000")
     try:
         assert "Authorization" not in client._http.headers
     finally:
         client.close()
 
 
-def test_sync_user_agent_identifies_sdk(base_url) -> None:
-    client = Ayiru(base_url=base_url)
+def test_sync_user_agent_identifies_sdk() -> None:
+    client = Ayiru(base_url="http://localhost:8000")
     try:
-        assert client._http.headers["User-Agent"].startswith("ayiru-client-py/")
+        assert client._http.headers["User-Agent"] == f"ayiru-client-py/{__version__}"
     finally:
         client.close()
+
+
+def test_exported_version_matches_installed_package_metadata() -> None:
+    from importlib import metadata
+
+    assert __version__ == metadata.version("ayiru-client")
+
+
+async def test_async_api_key_attaches_bearer_header() -> None:
+    client = AsyncAyiru(base_url="http://localhost:8000", api_key="test-key")
+    try:
+        assert client._http.headers["Authorization"] == "Bearer test-key"
+    finally:
+        await client.close()
+
+
+async def test_async_no_api_key_omits_bearer_header() -> None:
+    client = AsyncAyiru(base_url="http://localhost:8000")
+    try:
+        assert "Authorization" not in client._http.headers
+    finally:
+        await client.close()
+
+
+async def test_async_user_agent_identifies_sdk() -> None:
+    client = AsyncAyiru(base_url="http://localhost:8000")
+    try:
+        assert client._http.headers["User-Agent"] == f"ayiru-client-py/{__version__}"
+    finally:
+        await client.close()
+
+
+def test_package_version_falls_back_when_metadata_missing(monkeypatch) -> None:
+    from importlib import metadata
+
+    from ayiru_client import _version
+
+    def missing(_dist_name: str) -> str:
+        raise metadata.PackageNotFoundError
+
+    monkeypatch.setattr(_version.metadata, "version", missing)
+    assert _version.package_version() == "0.0.0+unknown"
 
 
 # ---------------------------------------------------------------------------
