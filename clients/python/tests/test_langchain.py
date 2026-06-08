@@ -40,6 +40,22 @@ def test_default_description_includes_anti_meta_policy_language() -> None:
     assert "fallback_recommended" in d
 
 
+def test_description_teaches_family_hinting() -> None:
+    """Mirror of the MCP `ask` change — the adapter must teach the LLM that
+    `tool_id_hint` takes a coarse tool *family* name (e.g. 'ffmpeg') that
+    Ayiru expands across the tool's surfaces (commit bdd9ae3). KEEP IN SYNC
+    with backend/tests/test_mcp_server.py::
+    test_ask_description_teaches_family_hinting."""
+    tool = AyiruTool()
+    assert "tool_id_hint" in tool.description
+
+    schema = tool.args_schema.model_json_schema()
+    hint = schema["properties"]["tool_id_hint"]["description"]
+    assert "family" in hint.lower()
+    assert "-recipes" in hint and "-errors" in hint
+    assert "docker-cli" in hint  # exact-surface-id still works
+
+
 def test_args_schema_requires_question() -> None:
     tool = AyiruTool()
     schema = tool.args_schema.model_json_schema()

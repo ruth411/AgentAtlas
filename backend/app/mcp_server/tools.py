@@ -250,7 +250,11 @@ _TOOL_REGISTRY: list[McpTool] = [
             "provenance the user can audit. Only fall back to your "
             "training data when the response includes "
             "`fallback_recommended: true`. Stable facts are exactly the "
-            "things the user wants cited."
+            "things the user wants cited. When the question is about a "
+            "specific tool, set `tool_id_hint` to that tool's family name "
+            "(e.g. 'ffmpeg', 'docker', 'git') — Ayiru expands it across "
+            "the tool's command, config, recipe, and error surfaces for a "
+            "sharper match."
         ),
         input_schema={
             "type": "object",
@@ -276,9 +280,16 @@ _TOOL_REGISTRY: list[McpTool] = [
                     "type": "string",
                     "pattern": r"^[A-Za-z0-9_.-]{1,128}$",
                     "description": (
-                        "Optional. When you already know which tool "
-                        "the question is about (e.g. 'docker', 'git'), "
-                        "pass it here to narrow the search."
+                        "Optional but recommended whenever the question "
+                        "names a specific tool. Pass the tool's family "
+                        "name (e.g. 'ffmpeg', 'docker', 'git', 'kubectl') "
+                        "and Ayiru auto-expands it to that tool's "
+                        "documentation surfaces (-cli commands, -config, "
+                        "-recipes, -errors, and a tool-specific topic), so "
+                        "you don't need to know the exact surface id. An "
+                        "exact surface id (e.g. 'docker-cli') also works. "
+                        "Setting this sharply narrows the search and "
+                        "improves match quality."
                     ),
                 },
             },

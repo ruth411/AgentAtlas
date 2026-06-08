@@ -97,6 +97,13 @@ def _notification(method: str, params: dict | None = None) -> str:
     )
 
 
+def _initialize_params(secret: str | None = None) -> dict:
+    params: dict[str, str] = {}
+    if secret is not None:
+        params["ayiru_shared_secret"] = secret
+    return params
+
+
 def _call_tool(
     server: McpServer, tool: str, arguments: dict, request_id: int = 1
 ) -> dict:
@@ -219,7 +226,7 @@ def _publish_workflow(store: ClaimStore, *, workflow_id: str = "w1") -> None:
 def test_initialize_returns_protocol_version_and_server_info(
     server: McpServer,
 ) -> None:
-    raw = server.handle_frame(_frame("initialize"))
+    raw = server.handle_frame(_frame("initialize", params=_initialize_params()))
     response = json.loads(raw)
     assert response["jsonrpc"] == "2.0"
     assert response["id"] == 1
@@ -228,6 +235,55 @@ def test_initialize_returns_protocol_version_and_server_info(
     assert result["serverInfo"]["name"] == proto.SERVER_NAME
     assert result["serverInfo"]["version"] == proto.SERVER_VERSION
     assert "tools" in result["capabilities"]
+
+
+def test_initialize_requires_shared_secret_when_configured(store: ClaimStore) -> None:
+    server = McpServer(store, shared_secret="shared-secret")
+
+    raw = server.handle_frame(_frame("initialize", params=_initialize_params()))
+    response = json.loads(raw)
+
+    assert response["error"]["code"] == proto.AUTHENTICATION_REQUIRED
+    assert "ayiru_shared_secret" in response["error"]["message"]
+
+
+def test_initialize_rejects_wrong_shared_secret(store: ClaimStore) -> None:
+    server = McpServer(store, shared_secret="shared-secret")
+
+    raw = server.handle_frame(
+        _frame("initialize", params=_initialize_params("wrong-secret"))
+    )
+    response = json.loads(raw)
+
+    assert response["error"]["code"] == proto.AUTHENTICATION_REQUIRED
+
+
+def test_initialize_accepts_correct_shared_secret_and_unlocks_session(
+    store: ClaimStore,
+) -> None:
+    server = McpServer(store, shared_secret="shared-secret")
+
+    init_raw = server.handle_frame(
+        _frame("initialize", params=_initialize_params("shared-secret"))
+    )
+    init = json.loads(init_raw)
+    assert init["result"]["protocolVersion"] == proto.PROTOCOL_VERSION
+
+    tools_raw = server.handle_frame(_frame("tools/list", request_id=2))
+    tools = json.loads(tools_raw)
+    assert "tools" in tools["result"]
+
+
+def test_methods_other_than_initialize_require_authenticated_session(
+    store: ClaimStore,
+) -> None:
+    server = McpServer(store, shared_secret="shared-secret")
+
+    raw = server.handle_frame(_frame("tools/list", request_id=7))
+    response = json.loads(raw)
+
+    assert response["error"]["code"] == proto.AUTHENTICATION_REQUIRED
+    assert response["id"] == 7
 
 
 def test_notifications_initialized_returns_no_reply(server: McpServer) -> None:
@@ -299,6 +355,24 @@ def test_ask_is_the_first_tool_listed(server: McpServer) -> None:
     response = json.loads(raw)
     tools = response["result"]["tools"]
     assert tools[0]["name"] == "ask"
+
+
+def test_ask_description_teaches_family_hinting(server: McpServer) -> None:
+    """The `ask` surface should teach the LLM that `tool_id_hint` accepts a
+    coarse tool *family* name (e.g. 'ffmpeg') which Ayiru expands to the
+    five-surface decomposition (commit bdd9ae3). Without this nudge the LLM
+    leaves the hint empty or guesses an exact surface id and the matcher
+    falls back unnecessarily."""
+    raw = server.handle_frame(_frame("tools/list"))
+    response = json.loads(raw)
+    ask = next(t for t in response["result"]["tools"] if t["name"] == "ask")
+    # The main description should nudge the model to set the hint.
+    assert "tool_id_hint" in ask["description"]
+    # The field description should explain family-name expansion + surfaces.
+    hint = ask["inputSchema"]["properties"]["tool_id_hint"]["description"]
+    assert "family" in hint.lower()
+    assert "-recipes" in hint and "-errors" in hint
+    assert "docker-cli" in hint  # exact-surface-id still works
 
 
 def test_every_tool_has_required_metadata(server: McpServer) -> None:
@@ -825,7 +899,7 @@ def test_subprocess_entry_point_runs_handshake_cleanly(tmp_path) -> None:
         # (initialize result + tools/list result; the notification gets no
         # reply).
         request_lines = [
-            _frame("initialize", request_id=1),
+            _frame("initialize", params=_initialize_params(), request_id=1),
             _notification("notifications/initialized"),
             _frame("tools/list", request_id=2),
         ]
@@ -852,3 +926,56 @@ def test_subprocess_entry_point_runs_handshake_cleanly(tmp_path) -> None:
         if proc.poll() is None:
             proc.kill()
             proc.wait(timeout=2)
+
+
+def test_subprocess_entry_point_accepts_shared_secret_when_configured(tmp_path) -> None:
+    db_path = tmp_path / "mcp_smoke_secret.db"
+    from app.db.session import init_db, create_database_engine
+
+    init_db(create_database_engine(f"sqlite:///{db_path}"))
+
+    backend_dir = Path(__file__).resolve().parents[1]
+    proc = subprocess.Popen(
+        [sys.executable, "-m", "app.mcp_server"],
+        cwd=backend_dir,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        env={
+            "PATH": __import__("os").environ.get("PATH", ""),
+            "HOME": __import__("os").environ.get("HOME", "/tmp"),
+            "AYIRU_DATABASE_URL": f"sqlite:///{db_path}",
+            "AYIRU_MCP_SHARED_SECRET": "shared-secret",
+            "PYTHONPATH": str(backend_dir),
+        },
+    )
+    try:
+        request_lines = [
+            _frame(
+                "initialize",
+                params=_initialize_params("shared-secret"),
+                request_id=1,
+            ),
+            _notification("notifications/initialized"),
+            _frame("tools/list", request_id=2),
+        ]
+        proc.stdin.write("\n".join(request_lines) + "\n")
+        proc.stdin.flush()
+        proc.stdin.close()
+
+        out_lines = [line.strip() for line in proc.stdout if line.strip()]
+
+        proc.wait(timeout=5)
+        assert proc.returncode == 0, (
+            f"server exited {proc.returncode}; stderr: {proc.stderr.read()}"
+        )
+        assert len(out_lines) == 2
+        init = json.loads(out_lines[0])
+        assert init["result"]["protocolVersion"] == proto.PROTOCOL_VERSION
+        tools = json.loads(out_lines[1])
+        assert "tools" in tools["result"]
+    finally:
+        if proc.poll() is None:
+            proc.kill()
+            proc.wait(timeout=5)
