@@ -109,9 +109,19 @@ class _StubResponse:
         self.headers = {"content-type": content_type}
 
 
+# The only hosts the offline seed replay needs to "resolve" without real
+# DNS — the two fixed seed URLs below. Scoping the override to these hosts
+# (instead of every hostname) keeps the blast radius tiny: a stray fetch to
+# any other host during seeding resolves normally instead of being silently
+# pinned to a placeholder IP that would neuter the SSRF resolver.
+_SEED_PINNED_HOSTS: frozenset[str] = frozenset(
+    {"api.openai.com", "json.schemastore.org"}
+)
+
+
 @contextmanager
 def _offline_seed_dns():
-    """Resolve known seed-doc hosts without depending on external DNS.
+    """Resolve the fixed seed-doc hosts without depending on external DNS.
 
     The seed runner replays byte-stable artifacts through the real
     ingestion services so the same parsing / verification code paths are
@@ -121,15 +131,20 @@ def _offline_seed_dns():
     that DNS dependency breaks the replay before the local artifact body is
     even consulted.
 
-    The seed URLs are fixed, contract-allowlisted official-docs hosts; the
-    only thing we bypass here is the external DNS dependency. The SSRF
-    policy itself still runs against the original HTTPS URL / hostname.
+    Only the known seed hosts are pinned; every other hostname delegates to
+    the real resolver so this override can't accidentally redirect an
+    unrelated lookup. The SSRF policy itself still runs against the
+    original HTTPS URL / hostname.
     """
 
     original_getaddrinfo = socket.getaddrinfo
 
     def fake_getaddrinfo(host, port, *args, **kwargs):
-        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", port))]
+        if host in _SEED_PINNED_HOSTS:
+            return [
+                (socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", port))
+            ]
+        return original_getaddrinfo(host, port, *args, **kwargs)
 
     socket.getaddrinfo = fake_getaddrinfo
     try:

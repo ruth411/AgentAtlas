@@ -59,6 +59,37 @@ def seeded_store(tmp_path) -> ClaimStore:
 
 
 # ---------------------------------------------------------------------------
+# Offline-DNS shim
+# ---------------------------------------------------------------------------
+
+
+def test_offline_seed_dns_only_pins_seed_hosts(monkeypatch) -> None:
+    """The offline-DNS shim pins only the known seed hosts; every other
+    lookup delegates to the real resolver, so it can't silently redirect an
+    unrelated fetch to a placeholder IP (P3-4)."""
+    import socket
+
+    from app.seed_data.runner import _offline_seed_dns
+
+    delegated: list[str] = []
+
+    def sentinel(host, port, *args, **kwargs):
+        delegated.append(host)
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("1.2.3.4", port))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", sentinel)
+
+    with _offline_seed_dns():
+        pinned = socket.getaddrinfo("api.openai.com", 443)
+        other = socket.getaddrinfo("example.org", 443)
+
+    assert pinned[0][4][0] == "93.184.216.34"  # seed host pinned
+    assert other[0][4][0] == "1.2.3.4"  # non-seed host delegated
+    assert delegated == ["example.org"]
+    assert socket.getaddrinfo is sentinel  # original restored on exit
+
+
+# ---------------------------------------------------------------------------
 # Smoke
 # ---------------------------------------------------------------------------
 
