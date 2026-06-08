@@ -15,13 +15,22 @@ schema lanes (7c.2, 7c.3) share one auditable definition.
 from __future__ import annotations
 
 from dataclasses import dataclass
-import gzip
 import http.client
 import ipaddress
 import socket
 import ssl
 import zlib
 from urllib.parse import urlparse
+
+
+# Hard ceiling on how many bytes a single outbound fetch may pull into
+# memory — applied to BOTH the compressed wire bytes and the decompressed
+# result. The largest legitimate lane cap is 8 MiB (openapi / graphql), so
+# 16 MiB leaves generous headroom while still bounding a hostile or
+# compromised allowlisted host from exhausting memory with a gigabyte body
+# or a small gzip/deflate bomb. Per-lane `max_bytes` still applies on top
+# of this as the precise limit; this is the defence-in-depth floor.
+_DEFAULT_MAX_RESPONSE_BYTES = 16 * 1024 * 1024
 
 
 class HttpFetchError(ValueError):
@@ -182,8 +191,14 @@ def safe_https_request(
     resolution: SafeUrlResolution,
     headers: dict[str, str],
     timeout: float,
+    max_bytes: int = _DEFAULT_MAX_RESPONSE_BYTES,
 ) -> SafeHttpResponse:
-    """Issue one HTTPS request against the pinned public IP from `resolution`."""
+    """Issue one HTTPS request against the pinned public IP from `resolution`.
+
+    `max_bytes` caps both the compressed bytes read off the wire and the
+    decompressed body, so a hostile or compromised allowlisted host cannot
+    exhaust memory with an oversized response or a compression bomb.
+    """
 
     conn = _PinnedHTTPSConnection(
         host=resolution.hostname,
@@ -201,7 +216,9 @@ def safe_https_request(
     try:
         conn.request(method, resolution.request_target, headers=request_headers)
         response = conn.getresponse()
-        raw_body = response.read()
+        # Read one byte past the limit so we can tell "exactly at cap" from
+        # "over cap" — http.client's read(amt) fulfils `amt` unless EOF.
+        raw_body = response.read(max_bytes + 1)
     except (OSError, ssl.SSLError, http.client.HTTPException) as exc:
         raise HttpFetchError(
             f"HTTPS {method} failed for {resolution.url}: {exc}"
@@ -209,8 +226,14 @@ def safe_https_request(
     finally:
         conn.close()
 
+    if len(raw_body) > max_bytes:
+        raise HttpFetchError(
+            f"Response body from {resolution.url} exceeded the "
+            f"{max_bytes}-byte safety limit."
+        )
+
     headers_lc = {key.lower(): value for key, value in response.getheaders()}
-    decoded = _decode_response_body(raw_body, headers_lc)
+    decoded = _decode_response_body(raw_body, headers_lc, max_bytes=max_bytes)
     return SafeHttpResponse(
         status_code=int(response.status),
         text=decoded,
@@ -228,12 +251,44 @@ def _request_target(parsed) -> str:
     return path
 
 
-def _decode_response_body(raw_body: bytes, headers: dict[str, str]) -> str:
+def _decompress_bounded(raw_body: bytes, *, wbits: int, max_bytes: int) -> bytes:
+    """Inflate `raw_body` but never produce more than `max_bytes` of output.
+
+    Uses a streaming `decompressobj` with an output cap instead of the
+    one-shot `gzip.decompress` / `zlib.decompress`, which would happily
+    expand a small compression bomb into gigabytes before any check ran.
+    """
+    dobj = zlib.decompressobj(wbits)
+    out = dobj.decompress(raw_body, max_bytes + 1)
+    # `unconsumed_tail` is non-empty when output hit the cap with input
+    # still pending — i.e. the decompressed body is larger than allowed.
+    if dobj.unconsumed_tail or len(out) > max_bytes:
+        raise HttpFetchError(
+            f"Decompressed response exceeded the {max_bytes}-byte safety "
+            "limit (possible compression bomb)."
+        )
+    out += dobj.flush()
+    if len(out) > max_bytes:
+        raise HttpFetchError(
+            f"Decompressed response exceeded the {max_bytes}-byte safety "
+            "limit (possible compression bomb)."
+        )
+    return out
+
+
+def _decode_response_body(
+    raw_body: bytes, headers: dict[str, str], *, max_bytes: int
+) -> str:
     encoding = headers.get("content-encoding", "").lower()
     if encoding == "gzip":
-        raw_body = gzip.decompress(raw_body)
+        # wbits 16+MAX_WBITS selects gzip framing.
+        raw_body = _decompress_bounded(
+            raw_body, wbits=16 + zlib.MAX_WBITS, max_bytes=max_bytes
+        )
     elif encoding == "deflate":
-        raw_body = zlib.decompress(raw_body)
+        raw_body = _decompress_bounded(
+            raw_body, wbits=zlib.MAX_WBITS, max_bytes=max_bytes
+        )
 
     charset = "utf-8"
     content_type = headers.get("content-type", "")

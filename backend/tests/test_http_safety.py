@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+import gzip
 import socket
 
+import pytest
+
 from app.services.http_safety import (
+    HttpFetchError,
     resolve_url_for_safe_fetch,
     safe_https_request,
 )
@@ -13,14 +17,25 @@ from app.services.http_safety import (
 class _FakeHTTPResponse:
     status = 200
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        body: bytes = b'{"ok": true}',
+        extra_headers: list[tuple[str, str]] | None = None,
+    ) -> None:
+        self._body = body
         self._headers = [
             ("Content-Type", "application/json; charset=utf-8"),
             ("Location", "/next"),
         ]
+        if extra_headers:
+            self._headers.extend(extra_headers)
 
-    def read(self) -> bytes:
-        return b'{"ok": true}'
+    def read(self, amt: int | None = None) -> bytes:
+        # Mirror http.client.HTTPResponse.read(amt): return up to `amt`
+        # bytes, or the whole body when `amt` is None.
+        if amt is None:
+            return self._body
+        return self._body[:amt]
 
     def getheaders(self):
         return list(self._headers)
@@ -90,6 +105,60 @@ def test_safe_https_request_uses_pinned_ip_without_second_dns_lookup(monkeypatch
     assert response.status_code == 200
     assert response.text == '{"ok": true}'
     assert response.headers["location"] == "/next"
+
+
+def _connection_returning(response: _FakeHTTPResponse):
+    class _Conn(_FakePinnedConnection):
+        def getresponse(self) -> _FakeHTTPResponse:
+            return response
+
+    return _Conn
+
+
+def _pin_dns(monkeypatch) -> None:
+    def fake_getaddrinfo(host, port, *args, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", port))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", fake_getaddrinfo)
+
+
+def test_safe_https_request_rejects_oversized_body(monkeypatch) -> None:
+    """An allowlisted host returning a body larger than the cap must be
+    rejected before it is fully read into memory (P1-1)."""
+    _pin_dns(monkeypatch)
+    monkeypatch.setattr(
+        "app.services.http_safety._PinnedHTTPSConnection",
+        _connection_returning(_FakeHTTPResponse(body=b"A" * 4096)),
+    )
+    resolution = resolve_url_for_safe_fetch(
+        "https://api.openai.com/x", allowed_hosts=frozenset({"api.openai.com"})
+    )
+    with pytest.raises(HttpFetchError, match="safety limit"):
+        safe_https_request(
+            "GET", resolution=resolution, headers={}, timeout=5.0, max_bytes=1024
+        )
+
+
+def test_safe_https_request_rejects_compression_bomb(monkeypatch) -> None:
+    """A small gzip payload that inflates past the cap must be rejected
+    during decompression rather than expanded into memory first (P1-1)."""
+    _pin_dns(monkeypatch)
+    bomb = gzip.compress(b"\0" * (64 * 1024))  # ~80 compressed bytes
+    monkeypatch.setattr(
+        "app.services.http_safety._PinnedHTTPSConnection",
+        _connection_returning(
+            _FakeHTTPResponse(
+                body=bomb, extra_headers=[("Content-Encoding", "gzip")]
+            )
+        ),
+    )
+    resolution = resolve_url_for_safe_fetch(
+        "https://api.openai.com/x", allowed_hosts=frozenset({"api.openai.com"})
+    )
+    with pytest.raises(HttpFetchError, match="compression bomb"):
+        safe_https_request(
+            "GET", resolution=resolution, headers={}, timeout=5.0, max_bytes=4096
+        )
 
 
 def test_resolve_url_for_safe_fetch_preserves_explicit_port(monkeypatch) -> None:
