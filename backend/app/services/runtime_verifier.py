@@ -335,6 +335,11 @@ class RuntimeClaimVerifier(Protocol):
 
 
 _TOKEN_BOUNDARY = re.compile(r"\s+")
+# A subcommand token is derived from documentation-sourced claim text and
+# then handed to a spawned `<tool> <subcommand> --help`. There is no shell
+# (argv is a list), but we still require a plain identifier shape so junk or
+# shell-metacharacter tokens never reach the spawn as defence-in-depth.
+_SAFE_SUBCOMMAND = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]*$")
 
 
 class _ToolExistenceVerifier:
@@ -461,6 +466,15 @@ class _CliFlagExistsVerifier:
             return VerifierOutcome(
                 skipped=True,
                 skip_reason="Could not extract a subcommand from claim subject.",
+                verifier_kind=self.kind,
+            )
+        if not _SAFE_SUBCOMMAND.match(subcommand):
+            return VerifierOutcome(
+                skipped=True,
+                skip_reason=(
+                    f"Refusing to spawn: subcommand token {subcommand!r} is not a "
+                    "plain identifier."
+                ),
                 verifier_kind=self.kind,
             )
         argv_template = entry.get("argv_template") or []

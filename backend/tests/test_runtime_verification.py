@@ -476,6 +476,29 @@ def test_cli_flag_exists_skips_when_no_flag_token_in_subject(store: ClaimStore) 
     assert "flag" in resp.skip_reason.lower()
 
 
+def test_cli_flag_exists_rejects_non_identifier_subcommand(store: ClaimStore) -> None:
+    """A subcommand token carrying shell metacharacters must never reach the
+    spawn. There is no shell (argv is a list) but the verifier still skips
+    with a clear reason as defence-in-depth (P3-5)."""
+    claim = _claim(
+        claim_type=ClaimType.CLI_FLAG_EXISTS,
+        subject="git foo;bar --short",
+        statement="A --short flag with a junk subcommand token.",
+        tool_id="git",
+    )
+    _persist_at_l2(store, claim)
+
+    sandbox = FakeSandbox(exit_code=0, stdout="whatever")
+    svc = RuntimeVerificationService(
+        store, sandbox=sandbox, head_client=FakeHeadClient(),
+        mcp_runner=FakeMcpRunner(), now=FIXED_TIME,
+    )
+    resp = svc.verify(claim_id=claim.claim_id)
+    assert resp.skipped is True
+    assert "plain identifier" in resp.skip_reason
+    assert sandbox.calls == []  # nothing was spawned
+
+
 # ---------------------------------------------------------------------------
 # API endpoint exists (HEAD) verifier
 # ---------------------------------------------------------------------------
