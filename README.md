@@ -162,6 +162,14 @@ docker build -t ayiru .
 docker run --rm -p 8000:8000 ayiru
 ```
 
+The published image defaults `AYIRU_STRICT_TOOL_LOCK=1`, so network-exposed
+container deployments reject unknown `tool_id`s by default. Opt out only if
+you intentionally want uncurated tool ingestion:
+
+```bash
+docker run --rm -p 8000:8000 -e AYIRU_STRICT_TOOL_LOCK=0 ayiru
+```
+
 You should see:
 
 ```
@@ -247,6 +255,8 @@ ayiru serve --reload
 AYIRU_DATABASE_URL="sqlite:///$(pwd)/backend/ayiru_v0.2_bulk.db" \
     ayiru serve --reload
 ```
+
+`ayiru serve` auto-applies pending Alembic migrations before boot. If migration fails, the server exits non-zero instead of starting against a stale schema. Pass `--no-migrate` only if you manage schema changes out of band.
 
 You should see:
 
@@ -668,14 +678,14 @@ cd backend
 
 #### 🌐 HTTP API
 
-Set `AYIRU_API_KEY` env var to require `Authorization: Bearer <key>` on all write endpoints. Read endpoints stay public so agents can query without coordinating creds. Timing-safe comparison.
+Set `AYIRU_API_KEY` env var to require `Authorization: Bearer <key>` on all write endpoints and on audit-log reads (`/audit/*`). Query / lookup reads stay public so agents can ask without coordinating creds. Timing-safe comparison.
 
 </td>
 <td width="50%">
 
 #### 🔌 MCP stdio
 
-The MCP server is **unauthenticated by design** — assumes the caller is a local trusted process (Claude Desktop, Cursor). Don't pipe `ayiru mcp` over SSH or expose to untrusted callers.
+The MCP server is local-first. By default it assumes the caller is a trusted local process (Claude Desktop, Cursor), but you can require `initialize.params.ayiru_shared_secret` by setting `AYIRU_MCP_SHARED_SECRET`. Don't pipe `ayiru mcp` over SSH or expose it to untrusted callers without that secret.
 
 </td>
 </tr>
@@ -691,9 +701,13 @@ The MCP server is **unauthenticated by design** — assumes the caller is a loca
 | Variable | Default | Purpose |
 |---|---|---|
 | `AYIRU_DATABASE_URL` | `sqlite:///./ayiru.db` | SQLAlchemy URL. Point at `backend/ayiru_v0.2_bulk.db` for the full catalog. |
-| `AYIRU_API_KEY` | unset | Required Bearer token for write endpoints. |
+| `AYIRU_API_KEY` | unset | Required Bearer token for write endpoints and audit-log reads. |
+| `AYIRU_TRUSTED_HOSTS` | unset | Optional comma-separated host allowlist for inbound HTTP `Host` headers. Supports exact hosts and `*.example.com` wildcard entries. |
+| `AYIRU_MCP_SHARED_SECRET` | unset | When set, requires MCP clients to send `params.ayiru_shared_secret` in the `initialize` request before any other MCP method is allowed. |
+| `AYIRU_ASK_RATE_LIMIT_REQUESTS` | unset | When set to a positive integer, rate-limits `POST /query/ask` and `POST /v1/query/ask` per client IP / forwarded client. |
+| `AYIRU_ASK_RATE_LIMIT_WINDOW_SECONDS` | `60` | Window size for `AYIRU_ASK_RATE_LIMIT_REQUESTS`. Ignored unless the ask limiter is enabled. |
 | `AYIRU_REVIEWER_REGISTRY` | unset | Comma-separated allowlist of reviewer IDs. |
-| `AYIRU_STRICT_TOOL_LOCK` | unset | When set, refuses unknown `tool_id`s at `POST /claims`. |
+| `AYIRU_STRICT_TOOL_LOCK` | unset in source installs; `1` in Docker image | Refuses unknown `tool_id`s at `POST /claims`. Recommended for network-exposed deployments. |
 | `AYIRU_ALEMBIC_INI` | autodetect | Override path to `alembic.ini`. |
 | `AYIRU_SEED_SCRIPT` | autodetect | Override path to `seed_examples.py`. |
 

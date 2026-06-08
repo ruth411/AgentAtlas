@@ -2,6 +2,10 @@
 ayiru_graph_3d.html
 tools/scripts/graph_view_3d.py
 
+# Agent handoff / operating notes — local only, not tracked
+AGENTS.md
+HANDOFF.md
+
 # OS / editor junk
 .DS_Store
 Thumbs.db
