@@ -10,8 +10,6 @@ import json
 
 import pytest
 
-from ayiru_client import AsyncAyiru, Ayiru
-
 # Skip the entire module cleanly when langchain-core isn't installed.
 pytest.importorskip("langchain_core")
 
@@ -87,12 +85,12 @@ def test_make_ayiru_tool_factory_threads_overrides() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Sync + async — against the live uvicorn-hosted backend
+# Sync + async — against the real backend app
 # ---------------------------------------------------------------------------
 
 
-def test_sync_tool_returns_json_with_fallback_on_empty_graph(base_url) -> None:
-    with Ayiru(base_url=base_url) as client:
+def test_sync_tool_returns_json_with_fallback_on_empty_graph(sync_client_factory) -> None:
+    with sync_client_factory() as client:
         tool = AyiruTool(client=client)
         out = tool.invoke(
             {"question": "what is the airspeed velocity of an unladen swallow"}
@@ -103,7 +101,7 @@ def test_sync_tool_returns_json_with_fallback_on_empty_graph(base_url) -> None:
 
 
 def test_sync_tool_returns_answers_when_graph_has_match(
-    base_url, claim_store
+    sync_client_factory, claim_store
 ) -> None:
     # Seed a claim so there's something concrete to match.
     from datetime import datetime, timezone
@@ -145,7 +143,7 @@ def test_sync_tool_returns_answers_when_graph_has_match(
         )
     )
 
-    with Ayiru(base_url=base_url) as client:
+    with sync_client_factory() as client:
         tool = AyiruTool(client=client)
         out = tool.invoke({"question": "how do I remove a docker volume"})
     payload = json.loads(out)
@@ -160,12 +158,12 @@ def test_sync_tool_returns_answers_when_graph_has_match(
     assert "evidence" in top
 
 
-def test_sync_tool_return_response_json_dumps_full_model(base_url) -> None:
+def test_sync_tool_return_response_json_dumps_full_model(sync_client_factory) -> None:
     """When `return_response_json=True`, the adapter emits the raw
     Pydantic model JSON instead of the compact projection. Useful for
     callers that want every field."""
 
-    with Ayiru(base_url=base_url) as client:
+    with sync_client_factory() as client:
         tool = AyiruTool(client=client, return_response_json=True)
         out = tool.invoke({"question": "what is the airspeed velocity"})
     payload = json.loads(out)
@@ -174,8 +172,8 @@ def test_sync_tool_return_response_json_dumps_full_model(base_url) -> None:
     assert "generated_at" in payload
 
 
-async def test_async_tool_routes_to_async_client(base_url) -> None:
-    async with AsyncAyiru(base_url=base_url) as async_client:
+async def test_async_tool_routes_to_async_client(async_client_factory) -> None:
+    async with async_client_factory() as async_client:
         tool = AyiruTool(async_client=async_client)
         out = await tool.ainvoke({"question": "how do I cook a soufflé"})
     payload = json.loads(out)
@@ -183,13 +181,13 @@ async def test_async_tool_routes_to_async_client(base_url) -> None:
 
 
 async def test_async_tool_falls_back_to_sync_client_when_async_missing(
-    base_url,
+    sync_client_factory,
 ) -> None:
     """If a caller only configured `client=Ayiru(...)` and then invokes
     via `ainvoke`, the adapter still works — it calls the sync client
     inside the coroutine. Documented escape hatch for mixed codebases."""
 
-    with Ayiru(base_url=base_url) as sync_client:
+    with sync_client_factory() as sync_client:
         tool = AyiruTool(client=sync_client)
         out = await tool.ainvoke({"question": "anything"})
     payload = json.loads(out)

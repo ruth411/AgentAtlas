@@ -1,10 +1,9 @@
-"""End-to-end tests for the SDK against a live uvicorn-hosted backend.
+"""SDK integration tests against the real backend app.
 
-Tests drive both clients (:class:`Ayiru`, :class:`AsyncAyiru`) against a
-real HTTP server bound to a free localhost port — the closest possible
-mirror of production use. If the SDK silently mis-parses a server
-response, that surfaces here as a Pydantic validation error or a wrong
-field value."""
+When the environment permits local socket binds these run against a live
+uvicorn-hosted backend. In restricted sandboxes they fall back to
+in-process transports, but still exercise the real FastAPI app and the
+real SDK parsing / error-handling code."""
 
 from __future__ import annotations
 
@@ -17,8 +16,6 @@ import pytest
 from ayiru_client import (
     Answer,
     AskResponse,
-    AsyncAyiru,
-    Ayiru,
     AyiruError,
     SearchToolsResponse,
     ValidateCommandResponse,
@@ -75,18 +72,18 @@ def _seed_minimal_claim(store, *, subject: str = "docker volume rm") -> str:
 # ---------------------------------------------------------------------------
 
 
-def test_sync_ask_returns_typed_response(base_url, claim_store) -> None:
+def test_sync_ask_returns_typed_response(sync_client_factory, claim_store) -> None:
     _seed_minimal_claim(claim_store)
-    with Ayiru(base_url=base_url) as client:
+    with sync_client_factory() as client:
         resp = client.ask("how do I remove a docker volume")
     assert isinstance(resp, AskResponse)
     assert resp.question == "how do I remove a docker volume"
     assert len(resp.answers) >= 1
 
 
-def test_sync_ask_is_useful_property(base_url, claim_store) -> None:
+def test_sync_ask_is_useful_property(sync_client_factory, claim_store) -> None:
     _seed_minimal_claim(claim_store)
-    with Ayiru(base_url=base_url) as client:
+    with sync_client_factory() as client:
         resp = client.ask("how do I remove a docker volume")
     top = resp.top
     assert top is not None
@@ -96,16 +93,16 @@ def test_sync_ask_is_useful_property(base_url, claim_store) -> None:
     assert top.is_useful is expected
 
 
-def test_sync_ask_on_unknown_topic_recommends_fallback(base_url) -> None:
-    with Ayiru(base_url=base_url) as client:
+def test_sync_ask_on_unknown_topic_recommends_fallback(sync_client_factory) -> None:
+    with sync_client_factory() as client:
         resp = client.ask("what is the airspeed velocity of an unladen swallow")
     assert resp.fallback_recommended is True
     assert resp.is_useful is False
     assert resp.estimated_tokens_saved == 0
 
 
-def test_sync_search_tools_returns_typed_response(base_url) -> None:
-    with Ayiru(base_url=base_url) as client:
+def test_sync_search_tools_returns_typed_response(sync_client_factory) -> None:
+    with sync_client_factory() as client:
         resp = client.search_tools()
     assert isinstance(resp, SearchToolsResponse)
     assert resp.limit >= 1
@@ -113,10 +110,10 @@ def test_sync_search_tools_returns_typed_response(base_url) -> None:
 
 
 def test_sync_validate_command_returns_typed_response(
-    base_url, claim_store
+    sync_client_factory, claim_store
 ) -> None:
     _seed_minimal_claim(claim_store)
-    with Ayiru(base_url=base_url) as client:
+    with sync_client_factory() as client:
         resp = client.validate_command(
             tool_id="docker", command="docker volume rm my-volume"
         )
@@ -124,42 +121,33 @@ def test_sync_validate_command_returns_typed_response(
     assert resp.tool_id == "docker"
 
 
-def test_sync_get_tool_spec_raises_on_unknown(base_url) -> None:
-    with Ayiru(base_url=base_url) as client, pytest.raises(AyiruError) as exc:
+def test_sync_get_tool_spec_raises_on_unknown(sync_client_factory) -> None:
+    with sync_client_factory() as client, pytest.raises(AyiruError) as exc:
         client.get_tool_spec("definitely-not-a-real-tool")
     assert exc.value.status_code == 404
     assert exc.value.code == "CANONICAL_SPEC_NOT_FOUND"
 
 
-def test_sync_savings_returns_typed_response(base_url) -> None:
-    with Ayiru(base_url=base_url) as client:
+def test_sync_savings_returns_typed_response(sync_client_factory) -> None:
+    with sync_client_factory() as client:
         resp = client.savings("7d")
     assert resp.window == "7d"
     assert resp.total_queries_served >= 0
 
 
-def test_sync_api_key_attaches_bearer_header() -> None:
-    client = Ayiru(base_url="http://localhost:8000", api_key="test-key")
-    try:
+def test_sync_api_key_attaches_bearer_header(sync_client_factory) -> None:
+    with sync_client_factory(api_key="test-key") as client:
         assert client._http.headers["Authorization"] == "Bearer test-key"
-    finally:
-        client.close()
 
 
-def test_sync_no_api_key_omits_bearer_header() -> None:
-    client = Ayiru(base_url="http://localhost:8000")
-    try:
+def test_sync_no_api_key_omits_bearer_header(sync_client_factory) -> None:
+    with sync_client_factory() as client:
         assert "Authorization" not in client._http.headers
-    finally:
-        client.close()
 
 
-def test_sync_user_agent_identifies_sdk() -> None:
-    client = Ayiru(base_url="http://localhost:8000")
-    try:
+def test_sync_user_agent_identifies_sdk(sync_client_factory) -> None:
+    with sync_client_factory() as client:
         assert client._http.headers["User-Agent"] == f"ayiru-client-py/{__version__}"
-    finally:
-        client.close()
 
 
 def test_exported_version_matches_installed_package_metadata() -> None:
@@ -168,28 +156,19 @@ def test_exported_version_matches_installed_package_metadata() -> None:
     assert __version__ == metadata.version("ayiru-client")
 
 
-async def test_async_api_key_attaches_bearer_header() -> None:
-    client = AsyncAyiru(base_url="http://localhost:8000", api_key="test-key")
-    try:
+async def test_async_api_key_attaches_bearer_header(async_client_factory) -> None:
+    async with async_client_factory(api_key="test-key") as client:
         assert client._http.headers["Authorization"] == "Bearer test-key"
-    finally:
-        await client.close()
 
 
-async def test_async_no_api_key_omits_bearer_header() -> None:
-    client = AsyncAyiru(base_url="http://localhost:8000")
-    try:
+async def test_async_no_api_key_omits_bearer_header(async_client_factory) -> None:
+    async with async_client_factory() as client:
         assert "Authorization" not in client._http.headers
-    finally:
-        await client.close()
 
 
-async def test_async_user_agent_identifies_sdk() -> None:
-    client = AsyncAyiru(base_url="http://localhost:8000")
-    try:
+async def test_async_user_agent_identifies_sdk(async_client_factory) -> None:
+    async with async_client_factory() as client:
         assert client._http.headers["User-Agent"] == f"ayiru-client-py/{__version__}"
-    finally:
-        await client.close()
 
 
 def test_package_version_falls_back_when_metadata_missing(monkeypatch) -> None:
@@ -209,36 +188,36 @@ def test_package_version_falls_back_when_metadata_missing(monkeypatch) -> None:
 # ---------------------------------------------------------------------------
 
 
-async def test_async_ask_returns_typed_response(base_url, claim_store) -> None:
+async def test_async_ask_returns_typed_response(async_client_factory, claim_store) -> None:
     _seed_minimal_claim(claim_store)
-    async with AsyncAyiru(base_url=base_url) as client:
+    async with async_client_factory() as client:
         resp = await client.ask("how do I remove a docker volume")
     assert isinstance(resp, AskResponse)
     assert len(resp.answers) >= 1
 
 
-async def test_async_ask_on_unknown_topic_recommends_fallback(base_url) -> None:
-    async with AsyncAyiru(base_url=base_url) as client:
+async def test_async_ask_on_unknown_topic_recommends_fallback(async_client_factory) -> None:
+    async with async_client_factory() as client:
         resp = await client.ask("how do I cook a soufflé")
     assert resp.fallback_recommended is True
     assert resp.is_useful is False
 
 
-async def test_async_search_tools(base_url) -> None:
-    async with AsyncAyiru(base_url=base_url) as client:
+async def test_async_search_tools(async_client_factory) -> None:
+    async with async_client_factory() as client:
         resp = await client.search_tools()
     assert isinstance(resp, SearchToolsResponse)
 
 
-async def test_async_get_tool_spec_raises_on_unknown(base_url) -> None:
-    async with AsyncAyiru(base_url=base_url) as client:
+async def test_async_get_tool_spec_raises_on_unknown(async_client_factory) -> None:
+    async with async_client_factory() as client:
         with pytest.raises(AyiruError) as exc:
             await client.get_tool_spec("nope")
     assert exc.value.status_code == 404
 
 
-async def test_async_savings(base_url) -> None:
-    async with AsyncAyiru(base_url=base_url) as client:
+async def test_async_savings(async_client_factory) -> None:
+    async with async_client_factory() as client:
         resp = await client.savings("all")
     assert resp.window == "all"
 

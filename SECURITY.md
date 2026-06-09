@@ -48,10 +48,10 @@ You will receive an acknowledgement within **72 hours** and a status update with
 - MCP server stderr is routed to `DEVNULL` to prevent pipe-fill deadlocks (Stage 7d audit fix).
 - 1 MiB request body limit; oversized bodies surface as structured `REQUEST_BODY_TOO_LARGE`.
 - Append-only audit log; no service path mutates an existing event (Stage 13 + introspection test).
-- API-key auth (`AYIRU_API_KEY`) gates all state-changing HTTP requests plus audit-log reads with a timing-safe `hmac.compare_digest` check; query / lookup reads stay public.
+- API-key auth (`AYIRU_API_KEY`) gates all state-changing HTTP requests plus the sensitive read surfaces (`/audit/*`, `/ingestion/*`, `/verification-results*`) with a timing-safe `hmac.compare_digest` check; query / lookup reads stay public.
 - Optional trusted-host enforcement (`AYIRU_TRUSTED_HOSTS`) rejects inbound requests whose `Host` header is not on the operator-provided allowlist.
 - MCP stdio can be gated independently with `AYIRU_MCP_SHARED_SECRET`, which requires `initialize.params.ayiru_shared_secret` before any other MCP method is allowed.
-- Optional per-client ask() rate limiting (`AYIRU_ASK_RATE_LIMIT_REQUESTS`) gives operators a built-in abuse brake on the public query surface without closing it entirely.
+- Optional per-client ask() rate limiting (`AYIRU_ASK_RATE_LIMIT_REQUESTS`) gives operators a built-in abuse brake on the public query surface without closing it entirely. By default it keys on the socket peer; `X-Forwarded-For` is only trusted when `AYIRU_RATE_LIMIT_TRUST_FORWARDED_FOR` is explicitly enabled behind a trusted proxy.
 - Baseline response security headers (`X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`) are stamped on every HTTP response.
 - `ayiru serve` auto-migrates before boot and exits non-zero on migration failure, so operators do not silently run against a stale schema.
 - The Docker image defaults `AYIRU_STRICT_TOOL_LOCK=1`, so network-exposed container deployments reject unknown `tool_id`s unless the operator explicitly overrides the env var.

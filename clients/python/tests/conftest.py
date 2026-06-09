@@ -1,12 +1,13 @@
 """Shared test fixtures.
 
-Strategy: stand up a real uvicorn server on a free localhost port for
-the whole session, point both the sync and async SDK clients at it.
-Tests then exercise the SDK over an actual HTTP socket — which is the
-closest possible parallel to how the package will be used in
-production, and which works uniformly across `httpx.Client` and
-`httpx.AsyncClient` (httpx's ASGITransport is async-only and crashes
-on `Client.close()`).
+Preferred strategy: stand up a real uvicorn server on a free localhost
+port for the whole session and point both SDK clients at it.
+
+Fallback strategy: some sandboxes forbid binding `127.0.0.1`. In that
+case we keep the same app + DB + SDK code under test, but route requests
+through in-process transports instead of a real socket. That preserves
+meaningful integration coverage in restricted environments instead of
+skipping the whole client suite.
 
 The DB is session-scoped (one fresh SQLite file for the entire run);
 tests use uniquely-suffixed claim IDs so they don't collide on inserts.
@@ -22,7 +23,7 @@ import sys
 import tempfile
 import threading
 import time
-from collections.abc import Iterator
+from collections.abc import AsyncIterator, Iterator
 from pathlib import Path
 
 import httpx
@@ -41,6 +42,14 @@ def _free_port() -> int:
     with contextlib.closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
         s.bind(("127.0.0.1", 0))
         return s.getsockname()[1]
+
+
+def _can_bind_localhost() -> bool:
+    try:
+        _free_port()
+    except OSError:
+        return False
+    return True
 
 
 @pytest.fixture(scope="session")
@@ -62,8 +71,20 @@ def _session_db() -> Iterator[str]:
 
 
 @pytest.fixture(scope="session")
-def _server(_session_db) -> Iterator[str]:
-    """Start uvicorn in a background thread; yield the base_url.
+def _backend_app(_session_db):
+    """Import and initialize the real backend app against the temp DB."""
+
+    from app.db.session import init_db, rebind_default_engine  # noqa: PLC0415
+    from app.main import app  # noqa: PLC0415
+
+    rebind_default_engine()  # honor the temp DB even if the module was preloaded
+    init_db()
+    return app
+
+
+@pytest.fixture(scope="session")
+def _server(_backend_app) -> Iterator[str | None]:
+    """Start uvicorn when localhost binds are available.
 
     Defends against three failure modes a test author shouldn't have
     to think about:
@@ -76,16 +97,19 @@ def _server(_session_db) -> Iterator[str]:
       3. Test process killed mid-run → the `try/finally` issues a
          graceful shutdown via `should_exit`, plus a hard
          `server.shutdown()` synchronously so the OS releases the
-         port even if the thread is jammed."""
+         port even if the thread is jammed.
+
+    If the environment forbids binding a local socket, yield `None` and
+    let the per-client fixtures fall back to in-process transports.
+    """
+    if not _can_bind_localhost():
+        yield None
+        return
 
     import uvicorn  # noqa: PLC0415
-    from app.db.session import init_db, rebind_default_engine  # noqa: PLC0415
-    from app.main import app  # noqa: PLC0415
 
-    rebind_default_engine()  # honor the temp DB even if the module was preloaded
-    init_db()
     port = _free_port()
-    config = uvicorn.Config(app, host="127.0.0.1", port=port, log_level="warning")
+    config = uvicorn.Config(_backend_app, host="127.0.0.1", port=port, log_level="warning")
     server = uvicorn.Server(config)
     thread = threading.Thread(target=server.run, daemon=True)
     thread.start()
@@ -116,11 +140,68 @@ def _server(_session_db) -> Iterator[str]:
 
 @pytest.fixture
 def base_url(_server) -> str:
-    return _server
+    return _server or "http://testserver"
 
 
 @pytest.fixture
-def claim_store(_server):
+def sync_client_factory(_backend_app, _server):
+    """Yield a contextmanager that builds an `Ayiru` client.
+
+    Prefers the real uvicorn socket when available. Otherwise uses
+    Starlette's sync test transport against the same app instance.
+    """
+
+    from ayiru_client import Ayiru  # noqa: PLC0415
+
+    @contextlib.contextmanager
+    def factory(*, api_key: str | None = None):
+        if _server is not None:
+            with Ayiru(base_url=_server, api_key=api_key) as client:
+                yield client
+            return
+
+        from starlette.testclient import TestClient  # noqa: PLC0415
+
+        with TestClient(_backend_app) as test_client:
+            client = Ayiru(
+                base_url=str(test_client.base_url),
+                api_key=api_key,
+                transport=test_client._transport,
+            )
+            try:
+                yield client
+            finally:
+                client.close()
+
+    return factory
+
+
+@pytest.fixture
+def async_client_factory(_backend_app, _server):
+    """Yield an async contextmanager that builds an `AsyncAyiru` client."""
+
+    from ayiru_client import AsyncAyiru  # noqa: PLC0415
+
+    @contextlib.asynccontextmanager
+    async def factory(*, api_key: str | None = None) -> AsyncIterator[AsyncAyiru]:
+        if _server is not None:
+            async with AsyncAyiru(base_url=_server, api_key=api_key) as client:
+                yield client
+            return
+
+        transport = httpx.ASGITransport(app=_backend_app, client=("testclient", 50000))
+        async with AsyncAyiru(
+            base_url="http://testserver",
+            api_key=api_key,
+            transport=transport,
+        ) as client:
+            yield client
+
+    return factory
+
+
+@pytest.fixture
+def claim_store(_backend_app):
     """Live ClaimStore handle — same DB the server uses, since both
     read `AYIRU_DATABASE_URL`."""
 
@@ -130,7 +211,7 @@ def claim_store(_server):
 
 
 @pytest.fixture
-def isolated_claim_store(_server):
+def isolated_claim_store(_backend_app):
     """Function-scoped variant of `claim_store` that truncates the
     knowledge-graph tables before yielding. Use when a test asserts on
     "the graph is empty" or "the graph holds exactly N claims" — the

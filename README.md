@@ -678,7 +678,7 @@ cd backend
 
 #### 🌐 HTTP API
 
-Set `AYIRU_API_KEY` env var to require `Authorization: Bearer <key>` on all write endpoints and on audit-log reads (`/audit/*`). Query / lookup reads stay public so agents can ask without coordinating creds. Timing-safe comparison.
+Set `AYIRU_API_KEY` env var to require `Authorization: Bearer <key>` on all write endpoints plus the sensitive read surfaces: audit history (`/audit/*`), ingestion artifacts (`/ingestion/*`), and verification-result listings (`/verification-results*`). Query / lookup reads stay public so agents can ask without coordinating creds. Timing-safe comparison.
 
 </td>
 <td width="50%">
@@ -691,7 +691,7 @@ The MCP server is local-first. By default it assumes the caller is a trusted loc
 </tr>
 </table>
 
-> ⚠️ For any network-exposed deployment, set `AYIRU_API_KEY` and put it behind a reverse proxy with rate limiting. See [SECURITY.md](SECURITY.md).
+> ⚠️ For any network-exposed deployment, set `AYIRU_API_KEY`, put it behind a reverse proxy with rate limiting, and only enable forwarded-client rate-limit keying when that proxy is trusted. See [SECURITY.md](SECURITY.md).
 
 ---
 
@@ -701,11 +701,12 @@ The MCP server is local-first. By default it assumes the caller is a trusted loc
 | Variable | Default | Purpose |
 |---|---|---|
 | `AYIRU_DATABASE_URL` | `sqlite:///./ayiru.db` | SQLAlchemy URL. Point at `backend/ayiru_v0.2_bulk.db` for the full catalog. |
-| `AYIRU_API_KEY` | unset | Required Bearer token for write endpoints and audit-log reads. |
+| `AYIRU_API_KEY` | unset | Required Bearer token for write endpoints plus `/audit/*`, `/ingestion/*`, and `/verification-results*` reads. |
 | `AYIRU_TRUSTED_HOSTS` | unset | Optional comma-separated host allowlist for inbound HTTP `Host` headers. Supports exact hosts and `*.example.com` wildcard entries. |
 | `AYIRU_MCP_SHARED_SECRET` | unset | When set, requires MCP clients to send `params.ayiru_shared_secret` in the `initialize` request before any other MCP method is allowed. |
-| `AYIRU_ASK_RATE_LIMIT_REQUESTS` | unset | When set to a positive integer, rate-limits `POST /query/ask` and `POST /v1/query/ask` per client IP / forwarded client. |
+| `AYIRU_ASK_RATE_LIMIT_REQUESTS` | unset | When set to a positive integer, rate-limits `POST /query/ask` and `POST /v1/query/ask` per client key. By default this is the socket peer address. |
 | `AYIRU_ASK_RATE_LIMIT_WINDOW_SECONDS` | `60` | Window size for `AYIRU_ASK_RATE_LIMIT_REQUESTS`. Ignored unless the ask limiter is enabled. |
+| `AYIRU_RATE_LIMIT_TRUST_FORWARDED_FOR` | unset | When set to `1` / `true`, trust the first `X-Forwarded-For` hop for ask() rate-limit keying. Only enable behind a trusted reverse proxy. |
 | `AYIRU_REVIEWER_REGISTRY` | unset | Comma-separated allowlist of reviewer IDs. |
 | `AYIRU_STRICT_TOOL_LOCK` | unset in source installs; `1` in Docker image | Refuses unknown `tool_id`s at `POST /claims`. Recommended for network-exposed deployments. |
 | `AYIRU_ALEMBIC_INI` | autodetect | Override path to `alembic.ini`. |
