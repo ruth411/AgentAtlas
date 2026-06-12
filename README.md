@@ -9,9 +9,9 @@
   ╚═╝  ╚═╝   ╚═╝   ╚═╝╚═╝  ╚═╝ ╚═════╝
 ```
 
-### **Verified, cited knowledge for AI agents.**
+### **Machine-readable external knowledge for AI agents.**
 
-*Your agent asks a question. Ayiru returns a cited answer from official docs — not a guess from training data months out of date. 3,600+ claims across 38 tool families (157 surfaces), every fact backed by a source URL.*
+*Ayiru is the substrate an agent queries before it acts. Resolve subjects, capabilities, constraints, effects, and workflows from cited sources first; render human-readable answers second. 3,600+ claims across 38 tool families (157 surfaces), every claim backed by a source URL.*
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-3776AB?logo=python&logoColor=white&style=for-the-badge)](https://www.python.org/downloads/)
 [![Tests](https://img.shields.io/badge/826_tests_✓-2EA44F?style=for-the-badge)](#-verify-it-works)
@@ -34,7 +34,7 @@ Vector search over docs helps, but the agent still has no way to know which chun
 
 ## The fix
 
-Ayiru is a read-only API your agent calls before it answers. Every claim it returns has:
+Ayiru is a read-only external knowledge layer your agent calls before it selects or executes an action. Natural-language `ask()` is still available, but it now sits on top of structured subject, capability, and action-resolution APIs. Every claim it returns has:
 
 - a **source URL** pointing at the official docs page it came from,
 - a **verification level** (`L1_source_recorded` → `L2_source_verified` → `L3_runtime_verified` — the highest tier means we actually spawned the binary and confirmed the flag exists),
@@ -60,15 +60,15 @@ print(answer.top.evidence[0].source_uri)
 # → https://git-scm.com/docs/git-push
 ```
 
-No hallucinated flag. No paraphrased blog post. The exact text from the catalog, with the official-docs URL.
+No hallucinated flag. No paraphrased blog post. The exact catalog text, with the official-docs URL and verification status.
 
 ## What's in the box
 
-- **`ask(question)`** — the headline surface. Cited, ranked answers grounded in 3,600+ claims across 38 tool families (157 surfaces) (git, kubectl, docker, gh, ffmpeg, postgres, openssl, …). Hybrid lexical + semantic retrieval.
-- **`search_tools` / `get_tool_spec`** — structured catalog access when you know the tool but not the command.
-- **`validate_command(tool, command)`** *(bonus)* — runs the same risk classifier over a literal command string and returns an advisory `safe_to_auto_execute` verdict. Useful as a second opinion before an agent runs a destructive command; **not** a security boundary against an adversarial agent.
+- **Structured query surfaces** — `resolve_subject`, `get_subject_spec`, `get_capabilities`, `get_constraints`, `get_effects`, `resolve_action`, and `get_workflow_plan` let an agent ground an intended action in typed records before it acts.
+- **`ask(question)`** — compatibility projection over the same graph. It renders cited, ranked answers grounded in 3,600+ claims across 38 tool families (157 surfaces). Accepted answers are preferred; review-pending answers are marked as informational.
+- **`validate_command(tool, command)`** — command-specific preflight verdicts for agents about to execute something. Useful as a second opinion before a destructive command; **not** a security boundary against an adversarial agent.
 - **MCP server** — drop into Claude Desktop / Cursor / Cline / Continue via stdio JSON-RPC. Six tools, zero config.
-- **Python SDK** — sync + async clients, plus a LangChain `Tool` adapter.
+- **Python SDK** — sync + async clients for both the compatibility APIs and the structured substrate, plus a LangChain `Tool` adapter.
 
 ---
 

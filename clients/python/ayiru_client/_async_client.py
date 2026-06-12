@@ -13,10 +13,17 @@ import httpx
 from ayiru_client._errors import AyiruError, parse_error_payload
 from ayiru_client._models import (
     AskResponse,
+    ConstraintSetResponse,
+    EffectProfileResponse,
+    GetCapabilitiesResponse,
+    ResolveActionResponse,
+    ResolveSubjectResponse,
     SavingsResponse,
     SearchToolsResponse,
+    SubjectSpecResponse,
     ToolSpec,
     ValidateCommandResponse,
+    WorkflowPlanResponse,
 )
 from ayiru_client._version import USER_AGENT
 
@@ -97,6 +104,115 @@ class AsyncAyiru:
 
     async def get_tool_spec(self, tool_id: str) -> ToolSpec:
         return await self._get(f"/query/tools/{tool_id}")  # type: ignore[return-value]
+
+    async def resolve_subject(
+        self,
+        subject_hint: str,
+        *,
+        kind: str | None = None,
+        family_hint: str | None = None,
+        limit: int = 20,
+    ) -> ResolveSubjectResponse:
+        body: dict[str, Any] = {"subject_hint": subject_hint, "limit": limit}
+        if kind is not None:
+            body["kind"] = kind
+        if family_hint is not None:
+            body["family_hint"] = family_hint
+        data = await self._post("/query/resolve-subject", json=body)
+        return ResolveSubjectResponse.model_validate(data)
+
+    async def get_subject_spec(self, subject_id: str) -> SubjectSpecResponse:
+        data = await self._get(f"/query/subjects/{subject_id}")
+        return SubjectSpecResponse.model_validate(data)
+
+    async def get_capabilities(
+        self,
+        subject_id: str,
+        *,
+        capability_types: list[str] | None = None,
+        accepted_only: bool = True,
+        verification_min: str | None = None,
+        limit: int = 50,
+    ) -> GetCapabilitiesResponse:
+        body: dict[str, Any] = {
+            "subject_id": subject_id,
+            "accepted_only": accepted_only,
+            "limit": limit,
+        }
+        if capability_types is not None:
+            body["capability_types"] = capability_types
+        if verification_min is not None:
+            body["verification_min"] = verification_min
+        data = await self._post("/query/capabilities", json=body)
+        return GetCapabilitiesResponse.model_validate(data)
+
+    async def get_constraints(
+        self,
+        subject_id: str,
+        *,
+        action_intent: str | None = None,
+        accepted_only: bool = True,
+    ) -> ConstraintSetResponse:
+        body: dict[str, Any] = {
+            "subject_id": subject_id,
+            "accepted_only": accepted_only,
+        }
+        if action_intent is not None:
+            body["action_intent"] = action_intent
+        data = await self._post("/query/constraints", json=body)
+        return ConstraintSetResponse.model_validate(data)
+
+    async def get_effects(
+        self,
+        subject_id: str,
+        *,
+        action_intent: str | None = None,
+        accepted_only: bool = True,
+    ) -> EffectProfileResponse:
+        body: dict[str, Any] = {
+            "subject_id": subject_id,
+            "accepted_only": accepted_only,
+        }
+        if action_intent is not None:
+            body["action_intent"] = action_intent
+        data = await self._post("/query/effects", json=body)
+        return EffectProfileResponse.model_validate(data)
+
+    async def resolve_action(
+        self,
+        subject_id: str,
+        action_intent: str,
+        *,
+        command: str | None = None,
+        environment: str | None = None,
+        accepted_only: bool = True,
+        limit: int = 5,
+    ) -> ResolveActionResponse:
+        body: dict[str, Any] = {
+            "subject_id": subject_id,
+            "action_intent": action_intent,
+            "accepted_only": accepted_only,
+            "limit": limit,
+        }
+        if command is not None:
+            body["command"] = command
+        if environment is not None:
+            body["environment"] = environment
+        data = await self._post("/query/resolve-action", json=body)
+        return ResolveActionResponse.model_validate(data)
+
+    async def get_workflow_plan(
+        self,
+        goal: str,
+        *,
+        environment: str | None = None,
+        limit: int = 20,
+    ) -> WorkflowPlanResponse:
+        body: dict[str, Any] = {"goal": goal, "limit": limit}
+        if environment is not None:
+            body["environment"] = environment
+        data = await self._post("/query/workflow-plan", json=body)
+        return WorkflowPlanResponse.model_validate(data)
 
     async def search_tools(
         self,

@@ -15,13 +15,26 @@ from app.api.errors import ERROR_RESPONSES, ErrorCode, raise_api_error
 from app.schemas.query import (
     AskRequest,
     AskResponse,
+    GetCapabilitiesRequest,
+    GetCapabilitiesResponse,
+    GetConstraintsRequest,
+    GetEffectsRequest,
+    GetWorkflowPlanRequest,
     ExplainRiskRequest,
     ExplainRiskResponse,
+    ConstraintSetResponse,
+    EffectProfileResponse,
+    ResolveActionRequest,
+    ResolveActionResponse,
+    ResolveSubjectRequest,
+    ResolveSubjectResponse,
     SafeWorkflowRequest,
     SafeWorkflowResponse,
     SearchToolsResponse,
+    SubjectSpecResponse,
     ValidateCommandRequest,
     ValidateCommandResponse,
+    WorkflowPlanResponse,
 )
 from app.schemas.tool_spec import ToolSpec
 from app.services.claim_store import ClaimStore, get_claim_store
@@ -74,6 +87,112 @@ def ask(
         question=request.question,
         limit=request.limit,
         tool_id_hint=request.tool_id_hint,
+    )
+
+
+@router.post(
+    "/resolve-subject",
+    response_model=ResolveSubjectResponse,
+    responses=ERROR_RESPONSES,
+)
+def resolve_subject(
+    request: ResolveSubjectRequest,
+    engine: QueryEngine = Depends(get_query_engine),
+) -> ResolveSubjectResponse:
+    return engine.resolve_subject(
+        subject_hint=request.subject_hint,
+        kind=request.kind,
+        family_hint=request.family_hint,
+        limit=request.limit,
+    )
+
+
+@router.get(
+    "/subjects/{subject_id}",
+    response_model=SubjectSpecResponse,
+    responses=ERROR_RESPONSES,
+)
+def get_subject_spec(
+    subject_id: str = Path(..., pattern=r"^[A-Za-z0-9_.-]{1,128}$"),
+    engine: QueryEngine = Depends(get_query_engine),
+) -> SubjectSpecResponse:
+    spec = engine.get_subject_spec(subject_id=subject_id)
+    if spec is None:
+        raise_api_error(
+            status.HTTP_404_NOT_FOUND,
+            code=ErrorCode.CANONICAL_SPEC_NOT_FOUND,
+            message=f"No canonical SubjectSpec published for subject_id '{subject_id}'.",
+            details={"subject_id": subject_id},
+        )
+    return spec
+
+
+@router.post(
+    "/capabilities",
+    response_model=GetCapabilitiesResponse,
+    responses=ERROR_RESPONSES,
+)
+def get_capabilities(
+    request: GetCapabilitiesRequest,
+    engine: QueryEngine = Depends(get_query_engine),
+) -> GetCapabilitiesResponse:
+    return engine.get_capabilities(
+        subject_id=request.subject_id,
+        capability_types=list(request.capability_types),
+        accepted_only=request.accepted_only,
+        verification_min=request.verification_min,
+        limit=request.limit,
+    )
+
+
+@router.post(
+    "/constraints",
+    response_model=ConstraintSetResponse,
+    responses=ERROR_RESPONSES,
+)
+def get_constraints(
+    request: GetConstraintsRequest,
+    engine: QueryEngine = Depends(get_query_engine),
+) -> ConstraintSetResponse:
+    return engine.get_constraints(
+        subject_id=request.subject_id,
+        action_intent=request.action_intent,
+        accepted_only=request.accepted_only,
+    )
+
+
+@router.post(
+    "/effects",
+    response_model=EffectProfileResponse,
+    responses=ERROR_RESPONSES,
+)
+def get_effects(
+    request: GetEffectsRequest,
+    engine: QueryEngine = Depends(get_query_engine),
+) -> EffectProfileResponse:
+    return engine.get_effects(
+        subject_id=request.subject_id,
+        action_intent=request.action_intent,
+        accepted_only=request.accepted_only,
+    )
+
+
+@router.post(
+    "/resolve-action",
+    response_model=ResolveActionResponse,
+    responses=ERROR_RESPONSES,
+)
+def resolve_action(
+    request: ResolveActionRequest,
+    engine: QueryEngine = Depends(get_query_engine),
+) -> ResolveActionResponse:
+    return engine.resolve_action(
+        subject_id=request.subject_id,
+        action_intent=request.action_intent,
+        command=request.command,
+        environment=request.environment,
+        accepted_only=request.accepted_only,
+        limit=request.limit,
     )
 
 
@@ -142,4 +261,20 @@ def safe_workflow(
 ) -> SafeWorkflowResponse:
     return engine.find_safe_workflows(
         goal=request.goal, environment=request.environment
+    )
+
+
+@router.post(
+    "/workflow-plan",
+    response_model=WorkflowPlanResponse,
+    responses=ERROR_RESPONSES,
+)
+def get_workflow_plan(
+    request: GetWorkflowPlanRequest,
+    engine: QueryEngine = Depends(get_query_engine),
+) -> WorkflowPlanResponse:
+    return engine.get_workflow_plan(
+        goal=request.goal,
+        environment=request.environment,
+        limit=request.limit,
     )

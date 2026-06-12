@@ -27,6 +27,41 @@ _VerificationLevel = Literal[
     "L5_human_audited",
 ]
 
+_VerificationStatus = Literal[
+    "pending",
+    "accepted",
+    "rejected",
+    "conflict_detected",
+    "requires_human_review",
+]
+
+_SubjectKind = Literal["tool", "api", "sdk", "adk", "workflow", "subject"]
+_CapabilityType = Literal[
+    "existence",
+    "invocation",
+    "configuration",
+    "constraint",
+    "effect",
+    "environment",
+    "deprecation",
+    "workflow",
+    "metadata",
+]
+_ClaimType = Literal[
+    "tool_exists",
+    "cli_command_exists",
+    "cli_flag_exists",
+    "api_endpoint_exists",
+    "mcp_tool_exists",
+    "auth_requirement",
+    "side_effect",
+    "destructive_action",
+    "environment_requirement",
+    "feature_deprecated",
+    "workflow_step",
+    "config_field_exists",
+]
+
 _ConfidenceBand = Literal["none", "low", "moderate", "high", "strong"]
 # Server's RiskLevel StrEnum has 5 values — "none" is emitted for no-risk
 # claims by safety_policy.py and consumed by risk_engine.py. Missing this
@@ -67,6 +102,7 @@ class Answer(_SDKModel):
 
     confidence: float = Field(ge=0.0, le=1.0)
     confidence_band: _ConfidenceBand
+    verification_status: _VerificationStatus
     verification_level: _VerificationLevel
     risk_level: _RiskLevel | None = None
 
@@ -83,12 +119,17 @@ class Answer(_SDKModel):
         callers needing a tighter bar can inspect ``confidence`` and
         ``verification_level`` directly."""
 
-        return self.confidence >= 0.6 and self.verification_level != "L0_unverified"
+        return (
+            self.verification_status == "accepted"
+            and self.confidence >= 0.6
+            and self.verification_level != "L0_unverified"
+        )
 
 
 class AskResponse(_SDKModel):
     question: str
     answers: list[Answer] = Field(default_factory=list)
+    answer_status: Literal["accepted", "informational", "miss"]
     fallback_recommended: bool
     estimated_tokens_saved: int = Field(ge=0)
     generated_at: datetime
@@ -103,9 +144,127 @@ class AskResponse(_SDKModel):
     def is_useful(self) -> bool:
         """True if the top answer is useful AND fallback_recommended is False."""
 
-        if self.fallback_recommended or self.top is None:
+        if self.fallback_recommended or self.answer_status != "accepted" or self.top is None:
             return False
         return self.top.is_useful
+
+
+class SubjectSummary(_SDKModel):
+    subject_id: str
+    subject_kind: _SubjectKind
+    name: str
+    family: str
+    interfaces: list[str] = Field(default_factory=list)
+    capability_count: int = Field(ge=0)
+    verification_level: _VerificationLevel
+    match_reason: str
+
+
+class ResolveSubjectResponse(_SDKModel):
+    subject_hint: str
+    kind: _SubjectKind | None = None
+    matches: list[SubjectSummary] = Field(default_factory=list)
+    total: int = Field(ge=0)
+    limit: int = Field(ge=1)
+
+
+class SubjectSpecResponse(_SDKModel):
+    subject_id: str
+    subject_kind: _SubjectKind
+    name: str
+    family: str
+    interfaces: list[str] = Field(default_factory=list)
+    capabilities: list[str] = Field(default_factory=list)
+    workflows: list[str] = Field(default_factory=list)
+    verification_level: _VerificationLevel
+    provenance_claim_ids: list[str] = Field(default_factory=list)
+    provenance_evidence_ids: list[str] = Field(default_factory=list)
+
+
+class CapabilityRecord(_SDKModel):
+    capability_id: str
+    subject_id: str
+    capability_type: _CapabilityType
+    claim_type: _ClaimType
+    title: str
+    detail: str
+    verification_status: _VerificationStatus
+    verification_level: _VerificationLevel
+    confidence: float = Field(ge=0.0, le=1.0)
+    confidence_band: _ConfidenceBand
+    risk_level: _RiskLevel | None = None
+    evidence: list[EvidenceCitation] = Field(default_factory=list)
+    relevance_reason: str | None = None
+
+
+class GetCapabilitiesResponse(_SDKModel):
+    subject_id: str
+    accepted_only: bool
+    capabilities: list[CapabilityRecord] = Field(default_factory=list)
+    total: int = Field(ge=0)
+    limit: int = Field(ge=1)
+
+
+class ConstraintSetResponse(_SDKModel):
+    subject_id: str
+    action_intent: str | None = None
+    constraints: list[CapabilityRecord] = Field(default_factory=list)
+    total: int = Field(ge=0)
+
+
+class EffectProfileResponse(_SDKModel):
+    subject_id: str
+    action_intent: str | None = None
+    effects: list[CapabilityRecord] = Field(default_factory=list)
+    total: int = Field(ge=0)
+    aggregate_risk_level: _RiskLevel | None = None
+    requires_confirmation: bool
+
+
+class ResolveActionResponse(_SDKModel):
+    subject_id: str
+    action_intent: str
+    command: str | None = None
+    environment: str | None = None
+    resolution_mode: Literal["command_match", "capability_search"]
+    top_capability: CapabilityRecord | None = None
+    supporting_capabilities: list[CapabilityRecord] = Field(default_factory=list)
+    constraints: list[CapabilityRecord] = Field(default_factory=list)
+    effects: list[CapabilityRecord] = Field(default_factory=list)
+    fallback_recommended: bool
+    safe_to_auto_execute: bool | None = None
+    requires_human_confirmation: bool | None = None
+    risk_level: _RiskLevel | None = None
+    verification_status: _VerificationStatus | None = None
+    verification_level: _VerificationLevel | None = None
+    confidence: float = Field(ge=0.0, le=1.0)
+    confidence_band: _ConfidenceBand
+    reasons: list[str] = Field(default_factory=list)
+
+    @property
+    def is_authoritative(self) -> bool:
+        return (
+            self.fallback_recommended is False
+            and self.verification_status == "accepted"
+            and self.confidence >= 0.6
+        )
+
+
+class WorkflowPlanSummary(_SDKModel):
+    workflow_id: str
+    goal: str = ""
+    subject_ids: list[str] = Field(default_factory=list)
+    step_count: int = Field(ge=0)
+    aggregate_risk_level: _RiskLevel
+    verification_level: _VerificationLevel
+    requires_confirmation: bool
+
+
+class WorkflowPlanResponse(_SDKModel):
+    goal: str
+    environment: str | None = None
+    plans: list[WorkflowPlanSummary] = Field(default_factory=list)
+    total: int = Field(ge=0)
 
 
 class ValidateCommandResponse(_SDKModel):
@@ -164,10 +323,20 @@ ToolSpec = dict[str, Any]
 __all__ = [
     "Answer",
     "AskResponse",
+    "CapabilityRecord",
+    "ConstraintSetResponse",
     "EvidenceCitation",
+    "EffectProfileResponse",
+    "GetCapabilitiesResponse",
+    "ResolveActionResponse",
+    "ResolveSubjectResponse",
     "SavingsResponse",
     "SearchToolsResponse",
+    "SubjectSpecResponse",
+    "SubjectSummary",
     "ToolMatchSummary",
     "ToolSpec",
     "ValidateCommandResponse",
+    "WorkflowPlanResponse",
+    "WorkflowPlanSummary",
 ]

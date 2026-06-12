@@ -527,6 +527,7 @@ def _build_fake_ask_engine(*, fallback: bool, answer_count: int = 2) -> Any:
         RiskLevel,
         TrustLevel,
         VerificationLevel,
+        VerificationStatus,
     )
     from app.schemas.evidence import EvidenceType
     from app.schemas.query import Answer, AskResponse, EvidenceCitation
@@ -546,6 +547,7 @@ def _build_fake_ask_engine(*, fallback: bool, answer_count: int = 2) -> Any:
                 return AskResponse(
                     question=question,
                     answers=[],
+                    answer_status="miss",
                     fallback_recommended=True,
                     estimated_tokens_saved=0,
                     generated_at=datetime.now(timezone.utc),
@@ -558,6 +560,7 @@ def _build_fake_ask_engine(*, fallback: bool, answer_count: int = 2) -> Any:
                     tool_id=tool_id_hint or "docker",
                     confidence=0.92,
                     confidence_band=ConfidenceBand.STRONG,
+                    verification_status=VerificationStatus.ACCEPTED,
                     verification_level=VerificationLevel.L2_SOURCE_VERIFIED,
                     risk_level=RiskLevel.CRITICAL,
                     evidence=[
@@ -574,6 +577,7 @@ def _build_fake_ask_engine(*, fallback: bool, answer_count: int = 2) -> Any:
             return AskResponse(
                 question=question,
                 answers=answers,
+                answer_status="accepted",
                 fallback_recommended=False,
                 estimated_tokens_saved=420,
                 generated_at=datetime.now(timezone.utc),
@@ -672,6 +676,7 @@ def test_ask_forwards_tool_hint_to_engine(
             return AskResponse(
                 question=question,
                 answers=[],
+                answer_status="miss",
                 fallback_recommended=True,
                 estimated_tokens_saved=0,
                 generated_at=datetime.now(timezone.utc),

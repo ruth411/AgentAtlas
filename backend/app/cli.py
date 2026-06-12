@@ -766,14 +766,14 @@ def _print_ask_response(payload: dict[str, Any]) -> None:
         return
 
     print(
-        f"HIT  answers={len(payload['answers'])}  "
+        f"HIT  status={payload['answer_status']}  answers={len(payload['answers'])}  "
         f"estimated_tokens_saved={payload['estimated_tokens_saved']}"
     )
     for i, answer in enumerate(payload["answers"], start=1):
         print(
             f"  {i}. [{answer['tool_id']}] {answer['subject']} "
             f"(conf={answer['confidence']:.2f} {answer['confidence_band']}, "
-            f"{answer['verification_level']})"
+            f"{answer['verification_status']}, {answer['verification_level']})"
         )
         # Truncate long statements so the CLI output stays scannable.
         statement = answer["statement"]

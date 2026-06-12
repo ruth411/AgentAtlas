@@ -3,10 +3,11 @@
 Official Python client for [Ayiru](https://github.com/ruth411/ayiru) —
 the verified, machine-readable knowledge layer for AI agents.
 
-Agents using this client can ask natural-language questions about CLIs,
-APIs, and developer tools and get **cited, verification-graded answers
-from a curated knowledge graph** instead of paying the token cost of a
-web search round-trip on every question.
+Agents using this client can query Ayiru as an external knowledge layer
+before they act: resolve subjects, inspect capabilities, check
+constraints and effects, or ground an intended action in cited,
+verification-graded records. Natural-language `ask()` remains available
+as a compatibility projection over the same graph.
 
 ## Install
 
@@ -26,8 +27,8 @@ Once 0.2.5 publishes the `pip install ayiru-client` path will work too.
 
 ## Quickstart
 
-The client has two flavors with the same public surface — pick the one
-that matches your codebase.
+The client has two flavors with the same public surface — structured
+query methods first, compatibility methods included.
 
 ### Sync
 
@@ -77,6 +78,47 @@ graph (Stage 20).
 
 All methods are available on both `Ayiru` and `AsyncAyiru`; the async
 versions are coroutines, otherwise identical.
+
+### Structured-first methods
+
+These are the preferred agent-facing surfaces when the caller is
+selecting or validating an action.
+
+### `resolve_subject(subject_hint, *, kind=None, family_hint=None, limit=20) -> ResolveSubjectResponse`
+
+Resolve a fuzzy hint like `"docker"` or `"github"` into canonical
+subject candidates.
+
+### `get_subject_spec(subject_id) -> SubjectSpecResponse`
+
+Fetch the canonical subject-level publication for a tool or workflow.
+
+### `get_capabilities(subject_id, *, capability_types=None, accepted_only=True, verification_min=None, limit=50) -> GetCapabilitiesResponse`
+
+List typed capability records for a subject.
+
+### `get_constraints(subject_id, *, action_intent=None, accepted_only=True) -> ConstraintSetResponse`
+
+Project auth, environment, and other preconditions.
+
+### `get_effects(subject_id, *, action_intent=None, accepted_only=True) -> EffectProfileResponse`
+
+Project side effects, deprecations, and aggregate execution risk.
+
+### `resolve_action(subject_id, action_intent, *, command=None, environment=None, accepted_only=True, limit=5) -> ResolveActionResponse`
+
+Ground an intended action before the agent executes it. When `command`
+is provided this routes through command validation; otherwise it ranks
+capabilities relevant to the action intent.
+
+### `get_workflow_plan(goal, *, environment=None, limit=20) -> WorkflowPlanResponse`
+
+Resolve a goal into published workflow plans.
+
+### Compatibility methods
+
+These remain supported, but they are projections over the same
+structured substrate.
 
 ### `ask(question, *, limit=5, tool_id_hint=None) -> AskResponse`
 
@@ -144,8 +186,8 @@ s = client.savings("7d")
 
 ### `Answer.is_useful`
 
-Quick heuristic on each answer: `True` when `confidence ≥ 0.6 AND
-verification_level != "L0_unverified"`.
+Quick heuristic on each answer: `True` when the answer is `accepted`,
+`confidence ≥ 0.6`, and `verification_level != "L0_unverified"`.
 
 > **Wire-format note.** `verification_level` is a string with an
 > uppercase-prefix + lowercase-suffix shape: `"L0_unverified"`,

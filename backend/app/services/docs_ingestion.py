@@ -30,6 +30,7 @@ from hashlib import sha256
 import html
 from html.parser import HTMLParser
 import json
+import re
 import threading
 import time
 from typing import Any, Callable, Protocol
@@ -102,6 +103,29 @@ _SAFE_TAGS_DROP_TEXT = frozenset(
 # is present we fall back to whole-body extraction so pages without
 # modern semantic HTML still work.
 _MAIN_CONTENT_TAGS = frozenset({"main", "article"})
+_PAGE_CHROME_TRUNCATION_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
+    ("search_docs", re.compile(r"\bSearch docs:.*$", re.IGNORECASE)),
+    ("hashiconf_banner", re.compile(r"\bHashiConf 20\d{2}.*$", re.IGNORECASE)),
+    ("helm_release_banner", re.compile(r"\bHelm v\d+\.\d+\.\d+ is out!.*$", re.IGNORECASE)),
+    (
+        "pnpm_banner",
+        re.compile(r"\bLearn how to Mitigate supply chain attacks with pnpm.*$", re.IGNORECASE),
+    ),
+)
+_PAGE_CHROME_FRAGMENT_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
+    ("skip_to_content", re.compile(r"\bSkip to (?:main )?content\b", re.IGNORECASE)),
+    ("github_cli_banner", re.compile(r"\bTake GitHub to the command line\b", re.IGNORECASE)),
+    ("ansible_forum_banner", re.compile(r"\bAnsible community forum\b", re.IGNORECASE)),
+    (
+        "ansible_docs_banner",
+        re.compile(
+            r"\bDocumentation Ansible Community Documentation\b",
+            re.IGNORECASE,
+        ),
+    ),
+    ("go_nav_banner", re.compile(r"\bWhy Go\b", re.IGNORECASE)),
+    ("go_nav_chevron", re.compile(r"\barrow_drop_down\b", re.IGNORECASE)),
+)
 
 # Stage 20.7 — ToS compliance for the bulk-ingest crawl.
 _USER_AGENT = "Ayiru-Bulk-Ingestion/1.0 (+https://github.com/ruth411/ayiru)"
@@ -374,6 +398,13 @@ class DocsIngestionService:
             )
             self._store.create(claim)
             created_claim_ids.append(claim.claim_id)
+
+            contamination_markers = _find_page_chrome_markers(fetch.sanitized_text)
+            if contamination_markers:
+                raise DocsIngestionError(
+                    "Sanitized text still contains page chrome markers: "
+                    + ", ".join(contamination_markers)
+                )
 
             if verify:
                 verification = CanonOrchestrator(self._store).verify_claim(claim)
@@ -809,7 +840,26 @@ def _sanitize_html_to_text(raw: str) -> str:
     parser = _SafeTextExtractor(restrict_to_main=detector.has_main)
     parser.feed(raw)
     parser.close()
-    return parser.text()
+    return _strip_known_page_chrome(parser.text())
+
+
+def _strip_known_page_chrome(text: str) -> str:
+    cleaned = text
+    for _, pattern in _PAGE_CHROME_TRUNCATION_PATTERNS:
+        cleaned = pattern.sub("", cleaned)
+    for _, pattern in _PAGE_CHROME_FRAGMENT_PATTERNS:
+        cleaned = pattern.sub(" ", cleaned)
+    return " ".join(cleaned.split())
+
+
+def _find_page_chrome_markers(text: str) -> list[str]:
+    markers: list[str] = []
+    for name, pattern in (
+        _PAGE_CHROME_TRUNCATION_PATTERNS + _PAGE_CHROME_FRAGMENT_PATTERNS
+    ):
+        if pattern.search(text):
+            markers.append(name)
+    return markers
 
 
 # -------- Build artifacts and claims --------
@@ -893,6 +943,7 @@ __all__ = [
     "docs_fetch_spec",
     "list_docs_sources_for_tool",
     "_assert_url_is_safe",
+    "_find_page_chrome_markers",
     "_sanitize_html_to_text",
 ]
 
