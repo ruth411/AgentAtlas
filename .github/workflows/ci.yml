@@ -78,7 +78,12 @@ jobs:
           cp core/dist/*.whl mcp/dist/*.whl backend/dist/*.whl /tmp/wheelhouse/
           python -m venv /tmp/smoke-venv
           /tmp/smoke-venv/bin/pip install --upgrade pip
-          /tmp/smoke-venv/bin/pip install --no-index --find-links=/tmp/wheelhouse \
+          # `--find-links` adds our locally-built wheels as candidates;
+          # transitive deps (fastapi, alembic, sqlalchemy, …) still
+          # resolve from PyPI. `--no-index` would block PyPI entirely
+          # and is wrong here — once ayiru-core hits PyPI we can drop
+          # the find-links too.
+          /tmp/smoke-venv/bin/pip install --find-links=/tmp/wheelhouse \
             ayiru ayiru-core ayiru-mcp
           /tmp/smoke-venv/bin/ayiru --version
           /tmp/smoke-venv/bin/ayiru --help
