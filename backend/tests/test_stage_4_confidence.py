@@ -458,6 +458,30 @@ def test_high_risk_with_two_strong_streams_reaches_strong_band(tmp_path) -> None
     assert result.confidence_band in {ConfidenceBand.HIGH, ConfidenceBand.STRONG}
 
 
+def test_recipe_surface_requires_review_without_multiple_evidence_streams(tmp_path) -> None:
+    claim = _claim(
+        claim_id="claim_recipe_review",
+        subject="git recipe: inspect commit history",
+        statement="Use git log --oneline --graph to inspect recent commits.",
+        tool_id="git-recipes",
+        risk_level=RiskLevel.MEDIUM,
+        evidence=[
+            _evidence_dict(
+                evidence_id="ev_recipe_docs",
+                evidence_type=EvidenceType.OFFICIAL_DOCS,
+                source_uri="https://git-scm.com/docs/git-log",
+            )
+        ],
+    )
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
+
+    result = CanonOrchestrator(store).verify_claim(claim)
+
+    assert result.decision == OrchestratorDecision.REQUIRES_HUMAN_REVIEW
+    assert result.verification_status == VerificationStatus.REQUIRES_HUMAN_REVIEW
+    assert "INFORMATIONAL_SURFACE_NEEDS_REVIEW" in result.reason_codes
+
+
 def test_fake_official_docs_high_trust_is_downgraded_by_server_rules() -> None:
     claim = _claim(
         claim_id="claim_fake_docs",

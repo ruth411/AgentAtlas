@@ -25,6 +25,7 @@ from app.services.docs_ingestion import (
     DocsIngestionError,
     DocsIngestionService,
     _assert_url_is_safe,
+    _find_page_chrome_markers,
     _sanitize_html_to_text,
     docs_fetch_spec,
     list_docs_sources_for_tool,
@@ -295,6 +296,17 @@ def test_sanitizer_falls_back_when_no_main_content_tag() -> None:
     html_blob = "<html><body><p>just a paragraph in a plain body</p></body></html>"
     text = _sanitize_html_to_text(html_blob)
     assert "just a paragraph in a plain body" in text
+
+
+def test_sanitizer_strips_known_page_chrome_markers() -> None:
+    text = _sanitize_html_to_text(
+        "<p>terraform plan command reference | Terraform | HashiCorp Developer "
+        "HashiConf 2025 Don't miss the live stream of HashiConf Day 2 happening now "
+        "View live stream</p>"
+    )
+    assert "terraform plan command reference" in text
+    assert "HashiConf 2025" not in text
+    assert _find_page_chrome_markers(text) == []
 
 
 # ---------------------------------------------------------------------------

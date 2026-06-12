@@ -5,6 +5,7 @@ tools/scripts/graph_view_3d.py
 # Agent handoff / operating notes — local only, not tracked
 AGENTS.md
 HANDOFF.md
+CODEX_HANDOFF.md
 
 # OS / editor junk
 .DS_Store

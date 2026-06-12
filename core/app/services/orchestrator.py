@@ -231,6 +231,18 @@ class CanonOrchestrator:
                 ],
             )
 
+        if _surface_needs_informational_review(claim) and _distinct_evidence_streams(claim) < 2:
+            return build_result(
+                decision=OrchestratorDecision.REQUIRES_HUMAN_REVIEW,
+                status=VerificationStatus.REQUIRES_HUMAN_REVIEW,
+                level=verification_level,
+                breakdown=breakdown,
+                reason_codes=["INFORMATIONAL_SURFACE_NEEDS_REVIEW"],
+                reasons=[
+                    "Recipe/error surfaces stay informational until they have at least two distinct evidence streams."
+                ] + breakdown.penalties,
+            )
+
         return build_result(
             decision=OrchestratorDecision.ACCEPTED,
             status=VerificationStatus.ACCEPTED,
@@ -251,6 +263,17 @@ def _empty_breakdown(reason: str) -> ConfidenceBreakdown:
         caps_applied=["score_suppressed"],
         penalties=[],
     )
+
+
+def _surface_needs_informational_review(claim: KnowledgeClaim) -> bool:
+    if "-" not in claim.tool_id:
+        return False
+    surface = claim.tool_id.split("-", 1)[1]
+    return surface in {"recipes", "errors"}
+
+
+def _distinct_evidence_streams(claim: KnowledgeClaim) -> int:
+    return len({(e.evidence_type, e.source_uri) for e in claim.evidence})
 
 
 def _result(

@@ -33,7 +33,7 @@ def test_default_description_includes_anti_meta_policy_language() -> None:
 
     tool = AyiruTool()
     d = tool.description
-    assert "EVERY user question" in d
+    assert "before acting" in d.lower()
     assert "even when you already know" in d.lower()
     assert "fallback_recommended" in d
 
@@ -148,11 +148,13 @@ def test_sync_tool_returns_answers_when_graph_has_match(
         out = tool.invoke({"question": "how do I remove a docker volume"})
     payload = json.loads(out)
     assert "answers" in payload
+    assert payload["answer_status"] in {"accepted", "informational"}
     assert len(payload["answers"]) >= 1
     # Every answer carries the fields the LLM needs to decide.
     top = payload["answers"][0]
     assert "claim_id" in top
     assert "statement" in top
+    assert "verification_status" in top
     assert "verification_level" in top
     assert "confidence" in top
     assert "evidence" in top
