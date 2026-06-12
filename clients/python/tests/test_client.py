@@ -458,6 +458,42 @@ def test_ask_response_top_is_none_on_empty_answers() -> None:
     assert resp.is_useful is False
 
 
+def test_get_capabilities_response_accepts_structured_detail_payload() -> None:
+    response = GetCapabilitiesResponse.model_validate(
+        {
+            "subject_id": "gh-pr-create",
+            "accepted_only": True,
+            "accepted_only_structured": False,
+            "total": 1,
+            "limit": 50,
+            "capabilities": [
+                {
+                    "capability_id": "cap-gh-pr-create-invocation",
+                    "subject_id": "gh-pr-create",
+                    "capability_type": "invocation",
+                    "claim_type": None,
+                    "title": "gh pr create invocation",
+                    "detail": {
+                        "kind": "invocation",
+                        "command": "gh pr create",
+                        "argv_schema": {"program": "gh", "subcommand_path": ["pr", "create"]},
+                    },
+                    "source": "structured",
+                    "verification_status": "accepted",
+                    "verification_level": "L3_runtime_verified",
+                    "confidence": 0.99,
+                    "confidence_band": "strong",
+                    "risk_level": "medium",
+                    "evidence": [],
+                    "relevance_reason": "title hit on ['create']",
+                }
+            ],
+        }
+    )
+    assert response.capabilities[0].source == "structured"
+    assert isinstance(response.capabilities[0].detail, dict)
+
+
 def test_ayiru_error_format() -> None:
     err = AyiruError(
         status_code=404,

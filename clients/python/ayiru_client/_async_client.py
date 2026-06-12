@@ -131,12 +131,14 @@ class AsyncAyiru:
         *,
         capability_types: list[str] | None = None,
         accepted_only: bool = True,
+        accepted_only_structured: bool = False,
         verification_min: str | None = None,
         limit: int = 50,
     ) -> GetCapabilitiesResponse:
         body: dict[str, Any] = {
             "subject_id": subject_id,
             "accepted_only": accepted_only,
+            "accepted_only_structured": accepted_only_structured,
             "limit": limit,
         }
         if capability_types is not None:
@@ -152,10 +154,12 @@ class AsyncAyiru:
         *,
         action_intent: str | None = None,
         accepted_only: bool = True,
+        accepted_only_structured: bool = False,
     ) -> ConstraintSetResponse:
         body: dict[str, Any] = {
             "subject_id": subject_id,
             "accepted_only": accepted_only,
+            "accepted_only_structured": accepted_only_structured,
         }
         if action_intent is not None:
             body["action_intent"] = action_intent
@@ -168,10 +172,12 @@ class AsyncAyiru:
         *,
         action_intent: str | None = None,
         accepted_only: bool = True,
+        accepted_only_structured: bool = False,
     ) -> EffectProfileResponse:
         body: dict[str, Any] = {
             "subject_id": subject_id,
             "accepted_only": accepted_only,
+            "accepted_only_structured": accepted_only_structured,
         }
         if action_intent is not None:
             body["action_intent"] = action_intent
@@ -186,12 +192,14 @@ class AsyncAyiru:
         command: str | None = None,
         environment: str | None = None,
         accepted_only: bool = True,
+        accepted_only_structured: bool = False,
         limit: int = 5,
     ) -> ResolveActionResponse:
         body: dict[str, Any] = {
             "subject_id": subject_id,
             "action_intent": action_intent,
             "accepted_only": accepted_only,
+            "accepted_only_structured": accepted_only_structured,
             "limit": limit,
         }
         if command is not None:

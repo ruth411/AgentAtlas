@@ -1,0 +1,300 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Ayiru Structured Capability Detail",
+  "type": "object",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/existenceDetail"
+    },
+    {
+      "$ref": "#/$defs/invocationDetail"
+    },
+    {
+      "$ref": "#/$defs/configurationDetail"
+    },
+    {
+      "$ref": "#/$defs/metadataDetail"
+    }
+  ],
+  "$defs": {
+    "positional": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "raw",
+        "required",
+        "variadic"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "raw": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "variadic": {
+          "type": "boolean"
+        },
+        "choices": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "flagSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "takes_value",
+        "value_type",
+        "repeatable",
+        "required",
+        "deprecated",
+        "inherited",
+        "description"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^--[A-Za-z0-9-]+$"
+        },
+        "short": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^-[A-Za-z0-9]$"
+        },
+        "takes_value": {
+          "type": "boolean"
+        },
+        "value_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "value_type": {
+          "type": "string",
+          "enum": [
+            "boolean",
+            "string",
+            "string_list",
+            "integer",
+            "duration",
+            "file",
+            "key_value",
+            "token"
+          ]
+        },
+        "repeatable": {
+          "type": "boolean"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "deprecated": {
+          "type": "boolean"
+        },
+        "inherited": {
+          "type": "boolean"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "default": {
+          "type": [
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        },
+        "choices": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "existenceDetail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "command",
+        "source_url",
+        "usage_signature",
+        "runtime_verified",
+        "synopsis"
+      ],
+      "properties": {
+        "kind": {
+          "const": "existence"
+        },
+        "command": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_url": {
+          "type": "string",
+          "minLength": 1
+        },
+        "usage_signature": {
+          "type": "string",
+          "minLength": 1
+        },
+        "runtime_verified": {
+          "type": "boolean"
+        },
+        "synopsis": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "invocationDetail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "command",
+        "source_url",
+        "usage_signature",
+        "argv_schema",
+        "flag_schema"
+      ],
+      "properties": {
+        "kind": {
+          "const": "invocation"
+        },
+        "command": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_url": {
+          "type": "string",
+          "minLength": 1
+        },
+        "usage_signature": {
+          "type": "string",
+          "minLength": 1
+        },
+        "synopsis": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "argv_schema": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "program",
+            "subcommand_path",
+            "positionals"
+          ],
+          "properties": {
+            "program": {
+              "type": "string",
+              "const": "gh"
+            },
+            "subcommand_path": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "positionals": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/positional"
+              }
+            }
+          }
+        },
+        "flag_schema": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/flagSchema"
+          }
+        }
+      }
+    },
+    "configurationDetail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "command",
+        "source_url",
+        "usage_signature",
+        "flag"
+      ],
+      "properties": {
+        "kind": {
+          "const": "configuration"
+        },
+        "command": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_url": {
+          "type": "string",
+          "minLength": 1
+        },
+        "usage_signature": {
+          "type": "string",
+          "minLength": 1
+        },
+        "flag": {
+          "$ref": "#/$defs/flagSchema"
+        }
+      }
+    },
+    "metadataDetail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "command",
+        "source_url",
+        "aliases"
+      ],
+      "properties": {
+        "kind": {
+          "const": "metadata"
+        },
+        "command": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_url": {
+          "type": "string",
+          "minLength": 1
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

@@ -75,6 +75,12 @@ from app.services.embedding_service import (
     deserialize_embedding,
 )
 from app.services.risk_classifier import classify_action
+from app.services.structured_knowledge_store import (
+    StructuredCapability,
+    StructuredConstraint,
+    StructuredEffect,
+    StructuredSubject,
+)
 
 
 _QUERY_POLICY_CONTRACT = contract_path("query_policy.v1.json")
@@ -268,6 +274,23 @@ class QueryEngine:
         scored_matches: list[tuple[int, SubjectSummary]] = []
 
         if kind in {None, "tool", "api", "sdk", "adk", "subject"}:
+            for subject in self._store.list_structured_subjects(family=family_hint):
+                if kind is not None and subject.subject_kind != kind:
+                    continue
+                score, reason = _score_structured_subject(subject, normalized_query)
+                if score <= 0:
+                    continue
+                scored_matches.append(
+                    (
+                        score,
+                        self._structured_subject_to_subject_summary(
+                            subject,
+                            match_reason=reason,
+                        ),
+                    )
+                )
+
+        if kind in {None, "tool", "api", "sdk", "adk", "subject"}:
             tool_matches = self.search_tools(query=query, limit=limit, offset=0)
             for item in tool_matches.matches:
                 spec = self._store.get_canonical_tool_spec(item.tool_id)
@@ -309,7 +332,15 @@ class QueryEngine:
                 item[1].subject_id,
             )
         )
-        matches = [summary for _, summary in scored_matches[:limit]]
+        matches: list[SubjectSummary] = []
+        seen_subject_ids: set[str] = set()
+        for _, summary in scored_matches:
+            if summary.subject_id in seen_subject_ids:
+                continue
+            seen_subject_ids.add(summary.subject_id)
+            matches.append(summary)
+            if len(matches) >= limit:
+                break
         return ResolveSubjectResponse(
             subject_hint=subject_hint,
             kind=kind,  # type: ignore[arg-type]
@@ -319,6 +350,9 @@ class QueryEngine:
         )
 
     def get_subject_spec(self, *, subject_id: str) -> SubjectSpecResponse | None:
+        structured = self._store.get_structured_subject(subject_id.strip())
+        if structured is not None:
+            return self._structured_subject_to_subject_spec(structured)
         tool_spec = self._store.get_canonical_tool_spec(subject_id.strip())
         if tool_spec is not None:
             return _tool_spec_to_subject_spec(tool_spec)
@@ -333,15 +367,54 @@ class QueryEngine:
         subject_id: str,
         capability_types: list[str] | None = None,
         accepted_only: bool = True,
+        accepted_only_structured: bool = False,
         verification_min: VerificationLevel | None = None,
         limit: int = 50,
     ) -> GetCapabilitiesResponse:
         capability_types = capability_types or []
+        structured_subject = self._store.get_structured_subject(subject_id)
+        if structured_subject is not None:
+            structured_caps = self._store.list_structured_capabilities(
+                subject_id=subject_id,
+                capability_types=capability_types,
+                accepted_only=accepted_only,
+                verification_min=verification_min,
+                limit=5_000,
+            )
+            structured_caps.sort(
+                key=lambda item: (
+                    _structured_capability_rank(item.capability_type),
+                    -VERIFICATION_LEVEL_ORDER[item.verification_level],
+                    -item.confidence,
+                    item.capability_id,
+                )
+            )
+            return GetCapabilitiesResponse(
+                subject_id=subject_id,
+                accepted_only=accepted_only,
+                accepted_only_structured=accepted_only_structured,
+                capabilities=[
+                    self._structured_capability_to_response_record(item)
+                    for item in structured_caps[:limit]
+                ],
+                total=len(structured_caps),
+                limit=limit,
+            )
+        if accepted_only_structured:
+            return GetCapabilitiesResponse(
+                subject_id=subject_id,
+                accepted_only=accepted_only,
+                accepted_only_structured=True,
+                capabilities=[],
+                total=0,
+                limit=limit,
+            )
         claims = self._claims_for_subject(subject_id)
         if not claims:
             return GetCapabilitiesResponse(
                 subject_id=subject_id,
                 accepted_only=accepted_only,
+                accepted_only_structured=accepted_only_structured,
                 capabilities=[],
                 total=0,
                 limit=limit,
@@ -383,6 +456,7 @@ class QueryEngine:
         return GetCapabilitiesResponse(
             subject_id=subject_id,
             accepted_only=accepted_only,
+            accepted_only_structured=accepted_only_structured,
             capabilities=page,
             total=len(capabilities),
             limit=limit,
@@ -394,11 +468,34 @@ class QueryEngine:
         subject_id: str,
         action_intent: str | None = None,
         accepted_only: bool = True,
+        accepted_only_structured: bool = False,
     ) -> ConstraintSetResponse:
+        if self._store.get_structured_subject(subject_id) is not None:
+            constraints = [
+                self._structured_constraint_to_response_record(item)
+                for item in self._store.list_structured_constraints(
+                    subject_id=subject_id,
+                    limit=200,
+                )
+            ]
+            return ConstraintSetResponse(
+                subject_id=subject_id,
+                action_intent=action_intent,
+                constraints=constraints,
+                total=len(constraints),
+            )
+        if accepted_only_structured:
+            return ConstraintSetResponse(
+                subject_id=subject_id,
+                action_intent=action_intent,
+                constraints=[],
+                total=0,
+            )
         response = self.get_capabilities(
             subject_id=subject_id,
             capability_types=["constraint", "environment"],
             accepted_only=accepted_only,
+            accepted_only_structured=accepted_only_structured,
             limit=200,
         )
         return ConstraintSetResponse(
@@ -414,11 +511,44 @@ class QueryEngine:
         subject_id: str,
         action_intent: str | None = None,
         accepted_only: bool = True,
+        accepted_only_structured: bool = False,
     ) -> EffectProfileResponse:
+        if self._store.get_structured_subject(subject_id) is not None:
+            effects = [
+                self._structured_effect_to_response_record(item)
+                for item in self._store.list_structured_effects(
+                    subject_id=subject_id,
+                    limit=200,
+                )
+            ]
+            aggregate = None
+            if effects:
+                aggregate = max(
+                    (cap.risk_level or RiskLevel.NONE for cap in effects),
+                    key=lambda level: RISK_ORDER[level],
+                )
+            return EffectProfileResponse(
+                subject_id=subject_id,
+                action_intent=action_intent,
+                effects=effects,
+                total=len(effects),
+                aggregate_risk_level=aggregate,
+                requires_confirmation=aggregate in {RiskLevel.HIGH, RiskLevel.CRITICAL},
+            )
+        if accepted_only_structured:
+            return EffectProfileResponse(
+                subject_id=subject_id,
+                action_intent=action_intent,
+                effects=[],
+                total=0,
+                aggregate_risk_level=None,
+                requires_confirmation=False,
+            )
         response = self.get_capabilities(
             subject_id=subject_id,
             capability_types=["effect", "deprecation"],
             accepted_only=accepted_only,
+            accepted_only_structured=accepted_only_structured,
             limit=200,
         )
         aggregate = None
@@ -444,18 +574,113 @@ class QueryEngine:
         command: str | None = None,
         environment: str | None = None,
         accepted_only: bool = True,
+        accepted_only_structured: bool = False,
         limit: int = 5,
     ) -> ResolveActionResponse:
         constraints = self.get_constraints(
             subject_id=subject_id,
             action_intent=action_intent,
             accepted_only=accepted_only,
+            accepted_only_structured=accepted_only_structured,
         )
         effects = self.get_effects(
             subject_id=subject_id,
             action_intent=action_intent,
             accepted_only=accepted_only,
+            accepted_only_structured=accepted_only_structured,
         )
+        if self._store.get_structured_subject(subject_id) is not None:
+            if command:
+                top_capability = self._structured_capability_for_command(
+                    subject_id=subject_id,
+                    command=command,
+                    accepted_only=accepted_only,
+                )
+                requires_confirmation = (
+                    None
+                    if top_capability is None
+                    else effects.aggregate_risk_level in {RiskLevel.HIGH, RiskLevel.CRITICAL}
+                )
+                return ResolveActionResponse(
+                    subject_id=subject_id,
+                    action_intent=action_intent,
+                    command=command,
+                    environment=environment,
+                    resolution_mode="command_match",
+                    top_capability=top_capability,
+                    supporting_capabilities=[top_capability] if top_capability else [],
+                    constraints=constraints.constraints,
+                    effects=effects.effects,
+                    fallback_recommended=top_capability is None,
+                    safe_to_auto_execute=(
+                        None if top_capability is None else requires_confirmation is False
+                    ),
+                    requires_human_confirmation=requires_confirmation,
+                    risk_level=effects.aggregate_risk_level if top_capability else None,
+                    verification_status=(
+                        top_capability.verification_status if top_capability else None
+                    ),
+                    verification_level=(
+                        top_capability.verification_level if top_capability else None
+                    ),
+                    confidence=top_capability.confidence if top_capability else 0.0,
+                    confidence_band=(
+                        top_capability.confidence_band if top_capability else ConfidenceBand.NONE
+                    ),
+                    reasons=[],
+                )
+
+            ranked = self._rank_structured_capabilities_for_action(
+                subject_id=subject_id,
+                query=action_intent,
+                accepted_only=accepted_only,
+                limit=limit,
+            )
+            top = ranked[0] if ranked else None
+            fallback = top is None or top.confidence < _ASK_SCORE_THRESHOLD
+            return ResolveActionResponse(
+                subject_id=subject_id,
+                action_intent=action_intent,
+                command=None,
+                environment=environment,
+                resolution_mode="capability_search",
+                top_capability=top,
+                supporting_capabilities=ranked,
+                constraints=constraints.constraints,
+                effects=effects.effects,
+                fallback_recommended=fallback,
+                safe_to_auto_execute=None,
+                requires_human_confirmation=(
+                    None if top is None else top.risk_level in {RiskLevel.HIGH, RiskLevel.CRITICAL}
+                ),
+                risk_level=top.risk_level if top else None,
+                verification_status=top.verification_status if top else None,
+                verification_level=top.verification_level if top else None,
+                confidence=top.confidence if top else 0.0,
+                confidence_band=top.confidence_band if top else ConfidenceBand.NONE,
+                reasons=[top.relevance_reason] if top and top.relevance_reason else [],
+            )
+        if accepted_only_structured:
+            return ResolveActionResponse(
+                subject_id=subject_id,
+                action_intent=action_intent,
+                command=command,
+                environment=environment,
+                resolution_mode="command_match" if command else "capability_search",
+                top_capability=None,
+                supporting_capabilities=[],
+                constraints=[],
+                effects=[],
+                fallback_recommended=True,
+                safe_to_auto_execute=None,
+                requires_human_confirmation=None,
+                risk_level=None,
+                verification_status=None,
+                verification_level=None,
+                confidence=0.0,
+                confidence_band=ConfidenceBand.NONE,
+                reasons=[],
+            )
         if command:
             verdict = self.validate_command(tool_id=subject_id, command=command)
             top_capability = None
@@ -871,6 +1096,172 @@ class QueryEngine:
                 )
             )
         return claims
+
+    def _structured_subject_to_subject_summary(
+        self,
+        subject: StructuredSubject,
+        *,
+        match_reason: str,
+    ) -> SubjectSummary:
+        capability_count = len(
+            self._store.list_structured_capabilities(
+                subject_id=subject.subject_id,
+                accepted_only=False,
+                limit=5_000,
+            )
+        )
+        return SubjectSummary(
+            subject_id=subject.subject_id,
+            subject_kind=subject.subject_kind,  # type: ignore[arg-type]
+            name=subject.name,
+            family=subject.family,
+            interfaces=["cli"] if subject.family == "gh" else [],
+            capability_count=capability_count,
+            verification_level=subject.verification_level,
+            match_reason=match_reason,
+        )
+
+    def _structured_subject_to_subject_spec(
+        self,
+        subject: StructuredSubject,
+    ) -> SubjectSpecResponse:
+        capabilities = self._store.list_structured_capabilities(
+            subject_id=subject.subject_id,
+            accepted_only=False,
+            limit=5_000,
+        )
+        return SubjectSpecResponse(
+            subject_id=subject.subject_id,
+            subject_kind=subject.subject_kind,  # type: ignore[arg-type]
+            name=subject.name,
+            family=subject.family,
+            interfaces=["cli"] if subject.family == "gh" else [],
+            capabilities=[cap.title for cap in capabilities],
+            workflows=[],
+            verification_level=subject.verification_level,
+            provenance_claim_ids=list(subject.provenance_claim_ids),
+            provenance_evidence_ids=[],
+        )
+
+    def _structured_capability_to_response_record(
+        self,
+        item: StructuredCapability,
+        *,
+        relevance_reason: str | None = None,
+        match_score: float | None = None,
+    ) -> CapabilityRecord:
+        confidence = item.confidence if match_score is None else max(0.0, min(1.0, match_score))
+        return CapabilityRecord(
+            capability_id=item.capability_id,
+            subject_id=item.subject_id,
+            capability_type=item.capability_type,  # type: ignore[arg-type]
+            claim_type=None,
+            title=item.title,
+            detail=item.detail,
+            source="structured",
+            verification_status=item.verification_status,
+            verification_level=item.verification_level,
+            confidence=confidence,
+            confidence_band=band_for_score(confidence),
+            risk_level=item.risk_level,
+            evidence=[],
+            relevance_reason=relevance_reason,
+        )
+
+    def _structured_constraint_to_response_record(
+        self,
+        item: StructuredConstraint,
+    ) -> CapabilityRecord:
+        capability_type: str = "environment" if item.constraint_kind == "environment" else "constraint"
+        if item.constraint_kind == "deprecation":
+            capability_type = "deprecation"
+        return CapabilityRecord(
+            capability_id=item.constraint_id,
+            subject_id=item.subject_id,
+            capability_type=capability_type,  # type: ignore[arg-type]
+            claim_type=None,
+            title=f"{item.subject_id} {item.constraint_kind}",
+            detail=item.detail,
+            source="structured",
+            verification_status=VerificationStatus.ACCEPTED,
+            verification_level=VerificationLevel.L3_RUNTIME_VERIFIED,
+            confidence=0.98,
+            confidence_band=ConfidenceBand.STRONG,
+            risk_level=RiskLevel.NONE,
+            evidence=[],
+            relevance_reason=None,
+        )
+
+    def _structured_effect_to_response_record(
+        self,
+        item: StructuredEffect,
+    ) -> CapabilityRecord:
+        return CapabilityRecord(
+            capability_id=item.effect_id,
+            subject_id=item.subject_id,
+            capability_type="effect",
+            claim_type=None,
+            title=f"{item.subject_id} {item.effect_kind}",
+            detail=item.detail,
+            source="structured",
+            verification_status=VerificationStatus.ACCEPTED,
+            verification_level=VerificationLevel.L3_RUNTIME_VERIFIED,
+            confidence=0.98,
+            confidence_band=ConfidenceBand.STRONG,
+            risk_level=_risk_level_for_structured_effect(item),
+            evidence=[],
+            relevance_reason=None,
+        )
+
+    def _structured_capability_for_command(
+        self,
+        *,
+        subject_id: str,
+        command: str,
+        accepted_only: bool,
+    ) -> CapabilityRecord | None:
+        structured_caps = self._store.list_structured_capabilities(
+            subject_id=subject_id,
+            capability_types=["invocation"],
+            accepted_only=accepted_only,
+            limit=20,
+        )
+        normalized_command = command.strip().lower()
+        for item in structured_caps:
+            item_command = str(item.detail.get("command", "")).strip().lower()
+            if item_command and normalized_command.startswith(item_command):
+                return self._structured_capability_to_response_record(item)
+        return None
+
+    def _rank_structured_capabilities_for_action(
+        self,
+        *,
+        subject_id: str,
+        query: str,
+        accepted_only: bool,
+        limit: int,
+    ) -> list[CapabilityRecord]:
+        question_tokens = _tokenize_question(query.strip())
+        structured_caps = self._store.list_structured_capabilities(
+            subject_id=subject_id,
+            accepted_only=accepted_only,
+            limit=5_000,
+        )
+        scored: list[tuple[float, str, StructuredCapability, str]] = []
+        for item in structured_caps:
+            score, reason = _score_structured_capability_for_question(item, question_tokens)
+            if score <= 0.0:
+                continue
+            scored.append((score, item.capability_id, item, reason))
+        scored.sort(key=lambda row: (-row[0], row[1]))
+        return [
+            self._structured_capability_to_response_record(
+                item,
+                relevance_reason=reason,
+                match_score=score,
+            )
+            for score, _, item, reason in scored[:limit]
+        ]
 
     def _rank_capabilities_for_action(
         self,
@@ -1433,6 +1824,7 @@ def _claim_to_capability_record(
         claim_type=claim.claim_type,
         title=claim.subject,
         detail=claim.statement,
+        source="projected",
         verification_status=claim.verification_status,
         verification_level=verification_level,
         confidence=confidence,
@@ -1441,6 +1833,82 @@ def _claim_to_capability_record(
         evidence=[_project_evidence(e) for e in claim.evidence],
         relevance_reason=relevance_reason,
     )
+
+
+def _score_structured_subject(subject: StructuredSubject, query: str) -> tuple[int, str]:
+    if not query:
+        return 1, "no-query (all subjects)"
+    query_tokens = set(_tokenize_question(query))
+    if not query_tokens:
+        return 0, ""
+    subject_id_text = subject.subject_id.replace("-", " ").lower()
+    name_text = subject.name.lower()
+    if query == subject.subject_id.lower():
+        return 100, "subject_id exact"
+    if query in subject_id_text:
+        return 80, f"subject_id substring '{query}'"
+    if query in name_text:
+        return 60, f"name substring '{query}'"
+    subject_tokens = set(_tokenize_question(subject_id_text)) | set(_tokenize_question(name_text))
+    overlap = sorted(query_tokens & subject_tokens)
+    if overlap:
+        return 30 + len(overlap) * 5, f"token overlap on {overlap!r}"
+    return 0, ""
+
+
+def _score_structured_capability_for_question(
+    capability: StructuredCapability,
+    question_tokens: list[str],
+) -> tuple[float, str]:
+    if not question_tokens:
+        return 0.0, ""
+    unique_question_tokens = set(question_tokens)
+    title_tokens = set(_tokenize_question(capability.title))
+    detail_tokens = set(_tokenize_question(json.dumps(capability.detail, sort_keys=True)))
+    subject_tokens = set(_tokenize_question(capability.subject_id.replace("-", " ")))
+
+    title_hits = sorted(unique_question_tokens & title_tokens)
+    subject_hits = sorted(unique_question_tokens & subject_tokens)
+    detail_hits = sorted(unique_question_tokens & detail_tokens)
+
+    raw_score = 3.0 * len(title_hits) + 2.0 * len(subject_hits) + 1.0 * len(detail_hits)
+    score = raw_score / (len(unique_question_tokens) * 3.0)
+    if score == 0.0:
+        return 0.0, ""
+    parts: list[str] = []
+    if title_hits:
+        parts.append(f"title hit on {title_hits!r}")
+    if subject_hits:
+        parts.append(f"subject_id hit on {subject_hits!r}")
+    if detail_hits and not title_hits:
+        parts.append(f"detail hit on {detail_hits!r}")
+    return score, "; ".join(parts) if parts else "structured token overlap"
+
+
+def _risk_level_for_structured_effect(effect: StructuredEffect) -> RiskLevel:
+    if effect.destructive:
+        return RiskLevel.CRITICAL
+    if effect.may_expose_secrets:
+        return RiskLevel.HIGH
+    if effect.may_cost_money or effect.mutates_remote_state:
+        return RiskLevel.MEDIUM
+    if effect.effect_kind == "network":
+        return RiskLevel.LOW
+    return RiskLevel.NONE
+
+
+def _structured_capability_rank(capability_type: str) -> int:
+    return {
+        "invocation": 0,
+        "existence": 1,
+        "workflow": 2,
+        "constraint": 3,
+        "environment": 4,
+        "effect": 5,
+        "deprecation": 6,
+        "configuration": 7,
+        "metadata": 8,
+    }.get(capability_type, 9)
 
 
 def _subject_kind_for_tool_spec(spec: ToolSpec) -> str:
@@ -1471,9 +1939,6 @@ def _tool_spec_to_subject_summary(spec: ToolSpec, *, match_reason: str) -> Subje
 def _workflow_spec_to_subject_summary(
     spec: WorkflowSpec, *, match_reason: str
 ) -> SubjectSummary:
-    aggregate_risk = max(
-        spec.steps, key=lambda step: RISK_ORDER[step.risk_level]
-    ).risk_level
     return SubjectSummary(
         subject_id=spec.workflow_id,
         subject_kind="workflow",
