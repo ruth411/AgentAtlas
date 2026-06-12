@@ -938,6 +938,7 @@ def _project_evidence(evidence: Evidence) -> EvidenceCitation:
         evidence_type=evidence.evidence_type,
         source_uri=evidence.source_uri,
         trust_level=evidence.trust_level,
+        fetched_at=evidence.captured_at,
     )
 
 

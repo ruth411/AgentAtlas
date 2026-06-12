@@ -61,13 +61,21 @@ class EvidenceCitation(BaseModel):
 
     Excludes the full excerpt + hash (those live in the raw artifact) so the
     verdict stays compact. Callers wanting the full evidence can follow the
-    `source_uri` or pull the original via the `/claims/{id}/evidence` API."""
+    `source_uri` or pull the original via the `/claims/{id}/evidence` API.
+
+    `fetched_at` is the source-of-truth timestamp for "when was this evidence
+    captured?" — agents can use it to decide whether the underlying docs
+    page may have moved since (e.g. by comparing to today's date and
+    falling back to web_search if the answer is stale). Older catalogs
+    may have rows without this field, so it is optional.
+    """
 
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
 
     evidence_type: EvidenceType
     source_uri: str = Field(min_length=1, max_length=2048)
     trust_level: TrustLevel
+    fetched_at: datetime | None = None
 
 
 class ValidateCommandResponse(BaseModel):

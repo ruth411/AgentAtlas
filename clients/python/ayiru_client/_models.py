@@ -47,11 +47,16 @@ class EvidenceCitation(_SDKModel):
     Intentionally narrow: the server omits the full excerpt and hash
     from query responses to keep verdicts compact. Callers wanting the
     full record can follow ``source_uri`` or call the dedicated
-    ``/v1/claims/{id}/evidence`` endpoint."""
+    ``/v1/claims/{id}/evidence`` endpoint.
+
+    ``fetched_at`` is when the underlying source was captured. Agents can
+    compare it to today's date to decide whether the answer may be stale.
+    Older server versions omit the field; it is therefore optional."""
 
     evidence_type: str
     source_uri: str
     trust_level: _TrustLevel
+    fetched_at: datetime | None = None
 
 
 class Answer(_SDKModel):

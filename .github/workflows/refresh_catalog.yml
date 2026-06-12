@@ -1,0 +1,136 @@
+name: Refresh ayiru-mcp bundled catalog
+
+on:
+  schedule:
+    # 1st of every month, 06:00 UTC.
+    - cron: '0 6 1 * *'
+  workflow_dispatch:
+    inputs:
+      tool_families:
+        description: 'Comma-separated tool families to bundle. Default: gh.'
+        required: false
+        default: 'gh'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      AYIRU_DATABASE_URL: sqlite:///refresh_source.db
+      TOOL_FAMILIES: ${{ github.event.inputs.tool_families || 'gh' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install packages
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ./core
+          pip install -e ./backend
+          pip install -e ./mcp
+          # sqlite3-tools provides `sqldiff` for the change-detection step.
+          sudo apt-get update -qq
+          sudo apt-get install -y sqlite3-tools
+
+      - name: Provision a fresh source DB
+        run: |
+          rm -f refresh_source.db
+          # Schema-only DB; subsequent seed scripts populate it.
+          python -c "
+          from alembic import command
+          from app.services.alembic_config import make_alembic_config
+          command.upgrade(make_alembic_config('${AYIRU_DATABASE_URL}'), 'head')
+          "
+
+      - name: Run depth-pass seed scripts for each family
+        # The seed scripts use the AYIRU_DATABASE_URL env var to know where
+        # to land claims. We run one per family — currently only `gh` ships,
+        # so iterating over $TOOL_FAMILIES is forward-looking.
+        run: |
+          for family in $(echo "$TOOL_FAMILIES" | tr ',' ' '); do
+            script="tools/scripts/seed_${family}_errors_recipes.py"
+            if [ -f "$script" ]; then
+              echo "Running $script"
+              python "$script"
+            else
+              echo "::warning::No seed script found at $script — skipping"
+            fi
+          done
+
+      - name: Build the slim catalog from the refreshed source
+        run: |
+          mkdir -p mcp/ayiru_mcp/data
+          python tools/scripts/build_slim_catalog.py \
+            --source refresh_source.db \
+            --output mcp/ayiru_mcp/data/catalog.db \
+            --tool-families "$TOOL_FAMILIES"
+
+      - name: Detect non-trivial change vs main
+        id: diff
+        run: |
+          if git diff --quiet -- mcp/ayiru_mcp/data/catalog.db; then
+            echo "No catalog drift this cycle. Nothing to do."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          # Show row-level deltas in the PR body. `sqldiff` ships in
+          # sqlite3-tools and emits SQL statements representing the diff.
+          sqldiff main..HEAD mcp/ayiru_mcp/data/catalog.db > catalog_sqldiff.txt 2>/dev/null || true
+
+      - name: Bump ayiru-mcp patch version
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          python - <<'PY'
+          import re, pathlib
+          p = pathlib.Path("mcp/pyproject.toml")
+          text = p.read_text()
+          m = re.search(r'^version\s*=\s*"(\d+)\.(\d+)\.(\d+)"', text, re.MULTILINE)
+          if not m:
+              raise SystemExit("Could not find version in mcp/pyproject.toml")
+          major, minor, patch = map(int, m.groups())
+          new = f'version = "{major}.{minor}.{patch + 1}"'
+          p.write_text(re.sub(r'^version\s*=\s*"\d+\.\d+\.\d+"', new, text, count=1, flags=re.MULTILINE))
+          print(f"Bumped to {major}.{minor}.{patch + 1}")
+          PY
+
+      - name: Compose PR body
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          {
+            echo "Automated monthly catalog refresh."
+            echo
+            echo "**Families refreshed:** \`${TOOL_FAMILIES}\`"
+            echo
+            echo "Re-runs the per-family seed scripts under \`tools/scripts/seed_*_errors_recipes.py\`,"
+            echo "rebuilds the slim catalog with \`tools/scripts/build_slim_catalog.py\`, and bumps"
+            echo "\`mcp/pyproject.toml\`'s patch version."
+            echo
+            echo "<details><summary>sqldiff output (first 200 lines)</summary>"
+            echo
+            echo '```sql'
+            head -200 catalog_sqldiff.txt 2>/dev/null || echo "(sqldiff produced no output)"
+            echo '```'
+            echo
+            echo "</details>"
+          } > pr_body.md
+
+      - name: Open PR
+        if: steps.diff.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: refresh-catalog-${{ github.run_id }}
+          title: 'mcp: refresh bundled catalog (${{ env.TOOL_FAMILIES }})'
+          commit-message: 'mcp: refresh bundled gh catalog from monthly depth pass'
+          body-path: pr_body.md
+          add-paths: |
+            mcp/ayiru_mcp/data/catalog.db
+            mcp/pyproject.toml
