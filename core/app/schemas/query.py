@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from datetime import datetime
 import re
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -342,6 +342,7 @@ CapabilityType = Literal[
     "workflow",
     "metadata",
 ]
+CapabilitySource = Literal["structured", "projected"]
 
 
 class ResolveSubjectRequest(BaseModel):
@@ -404,6 +405,7 @@ class GetCapabilitiesRequest(BaseModel):
     subject_id: str = Field(min_length=1, max_length=128)
     capability_types: list[CapabilityType] = Field(default_factory=list, max_length=20)
     accepted_only: bool = True
+    accepted_only_structured: bool = False
     verification_min: VerificationLevel | None = None
     limit: int = Field(default=50, ge=1, le=200)
 
@@ -419,9 +421,10 @@ class CapabilityRecord(BaseModel):
     capability_id: str = Field(min_length=1, max_length=128)
     subject_id: str = Field(min_length=1, max_length=128)
     capability_type: CapabilityType
-    claim_type: ClaimType
+    claim_type: ClaimType | None = None
     title: str = Field(min_length=1, max_length=512)
-    detail: str = Field(min_length=1)
+    detail: dict[str, Any] | str
+    source: CapabilitySource
     verification_status: VerificationStatus
     verification_level: VerificationLevel
     confidence: float = Field(ge=0.0, le=1.0)
@@ -436,6 +439,7 @@ class GetCapabilitiesResponse(BaseModel):
 
     subject_id: str = Field(min_length=1, max_length=128)
     accepted_only: bool
+    accepted_only_structured: bool = False
     capabilities: list[CapabilityRecord] = Field(default_factory=list)
     total: int = Field(ge=0)
     limit: int = Field(ge=1)
@@ -447,6 +451,7 @@ class GetConstraintsRequest(BaseModel):
     subject_id: str = Field(min_length=1, max_length=128)
     action_intent: str | None = Field(default=None, max_length=512)
     accepted_only: bool = True
+    accepted_only_structured: bool = False
 
     @field_validator("subject_id")
     @classmethod
@@ -469,6 +474,7 @@ class GetEffectsRequest(BaseModel):
     subject_id: str = Field(min_length=1, max_length=128)
     action_intent: str | None = Field(default=None, max_length=512)
     accepted_only: bool = True
+    accepted_only_structured: bool = False
 
     @field_validator("subject_id")
     @classmethod
@@ -495,6 +501,7 @@ class ResolveActionRequest(BaseModel):
     command: str | None = Field(default=None, max_length=512)
     environment: str | None = Field(default=None, max_length=128)
     accepted_only: bool = True
+    accepted_only_structured: bool = False
     limit: int = Field(default=5, ge=1, le=20)
 
     @field_validator("subject_id")

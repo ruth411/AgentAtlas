@@ -47,6 +47,7 @@ _CapabilityType = Literal[
     "workflow",
     "metadata",
 ]
+_CapabilitySource = Literal["structured", "projected"]
 _ClaimType = Literal[
     "tool_exists",
     "cli_command_exists",
@@ -185,9 +186,10 @@ class CapabilityRecord(_SDKModel):
     capability_id: str
     subject_id: str
     capability_type: _CapabilityType
-    claim_type: _ClaimType
+    claim_type: _ClaimType | None = None
     title: str
-    detail: str
+    detail: dict[str, Any] | str
+    source: _CapabilitySource
     verification_status: _VerificationStatus
     verification_level: _VerificationLevel
     confidence: float = Field(ge=0.0, le=1.0)
@@ -200,6 +202,7 @@ class CapabilityRecord(_SDKModel):
 class GetCapabilitiesResponse(_SDKModel):
     subject_id: str
     accepted_only: bool
+    accepted_only_structured: bool = False
     capabilities: list[CapabilityRecord] = Field(default_factory=list)
     total: int = Field(ge=0)
     limit: int = Field(ge=1)

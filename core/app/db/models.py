@@ -14,7 +14,7 @@ shape) or ``KnowledgeClaimRecord`` from this module (DB shape).
 
 from datetime import datetime
 
-from sqlalchemy import CheckConstraint, DateTime, Float, ForeignKey, String, Text
+from sqlalchemy import CheckConstraint, DateTime, Float, ForeignKey, Index, String, Text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 from app.schemas.enums import (
@@ -37,6 +37,23 @@ from app.schemas.enums import (
 def _allowed_values_sql(column_name: str, values: list[str]) -> str:
     quoted_values = ", ".join(f"'{value}'" for value in values)
     return f"{column_name} IN ({quoted_values})"
+
+
+_SUBJECT_KINDS = ["tool", "api", "sdk", "adk", "workflow", "subject"]
+_CAPABILITY_TYPES = [
+    "existence",
+    "invocation",
+    "configuration",
+    "constraint",
+    "effect",
+    "environment",
+    "deprecation",
+    "workflow",
+    "metadata",
+]
+_CONSTRAINT_KINDS = ["auth_scope", "environment", "precondition", "deprecation"]
+_EFFECT_KINDS = ["mutation", "destructive", "cost", "secret_exposure", "network"]
+_STRUCTURED_SOURCES = ["structured_ingestion", "prose_projection"]
 
 
 class Base(DeclarativeBase):
@@ -207,6 +224,159 @@ class CanonicalWorkflowSpecRecord(Base):
     compiled_by: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
     source_claim_ids_json: Mapped[str] = mapped_column(Text, nullable=False)
     verification_level: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+
+
+class SubjectRecord(Base):
+    __tablename__ = "subjects"
+    __table_args__ = (
+        CheckConstraint(
+            _allowed_values_sql("subject_kind", _SUBJECT_KINDS),
+            name="ck_subjects_subject_kind",
+        ),
+        CheckConstraint(
+            _allowed_values_sql("verification_level", [item.value for item in VerificationLevel]),
+            name="ck_subjects_verification_level",
+        ),
+        Index("ix_subjects_family_subject_kind", "family", "subject_kind"),
+    )
+
+    subject_id: Mapped[str] = mapped_column(String(128), primary_key=True)
+    subject_kind: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(256), nullable=False)
+    family: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
+    verification_level: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    provenance_claim_ids_json: Mapped[str] = mapped_column(Text, nullable=False, default="[]")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
+
+    capabilities: Mapped[list["CapabilityRecord"]] = relationship(
+        back_populates="subject",
+        cascade="all, delete-orphan",
+        order_by="CapabilityRecord.capability_id",
+    )
+    constraints: Mapped[list["ConstraintRecord"]] = relationship(
+        back_populates="subject",
+        cascade="all, delete-orphan",
+        order_by="ConstraintRecord.constraint_id",
+    )
+    effects: Mapped[list["EffectRecord"]] = relationship(
+        back_populates="subject",
+        cascade="all, delete-orphan",
+        order_by="EffectRecord.effect_id",
+    )
+
+
+class CapabilityRecord(Base):
+    __tablename__ = "capabilities"
+    __table_args__ = (
+        CheckConstraint(
+            _allowed_values_sql("capability_type", _CAPABILITY_TYPES),
+            name="ck_capabilities_capability_type",
+        ),
+        CheckConstraint(
+            _allowed_values_sql("verification_status", [item.value for item in VerificationStatus]),
+            name="ck_capabilities_verification_status",
+        ),
+        CheckConstraint(
+            _allowed_values_sql("verification_level", [item.value for item in VerificationLevel]),
+            name="ck_capabilities_verification_level",
+        ),
+        CheckConstraint(
+            _allowed_values_sql("confidence_band", [item.value for item in ConfidenceBand]),
+            name="ck_capabilities_confidence_band",
+        ),
+        CheckConstraint(
+            "risk_level IS NULL OR "
+            + _allowed_values_sql("risk_level", [item.value for item in RiskLevel]),
+            name="ck_capabilities_risk_level",
+        ),
+        CheckConstraint(
+            _allowed_values_sql("source", _STRUCTURED_SOURCES),
+            name="ck_capabilities_source",
+        ),
+    )
+
+    capability_id: Mapped[str] = mapped_column(String(128), primary_key=True)
+    subject_id: Mapped[str] = mapped_column(
+        ForeignKey("subjects.subject_id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    capability_type: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    title: Mapped[str] = mapped_column(String(512), nullable=False)
+    detail_json: Mapped[str] = mapped_column(Text, nullable=False)
+    verification_status: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    verification_level: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    confidence: Mapped[float] = mapped_column(Float, nullable=False)
+    confidence_band: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    risk_level: Mapped[str | None] = mapped_column(String(32), nullable=True, index=True)
+    provenance_claim_ids_json: Mapped[str] = mapped_column(Text, nullable=False, default="[]")
+    source: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
+
+    subject: Mapped[SubjectRecord] = relationship(back_populates="capabilities")
+
+
+class ConstraintRecord(Base):
+    __tablename__ = "constraints"
+    __table_args__ = (
+        CheckConstraint(
+            _allowed_values_sql("constraint_kind", _CONSTRAINT_KINDS),
+            name="ck_constraints_constraint_kind",
+        ),
+        CheckConstraint(
+            _allowed_values_sql("source", _STRUCTURED_SOURCES),
+            name="ck_constraints_source",
+        ),
+    )
+
+    constraint_id: Mapped[str] = mapped_column(String(128), primary_key=True)
+    subject_id: Mapped[str] = mapped_column(
+        ForeignKey("subjects.subject_id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    constraint_kind: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    detail_json: Mapped[str] = mapped_column(Text, nullable=False)
+    source: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
+
+    subject: Mapped[SubjectRecord] = relationship(back_populates="constraints")
+
+
+class EffectRecord(Base):
+    __tablename__ = "effects"
+    __table_args__ = (
+        CheckConstraint(
+            _allowed_values_sql("effect_kind", _EFFECT_KINDS),
+            name="ck_effects_effect_kind",
+        ),
+        CheckConstraint(
+            _allowed_values_sql("source", _STRUCTURED_SOURCES),
+            name="ck_effects_source",
+        ),
+    )
+
+    effect_id: Mapped[str] = mapped_column(String(128), primary_key=True)
+    subject_id: Mapped[str] = mapped_column(
+        ForeignKey("subjects.subject_id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    effect_kind: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    destructive: Mapped[bool] = mapped_column(nullable=False, default=False)
+    reversible: Mapped[bool] = mapped_column(nullable=False, default=True)
+    mutates_remote_state: Mapped[bool] = mapped_column(nullable=False, default=False)
+    may_cost_money: Mapped[bool] = mapped_column(nullable=False, default=False)
+    may_expose_secrets: Mapped[bool] = mapped_column(nullable=False, default=False)
+    detail_json: Mapped[str] = mapped_column(Text, nullable=False)
+    source: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
+
+    subject: Mapped[SubjectRecord] = relationship(back_populates="effects")
 
 
 class IngestionRunRecord(Base):

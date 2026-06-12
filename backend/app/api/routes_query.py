@@ -140,6 +140,7 @@ def get_capabilities(
         subject_id=request.subject_id,
         capability_types=list(request.capability_types),
         accepted_only=request.accepted_only,
+        accepted_only_structured=request.accepted_only_structured,
         verification_min=request.verification_min,
         limit=request.limit,
     )
@@ -158,6 +159,7 @@ def get_constraints(
         subject_id=request.subject_id,
         action_intent=request.action_intent,
         accepted_only=request.accepted_only,
+        accepted_only_structured=request.accepted_only_structured,
     )
 
 
@@ -174,6 +176,7 @@ def get_effects(
         subject_id=request.subject_id,
         action_intent=request.action_intent,
         accepted_only=request.accepted_only,
+        accepted_only_structured=request.accepted_only_structured,
     )
 
 
@@ -192,6 +195,7 @@ def resolve_action(
         command=request.command,
         environment=request.environment,
         accepted_only=request.accepted_only,
+        accepted_only_structured=request.accepted_only_structured,
         limit=request.limit,
     )
 

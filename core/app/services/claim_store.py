@@ -14,14 +14,18 @@ from sqlalchemy.orm import Session, selectinload, sessionmaker
 
 from app.db.models import (
     AuditEventRecord,
+    CapabilityRecord,
     CanonicalToolSpecRecord,
     CanonicalWorkflowSpecRecord,
+    ConstraintRecord,
     DocsFetchCacheRecord,
     EvidenceRecord,
+    EffectRecord,
     HumanReviewRecord,
     IngestionRunRecord,
     KnowledgeClaimRecord,
     RawIngestionArtifactRecord,
+    SubjectRecord,
     VerificationResultRecord,
 )
 from app.db.session import SessionLocal, create_database_engine, init_db
@@ -39,6 +43,7 @@ from app.schemas.enums import (
     IngestionStatus,
     RiskLevel,
     VerificationLevel,
+    VERIFICATION_LEVEL_ORDER,
     VerificationStatus,
 )
 from app.schemas.human_review import HumanReview, ReviewQueueItem
@@ -56,6 +61,12 @@ from app.schemas.workflow_spec import WorkflowSpec
 from app.services.contract_paths import contract_path
 from app.services.evidence_policy import evidence_policy_violations
 from app.services.evidence_trust import normalize_claim_evidence_trust
+from app.services.structured_knowledge_store import (
+    StructuredCapability,
+    StructuredConstraint,
+    StructuredEffect,
+    StructuredSubject,
+)
 
 
 @cache
@@ -302,6 +313,88 @@ class ClaimStore:
                 select(KnowledgeClaimRecord.tool_id).distinct()
             ).all()
             return sorted(row[0] for row in rows)
+
+    def list_structured_subjects(
+        self,
+        *,
+        family: str | None = None,
+    ) -> list[StructuredSubject]:
+        statement = select(SubjectRecord).order_by(SubjectRecord.subject_id)
+        if family is not None:
+            statement = statement.where(SubjectRecord.family == family)
+        with self._session_factory() as session:
+            records = session.scalars(statement).all()
+            return [_record_to_structured_subject(record) for record in records]
+
+    def get_structured_subject(self, subject_id: str) -> StructuredSubject | None:
+        with self._session_factory() as session:
+            record = session.get(SubjectRecord, subject_id)
+            return _record_to_structured_subject(record) if record else None
+
+    def list_structured_capabilities(
+        self,
+        *,
+        subject_id: str,
+        capability_types: list[str] | None = None,
+        accepted_only: bool = True,
+        verification_min: VerificationLevel | None = None,
+        limit: int = 200,
+    ) -> list[StructuredCapability]:
+        capability_types = capability_types or []
+        statement = (
+            select(CapabilityRecord)
+            .where(CapabilityRecord.subject_id == subject_id)
+            .order_by(CapabilityRecord.capability_id)
+        )
+        if capability_types:
+            statement = statement.where(CapabilityRecord.capability_type.in_(capability_types))
+        if accepted_only:
+            statement = statement.where(
+                CapabilityRecord.verification_status == VerificationStatus.ACCEPTED.value
+            )
+        if verification_min is not None:
+            allowed_levels = [
+                level.value
+                for level, order in VERIFICATION_LEVEL_ORDER.items()
+                if order >= VERIFICATION_LEVEL_ORDER[verification_min]
+            ]
+            statement = statement.where(CapabilityRecord.verification_level.in_(allowed_levels))
+        statement = statement.limit(limit)
+        with self._session_factory() as session:
+            records = session.scalars(statement).all()
+            return [_record_to_structured_capability(record) for record in records]
+
+    def list_structured_constraints(
+        self,
+        *,
+        subject_id: str,
+        limit: int = 200,
+    ) -> list[StructuredConstraint]:
+        statement = (
+            select(ConstraintRecord)
+            .where(ConstraintRecord.subject_id == subject_id)
+            .order_by(ConstraintRecord.constraint_id)
+            .limit(limit)
+        )
+        with self._session_factory() as session:
+            records = session.scalars(statement).all()
+            return [_record_to_structured_constraint(record) for record in records]
+
+    def list_structured_effects(
+        self,
+        *,
+        subject_id: str,
+        limit: int = 200,
+    ) -> list[StructuredEffect]:
+        statement = (
+            select(EffectRecord)
+            .where(EffectRecord.subject_id == subject_id)
+            .order_by(EffectRecord.effect_id)
+            .limit(limit)
+        )
+        with self._session_factory() as session:
+            records = session.scalars(statement).all()
+            return [_record_to_structured_effect(record) for record in records]
 
     # ------------------------------------------------------------------
     # Stage 22-stretch — semantic embedding read/write helpers
@@ -1259,6 +1352,67 @@ def _record_to_docs_cache(record: DocsFetchCacheRecord) -> DocsFetchCacheEntry:
         body_hash=record.body_hash,
         last_fetched_at=_ensure_utc(record.last_fetched_at),
         last_artifact_id=record.last_artifact_id,
+    )
+
+
+def _record_to_structured_subject(record: SubjectRecord) -> StructuredSubject:
+    return StructuredSubject(
+        subject_id=record.subject_id,
+        subject_kind=record.subject_kind,
+        name=record.name,
+        family=record.family,
+        verification_level=VerificationLevel(record.verification_level),
+        provenance_claim_ids=json.loads(record.provenance_claim_ids_json),
+        created_at=_ensure_utc(record.created_at),
+        updated_at=_ensure_utc(record.updated_at),
+    )
+
+
+def _record_to_structured_capability(record: CapabilityRecord) -> StructuredCapability:
+    return StructuredCapability(
+        capability_id=record.capability_id,
+        subject_id=record.subject_id,
+        capability_type=record.capability_type,
+        title=record.title,
+        detail=json.loads(record.detail_json),
+        verification_status=VerificationStatus(record.verification_status),
+        verification_level=VerificationLevel(record.verification_level),
+        confidence=record.confidence,
+        confidence_band=ConfidenceBand(record.confidence_band),
+        risk_level=RiskLevel(record.risk_level) if record.risk_level else None,
+        provenance_claim_ids=json.loads(record.provenance_claim_ids_json),
+        source=record.source,
+        created_at=_ensure_utc(record.created_at),
+        updated_at=_ensure_utc(record.updated_at),
+    )
+
+
+def _record_to_structured_constraint(record: ConstraintRecord) -> StructuredConstraint:
+    return StructuredConstraint(
+        constraint_id=record.constraint_id,
+        subject_id=record.subject_id,
+        constraint_kind=record.constraint_kind,
+        detail=json.loads(record.detail_json),
+        source=record.source,
+        created_at=_ensure_utc(record.created_at),
+        updated_at=_ensure_utc(record.updated_at),
+    )
+
+
+def _record_to_structured_effect(record: EffectRecord) -> StructuredEffect:
+    return StructuredEffect(
+        effect_id=record.effect_id,
+        subject_id=record.subject_id,
+        effect_kind=record.effect_kind,
+        destructive=record.destructive,
+        reversible=record.reversible,
+        mutates_remote_state=record.mutates_remote_state,
+        may_cost_money=record.may_cost_money,
+        may_expose_secrets=record.may_expose_secrets,
+        detail=json.loads(record.detail_json),
+        source=record.source,
+        created_at=_ensure_utc(record.created_at),
+        updated_at=_ensure_utc(record.updated_at),
     )
 
 

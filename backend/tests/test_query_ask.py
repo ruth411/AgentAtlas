@@ -45,6 +45,13 @@ from app.services.ids import (
     generate_verification_id,
 )
 from app.services.query_engine import QueryEngine
+from app.services.structured_knowledge_store import (
+    StructuredCapability,
+    StructuredConstraint,
+    StructuredEffect,
+    StructuredKnowledgeStore,
+    StructuredSubject,
+)
 from tests.helpers import risk_assessment, valid_sha256
 
 
@@ -209,6 +216,99 @@ def _publish_workflow(
     )
 
 
+def _seed_structured_gh_subject(store: ClaimStore) -> None:
+    structured = StructuredKnowledgeStore(session_factory=store._session_factory)
+    structured.upsert_subject_graph(
+        StructuredSubject(
+            subject_id="gh-pr-create",
+            subject_kind="tool",
+            name="gh pr create (create a pull request)",
+            family="gh",
+            verification_level=VerificationLevel.L3_RUNTIME_VERIFIED,
+            provenance_claim_ids=[],
+            created_at=FIXED_TIME,
+            updated_at=FIXED_TIME,
+        ),
+        capabilities=[
+            StructuredCapability(
+                capability_id="cap-gh-pr-create-invocation",
+                subject_id="gh-pr-create",
+                capability_type="invocation",
+                title="gh pr create invocation",
+                detail={
+                    "kind": "invocation",
+                    "command": "gh pr create",
+                    "source_url": "https://cli.github.com/manual/gh_pr_create",
+                    "usage_signature": "gh pr create [flags]",
+                    "synopsis": "Create a pull request on GitHub.",
+                    "argv_schema": {
+                        "program": "gh",
+                        "subcommand_path": ["pr", "create"],
+                        "positionals": [],
+                    },
+                    "flag_schema": [
+                        {
+                            "name": "--title",
+                            "short": "-t",
+                            "takes_value": True,
+                            "value_name": "string",
+                            "value_type": "string",
+                            "repeatable": False,
+                            "required": False,
+                            "deprecated": False,
+                            "inherited": False,
+                            "description": "Title for the pull request",
+                            "default": None,
+                            "choices": [],
+                        }
+                    ],
+                },
+                verification_status=VerificationStatus.ACCEPTED,
+                verification_level=VerificationLevel.L3_RUNTIME_VERIFIED,
+                confidence=0.99,
+                confidence_band=ConfidenceBand.STRONG,
+                risk_level=RiskLevel.MEDIUM,
+                provenance_claim_ids=[],
+                created_at=FIXED_TIME,
+                updated_at=FIXED_TIME,
+            )
+        ],
+        constraints=[
+            StructuredConstraint(
+                constraint_id="constraint-gh-pr-create-project",
+                subject_id="gh-pr-create",
+                constraint_kind="auth_scope",
+                detail={
+                    "command": "gh pr create",
+                    "source_url": "https://cli.github.com/manual/gh_pr_create",
+                    "scope": "project",
+                },
+                created_at=FIXED_TIME,
+                updated_at=FIXED_TIME,
+            )
+        ],
+        effects=[
+            StructuredEffect(
+                effect_id="effect-gh-pr-create-mutation",
+                subject_id="gh-pr-create",
+                effect_kind="mutation",
+                destructive=False,
+                reversible=False,
+                mutates_remote_state=True,
+                may_cost_money=False,
+                may_expose_secrets=False,
+                detail={
+                    "command": "gh pr create",
+                    "source_url": "https://cli.github.com/manual/gh_pr_create",
+                    "synopsis": "Create a pull request on GitHub.",
+                },
+                created_at=FIXED_TIME,
+                updated_at=FIXED_TIME,
+            )
+        ],
+    )
+
+
 # ---------------------------------------------------------------------------
 # Happy path
 # ---------------------------------------------------------------------------
@@ -275,6 +375,20 @@ def test_resolve_subject_and_subject_spec_return_canonical_projection(
     assert any(match.subject_kind == "workflow" for match in workflow_response.matches)
 
 
+def test_resolve_subject_and_subject_spec_read_structured_subjects(
+    engine: QueryEngine, store: ClaimStore
+) -> None:
+    _seed_structured_gh_subject(store)
+
+    response = engine.resolve_subject(subject_hint="gh pr create")
+    spec = engine.get_subject_spec(subject_id="gh-pr-create")
+
+    assert any(match.subject_id == "gh-pr-create" for match in response.matches)
+    assert spec is not None
+    assert spec.subject_id == "gh-pr-create"
+    assert spec.interfaces == ["cli"]
+
+
 def test_get_capabilities_constraints_and_effects_project_claim_types(
     engine: QueryEngine, store: ClaimStore
 ) -> None:
@@ -306,6 +420,48 @@ def test_get_capabilities_constraints_and_effects_project_claim_types(
     assert effects.aggregate_risk_level == RiskLevel.HIGH
 
 
+def test_get_capabilities_reads_structured_rows_before_projection(
+    engine: QueryEngine, store: ClaimStore
+) -> None:
+    _seed_structured_gh_subject(store)
+
+    capabilities = engine.get_capabilities(subject_id="gh-pr-create")
+    constraints = engine.get_constraints(subject_id="gh-pr-create")
+    effects = engine.get_effects(subject_id="gh-pr-create")
+
+    assert capabilities.total >= 1
+    assert capabilities.capabilities[0].source == "structured"
+    assert isinstance(capabilities.capabilities[0].detail, dict)
+    assert constraints.total == 1
+    assert constraints.constraints[0].source == "structured"
+    assert effects.total == 1
+    assert effects.effects[0].source == "structured"
+    assert effects.aggregate_risk_level == RiskLevel.MEDIUM
+
+
+def test_get_capabilities_can_force_structured_only_miss(
+    engine: QueryEngine, store: ClaimStore
+) -> None:
+    _add_claim(
+        store,
+        subject="docker login",
+        statement="docker login requires valid registry credentials.",
+        tool_id="docker",
+        claim_type=ClaimType.AUTH_REQUIREMENT,
+        risk=RiskLevel.LOW,
+    )
+
+    capabilities = engine.get_capabilities(
+        subject_id="docker",
+        accepted_only=False,
+        accepted_only_structured=True,
+    )
+
+    assert capabilities.total == 0
+    assert capabilities.accepted_only_structured is True
+    assert capabilities.capabilities == []
+
+
 def test_resolve_action_and_workflow_plan_project_structured_results(
     engine: QueryEngine, store: ClaimStore
 ) -> None:
@@ -331,6 +487,24 @@ def test_resolve_action_and_workflow_plan_project_structured_results(
     assert resolution.confidence >= 0.0
     assert plan.total >= 1
     assert any(item.workflow_id == "workflow-docker-preview" for item in plan.plans)
+
+
+def test_resolve_action_reads_structured_subject_rows(
+    engine: QueryEngine, store: ClaimStore
+) -> None:
+    _seed_structured_gh_subject(store)
+
+    resolution = engine.resolve_action(
+        subject_id="gh-pr-create",
+        action_intent="create a pull request",
+        command="gh pr create --title hello",
+    )
+
+    assert resolution.resolution_mode == "command_match"
+    assert resolution.top_capability is not None
+    assert resolution.top_capability.source == "structured"
+    assert isinstance(resolution.top_capability.detail, dict)
+    assert resolution.fallback_recommended is False
 
 
 # ---------------------------------------------------------------------------
