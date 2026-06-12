@@ -39,6 +39,10 @@ ayiru.db
 *.db-journal
 *.db-wal
 *.db-shm
+# Exception: the slim catalog shipped inside the ayiru-mcp wheel is the
+# whole point of that package. Built by tools/scripts/build_slim_catalog.py
+# and committed so a clean checkout produces a functional wheel.
+!mcp/ayiru_mcp/data/catalog.db
 
 # Per-run results / spikes / scratch
 phase0_results.json
