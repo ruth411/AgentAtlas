@@ -1,8 +1,11 @@
-"""Stage 10: Ayiru MCP server.
+"""Stage 10: Ayiru MCP server (back-compat shim).
 
-Exposes the Stage 9 query surface (plus claim submission) as MCP tools over
-stdio JSON-RPC. Clients are agent frameworks (Claude Desktop, Cursor, Cline,
-etc.) that speak the Model Context Protocol natively.
+The implementation now lives in `ayiru_mcp._internal` (shipped with the
+`ayiru-mcp` wheel). This package re-exports the same surface so callers
+that still spell things `app.mcp_server.*` keep working: the CLI dev
+path (`backend/app/cli.py` → `python -m app.mcp_server`), the existing
+test suite, and any third-party config that registers the legacy entry
+point.
 
 Why we roll our own MCP server instead of using the official `mcp` Python
 SDK:
@@ -16,9 +19,6 @@ SDK:
 - We control the test surface: every tool is a plain function we can
   unit-test in-process; the subprocess integration test is one focused
   smoke check, not 30 fragile end-to-end tests.
-
-If MCP protocol nuances ever bite us (or the SDK gains features we want),
-the tool implementations don't change — only the transport wrapper does.
 """
 
-__all__ = []
+__all__: list[str] = []

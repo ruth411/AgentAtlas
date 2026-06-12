@@ -1,11 +1,12 @@
-"""Entry point: `python -m app.mcp_server`.
+"""Back-compat entry point: `python -m app.mcp_server`.
 
-Wires the production `McpServer` and runs the blocking stdio loop. Used by
-Claude Desktop / Cursor when Ayiru is registered as an MCP server in
-their config file.
+The implementation lives in `ayiru_mcp._internal`. This module forwards
+to the same `build_default_server()` the new console script uses, but
+does NOT swap the database URL — the backend dev path relies on whatever
+`AYIRU_DATABASE_URL` (or the auto-resolved checkout default) points at.
 """
 
-from app.mcp_server.server import build_default_server
+from ayiru_mcp._internal.server import build_default_server
 
 
 def main() -> None:

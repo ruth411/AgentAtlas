@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ayiru-mcp"
+version = "0.1.0"
+description = "Verified, cited knowledge for AI agents — Model Context Protocol server. Ships with a bundled gh catalog."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.12"
+authors = [{ name = "Ayiru contributors" }]
+keywords = ["mcp", "model-context-protocol", "ai-agents", "knowledge-graph", "github-cli", "gh"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development :: Libraries",
+]
+dependencies = [
+  # ayiru-core ships the schemas, claim store, query engine, lean contracts.
+  "ayiru-core>=0.1,<0.2",
+]
+
+[project.optional-dependencies]
+# Enables semantic re-rank inside `ask()`. Pulls fastembed which downloads
+# a ~130 MB ONNX model on first use. Without this extra the server runs
+# in pure lexical mode (catalog ships pre-computed embeddings, but the
+# query side stays lexical because we never embed the user's question).
+semantic = ["fastembed>=0.8,<1.0"]
+
+[project.scripts]
+ayiru-mcp = "ayiru_mcp.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/ruth411/ayiru"
+Repository = "https://github.com/ruth411/ayiru"
+
+[tool.setuptools.packages.find]
+include = ["ayiru_mcp", "ayiru_mcp.*"]
+
+[tool.setuptools.package-data]
+"ayiru_mcp.data" = ["catalog.db"]

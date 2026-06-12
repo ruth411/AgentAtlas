@@ -331,8 +331,12 @@ def test_prompts_list_returns_empty(server: McpServer) -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_tools_list_returns_all_seven_tools(server: McpServer) -> None:
-    """Stage 17 added `ask` as the 7th MCP tool; the v0.2 headline."""
+def test_tools_list_returns_six_advertised_tools(server: McpServer) -> None:
+    """tools/list advertises the six read surfaces. `submit_claim` is
+    registered (find_tool returns it, tools/call routes to it) but hidden
+    via `advertised=False` because the bundled MCP wheel's catalog lives
+    in read-only site-packages — surfacing a write tool the host can't
+    actually write to would just confuse the agent."""
     raw = server.handle_frame(_frame("tools/list"))
     response = json.loads(raw)
     names = {t["name"] for t in response["result"]["tools"]}
@@ -343,7 +347,6 @@ def test_tools_list_returns_all_seven_tools(server: McpServer) -> None:
         "search_tools",
         "explain_risk",
         "get_safe_workflow",
-        "submit_claim",
     }
 
 
@@ -391,7 +394,16 @@ def test_every_tool_has_required_metadata(server: McpServer) -> None:
 
 
 def test_tools_list_count_matches_registry() -> None:
-    assert len(list_tools()) == 7
+    # 6 advertised tools (ask, validate_command, get_tool_spec, search_tools,
+    # explain_risk, get_safe_workflow). `submit_claim` is registered but
+    # marked `advertised=False` so it stays out of `tools/list` — its
+    # bundled-catalog write path is read-only by design, but `find_tool`
+    # still resolves it for direct invocation in dev contexts.
+    assert len(list_tools()) == 6
+    # Sanity: the hidden write tool is still findable for in-process tests.
+    from ayiru_mcp._internal.tools import find_tool
+
+    assert find_tool("submit_claim") is not None
 
 
 def test_every_tool_declares_mcp_2025_annotations(server: McpServer) -> None:
@@ -423,13 +435,20 @@ def test_every_tool_declares_mcp_2025_annotations(server: McpServer) -> None:
 
 
 def test_read_tools_are_marked_read_only(server: McpServer) -> None:
-    """The six query/lookup tools must declare ``readOnlyHint: true``.
-    Only ``submit_claim`` writes state; if any read tool drifts to
-    ``readOnlyHint: false`` it gets gated by the host UI and the LLM
-    can no longer reach for it."""
+    """The six advertised query/lookup tools must declare ``readOnlyHint: true``.
+    If any read tool drifts to ``readOnlyHint: false`` it gets gated by the
+    host UI and the LLM can no longer reach for it.
+
+    ``submit_claim`` is registered but hidden (`advertised=False`) so the
+    bundled MCP wheel — whose catalog lives in read-only site-packages —
+    doesn't surface a write tool the user can't actually use. Its
+    annotations (readOnlyHint=False) are still asserted via the registry
+    in `test_submit_claim_registry_annotations` below.
+    """
     raw = server.handle_frame(_frame("tools/list"))
     response = json.loads(raw)
-    read_only_expected = {
+    advertised_names = {tool["name"] for tool in response["result"]["tools"]}
+    assert advertised_names == {
         "ask",
         "validate_command",
         "get_tool_spec",
@@ -438,14 +457,23 @@ def test_read_tools_are_marked_read_only(server: McpServer) -> None:
         "get_safe_workflow",
     }
     for tool in response["result"]["tools"]:
-        if tool["name"] in read_only_expected:
-            assert tool["annotations"]["readOnlyHint"] is True, (
-                f"{tool['name']} must declare readOnlyHint=True or Claude Desktop "
-                "will hide it from the LLM"
-            )
-    # submit_claim is the one write tool — explicitly NOT read-only.
-    submit = next(t for t in response["result"]["tools"] if t["name"] == "submit_claim")
-    assert submit["annotations"]["readOnlyHint"] is False
+        assert tool["annotations"]["readOnlyHint"] is True, (
+            f"{tool['name']} must declare readOnlyHint=True or Claude Desktop "
+            "will hide it from the LLM"
+        )
+
+
+def test_submit_claim_registry_annotations() -> None:
+    """`submit_claim` is hidden from tools/list but the registry entry
+    must still declare it as a write surface so the annotations stay
+    accurate when a backend dev context re-advertises it."""
+    from ayiru_mcp._internal.tools import find_tool
+
+    submit = find_tool("submit_claim")
+    assert submit is not None
+    assert submit.advertised is False
+    assert submit.annotations is not None
+    assert submit.annotations["readOnlyHint"] is False
 
 
 # ---------------------------------------------------------------------------
@@ -921,7 +949,7 @@ def test_subprocess_entry_point_runs_handshake_cleanly(tmp_path) -> None:
         assert init_response["result"]["protocolVersion"] == proto.PROTOCOL_VERSION
         tools_response = json.loads(out_lines[1])
         tool_names = {t["name"] for t in tools_response["result"]["tools"]}
-        assert len(tool_names) == 7
+        assert len(tool_names) == 6  # 6 advertised; submit_claim is hidden
     finally:
         if proc.poll() is None:
             proc.kill()
