@@ -21,6 +21,8 @@ classifiers = [
   "Topic :: Software Development :: Libraries",
 ]
 dependencies = [
+  # Shared schemas, claim store, query engine, lean contracts.
+  "ayiru-core>=0.1,<0.2",
   "alembic>=1.13,<2.0",
   "fastapi>=0.115,<1.0",
   # Stage 22-stretch — ONNX-backed embedding model for semantic re-rank
@@ -31,8 +33,6 @@ dependencies = [
   "httpx>=0.27,<1.0",
   "jsonschema>=4.20,<5.0",
   "openapi-spec-validator>=0.7,<1.0",
-  "pydantic>=2.8,<3.0",
-  "sqlalchemy>=2.0,<3.0",
   "uvicorn[standard]>=0.30,<1.0",
 ]
 
@@ -60,15 +60,17 @@ pythonpath = ["."]
 testpaths = ["tests"]
 
 [tool.setuptools.packages.find]
-include = ["app*"]
+include = ["app", "app.*"]
+# `app` and `app.contracts` and `app.services` are PEP 420 namespace
+# packages shared with the `ayiru-core` wheel. Both wheels contribute
+# disjoint subtrees of `app.*`; `importlib.resources.files("app.contracts")`
+# merges contributors via MultiplexedPath at runtime.
+namespaces = true
 
 [tool.setuptools.package-data]
-# Stage 14: bundle the versioned trust contracts, the seed artifacts,
-# and the alembic migration scripts into the wheel so a plain
-# `pip install ayiru` produces a fully-functional package.
-# `contract_paths.contract_path()`, the seed loader, and the alembic
-# config resolver all prefer the source-tree copies during development
-# and fall back to these bundled paths when the source tree is absent.
+# Only the ingestion-side contracts ship in this wheel. The lean
+# contracts (risk_model, confidence_model, query_policy, tool_trust_sources,
+# ayiru_stage_0.v{1,2}) ship in ayiru-core.
 "app.contracts" = ["*.json"]
 "app.seed_data" = ["**/*.json", "main.py"]
 "app._alembic" = ["*.py", "**/*.py"]

@@ -1,2 +1,0 @@
-"""Ayiru backend package."""
-

@@ -20,9 +20,12 @@ def _resolve_default_database_url() -> str:
     ``OperationalError: unable to open database file``.
 
     Resolution order (first hit wins):
-      1. Walk up from this module's ``__file__`` looking for
-         ``alembic.ini`` — that marks a dev checkout where the canonical
-         DB lives at ``<repo>/backend/ayiru.db``.
+      1. Walk up from this module's ``__file__`` looking for either
+         ``alembic.ini`` (sibling file — applies if session.py ever lives
+         alongside it again) OR ``backend/alembic.ini`` (current layout
+         where this module is in the ``ayiru-core`` wheel one tree up
+         from the backend). Either way the canonical DB lives at
+         ``<repo>/backend/ayiru.db``.
       2. Fall back to CWD-relative ``./ayiru.db`` (preserves the v0.1
          behavior for wheel-installed runs where the user opts in by
          setting AYIRU_DATABASE_URL explicitly or by `cd`-ing first).
@@ -35,6 +38,8 @@ def _resolve_default_database_url() -> str:
     for parent in here.parents:
         if (parent / "alembic.ini").is_file():
             return f"sqlite:///{parent / 'ayiru.db'}"
+        if (parent / "backend" / "alembic.ini").is_file():
+            return f"sqlite:///{parent / 'backend' / 'ayiru.db'}"
         # Stop walking at the repo root marker so we don't accidentally
         # match an ``alembic.ini`` far up the filesystem.
         if (parent / ".git").exists():
