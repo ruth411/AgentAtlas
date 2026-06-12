@@ -370,60 +370,84 @@ with Ayiru(base_url="http://localhost:8000") as client:
 
 ## 🤖 Use it with Claude, Cursor, Cline (MCP)
 
-Ayiru speaks **Model Context Protocol** out of the box — any MCP-aware client can use it.
+The recommended way to use Ayiru with a coding agent is the standalone
+`ayiru-mcp` package. It ships with a pre-built `gh` catalog inside the
+wheel — no server, no database to point at, no API key.
 
-### Claude Desktop (macOS)
-
-**Step 1 — Find your `ayiru` binary:**
-
-```bash
-which ayiru
-# /Users/you/path/to/ayiru/backend/.venv/bin/ayiru
-```
-
-**Step 2 — Edit Claude's config:**
+### Install (any MCP client)
 
 ```bash
-open ~/Library/Application\ Support/Claude/claude_desktop_config.json
+pip install ayiru-mcp
 ```
 
-**Step 3 — Add Ayiru as an MCP server:**
+That gives you the `ayiru-mcp` console script. Add it to your client's MCP config:
+
+**Claude Desktop** — `~/Library/Application Support/Claude/claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "ayiru": { "command": "ayiru-mcp" }
+  }
+}
+```
+
+**Cursor / Cline / Continue** — same shape; consult your client's docs for
+the JSON location. The advertised tools after restart:
+
+| Tool | What it does |
+|---|---|
+| `ask` | Natural-language question → ranked, cited answers |
+| `validate_command` | Advisory safety verdict for `{tool_id, command}` |
+| `get_tool_spec` | Full canonical spec for a tool |
+| `search_tools` | Search across published tools |
+| `explain_risk` | Risk classification with reasons |
+| `get_safe_workflow` | Goal-matched workflows, safest first |
+
+Ask the agent something like *"how do I authenticate gh from a CI workflow?"* —
+it'll call `ask()` and return a cited answer with a `cli.github.com` source URL.
+
+### Semantic re-rank (optional)
+
+```bash
+pip install ayiru-mcp[semantic]
+```
+
+Pulls `fastembed` (~130 MB ONNX model on first use). Without this extra
+the server runs in pure lexical mode — already useful, but query phrasings
+that don't share tokens with the catalog rank worse.
+
+### Catalog scope
+
+The bundled wheel ships **`gh` only** (~130 claims, ~1.5 MB). It's the
+MVP catalog for the install-and-go pitch. The full multi-tool catalog
+(`git`, `docker`, `kubectl`, `ffmpeg`, …) lives in the FastAPI backend
+described above; running it locally via Docker or `pip install ayiru`
+gives you all 2,800+ claims across 60+ tools.
+
+<details>
+<summary><b>Dev path: <code>python -m app.mcp_server</code> against the full catalog</b></summary>
+
+Contributors and self-hosters who want the full catalog over MCP can
+still register the legacy entry point:
 
 ```json
 {
   "mcpServers": {
     "ayiru": {
-      "command": "/absolute/path/to/ayiru",
-      "args": ["mcp"],
+      "command": "/absolute/path/to/.venv/bin/python",
+      "args": ["-m", "app.mcp_server"],
       "env": {
-        "AYIRU_DATABASE_URL": "sqlite:////absolute/path/to/ayiru/backend/ayiru_v0.2_bulk.db"
+        "AYIRU_DATABASE_URL": "sqlite:////absolute/path/to/backend/ayiru_v0.2_bulk.db"
       }
     }
   }
 }
 ```
 
-**Step 4 — Restart Claude Desktop.** You'll see 7 new tools in the tool list. Ask Claude:
-
-> *"Is it safe to run `gh repo delete my-org/prod --yes`?"*
-
-Claude will query Ayiru, see it's flagged `critical`, and warn you. 🛡️
-
-<details>
-<summary><b>Cursor / Cline / Continue / other MCP clients</b></summary>
-
-Same config shape — consult your client's docs for the JSON location. The seven tools Ayiru exposes:
-
-| Tool | What it does |
-|---|---|
-| 🔥 `ask` | Natural-language question → ranked, cited answers |
-| 🛡️ `validate_command` | Safety verdict for `{tool_id, command}` |
-| 📋 `get_tool_spec` | Full canonical spec for a tool |
-| 🔍 `search_tools` | Search across published tools |
-| ⚠️ `explain_risk` | Risk classification with reasons |
-| 🗺️ `get_safe_workflow` | Goal-matched workflows, safest first |
-| ✏️ `submit_claim` | Add a new claim to the graph (write tool) |
-
+This path advertises the same 6 read tools plus an extra `submit_claim`
+write surface (hidden from the published `ayiru-mcp` wheel because its
+catalog lives in read-only `site-packages`).
 </details>
 
 ---
