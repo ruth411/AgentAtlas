@@ -1,7 +1,5 @@
 <div align="center">
 
-<br/>
-
 ```
    █████╗ ██╗   ██╗██╗██████╗ ██╗   ██╗
   ██╔══██╗╚██╗ ██╔╝██║██╔══██╗██║   ██║
@@ -11,79 +9,84 @@
   ╚═╝  ╚═╝   ╚═╝   ╚═╝╚═╝  ╚═╝ ╚═════╝
 ```
 
-### **Stop your AI agent from hallucinating CLI commands.**
+### **Verified, cited knowledge for AI agents.**
 
-*A verified, cited knowledge graph that AI agents query before they act.<br/>2,800+ claims across 60+ tools — every fact has a citation, no LLM guessing.*
-
-<br/>
+*Your agent asks a question. Ayiru returns a cited answer from official docs — not a guess from training data months out of date. 2,800+ claims across 60+ tools, every fact backed by a source URL.*
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-3776AB?logo=python&logoColor=white&style=for-the-badge)](https://www.python.org/downloads/)
-[![Tests](https://img.shields.io/badge/790_tests_✓-2EA44F?style=for-the-badge)](#-verify-it-works)
+[![Tests](https://img.shields.io/badge/826_tests_✓-2EA44F?style=for-the-badge)](#-verify-it-works)
 [![License MIT](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
 
-[![Claims](https://img.shields.io/badge/📚_claims-2,800%2B-7C3AED?style=flat-square)](#-tool-catalog)
-[![Tools](https://img.shields.io/badge/🔧_tools-60%2B-0EA5E9?style=flat-square)](#-tool-catalog)
-[![Perfect probes](https://img.shields.io/badge/✅_perfect_probes-12_tools-22C55E?style=flat-square)](#-tool-catalog)
-[![MCP](https://img.shields.io/badge/🔌_MCP_ready-F97316?style=flat-square)](#-claude-cursor-cline-mcp)
+[![Claims](https://img.shields.io/badge/claims-2,800%2B-7C3AED?style=flat-square)](#-tool-catalog)
+[![Tools](https://img.shields.io/badge/tools-60%2B-0EA5E9?style=flat-square)](#-tool-catalog)
+[![MCP](https://img.shields.io/badge/MCP_ready-F97316?style=flat-square)](#-use-it-with-claude-cursor-cline-mcp)
+
+</div>
 
 ---
 
-### 🚀 **Get started in 30 seconds**
+## The problem
+
+Your agent's training data is months old. When it answers *"how do I force-push safely after a rebase?"* or *"what's the right ffmpeg flag to re-encode without re-muxing?"*, it pattern-matches plausible-looking syntax — and ships deprecated flags, wrong defaults, or commands that never existed.
+
+Vector search over docs helps, but the agent still has no way to know which chunk is **current**, **official**, or **verified to exist**.
+
+## The fix
+
+Ayiru is a read-only API your agent calls before it answers. Every claim it returns has:
+
+- a **source URL** pointing at the official docs page it came from,
+- a **verification level** (`L1_source_recorded` → `L2_source_verified` → `L3_runtime_verified` — the highest tier means we actually spawned the binary and confirmed the flag exists),
+- a **deterministic risk label** (advisory, regex-driven from a versioned contract — no LLM in the loop).
+
+```python
+from ayiru_client import Ayiru
+
+with Ayiru() as a:
+    answer = a.ask("how do I force-push safely after a rebase?")
+
+print(answer.top.subject)
+# → "git recipe: force-push safely with --force-with-lease"
+
+print(answer.top.statement)
+# → "After rebase or amend on a pushed branch. `git push --force-with-lease`.
+#    Difference vs `--force`: only succeeds if remote hasn't moved since
+#    your last fetch. Protects against overwriting someone else's pushes
+#    you don't have. … NEVER force-push to main/master on shared repos
+#    without explicit coordination."
+
+print(answer.top.evidence[0].source_uri)
+# → https://git-scm.com/docs/git-push
+```
+
+No hallucinated flag. No paraphrased blog post. The exact text from the catalog, with the official-docs URL.
+
+## What's in the box
+
+- **`ask(question)`** — the headline surface. Cited, ranked answers grounded in 2,800+ claims across 60+ tools (git, kubectl, docker, gh, ffmpeg, postgres, openssl, …). Hybrid lexical + semantic retrieval.
+- **`search_tools` / `get_tool_spec`** — structured catalog access when you know the tool but not the command.
+- **`validate_command(tool, command)`** *(bonus)* — runs the same risk classifier over a literal command string and returns an advisory `safe_to_auto_execute` verdict. Useful as a second opinion before an agent runs a destructive command; **not** a security boundary against an adversarial agent.
+- **MCP server** — drop into Claude Desktop / Cursor / Cline / Continue via stdio JSON-RPC. Six tools, zero config.
+- **Python SDK** — sync + async clients, plus a LangChain `Tool` adapter.
+
+---
+
+### Get started in 30 seconds
 
 ```bash
 git clone https://github.com/ruth411/ayiru.git && cd ayiru
 docker build -t ayiru . && docker run --rm -p 8000:8000 ayiru
 ```
 
-Then open <http://localhost:8000/docs> in your browser. **That's it. ✨**
+Then:
 
-</div>
-
----
-
-## 🤔 What is this?
-
-You're building an AI agent. It needs to run real commands on real systems — `kubectl delete`, `gh repo delete`, `docker rm`, `git push --force`. **What could go wrong?**
-
-<table>
-<tr>
-<td width="50%">
-
-### 😱 Without Ayiru
-
-```python
-# The LLM "thought" this was safe.
-# It wasn't.
-agent.run(
-  "gh repo delete prod --yes"
-)
-# Production. Gone. 💀
+```bash
+curl -X POST http://localhost:8000/v1/query/ask \
+  -H 'Content-Type: application/json' \
+  -d '{"question": "how do I force-push safely after a rebase?"}'
 ```
 
-Your agent guesses from training data. That training data is **months old**, contains **deprecated flags**, and has **no citations**.
-
-</td>
-<td width="50%">
-
-### ✅ With Ayiru
-
-```python
-from ayiru_client import Ayiru
-
-with Ayiru() as a:
-    v = a.validate_command(
-        "github-cli",
-        "gh repo delete prod --yes"
-    )
-    if not v.safe_to_auto_execute:
-        ask_human(v.reasons)  # blocked ✋
-```
-
-Every fact comes from **official docs**, with **citations** and a **deterministic risk score**.
-
-</td>
-</tr>
-</table>
+Or open <http://localhost:8000/docs> for the interactive API.
 
 ---
 
