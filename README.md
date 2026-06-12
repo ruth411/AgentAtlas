@@ -11,15 +11,15 @@
 
 ### **Machine-readable external knowledge for AI agents.**
 
-*Ayiru is the substrate an agent queries before it acts. Resolve subjects, capabilities, constraints, effects, and workflows from cited sources first; render human-readable answers second. 3,600+ claims across 38 tool families (157 surfaces), every claim backed by a source URL.*
+*Google is for humans. Ayiru is for agents. Your agent calls a typed API and gets back typed records — `subject_id`, `capability_type`, `argv_schema`, `flag_schema`, `effect_kind`, `verification_level` — not prose. No webpage surfing, no LLM-in-the-loop summarisation, no hallucinated flags.*
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-3776AB?logo=python&logoColor=white&style=for-the-badge)](https://www.python.org/downloads/)
-[![Tests](https://img.shields.io/badge/826_tests_✓-2EA44F?style=for-the-badge)](#-verify-it-works)
+[![Tests](https://img.shields.io/badge/850_tests_✓-2EA44F?style=for-the-badge)](#-verify-it-works)
 [![License MIT](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
 
-[![Claims](https://img.shields.io/badge/claims-3,600%2B-7C3AED?style=flat-square)](#-tool-catalog)
-[![Tools](https://img.shields.io/badge/tool_families-38-0EA5E9?style=flat-square)](#-tool-catalog)
-[![Accepted](https://img.shields.io/badge/verification--accepted-40%25-22C55E?style=flat-square)](#-tool-catalog)
+[![Structured coverage gh](https://img.shields.io/badge/structured--coverage_gh-61%2F61_subcommands-22C55E?style=flat-square)](#-tool-catalog)
+[![Capabilities](https://img.shields.io/badge/typed_capabilities-700%2B-7C3AED?style=flat-square)](#-tool-catalog)
+[![Tool families](https://img.shields.io/badge/tool_families-38-0EA5E9?style=flat-square)](#-tool-catalog)
 [![MCP](https://img.shields.io/badge/MCP_ready-F97316?style=flat-square)](#-use-it-with-claude-cursor-cline-mcp)
 
 </div>
@@ -28,47 +28,49 @@
 
 ## The problem
 
-Your agent's training data is months old. When it answers *"how do I force-push safely after a rebase?"* or *"what's the right ffmpeg flag to re-encode without re-muxing?"*, it pattern-matches plausible-looking syntax — and ships deprecated flags, wrong defaults, or commands that never existed.
+Agents do not read web pages. They emit tokens. When an agent decides "run `gh pr create --reviewer alice`" it's pattern-matching plausible syntax from training data that's months out of date. Deprecated flags ship. Removed subcommands ship. Hallucinated arguments ship.
 
-Vector search over docs helps, but the agent still has no way to know which chunk is **current**, **official**, or **verified to exist**.
+Vector search over docs doesn't fix this — the agent still gets back prose that it has to summarise, paraphrase, and convert into a command at decoding time. Every step is a chance to corrupt the result.
 
-## The fix
+## The fix — typed records, no prose
 
-Ayiru is a read-only external knowledge layer your agent calls before it selects or executes an action. Natural-language `ask()` is still available, but it now sits on top of structured subject, capability, and action-resolution APIs. Every claim it returns has:
-
-- a **source URL** pointing at the official docs page it came from,
-- a **verification level** (`L1_source_recorded` → `L2_source_verified` → `L3_runtime_verified` — the highest tier means we actually spawned the binary and confirmed the flag exists),
-- a **deterministic risk label** (advisory, regex-driven from a versioned contract — no LLM in the loop).
+Ayiru is a read-only **structured knowledge layer**. The agent asks for a subject's capabilities; Ayiru returns typed `Capability` records with `argv_schema`, `flag_schema`, `effect_kind` populated from actual `--help` parses. No prose statements, no summarisation, no LLM in the loop.
 
 ```python
 from ayiru_client import Ayiru
 
 with Ayiru() as a:
-    answer = a.ask("how do I force-push safely after a rebase?")
+    caps = a.get_capabilities(subject_id="gh-pr-create",
+                              capability_types=["invocation"])
 
-print(answer.top.subject)
-# → "git recipe: force-push safely with --force-with-lease"
-
-print(answer.top.statement)
-# → "After rebase or amend on a pushed branch. `git push --force-with-lease`.
-#    Difference vs `--force`: only succeeds if remote hasn't moved since
-#    your last fetch. Protects against overwriting someone else's pushes
-#    you don't have. … NEVER force-push to main/master on shared repos
-#    without explicit coordination."
-
-print(answer.top.evidence[0].source_uri)
-# → https://git-scm.com/docs/git-push
+top = caps.capabilities[0]
+print(top.source)              # → 'structured'
+print(top.verification_level)  # → 'L3_runtime_verified'
+print(top.detail["command"])   # → 'gh pr create'
+print(len(top.detail["flag_schema"]))   # → 22
+print(top.detail["flag_schema"][0])
+# → {
+#     "name": "--assignee",
+#     "short": "-a",
+#     "value_type": "string",
+#     "value_name": "login",
+#     "takes_value": true,
+#     "required": false,
+#     "deprecated": false,
+#     "description": "Assign people by their login. Use \"@me\" to self-assign."
+#   }
 ```
 
-No hallucinated flag. No paraphrased blog post. The exact catalog text, with the official-docs URL and verification status.
+`L3_runtime_verified` means Ayiru actually spawned `gh --help` and parsed it. Every flag's type, default, deprecation status, and short-form is a real field — not text the agent has to extract. The agent constructs `gh pr create --assignee @me --base main --body "..."` from typed metadata, not from a hallucinated guess.
 
 ## What's in the box
 
-- **Structured query surfaces** — `resolve_subject`, `get_subject_spec`, `get_capabilities`, `get_constraints`, `get_effects`, `resolve_action`, and `get_workflow_plan` let an agent ground an intended action in typed records before it acts.
-- **`ask(question)`** — compatibility projection over the same graph. It renders cited, ranked answers grounded in 3,600+ claims across 38 tool families (157 surfaces). Accepted answers are preferred; review-pending answers are marked as informational.
-- **`validate_command(tool, command)`** — command-specific preflight verdicts for agents about to execute something. Useful as a second opinion before a destructive command; **not** a security boundary against an adversarial agent.
-- **MCP server** — drop into Claude Desktop / Cursor / Cline / Continue via stdio JSON-RPC. Six tools, zero config.
-- **Python SDK** — sync + async clients for both the compatibility APIs and the structured substrate, plus a LangChain `Tool` adapter.
+- **7 structured query tools** advertised over MCP — `resolve_subject`, `get_subject_spec`, `get_capabilities`, `get_constraints`, `get_effects`, `resolve_action`, `get_workflow_plan`. All return typed records; none return prose.
+- **Structured `gh` catalog** — 61 subjects (every gh subcommand), 700+ typed capabilities, 60+ typed constraints, typed effects with `destructive` / `mutates_remote_state` / `reversible` booleans. `L3_runtime_verified`.
+- **Projection fallback** for the other 37 tool families — Ayiru projects structured records over the existing prose catalog when no first-class typed records exist yet. Responses carry `source: structured | projected` so the agent knows the difference.
+- **MCP server** — drop into Claude Desktop / Cursor / Cline / Continue via stdio JSON-RPC. Zero config.
+- **Python SDK** — sync + async clients for every typed surface.
+- **Legacy prose surfaces** (`ask`, `validate_command`, `search_tools`, `explain_risk`, `get_safe_workflow`, `get_tool_spec`) remain available but are hidden from `tools/list`. Pinned external callers still work; agents discovering tools fresh see only the typed surfaces.
 
 ---
 
@@ -82,9 +84,12 @@ docker build -t ayiru . && docker run --rm -p 8000:8000 ayiru
 Then:
 
 ```bash
-curl -X POST http://localhost:8000/v1/query/ask \
+curl -X POST http://localhost:8000/v1/query/capabilities \
   -H 'Content-Type: application/json' \
-  -d '{"question": "how do I force-push safely after a rebase?"}'
+  -d '{"subject_id": "gh-pr-create", "capability_types": ["invocation"], "limit": 1}'
+# → typed record: subject_id, capability_type=invocation,
+#   detail.command="gh pr create", detail.flag_schema=[{name:"--assignee",...}, ...],
+#   source="structured", verification_level="L3_runtime_verified"
 ```
 
 Or open <http://localhost:8000/docs> for the interactive API.
@@ -188,9 +193,12 @@ INFO:     Application startup complete.
 In a new terminal:
 
 ```bash
-curl -X POST http://localhost:8000/v1/query/ask \
+curl -s -X POST http://localhost:8000/v1/query/resolve-subject \
   -H 'Content-Type: application/json' \
-  -d '{"question": "how do I force-push safely after rebase?"}'
+  -d '{"subject_hint": "open a github pull request"}' | jq '.matches[0]'
+# → {"subject_id":"gh-pr-create", "subject_kind":"invocation",
+#    "family":"gh", "capability_count":25,
+#    "verification_level":"L3_runtime_verified", ...}
 ```
 
 Or open the interactive docs at **<http://localhost:8000/docs>** in your browser.
@@ -299,54 +307,57 @@ For adding a new tool to the catalog, see [Growing the Catalog](#-growing-the-ca
 
 ## ✨ Your First Query
 
-Once Ayiru is running on `http://localhost:8000`, try these:
+Once Ayiru is running on `http://localhost:8000`, try the structured surface — the same one the agent calls over MCP.
 
-### 1️⃣ Ask a natural-language question
+### 1️⃣ Resolve a subject from a fuzzy hint
 
 ```bash
-curl -s -X POST http://localhost:8000/v1/query/ask \
+curl -s -X POST http://localhost:8000/v1/query/resolve-subject \
   -H 'Content-Type: application/json' \
-  -d '{"question": "trim a video without re-encoding"}' | jq
+  -d '{"subject_hint": "create a github pull request"}' | jq '.matches[0]'
 ```
 
-**Expected response:**
+**Expected response (typed `SubjectSummary`):**
 
 ```json
 {
-  "answers": [{
-    "statement": "Cut a section of video instantly. `ffmpeg -ss 00:01:30 -to 00:02:00 -i in.mp4 -c copy out.mp4`. `-c copy` skips re-encoding (no quality loss, near-instant)...",
-    "tool_id": "ffmpeg-recipes",
-    "confidence": 0.95,
-    "verification_level": "L2_source_verified",
-    "evidence": [{
-      "source_uri": "https://ffmpeg.org/ffmpeg.html",
-      "trust_level": "high"
-    }]
-  }],
-  "fallback_recommended": false
+  "subject_id": "gh-pr-create",
+  "subject_kind": "invocation",
+  "name": "gh pr create",
+  "family": "gh",
+  "capability_count": 25,
+  "verification_level": "L3_runtime_verified",
+  "match_reason": "name match on 'pr create'"
 }
 ```
 
-### 2️⃣ Check if a command is safe
+### 2️⃣ Pull typed capabilities + effects
 
 ```bash
-curl -s -X POST http://localhost:8000/v1/query/validate-command \
+curl -s -X POST http://localhost:8000/v1/query/capabilities \
   -H 'Content-Type: application/json' \
-  -d '{"tool_id": "github-cli", "command": "gh repo delete prod --yes"}' | jq
+  -d '{"subject_id": "gh-pr-create", "capability_types": ["invocation"], "limit": 1}' \
+  | jq '.capabilities[0] | {source, capability_type, command: .detail.command, flag_count: (.detail.flag_schema | length), first_flag: .detail.flag_schema[0]}'
 ```
 
 **Expected response:**
 
 ```json
 {
-  "safe_to_auto_execute": false,
-  "risk_level": "critical",
-  "requires_human_confirmation": true,
-  "verification_level": "L2_source_verified",
-  "reasons": [
-    "Deleting a GitHub repository is an irreversible remote mutation.",
-    "Safety policy blocks auto-execution at risk level 'critical'."
-  ]
+  "source": "structured",
+  "capability_type": "invocation",
+  "command": "gh pr create",
+  "flag_count": 22,
+  "first_flag": {
+    "name": "--assignee",
+    "short": "-a",
+    "value_type": "string",
+    "value_name": "login",
+    "takes_value": true,
+    "required": false,
+    "deprecated": false,
+    "description": "Assign people by their login. Use \"@me\" to self-assign."
+  }
 }
 ```
 
@@ -356,15 +367,23 @@ curl -s -X POST http://localhost:8000/v1/query/validate-command \
 from ayiru_client import Ayiru
 
 with Ayiru(base_url="http://localhost:8000") as client:
-    # Ask anything
-    answer = client.ask("how do I copy files between docker containers")
-    if answer.is_useful:
-        print(answer.top.statement)
-        print(f"📎 Source: {answer.top.evidence[0].source_uri}")
+    # Discovery
+    subjects = client.resolve_subject(subject_hint="delete a docker container")
+    top = subjects.matches[0]
+    print(top.subject_id, top.verification_level)
 
-    # Or check command safety
-    v = client.validate_command("kubectl", "kubectl delete ns production")
-    print(f"Safe to auto-execute: {v.safe_to_auto_execute}")
+    # Typed capabilities for that subject
+    caps = client.get_capabilities(subject_id=top.subject_id,
+                                   accepted_only_structured=True)
+    for cap in caps.capabilities[:3]:
+        print(cap.capability_type, "→", cap.title)
+        # cap.detail is a dict with argv_schema, flag_schema, etc.
+
+    # End-to-end action grounding (capability + constraints + effects in one shot)
+    plan = client.resolve_action(subject_id="gh-pr-create",
+                                 action_intent="open a draft PR")
+    print(plan.top_capability.detail["command"])
+    print(plan.requires_human_confirmation, plan.risk_level)
 ```
 
 ---
@@ -394,19 +413,28 @@ That gives you the `ayiru-mcp` console script. Add it to your client's MCP confi
 ```
 
 **Cursor / Cline / Continue** — same shape; consult your client's docs for
-the JSON location. The advertised tools after restart:
+the JSON location. The advertised tools after restart (typed I/O, no prose):
 
-| Tool | What it does |
+| Tool | Returns |
 |---|---|
-| `ask` | Natural-language question → ranked, cited answers |
-| `validate_command` | Advisory safety verdict for `{tool_id, command}` |
-| `get_tool_spec` | Full canonical spec for a tool |
-| `search_tools` | Search across published tools |
-| `explain_risk` | Risk classification with reasons |
-| `get_safe_workflow` | Goal-matched workflows, safest first |
+| `resolve_subject` | Typed `SubjectSummary` records from a fuzzy hint. **Call this first.** |
+| `get_subject_spec` | Full `SubjectSpec` for a known `subject_id` |
+| `get_capabilities` | Typed `CapabilityRecord` rows — invocations, configs, constraints, effects |
+| `get_constraints` | Typed constraint records — auth scopes, env preconditions, deprecation |
+| `get_effects` | Typed effect profile — destructive / mutates_remote_state / reversible booleans |
+| `resolve_action` | End-to-end grounding — top capability + constraints + effects + risk verdict |
+| `get_workflow_plan` | Goal-matched workflow plans, safest-first |
 
-Ask the agent something like *"how do I authenticate gh from a CI workflow?"* —
-it'll call `ask()` and return a cited answer with a `cli.github.com` source URL.
+Ask the agent *"what flags does `gh pr create` accept?"* — it'll call
+`resolve_subject` then `get_capabilities` and get back 22 typed flag
+records with `value_type`, `takes_value`, `required`, `deprecated` populated.
+No hallucination because no prose to misread.
+
+The legacy prose surfaces (`ask`, `validate_command`, `search_tools`,
+`explain_risk`, `get_safe_workflow`, `get_tool_spec`) remain registered for
+backward compatibility but are hidden from `tools/list`. Agents discovering
+tools fresh see only the typed surfaces; pinned external callers that invoke
+the old tools by name still work.
 
 ### Semantic re-rank (optional)
 
