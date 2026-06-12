@@ -95,15 +95,39 @@ def test_orchestrator_accepts_low_risk_source_verified_claim(tmp_path) -> None:
     assert result.risk_assessment.matched_rule_ids == ["git.status"]
 
 
-def test_orchestrator_does_not_accept_low_band_claim(tmp_path) -> None:
+def test_orchestrator_accepts_single_high_trust_official_docs_claim(tmp_path) -> None:
+    """Under the v2 confidence model (2026-06), a low-risk claim with one
+    high-trust official_docs citation reaches the `moderate` band on its
+    own (0.60) and is acceptable. v1 capped at 0.45 → `low` → forced
+    PENDING_MORE_EVIDENCE, which left 99% of the catalog stuck."""
+
     store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
     claim = _claim()
 
     result = CanonOrchestrator(store).verify_claim(claim)
 
-    assert result.decision == OrchestratorDecision.PENDING_MORE_EVIDENCE
+    assert result.decision == OrchestratorDecision.ACCEPTED
+    assert result.verification_status == "accepted"
     assert result.verification_level == "L2_source_verified"
-    assert result.reason_codes == ["INSUFFICIENT_CONFIDENCE_FOR_ACCEPTANCE"]
+
+
+def test_orchestrator_does_not_accept_non_trusted_evidence_type(tmp_path) -> None:
+    """Claims whose only evidence is a non-diverse-trusted-type still
+    block at the trust gate, even after the v2 confidence rebalance.
+    `release_notes` does not appear in the contract's
+    ``diverse_trusted_types`` list, so the orchestrator returns
+    ``NO_TRUSTED_SOURCE_EVIDENCE`` before confidence even matters."""
+
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
+    claim = _claim(
+        evidence_type=EvidenceType.RELEASE_NOTES,
+        source_uri="https://example.com/release-notes/1.0",
+    )
+
+    result = CanonOrchestrator(store).verify_claim(claim)
+
+    assert result.decision == OrchestratorDecision.PENDING_MORE_EVIDENCE
+    assert "NO_TRUSTED_SOURCE_EVIDENCE" in result.reason_codes
 
 
 def test_orchestrator_requires_more_evidence_when_claim_has_no_evidence(tmp_path) -> None:

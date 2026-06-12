@@ -36,7 +36,7 @@ from app.services.contract_paths import contract_path
 from app.services.evidence_trust import normalize_claim_evidence_trust
 
 
-_CONFIDENCE_MODEL_CONTRACT = contract_path("confidence_model.v1.json")
+_CONFIDENCE_MODEL_CONTRACT = contract_path("confidence_model.v2.json")
 
 
 def band_for_score(score: float) -> ConfidenceBand:
@@ -181,7 +181,21 @@ def compute_confidence_breakdown(
             score = cap
         caps_applied.append(f"conflict_detected:{cap:.2f}")
 
-    score = max(0.0, min(round(score, 4), 1.0))
+    # If components summed past 1.0 (much more common under v2's
+    # heavier per-type weights), emit an explicit clip component so
+    # `sum(components.delta) == score` stays an invariant. Without this,
+    # downstream consumers reconciling the breakdown — including the
+    # orchestrator's understated-risk path — saw `0.65 == 0.5` mismatches.
+    raw_score = round(score, 4)
+    score = max(0.0, min(raw_score, 1.0))
+    if raw_score > 1.0:
+        components.append(
+            ConfidenceComponent(
+                source="cap:max_one",
+                delta=round(1.0 - raw_score, 4),
+                reason=f"Raw score {raw_score:.4f} exceeded 1.0; clipped to 1.00.",
+            )
+        )
     band = band_for_score(score)
 
     return ConfidenceBreakdown(
@@ -238,8 +252,14 @@ def _band_thresholds() -> tuple[tuple[float, ConfidenceBand], ...]:
 
 
 def _validate_confidence_model(data: dict[str, Any]) -> None:
-    if data.get("version") != 1:
-        raise ValueError("confidence model contract must have version=1")
+    # v2 (2026-06) raised the per-type weights so a single high-trust
+    # authoritative citation (official_docs, man_page, sandbox_execution)
+    # reaches the `moderate` band on its own. Pre-v2 catalogs land
+    # universally in `low` because the majority of claims have exactly
+    # one citation. v1 stays on disk for replay; the live scorer always
+    # loads v2.
+    if data.get("version") not in (1, 2):
+        raise ValueError("confidence model contract must have version in (1, 2)")
 
     weights = data.get("evidence_type_weights")
     multipliers = data.get("trust_multipliers")
