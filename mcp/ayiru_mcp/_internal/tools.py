@@ -23,6 +23,12 @@ from app.schemas.evidence import Evidence
 from app.schemas.query import (
     AskRequest,
     ExplainRiskRequest,
+    GetCapabilitiesRequest,
+    GetConstraintsRequest,
+    GetEffectsRequest,
+    GetWorkflowPlanRequest,
+    ResolveActionRequest,
+    ResolveSubjectRequest,
     SafeWorkflowRequest,
     ValidateCommandRequest,
 )
@@ -220,10 +226,466 @@ def _handle_submit_claim(
     return persisted.model_dump(mode="json")
 
 
+# -------- Structured-substrate handlers (v0.2 headline surface) --------
+#
+# The seven tools below mirror the structured query surfaces on
+# `QueryEngine`. They return typed records — `CapabilityRecord`,
+# `SubjectSummary`, etc. — not natural-language `statement` text. This is
+# the "machine-readable external knowledge layer for AI agents" surface:
+# agents call these BEFORE acting, not for prose answers.
+
+
+def _handle_resolve_subject(
+    arguments: dict[str, Any], store: ClaimStore
+) -> dict[str, Any]:
+    """Discovery: turn a fuzzy hint into a typed list of subjects."""
+    request = ResolveSubjectRequest.model_validate(arguments)
+    response = QueryEngine(store).resolve_subject(
+        subject_hint=request.subject_hint,
+        kind=request.kind,
+        family_hint=request.family_hint,
+        limit=request.limit,
+    )
+    return response.model_dump(mode="json")
+
+
+def _handle_get_subject_spec(
+    arguments: dict[str, Any], store: ClaimStore
+) -> dict[str, Any]:
+    """Once subject_id is known, return its full typed spec."""
+    subject_id = str(arguments.get("subject_id", "")).strip()
+    if not subject_id:
+        raise ValueError("subject_id is required")
+    spec = QueryEngine(store).get_subject_spec(subject_id=subject_id)
+    if spec is None:
+        raise LookupError(
+            f"No subject spec found for subject_id '{subject_id}'."
+        )
+    return spec.model_dump(mode="json")
+
+
+def _handle_get_capabilities(
+    arguments: dict[str, Any], store: ClaimStore
+) -> dict[str, Any]:
+    """Typed capability records for a subject — invocations, configs, etc."""
+    request = GetCapabilitiesRequest.model_validate(arguments)
+    response = QueryEngine(store).get_capabilities(
+        subject_id=request.subject_id,
+        capability_types=list(request.capability_types) or None,
+        accepted_only=request.accepted_only,
+        accepted_only_structured=request.accepted_only_structured,
+        verification_min=request.verification_min,
+        limit=request.limit,
+    )
+    return response.model_dump(mode="json")
+
+
+def _handle_get_constraints(
+    arguments: dict[str, Any], store: ClaimStore
+) -> dict[str, Any]:
+    """Typed constraint records — auth scopes, env preconditions, etc."""
+    request = GetConstraintsRequest.model_validate(arguments)
+    response = QueryEngine(store).get_constraints(
+        subject_id=request.subject_id,
+        action_intent=request.action_intent,
+        accepted_only=request.accepted_only,
+        accepted_only_structured=request.accepted_only_structured,
+    )
+    return response.model_dump(mode="json")
+
+
+def _handle_get_effects(
+    arguments: dict[str, Any], store: ClaimStore
+) -> dict[str, Any]:
+    """Typed effect profile — destructive, mutates_remote_state, reversible."""
+    request = GetEffectsRequest.model_validate(arguments)
+    response = QueryEngine(store).get_effects(
+        subject_id=request.subject_id,
+        action_intent=request.action_intent,
+        accepted_only=request.accepted_only,
+        accepted_only_structured=request.accepted_only_structured,
+    )
+    return response.model_dump(mode="json")
+
+
+def _handle_resolve_action(
+    arguments: dict[str, Any], store: ClaimStore
+) -> dict[str, Any]:
+    """Ground an intended action: top capability + constraints + effects."""
+    request = ResolveActionRequest.model_validate(arguments)
+    response = QueryEngine(store).resolve_action(
+        subject_id=request.subject_id,
+        action_intent=request.action_intent,
+        command=request.command,
+        environment=request.environment,
+        accepted_only=request.accepted_only,
+        accepted_only_structured=request.accepted_only_structured,
+        limit=request.limit,
+    )
+    return response.model_dump(mode="json")
+
+
+def _handle_get_workflow_plan(
+    arguments: dict[str, Any], store: ClaimStore
+) -> dict[str, Any]:
+    """Goal-matched workflow plans, safest-first."""
+    request = GetWorkflowPlanRequest.model_validate(arguments)
+    response = QueryEngine(store).get_workflow_plan(
+        goal=request.goal,
+        environment=request.environment,
+        limit=request.limit,
+    )
+    return response.model_dump(mode="json")
+
+
 # -------- Tool registry --------
 
 
 _TOOL_REGISTRY: list[McpTool] = [
+    # -------- Structured substrate (v0.2 headline) --------
+    #
+    # Ayiru's machine-readable surface. Agents call these BEFORE acting on
+    # a developer tool. The order matters — `resolve_subject` is first so
+    # an LLM doing discovery reaches for it before anything else (Stage 17
+    # found tool order biases LLM tool choice).
+    McpTool(
+        name="resolve_subject",
+        description=(
+            "FIRST CALL before acting on any developer tool, API, SDK, or "
+            "workflow. Resolves a fuzzy human-facing hint (e.g. 'open a "
+            "pull request', 'gh pr create', 'github') to a typed list of "
+            "subjects with `subject_id`s you can then feed to "
+            "`get_capabilities`, `get_constraints`, `get_effects`, or "
+            "`resolve_action`. Returns SubjectSummary records (typed: "
+            "subject_id, subject_kind, family, capability_count, "
+            "verification_level) — NO prose. If the LLM is uncertain "
+            "which tool the user means, call this first."
+        ),
+        input_schema={
+            "type": "object",
+            "properties": {
+                "subject_hint": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256,
+                    "description": (
+                        "Fuzzy hint — a verb phrase, a tool name, a "
+                        "subcommand, an API path, etc. Examples: 'gh pr "
+                        "create', 'delete a docker volume', 'kubectl get "
+                        "pods'."
+                    ),
+                },
+                "kind": {
+                    "type": "string",
+                    "enum": ["tool", "api", "sdk", "adk", "workflow", "subject"],
+                    "description": (
+                        "Optional kind filter when the hint is ambiguous "
+                        "across kinds."
+                    ),
+                },
+                "family_hint": {
+                    "type": "string",
+                    "pattern": r"^[A-Za-z0-9_.-]{1,128}$",
+                    "description": (
+                        "Optional family narrower (e.g. 'gh', 'docker'). "
+                        "Useful when the subject_hint alone is too generic."
+                    ),
+                },
+                "limit": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100,
+                    "default": 20,
+                },
+            },
+            "required": ["subject_hint"],
+            "additionalProperties": False,
+        },
+        handler=_handle_resolve_subject,
+        annotations={
+            "title": "Resolve subject",
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
+    ),
+    McpTool(
+        name="get_subject_spec",
+        description=(
+            "Return the full typed spec for a known `subject_id` "
+            "(SubjectSpecResponse: name, family, interfaces, capabilities, "
+            "workflows, verification_level, provenance_claim_ids). Use "
+            "this after `resolve_subject` when you need the spec body, "
+            "not just the summary. Returns null-equivalent error if the "
+            "subject is unknown."
+        ),
+        input_schema={
+            "type": "object",
+            "properties": {
+                "subject_id": {
+                    "type": "string",
+                    "pattern": r"^[A-Za-z0-9_.-]{1,128}$",
+                    "description": (
+                        "Canonical subject id from `resolve_subject` "
+                        "(e.g. 'gh-pr-create')."
+                    ),
+                },
+            },
+            "required": ["subject_id"],
+            "additionalProperties": False,
+        },
+        handler=_handle_get_subject_spec,
+        annotations={
+            "title": "Get subject spec",
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
+    ),
+    McpTool(
+        name="get_capabilities",
+        description=(
+            "THE structured surface. Returns typed CapabilityRecord rows "
+            "for a subject — `capability_type` ∈ {invocation, "
+            "configuration, constraint, effect, environment, deprecation, "
+            "workflow, metadata}, `detail` (structured dict for "
+            "well-modelled subjects, prose string for legacy projection), "
+            "`source` ∈ {structured, projected}, verification metadata. "
+            "Prefer `source: structured` results — they are ingested from "
+            "real `--help` output with typed argv / flag fields. Set "
+            "`accepted_only_structured: true` to force structured-only "
+            "answers."
+        ),
+        input_schema={
+            "type": "object",
+            "properties": {
+                "subject_id": {
+                    "type": "string",
+                    "pattern": r"^[A-Za-z0-9_.-]{1,128}$",
+                },
+                "capability_types": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "existence", "invocation", "configuration",
+                            "constraint", "effect", "environment",
+                            "deprecation", "workflow", "metadata",
+                        ],
+                    },
+                    "maxItems": 20,
+                    "default": [],
+                    "description": "Filter to these capability types only.",
+                },
+                "accepted_only": {"type": "boolean", "default": True},
+                "accepted_only_structured": {
+                    "type": "boolean",
+                    "default": False,
+                    "description": (
+                        "When true, hides projected (prose) records — "
+                        "returns only typed structured rows. Use for "
+                        "strict machine-readable consumption."
+                    ),
+                },
+                "verification_min": {
+                    "type": "string",
+                    "enum": [
+                        "L0_unverified", "L1_schema_valid",
+                        "L2_source_verified", "L3_runtime_verified",
+                    ],
+                },
+                "limit": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 200,
+                    "default": 50,
+                },
+            },
+            "required": ["subject_id"],
+            "additionalProperties": False,
+        },
+        handler=_handle_get_capabilities,
+        annotations={
+            "title": "Get capabilities",
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
+    ),
+    McpTool(
+        name="get_constraints",
+        description=(
+            "Typed constraint records — what the agent must satisfy "
+            "BEFORE running an action: auth scopes, environment "
+            "preconditions, deprecation status. Call this before "
+            "`resolve_action` if you want to surface gating requirements "
+            "early."
+        ),
+        input_schema={
+            "type": "object",
+            "properties": {
+                "subject_id": {
+                    "type": "string",
+                    "pattern": r"^[A-Za-z0-9_.-]{1,128}$",
+                },
+                "action_intent": {
+                    "type": "string",
+                    "maxLength": 512,
+                    "description": (
+                        "Optional intent narrower (e.g. 'create a PR "
+                        "with reviewers')."
+                    ),
+                },
+                "accepted_only": {"type": "boolean", "default": True},
+                "accepted_only_structured": {
+                    "type": "boolean", "default": False,
+                },
+            },
+            "required": ["subject_id"],
+            "additionalProperties": False,
+        },
+        handler=_handle_get_constraints,
+        annotations={
+            "title": "Get constraints",
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
+    ),
+    McpTool(
+        name="get_effects",
+        description=(
+            "Typed effect profile — destructive, mutates_remote_state, "
+            "reversible, may_cost_money, may_expose_secrets. Returns "
+            "EffectProfileResponse with aggregate_risk_level and "
+            "requires_confirmation. Call this before executing any "
+            "action that could change remote state."
+        ),
+        input_schema={
+            "type": "object",
+            "properties": {
+                "subject_id": {
+                    "type": "string",
+                    "pattern": r"^[A-Za-z0-9_.-]{1,128}$",
+                },
+                "action_intent": {"type": "string", "maxLength": 512},
+                "accepted_only": {"type": "boolean", "default": True},
+                "accepted_only_structured": {
+                    "type": "boolean", "default": False,
+                },
+            },
+            "required": ["subject_id"],
+            "additionalProperties": False,
+        },
+        handler=_handle_get_effects,
+        annotations={
+            "title": "Get effects",
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
+    ),
+    McpTool(
+        name="resolve_action",
+        description=(
+            "End-to-end action grounding. Given a subject_id + intent + "
+            "optional literal command, returns the matched capability, "
+            "supporting capabilities, constraints, effects, "
+            "safe_to_auto_execute, requires_human_confirmation, and "
+            "verdict reasons. The one-shot machine-readable answer for "
+            "'what should I run, what does it need, what does it do'."
+        ),
+        input_schema={
+            "type": "object",
+            "properties": {
+                "subject_id": {
+                    "type": "string",
+                    "pattern": r"^[A-Za-z0-9_.-]{1,128}$",
+                },
+                "action_intent": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512,
+                },
+                "command": {
+                    "type": "string",
+                    "maxLength": 512,
+                    "description": (
+                        "Optional literal command the agent is "
+                        "considering running. When set, the response "
+                        "resolves via command_match instead of "
+                        "capability search."
+                    ),
+                },
+                "environment": {"type": "string", "maxLength": 128},
+                "accepted_only": {"type": "boolean", "default": True},
+                "accepted_only_structured": {
+                    "type": "boolean", "default": False,
+                },
+                "limit": {
+                    "type": "integer",
+                    "minimum": 1, "maximum": 20, "default": 5,
+                },
+            },
+            "required": ["subject_id", "action_intent"],
+            "additionalProperties": False,
+        },
+        handler=_handle_resolve_action,
+        annotations={
+            "title": "Resolve action",
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
+    ),
+    McpTool(
+        name="get_workflow_plan",
+        description=(
+            "Goal-matched workflow plans, safest-first. Returns typed "
+            "WorkflowPlanSummary records (workflow_id, subject_ids, "
+            "step_count, aggregate_risk_level, verification_level, "
+            "requires_confirmation). Use when the user states a "
+            "multi-step goal ('deploy a Helm release', 'cut a GitHub "
+            "release') rather than a single command."
+        ),
+        input_schema={
+            "type": "object",
+            "properties": {
+                "goal": {
+                    "type": "string",
+                    "minLength": 1, "maxLength": 512,
+                },
+                "environment": {"type": "string", "maxLength": 128},
+                "limit": {
+                    "type": "integer",
+                    "minimum": 1, "maximum": 100, "default": 20,
+                },
+            },
+            "required": ["goal"],
+            "additionalProperties": False,
+        },
+        handler=_handle_get_workflow_plan,
+        annotations={
+            "title": "Get workflow plan",
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
+    ),
+    # -------- Legacy prose surfaces (handlers preserved, hidden from tools/list) --------
+    #
+    # These six tools shipped in v0.1 and remain registered so any pinned
+    # external config still routes correctly. They are NOT in `tools/list`
+    # because the v0.2 thesis is structured-first: agents should reach for
+    # the typed surfaces above, not prose responses. `find_tool()` still
+    # resolves them, so `tools/call ask {...}` continues to work.
     McpTool(
         name="ask",
         # The description is what the LLM sees when picking which tool
@@ -311,6 +773,7 @@ _TOOL_REGISTRY: list[McpTool] = [
             "idempotentHint": True,
             "openWorldHint": False,
         },
+        advertised=False,
     ),
     McpTool(
         name="validate_command",
@@ -346,6 +809,7 @@ _TOOL_REGISTRY: list[McpTool] = [
             "idempotentHint": True,
             "openWorldHint": False,
         },
+        advertised=False,
     ),
     McpTool(
         name="get_tool_spec",
@@ -373,6 +837,7 @@ _TOOL_REGISTRY: list[McpTool] = [
             "idempotentHint": True,
             "openWorldHint": False,
         },
+        advertised=False,
     ),
     McpTool(
         name="search_tools",
@@ -399,6 +864,7 @@ _TOOL_REGISTRY: list[McpTool] = [
             "idempotentHint": True,
             "openWorldHint": False,
         },
+        advertised=False,
     ),
     McpTool(
         name="explain_risk",
@@ -429,6 +895,7 @@ _TOOL_REGISTRY: list[McpTool] = [
             "idempotentHint": True,
             "openWorldHint": False,
         },
+        advertised=False,
     ),
     McpTool(
         name="get_safe_workflow",
@@ -455,6 +922,7 @@ _TOOL_REGISTRY: list[McpTool] = [
             "idempotentHint": True,
             "openWorldHint": False,
         },
+        advertised=False,
     ),
     McpTool(
         name="submit_claim",

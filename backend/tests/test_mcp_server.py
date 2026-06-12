@@ -331,48 +331,52 @@ def test_prompts_list_returns_empty(server: McpServer) -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_tools_list_returns_six_advertised_tools(server: McpServer) -> None:
-    """tools/list advertises the six read surfaces. `submit_claim` is
-    registered (find_tool returns it, tools/call routes to it) but hidden
-    via `advertised=False` because the bundled MCP wheel's catalog lives
-    in read-only site-packages — surfacing a write tool the host can't
-    actually write to would just confuse the agent."""
+def test_tools_list_returns_seven_structured_tools(server: McpServer) -> None:
+    """v0.2 thesis: Ayiru is a machine-readable knowledge layer.
+    `tools/list` advertises the seven structured surfaces; the prose
+    surfaces (`ask`, `validate_command`, `get_tool_spec`, `search_tools`,
+    `explain_risk`, `get_safe_workflow`) and `submit_claim` remain
+    registered (find_tool resolves them, tools/call still works) but are
+    marked `advertised=False` so the agent reaches for typed records first."""
     raw = server.handle_frame(_frame("tools/list"))
     response = json.loads(raw)
     names = {t["name"] for t in response["result"]["tools"]}
     assert names == {
-        "ask",
-        "validate_command",
-        "get_tool_spec",
-        "search_tools",
-        "explain_risk",
-        "get_safe_workflow",
+        "resolve_subject",
+        "get_subject_spec",
+        "get_capabilities",
+        "get_constraints",
+        "get_effects",
+        "resolve_action",
+        "get_workflow_plan",
     }
 
 
-def test_ask_is_the_first_tool_listed(server: McpServer) -> None:
-    """LLM tool-choice is order-sensitive — the first listed tool gets
-    the strongest implicit prior. Stage 17 puts `ask` first so an agent
-    given Ayiru's MCP defaults reaches for ask() before web_search."""
+def test_resolve_subject_is_the_first_tool_listed(server: McpServer) -> None:
+    """LLM tool-choice is order-sensitive — the first listed tool gets the
+    strongest implicit prior. v0.2 puts `resolve_subject` first so an
+    agent doing discovery reaches for the structured-discovery surface
+    before any prose lookup."""
     raw = server.handle_frame(_frame("tools/list"))
     response = json.loads(raw)
     tools = response["result"]["tools"]
-    assert tools[0]["name"] == "ask"
+    assert tools[0]["name"] == "resolve_subject"
 
 
-def test_ask_description_teaches_family_hinting(server: McpServer) -> None:
-    """The `ask` surface should teach the LLM that `tool_id_hint` accepts a
-    coarse tool *family* name (e.g. 'ffmpeg') which Ayiru expands to the
-    five-surface decomposition (commit bdd9ae3). Without this nudge the LLM
-    leaves the hint empty or guesses an exact surface id and the matcher
-    falls back unnecessarily."""
-    raw = server.handle_frame(_frame("tools/list"))
-    response = json.loads(raw)
-    ask = next(t for t in response["result"]["tools"] if t["name"] == "ask")
-    # The main description should nudge the model to set the hint.
-    assert "tool_id_hint" in ask["description"]
-    # The field description should explain family-name expansion + surfaces.
-    hint = ask["inputSchema"]["properties"]["tool_id_hint"]["description"]
+def test_legacy_ask_description_still_documents_family_hinting() -> None:
+    """The legacy `ask` surface is hidden from `tools/list` (v0.2 is
+    structured-first), but the handler stays registered for backward
+    compatibility. Its description still has to teach `tool_id_hint`
+    family expansion for the dev path / pinned external callers that
+    still invoke it by name."""
+    from ayiru_mcp._internal.tools import find_tool
+
+    ask = find_tool("ask")
+    assert ask is not None
+    assert ask.advertised is False
+    # Description still nudges the model to set the hint.
+    assert "tool_id_hint" in ask.description
+    hint = ask.input_schema["properties"]["tool_id_hint"]["description"]
     assert "family" in hint.lower()
     assert "-recipes" in hint and "-errors" in hint
     assert "docker-cli" in hint  # exact-surface-id still works
@@ -394,16 +398,21 @@ def test_every_tool_has_required_metadata(server: McpServer) -> None:
 
 
 def test_tools_list_count_matches_registry() -> None:
-    # 6 advertised tools (ask, validate_command, get_tool_spec, search_tools,
-    # explain_risk, get_safe_workflow). `submit_claim` is registered but
-    # marked `advertised=False` so it stays out of `tools/list` — its
-    # bundled-catalog write path is read-only by design, but `find_tool`
-    # still resolves it for direct invocation in dev contexts.
-    assert len(list_tools()) == 6
-    # Sanity: the hidden write tool is still findable for in-process tests.
+    # 7 advertised structured surfaces (resolve_subject, get_subject_spec,
+    # get_capabilities, get_constraints, get_effects, resolve_action,
+    # get_workflow_plan). The 6 legacy prose tools + `submit_claim` are
+    # registered but marked `advertised=False` so they stay out of
+    # `tools/list` while `find_tool` still resolves them for backward-
+    # compat callers and in-process tests.
+    assert len(list_tools()) == 7
+    # Sanity: every hidden tool is still findable.
     from ayiru_mcp._internal.tools import find_tool
 
-    assert find_tool("submit_claim") is not None
+    for hidden in (
+        "ask", "validate_command", "get_tool_spec", "search_tools",
+        "explain_risk", "get_safe_workflow", "submit_claim",
+    ):
+        assert find_tool(hidden) is not None, f"hidden tool {hidden!r} lost"
 
 
 def test_every_tool_declares_mcp_2025_annotations(server: McpServer) -> None:
@@ -435,9 +444,9 @@ def test_every_tool_declares_mcp_2025_annotations(server: McpServer) -> None:
 
 
 def test_read_tools_are_marked_read_only(server: McpServer) -> None:
-    """The six advertised query/lookup tools must declare ``readOnlyHint: true``.
-    If any read tool drifts to ``readOnlyHint: false`` it gets gated by the
-    host UI and the LLM can no longer reach for it.
+    """The seven advertised structured surfaces must declare
+    ``readOnlyHint: true``. If any drifts to ``readOnlyHint: false`` it
+    gets gated by the host UI and the LLM can no longer reach for it.
 
     ``submit_claim`` is registered but hidden (`advertised=False`) so the
     bundled MCP wheel — whose catalog lives in read-only site-packages —
@@ -449,12 +458,13 @@ def test_read_tools_are_marked_read_only(server: McpServer) -> None:
     response = json.loads(raw)
     advertised_names = {tool["name"] for tool in response["result"]["tools"]}
     assert advertised_names == {
-        "ask",
-        "validate_command",
-        "get_tool_spec",
-        "search_tools",
-        "explain_risk",
-        "get_safe_workflow",
+        "resolve_subject",
+        "get_subject_spec",
+        "get_capabilities",
+        "get_constraints",
+        "get_effects",
+        "resolve_action",
+        "get_workflow_plan",
     }
     for tool in response["result"]["tools"]:
         assert tool["annotations"]["readOnlyHint"] is True, (
@@ -949,7 +959,7 @@ def test_subprocess_entry_point_runs_handshake_cleanly(tmp_path) -> None:
         assert init_response["result"]["protocolVersion"] == proto.PROTOCOL_VERSION
         tools_response = json.loads(out_lines[1])
         tool_names = {t["name"] for t in tools_response["result"]["tools"]}
-        assert len(tool_names) == 6  # 6 advertised; submit_claim is hidden
+        assert len(tool_names) == 7  # 7 structured surfaces; legacy prose + submit_claim hidden
     finally:
         if proc.poll() is None:
             proc.kill()
