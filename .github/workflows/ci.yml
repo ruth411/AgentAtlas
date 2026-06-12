@@ -28,11 +28,22 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
-          cache-dependency-path: backend/pyproject.toml
+          cache-dependency-path: |
+            core/pyproject.toml
+            backend/pyproject.toml
+            mcp/pyproject.toml
 
-      - name: Install backend (with dev extras)
+      - name: Install all three packages (editable, dep order)
+        # `ayiru-core` is a transitive dep of both `ayiru` (backend) and
+        # `ayiru-mcp`, and isn't published to PyPI yet — installing core
+        # editable first lets pip resolve the local copy instead of
+        # hitting the index. `ayiru-mcp` is needed because backend tests
+        # import `app.mcp_server.*` shims that forward into
+        # `ayiru_mcp._internal.*`.
         run: |
           python -m pip install --upgrade pip
+          pip install -e ./core
+          pip install -e ./mcp
           pip install -e 'backend[dev]'
 
       - name: Lint (ruff)
@@ -52,17 +63,28 @@ jobs:
           AYIRU_DATABASE_URL=sqlite:////tmp/ayiru-ci.db alembic upgrade head
 
       - name: Clean-venv install smoke
-        # Build the wheel and install it into a throwaway interpreter to
-        # catch packaging regressions (missing package_data, broken
-        # entry points, etc.) before they hit PyPI.
+        # Build all three wheels and install them into a throwaway
+        # interpreter to catch packaging regressions (missing
+        # package_data, broken entry points, namespace-package
+        # contributor drift) before they hit PyPI. We install via
+        # `--find-links` so pip resolves `ayiru-core` to the local
+        # wheel rather than the (currently empty) PyPI index.
         run: |
           python -m pip install --upgrade build
+          python -m build core
+          python -m build mcp
           python -m build backend
+          mkdir -p /tmp/wheelhouse
+          cp core/dist/*.whl mcp/dist/*.whl backend/dist/*.whl /tmp/wheelhouse/
           python -m venv /tmp/smoke-venv
           /tmp/smoke-venv/bin/pip install --upgrade pip
-          /tmp/smoke-venv/bin/pip install backend/dist/ayiru-*.whl
+          /tmp/smoke-venv/bin/pip install --no-index --find-links=/tmp/wheelhouse \
+            ayiru ayiru-core ayiru-mcp
           /tmp/smoke-venv/bin/ayiru --version
           /tmp/smoke-venv/bin/ayiru --help
+          # `ayiru-mcp` console script ships its own catalog — confirm the
+          # handshake reaches a non-zero exit cleanly under EOF on stdin.
+          /tmp/smoke-venv/bin/python -c "from ayiru_mcp.__main__ import _resolve_bundled_catalog_path; p = _resolve_bundled_catalog_path(); print('catalog:', p, 'size:', p.stat().st_size)"
 
   sdk:
     # The Python client SDK ships from clients/python and has its own
@@ -81,9 +103,15 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
-      - name: Install backend (SDK tests drive a live FastAPI app)
+      - name: Install all three Ayiru packages (editable, dep order)
+        # SDK tests drive a live FastAPI app, so we need the full
+        # backend stack. `ayiru-core` and `ayiru-mcp` are required for
+        # the same reason as the backend job — local resolution before
+        # PyPI publication.
         run: |
           python -m pip install --upgrade pip
+          pip install -e ./core
+          pip install -e ./mcp
           pip install -e 'backend[dev]'
       - name: Install SDK with dev extras
         run: pip install -e 'clients/python[dev]'
