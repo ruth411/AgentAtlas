@@ -1,11 +1,13 @@
 # ayiru-mcp
 
-**Verified, cited knowledge for AI agents — Model Context Protocol server.**
+**Machine-readable external knowledge for AI agents — Model Context Protocol server.**
 
-Your coding agent asks a question. `ayiru-mcp` returns a cited answer from
-official docs, not a guess from training data months out of date. Ships
-with a pre-built **`gh` (GitHub CLI) catalog** inside the wheel — no
-server, no database to set up, no API key.
+Your coding agent calls 7 typed MCP tools and gets back typed records:
+`subject_id`, `capability_type`, `argv_schema`, `flag_schema`, `effect_kind`,
+`verification_level`. No prose, no webpage surfing, no hallucinated flags.
+Ships with a structured-first **`gh` catalog** parsed from real
+`gh ... --help` output — 61 subjects, 700+ typed capabilities, 60+ typed
+constraints, every effect typed. No server, no database to set up, no API key.
 
 ## Install
 
@@ -29,9 +31,9 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json`
 }
 ```
 
-Restart Claude Desktop. The six Ayiru tools (`ask`, `validate_command`,
-`get_tool_spec`, `search_tools`, `explain_risk`, `get_safe_workflow`)
-appear in the tool list.
+Restart Claude Desktop. The seven structured Ayiru tools (`resolve_subject`,
+`get_subject_spec`, `get_capabilities`, `get_constraints`, `get_effects`,
+`resolve_action`, `get_workflow_plan`) appear in the tool list.
 
 ### Cursor
 
@@ -60,45 +62,62 @@ Edit `~/Library/Application Support/Code/User/globalStorage/saoudrizwan.claude-d
 
 ## Live example
 
-Ask the agent: *"how do I open a pull request from my current branch?"*
+Ask the agent: *"what flags does `gh pr create` take?"*
 
-It calls `ask()` and gets back:
+It calls `resolve_subject` then `get_capabilities` and gets back:
 
-```text
-Subject:      gh recipe: open a pull request from current branch
-Statement:    Quick: `gh pr create --fill` (auto-fills title + body from commit
-              messages). Full control: `gh pr create --title 'feat: add X'
-              --body 'closes #42' --base main --reviewer alice,bob --label
-              feature`. Draft: add `--draft`. Web (open in browser to finish):
-              `gh pr create --web`. From a fork: gh detects upstream
-              automatically.
-Citation:     https://cli.github.com/manual/gh_pr_create
-Confidence:   0.84  (high band)
-Verification: L1_schema_valid
+```jsonc
+// tools/call get_capabilities {"subject_id":"gh-pr-create","limit":1}
+{
+  "subject_id": "gh-pr-create",
+  "capabilities": [{
+    "capability_id": "gh-pr-create#invocation",
+    "capability_type": "invocation",
+    "source": "structured",
+    "title": "gh pr create invocation",
+    "verification_level": "L3_runtime_verified",
+    "detail": {
+      "command": "gh pr create",
+      "source_url": "https://cli.github.com/manual/gh_pr_create",
+      "argv_schema": [],
+      "flag_schema": [
+        {"name":"--assignee","short":"-a","value_type":"string","value_name":"login",
+         "takes_value":true,"required":false,"deprecated":false,
+         "description":"Assign people by their login. Use \"@me\" to self-assign."},
+        {"name":"--base","short":"-B","value_type":"string","value_name":"branch",
+         "takes_value":true,"required":false,"deprecated":false,
+         "description":"The branch into which you want your code merged"},
+        /* …20 more typed flags… */
+      ]
+    }
+  }],
+  "total": 25
+}
 ```
 
-No hallucinated flag. No paraphrased blog post. The current canonical docs
-sentence, with the source URL, a confidence score, and a verification
-level — agents can decide how strict to be on a per-claim basis.
+`L3_runtime_verified` means we actually spawned `gh pr create --help` and
+parsed the output. Every flag has `value_type`, `takes_value`, `required`,
+`deprecated`, and `description` populated. The agent constructs the command
+from typed metadata; there's no prose for it to misread.
 
 ## What's in the catalog
 
-The bundled wheel ships **`gh` only** — 129 claims across the five
-GitHub-CLI surfaces:
+The bundled wheel ships **structured `gh` only** — every `gh` subcommand
+parsed from real `--help` output into typed rows:
 
-| Surface | Claims | Examples |
+| Table | Rows | What's in it |
 |---|---|---|
-| `gh-cli` | 41 | per-command pages from `cli.github.com/manual` |
-| `gh-recipes` | 36 | real workflows (`gh pr create --fill`, `gh repo fork --clone`) |
-| `gh-errors` | 30 | error messages with diagnoses + fixes |
-| `gh-workflows` | 14 | Actions + workflow-dispatch patterns |
-| `gh-config` | 8 | config/env knobs |
+| `subjects` | 61 | One row per `gh` subcommand (`gh-pr-create`, `gh-repo-delete`, …) |
+| `capabilities` | 700+ | Typed `invocation` / `configuration` / `metadata` rows with `argv_schema` + `flag_schema` |
+| `constraints` | 60+ | Typed auth-scope and environment-precondition rows |
+| `effects` | 60+ | Typed `destructive` / `mutates_remote_state` / `reversible` booleans |
 
-Total wheel size: ~2 MB (including the bundled SQLite catalog with
-pre-computed embeddings).
+Total wheel size: ~2 MB (bundled SQLite catalog with pre-computed embeddings).
+`verification_level` on every structured row is `L3_runtime_verified` — the
+parser ran the binary.
 
-The full multi-tool catalog (60+ tools, 2,800+ claims across `git`,
-`docker`, `kubectl`, `ffmpeg`, …) lives in the FastAPI backend — see the
+The wider catalog (38 tool families, prose-projection fallback for the 37
+without structured ingestion yet) lives in the FastAPI backend — see the
 main repo's [README](https://github.com/ruth411/ayiru) for the self-hosted
 path.
 
@@ -115,16 +134,23 @@ tokens with the catalog rank worse.
 
 ## Tools
 
-The server advertises six read-only tools via `tools/list`:
+The server advertises seven read-only structured tools via `tools/list`:
 
-| Tool | Description |
+| Tool | Returns |
 |---|---|
-| `ask` | Natural-language question → ranked, cited answers. The headline surface. |
-| `validate_command` | Advisory risk verdict for a literal command string. *Not* a security boundary against an adversarial agent — useful as a second opinion. |
-| `get_tool_spec` | Full canonical spec for a tool (currently empty for `gh` — no specs published yet). |
-| `search_tools` | Search across known tools by id / capability. |
-| `explain_risk` | Deterministic risk classification with reasons + dimensions. |
-| `get_safe_workflow` | Goal-matched workflows, safest-first. |
+| `resolve_subject` | Typed `SubjectSummary` records from a fuzzy hint. **Call this first.** |
+| `get_subject_spec` | Full `SubjectSpec` for a known `subject_id` |
+| `get_capabilities` | Typed `CapabilityRecord` rows — invocations, configs, constraints, effects |
+| `get_constraints` | Typed constraint records — auth scopes, env preconditions, deprecation |
+| `get_effects` | Typed effect profile — `destructive` / `mutates_remote_state` / `reversible` booleans |
+| `resolve_action` | End-to-end grounding — top capability + constraints + effects + risk verdict |
+| `get_workflow_plan` | Goal-matched workflow plans, safest-first |
+
+The legacy prose surfaces (`ask`, `validate_command`, `search_tools`,
+`explain_risk`, `get_safe_workflow`, `get_tool_spec`) remain registered for
+backward compatibility but are hidden from `tools/list`. Pinned external
+callers that invoke them by name still work; fresh tool discovery only
+shows the typed surfaces above.
 
 The catalog is read-only — there's no write surface on the bundled wheel
 because `site-packages` isn't user-writable on most systems. Self-hosters

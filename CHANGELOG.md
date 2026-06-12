@@ -7,9 +7,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-The v0.2 pivot to "agent search box that cuts API costs" is documented in
-[roadmap_v0.2.md](./roadmap_v0.2.md). Work is gated behind a Phase 0
-measurement spike; no v0.2 features have shipped yet.
+### Pivot — machine-readable external knowledge for AI agents
+
+Ayiru is now a **structured knowledge substrate**, not a prose search box.
+Agents call 7 typed MCP tools and get back typed records; prose statements
+are no longer the headline.
+
+#### Added
+
+- **Structured persistence schema** (`subjects`, `capabilities`, `constraints`,
+  `effects` tables; migration `0018_add_structured_knowledge_tables.py`).
+  `CapabilityRecord.detail` is a typed dict for structured rows, falls back
+  to prose for projection.
+- **Structured-first `gh` ingestion** — `tools/scripts/structured_ingest_gh.py`
+  parses real `gh ... --help` output into 61 subjects, 700+ typed
+  capabilities, 60+ typed constraints, 60+ typed effects. Every row carries
+  `verification_level=L3_runtime_verified` because the parser ran the binary.
+- **7 typed MCP tools** advertised in `tools/list`: `resolve_subject`,
+  `get_subject_spec`, `get_capabilities`, `get_constraints`, `get_effects`,
+  `resolve_action`, `get_workflow_plan`. Responses include a
+  `source: structured | projected` field so agents know whether the record
+  came from a typed ingest or a prose fallback.
+- **Catalog quality audit** — `tools/scripts/audit_catalog_quality.py`
+  reports structured-coverage per family + accepted-contaminated counts.
+
+#### Changed
+
+- **MCP advertised list** — the 6 legacy prose tools (`ask`,
+  `validate_command`, `get_tool_spec`, `search_tools`, `explain_risk`,
+  `get_safe_workflow`) are now `advertised=False`. They remain registered;
+  `find_tool()` still resolves them; `tools/call <name>` still works.
+  Agents discovering tools fresh see only the typed surfaces.
+- **README hero** rewritten to typed I/O — no prose `ask()` example.
+  Headline KPI: `gh structured coverage 61/61 subcommands` instead of
+  "claim count."
+- **Confidence model** v1 → v2 (committed earlier in this cycle): single
+  high-trust official-docs citation now reaches the `moderate` band.
+
+#### Deprecated
+
+- The prose `ask()` surface remains available via direct `tools/call ask`
+  and the HTTP `POST /v1/query/ask` route, but is no longer advertised over
+  MCP. Plan to remove it from `_TOOL_REGISTRY` in v0.3 once external pinned
+  callers have migrated.
 
 ## [0.1.0] — 2026-05-20
 
