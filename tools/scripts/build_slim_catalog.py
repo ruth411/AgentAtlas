@@ -160,7 +160,80 @@ def _migrate_target_schema(target_path: Path) -> None:
     command.upgrade(config, "head")
 
 
-def build(source_path: Path, output_path: Path, families: list[str]) -> dict[str, int]:
+_STRUCTURED_PARENT_TABLES = ("subjects",)
+_STRUCTURED_CHILD_TABLES = ("capabilities", "constraints", "effects")
+
+
+def _copy_structured_subjects(
+    source: sqlite3.Connection,
+    target: sqlite3.Connection,
+    families: list[str],
+) -> tuple[int, list[str]]:
+    """Copy `subjects` rows whose `family` is one of the requested families.
+
+    Returns the row count and the list of `subject_id`s copied (used to
+    filter the dependent capability / constraint / effect rows)."""
+    placeholders = ",".join(["?"] * len(families))
+    cursor = source.execute(
+        f"SELECT * FROM subjects WHERE family IN ({placeholders})",
+        families,
+    )
+    columns = [d[0] for d in cursor.description]
+    rows = cursor.fetchall()
+    if not rows:
+        return 0, []
+    col_list = ",".join(columns)
+    inserts = ",".join(["?"] * len(columns))
+    target.executemany(
+        f"INSERT OR REPLACE INTO subjects ({col_list}) VALUES ({inserts})",
+        rows,
+    )
+    subject_id_idx = columns.index("subject_id")
+    return len(rows), [row[subject_id_idx] for row in rows]
+
+
+def _copy_structured_child(
+    source: sqlite3.Connection,
+    target: sqlite3.Connection,
+    table: str,
+    subject_ids: list[str],
+) -> int:
+    if not subject_ids:
+        return 0
+    placeholders = ",".join(["?"] * len(subject_ids))
+    cursor = source.execute(
+        f"SELECT * FROM {table} WHERE subject_id IN ({placeholders})",
+        subject_ids,
+    )
+    columns = [d[0] for d in cursor.description]
+    rows = cursor.fetchall()
+    if not rows:
+        return 0
+    col_list = ",".join(columns)
+    inserts = ",".join(["?"] * len(columns))
+    target.executemany(
+        f"INSERT OR REPLACE INTO {table} ({col_list}) VALUES ({inserts})",
+        rows,
+    )
+    return len(rows)
+
+
+def build(
+    source_path: Path,
+    output_path: Path,
+    families: list[str],
+    *,
+    structured_only: bool = False,
+) -> dict[str, int]:
+    """Bake a slim bundled catalog.
+
+    When ``structured_only=True`` (the default for v0.2+ MCP wheels), only the
+    structured-knowledge tables ship; prose claims / evidence / verification
+    rows are skipped. The `QueryEngine` reads structured records first and
+    only falls through to prose projection when no structured row exists,
+    so a structured-only bundle is correct as long as every requested
+    family has structured coverage.
+    """
     if not source_path.is_file():
         raise FileNotFoundError(f"Source DB not found: {source_path}")
 
@@ -174,26 +247,34 @@ def build(source_path: Path, output_path: Path, families: list[str]) -> dict[str
     target = sqlite3.connect(str(output_path))
     try:
         counts: dict[str, int] = {}
-        counts["knowledge_claims"] = _copy_claims(source, target, families)
-        # Look up the claim_ids we just copied — child tables filter on them.
-        predicate, params = _family_match_predicate(families)
-        claim_ids = [
-            row[0]
-            for row in source.execute(
-                f"SELECT claim_id FROM knowledge_claims WHERE {predicate}", params
+
+        # Structured tables — the v0.2 headline content.
+        subject_count, subject_ids = _copy_structured_subjects(source, target, families)
+        counts["subjects"] = subject_count
+        for table in _STRUCTURED_CHILD_TABLES:
+            counts[table] = _copy_structured_child(source, target, table, subject_ids)
+
+        if not structured_only:
+            # Legacy prose tables — kept for backward-compat self-hosting.
+            counts["knowledge_claims"] = _copy_claims(source, target, families)
+            predicate, params = _family_match_predicate(families)
+            claim_ids = [
+                row[0]
+                for row in source.execute(
+                    f"SELECT claim_id FROM knowledge_claims WHERE {predicate}", params
+                )
+            ]
+            counts["evidence"] = _copy_child_table(source, target, "evidence", claim_ids)
+            counts["verification_results"] = _copy_child_table(
+                source, target, "verification_results", claim_ids
             )
-        ]
-        counts["evidence"] = _copy_child_table(source, target, "evidence", claim_ids)
-        counts["verification_results"] = _copy_child_table(
-            source, target, "verification_results", claim_ids
-        )
-        counts["canonical_tool_specs"] = _copy_canonical_specs(
-            source, target, "canonical_tool_specs", families
-        )
-        # `canonical_workflow_specs` is keyed by `workflow_id`, not `tool_id`,
-        # so we can't filter it by family. The bulk DB currently has zero
-        # rows in it; revisit when workflows actually ship.
-        counts["canonical_workflow_specs"] = 0
+            counts["canonical_tool_specs"] = _copy_canonical_specs(
+                source, target, "canonical_tool_specs", families
+            )
+            # `canonical_workflow_specs` is keyed by `workflow_id`, not `tool_id`,
+            # so we can't filter it by family.
+            counts["canonical_workflow_specs"] = 0
+
         target.commit()
         target.execute("VACUUM")
         return counts
@@ -221,12 +302,24 @@ def main(argv: list[str] | None = None) -> int:
         default="gh",
         help="Comma-separated list of tool-id family prefixes to include. Default: gh.",
     )
+    parser.add_argument(
+        "--structured-only",
+        action="store_true",
+        help=(
+            "Skip the prose `knowledge_claims` / `evidence` / "
+            "`verification_results` / `canonical_tool_specs` tables; ship "
+            "only structured `subjects` / `capabilities` / `constraints` / "
+            "`effects`. Default for v0.2+ MCP wheels."
+        ),
+    )
     args = parser.parse_args(argv)
     families = [item.strip() for item in args.tool_families.split(",") if item.strip()]
     if not families:
         parser.error("--tool-families must contain at least one family name.")
 
-    counts = build(args.source, args.output, families)
+    counts = build(
+        args.source, args.output, families, structured_only=args.structured_only,
+    )
     size_mb = args.output.stat().st_size / (1024 * 1024)
     print(f"Wrote {args.output} ({size_mb:.2f} MB):")
     for table, count in counts.items():
