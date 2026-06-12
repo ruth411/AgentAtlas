@@ -81,9 +81,27 @@ from app.services.risk_classifier import classify_action
 
 _DOCS_INGESTION_CONTRACT = contract_path("docs_ingestion_sources.v1.json")
 _EXCERPT_MAX_CHARS = 8000
+# Tags whose text content is dropped entirely. The first row is hostile or
+# non-content (scripts, embedded objects); the second row is page chrome
+# (nav menus, headers, footers, sidebars) that the 2026-06-12 audit caught
+# leaking into claim statements when an article happened to render its
+# nav inline with the page body. Without this expansion the first non-
+# empty line of the gh-cli pages was the site navigation banner.
 _SAFE_TAGS_DROP_TEXT = frozenset(
-    {"script", "style", "iframe", "object", "embed", "template", "noscript", "svg"}
+    {
+        "script", "style", "iframe", "object", "embed",
+        "template", "noscript", "svg",
+        "nav", "header", "footer", "aside",
+    }
 )
+
+# When any of these "main content" tags appears in the page, the sanitizer
+# emits ONLY the text inside them — chrome that lives outside `<main>` is
+# discarded even if it bypassed `_SAFE_TAGS_DROP_TEXT` (e.g. a layout
+# `<div class="navbar">` with no semantic tag). When no main-content tag
+# is present we fall back to whole-body extraction so pages without
+# modern semantic HTML still work.
+_MAIN_CONTENT_TAGS = frozenset({"main", "article"})
 
 # Stage 20.7 — ToS compliance for the bulk-ingest crawl.
 _USER_AGENT = "Ayiru-Bulk-Ingestion/1.0 (+https://github.com/ruth411/ayiru)"
@@ -704,28 +722,49 @@ def _assert_url_is_safe(url: str, *, allowed_hosts: frozenset[str]) -> None:
 
 
 class _SafeTextExtractor(HTMLParser):
-    """Drop script/style/iframe/etc. content and on* attributes.
+    """Drop script/style/nav/header/etc. content and on* attributes.
 
-    Output is plain text only — collected from the data between non-droppable
+    Output is plain text only — collected from data between non-droppable
     tags, with HTML entities decoded.
+
+    When `restrict_to_main=True`, the parser only emits text inside
+    `<main>` / `<article>` elements (or elements with `role="main"`).
+    Callers use that mode only after confirming the page has at least one
+    such element; otherwise pages without semantic HTML would silently
+    return empty.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, *, restrict_to_main: bool = False) -> None:
         super().__init__(convert_charrefs=True)
         self._chunks: list[str] = []
         self._suppress_depth: int = 0
+        self._restrict_to_main = restrict_to_main
+        self._main_depth: int = 0
 
     def handle_starttag(self, tag: str, attrs: list) -> None:  # type: ignore[override]
-        if tag.lower() in _SAFE_TAGS_DROP_TEXT:
+        tag = tag.lower()
+        if tag in _SAFE_TAGS_DROP_TEXT:
             self._suppress_depth += 1
+            return
+        if self._restrict_to_main and (
+            tag in _MAIN_CONTENT_TAGS or _has_role_main(attrs)
+        ):
+            self._main_depth += 1
 
     def handle_endtag(self, tag: str) -> None:  # type: ignore[override]
-        if tag.lower() in _SAFE_TAGS_DROP_TEXT and self._suppress_depth > 0:
+        tag = tag.lower()
+        if tag in _SAFE_TAGS_DROP_TEXT and self._suppress_depth > 0:
             self._suppress_depth -= 1
+            return
+        if self._restrict_to_main and tag in _MAIN_CONTENT_TAGS and self._main_depth > 0:
+            self._main_depth -= 1
 
     def handle_data(self, data: str) -> None:  # type: ignore[override]
-        if self._suppress_depth == 0:
-            self._chunks.append(data)
+        if self._suppress_depth > 0:
+            return
+        if self._restrict_to_main and self._main_depth == 0:
+            return
+        self._chunks.append(data)
 
     def text(self) -> str:
         joined = " ".join(self._chunks)
@@ -734,8 +773,40 @@ class _SafeTextExtractor(HTMLParser):
         return " ".join(joined.split())
 
 
+def _has_role_main(attrs: list[tuple[str, str | None]]) -> bool:
+    for name, value in attrs:
+        if name.lower() == "role" and (value or "").strip().lower() == "main":
+            return True
+    return False
+
+
+class _MainTagDetector(HTMLParser):
+    """One-shot scan to decide whether the page has a main-content region.
+
+    Cheap — runs on the same string once before the real extractor; bails
+    out as soon as it sees a relevant tag so we don't keep parsing.
+    """
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=False)
+        self.has_main = False
+
+    def handle_starttag(self, tag: str, attrs: list) -> None:  # type: ignore[override]
+        if self.has_main:
+            return
+        if tag.lower() in _MAIN_CONTENT_TAGS or _has_role_main(attrs):
+            self.has_main = True
+
+
 def _sanitize_html_to_text(raw: str) -> str:
-    parser = _SafeTextExtractor()
+    # Two-pass: first decide whether to restrict to main-content; second
+    # extract. This is cheaper than parsing the whole document twice in
+    # most real-world cases because the detector short-circuits on the
+    # first hit and most pages have <main> very early in the markup.
+    detector = _MainTagDetector()
+    detector.feed(raw)
+    detector.close()
+    parser = _SafeTextExtractor(restrict_to_main=detector.has_main)
     parser.feed(raw)
     parser.close()
     return parser.text()
