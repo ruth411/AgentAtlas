@@ -35,7 +35,9 @@ from app.schemas.enums import (
 )
 from app.schemas.evidence import Evidence
 from app.schemas.query import Answer, AskResponse
+from app.schemas.tool_spec import AuthRequirement, Provenance, RiskProfile, ToolSpec
 from app.schemas.verification import VerificationResult
+from app.schemas.workflow_spec import WorkflowSpec, WorkflowStep
 from app.services.claim_store import ClaimStore
 from app.services.ids import (
     generate_claim_id,
@@ -94,6 +96,7 @@ def _add_claim(
     subject: str,
     statement: str,
     tool_id: str = "docker",
+    claim_type: ClaimType = ClaimType.CLI_COMMAND_EXISTS,
     risk: RiskLevel = RiskLevel.LOW,
     status: VerificationStatus = VerificationStatus.ACCEPTED,
     level: VerificationLevel = VerificationLevel.L2_SOURCE_VERIFIED,
@@ -108,7 +111,7 @@ def _add_claim(
     """
     claim = KnowledgeClaim(
         claim_id=generate_claim_id(),
-        claim_type=ClaimType.CLI_COMMAND_EXISTS,
+        claim_type=claim_type,
         subject=subject,
         statement=statement,
         tool_id=tool_id,
@@ -155,6 +158,57 @@ def _add_claim(
     return claim
 
 
+def _publish_tool_spec(store: ClaimStore, *, tool_id: str = "docker") -> None:
+    store.save_canonical_tool_spec(
+        ToolSpec(
+            tool_id=tool_id,
+            name=tool_id.title(),
+            interfaces=["cli"],
+            capabilities=["read", "execute"],
+            commands=[],
+            auth=AuthRequirement(required=False, methods=[]),
+            risk_profile=RiskProfile(default_risk_level=RiskLevel.LOW),
+            workflows=["workflow-docker-preview"],
+            provenance=Provenance(
+                source_claim_ids=["c1"],
+                source_evidence_ids=["e1"],
+                compiled_at=FIXED_TIME,
+                compiled_by="ask-test",
+                verification_level=VerificationLevel.L2_SOURCE_VERIFIED,
+            ),
+            verification_level=VerificationLevel.L2_SOURCE_VERIFIED,
+        )
+    )
+
+
+def _publish_workflow(
+    store: ClaimStore, *, workflow_id: str = "workflow-docker-preview"
+) -> None:
+    store.save_canonical_workflow_spec(
+        WorkflowSpec(
+            workflow_id=workflow_id,
+            goal="deploy preview environment",
+            tool_ids=["docker"],
+            steps=[
+                WorkflowStep(
+                    step_id="s1",
+                    action="build preview image",
+                    description="Build the preview image before deploy.",
+                    risk_level=RiskLevel.LOW,
+                )
+            ],
+            provenance=Provenance(
+                source_claim_ids=["c1"],
+                source_evidence_ids=["e1"],
+                compiled_at=FIXED_TIME,
+                compiled_by="ask-test",
+                verification_level=VerificationLevel.L2_SOURCE_VERIFIED,
+            ),
+            verification_level=VerificationLevel.L2_SOURCE_VERIFIED,
+        )
+    )
+
+
 # ---------------------------------------------------------------------------
 # Happy path
 # ---------------------------------------------------------------------------
@@ -176,10 +230,12 @@ def test_ask_returns_top_match_for_a_realistic_question(
     response = engine.ask(question="how do I delete a docker container")
 
     assert isinstance(response, AskResponse)
+    assert response.answer_status == "accepted"
     assert response.fallback_recommended is False
     assert len(response.answers) >= 1
     assert response.answers[0].claim_id == target.claim_id
     assert response.answers[0].tool_id == "docker"
+    assert response.answers[0].verification_status == VerificationStatus.ACCEPTED
     assert response.answers[0].risk_level == RiskLevel.CRITICAL
     # The match reason is debug surface — must say SOMETHING actionable.
     assert response.answers[0].match_reason
@@ -196,6 +252,85 @@ def test_ask_response_uses_timezone_aware_timestamp(
     _add_claim(store, subject="docker rm", statement="removes containers")
     response = engine.ask(question="docker rm container")
     assert response.generated_at.tzinfo is not None
+
+
+def test_resolve_subject_and_subject_spec_return_canonical_projection(
+    engine: QueryEngine, store: ClaimStore
+) -> None:
+    _publish_tool_spec(store)
+    _publish_workflow(store)
+
+    response = engine.resolve_subject(subject_hint="docker")
+    spec = engine.get_subject_spec(subject_id="docker")
+    workflow_response = engine.resolve_subject(
+        subject_hint="deploy preview environment",
+        kind="workflow",
+    )
+
+    assert response.total >= 1
+    assert any(match.subject_id == "docker" for match in response.matches)
+    assert spec is not None
+    assert spec.subject_id == "docker"
+    assert spec.subject_kind == "tool"
+    assert any(match.subject_kind == "workflow" for match in workflow_response.matches)
+
+
+def test_get_capabilities_constraints_and_effects_project_claim_types(
+    engine: QueryEngine, store: ClaimStore
+) -> None:
+    _add_claim(
+        store,
+        subject="docker login",
+        statement="docker login requires valid registry credentials.",
+        tool_id="docker",
+        claim_type=ClaimType.AUTH_REQUIREMENT,
+        risk=RiskLevel.LOW,
+    )
+    _add_claim(
+        store,
+        subject="docker volume rm",
+        statement="docker volume rm permanently removes a local volume.",
+        tool_id="docker",
+        claim_type=ClaimType.SIDE_EFFECT,
+        risk=RiskLevel.HIGH,
+    )
+
+    capabilities = engine.get_capabilities(subject_id="docker", accepted_only=False)
+    constraints = engine.get_constraints(subject_id="docker")
+    effects = engine.get_effects(subject_id="docker")
+
+    assert capabilities.total >= 2
+    assert any(cap.capability_type == "constraint" for cap in capabilities.capabilities)
+    assert any(cap.claim_type == ClaimType.AUTH_REQUIREMENT for cap in constraints.constraints)
+    assert any(cap.claim_type == ClaimType.SIDE_EFFECT for cap in effects.effects)
+    assert effects.aggregate_risk_level == RiskLevel.HIGH
+
+
+def test_resolve_action_and_workflow_plan_project_structured_results(
+    engine: QueryEngine, store: ClaimStore
+) -> None:
+    _add_claim(
+        store,
+        subject="docker volume rm",
+        statement="docker volume rm removes a local volume.",
+        tool_id="docker",
+        risk=RiskLevel.HIGH,
+    )
+    _publish_tool_spec(store)
+    _publish_workflow(store)
+
+    resolution = engine.resolve_action(
+        subject_id="docker",
+        action_intent="remove a local volume",
+        command="docker volume rm my-volume",
+    )
+    plan = engine.get_workflow_plan(goal="deploy preview environment")
+
+    assert resolution.resolution_mode == "command_match"
+    assert resolution.subject_id == "docker"
+    assert resolution.confidence >= 0.0
+    assert plan.total >= 1
+    assert any(item.workflow_id == "workflow-docker-preview" for item in plan.plans)
 
 
 # ---------------------------------------------------------------------------
@@ -268,6 +403,7 @@ def test_ask_returns_fallback_for_all_stopword_question(
 
     response = engine.ask(question="how do I")
 
+    assert response.answer_status == "miss"
     assert response.fallback_recommended is True
     assert response.answers == []
     assert response.estimated_tokens_saved == 0
@@ -282,6 +418,7 @@ def test_ask_returns_fallback_when_no_claim_overlaps(
 
     response = engine.ask(question="aurora borealis quantum mechanics")
 
+    assert response.answer_status == "miss"
     assert response.fallback_recommended is True
     assert response.answers == []
     assert response.estimated_tokens_saved == 0
@@ -293,6 +430,7 @@ def test_ask_returns_fallback_on_empty_graph(engine: QueryEngine) -> None:
     response = engine.ask(question="how do I delete a docker container")
 
     assert isinstance(response, AskResponse)
+    assert response.answer_status == "miss"
     assert response.fallback_recommended is True
     assert response.answers == []
 
@@ -302,14 +440,11 @@ def test_ask_returns_fallback_on_empty_graph(engine: QueryEngine) -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_ask_includes_pending_claims_for_curated_tools(
+def test_ask_surfaces_pending_claims_as_informational_answers(
     engine: QueryEngine, store: ClaimStore
 ) -> None:
-    """Stage 19: PENDING claims (which is the L0 state for uncurated
-    bulk-ingest from Stage 20) are now SURFACED by ask, not excluded.
-    The original v0.1 'ACCEPTED only' filter was tightened too far;
-    the matcher's L2+ requirement still keeps these out of
-    validate_command's safety surface."""
+    """Pending claims are still visible to ask(), but only as explicitly
+    informational answers rather than accepted ones."""
     _add_claim(
         store,
         subject="docker rm",
@@ -320,18 +455,18 @@ def test_ask_includes_pending_claims_for_curated_tools(
 
     response = engine.ask(question="how do I delete a docker container")
 
+    assert response.answer_status == "informational"
     assert response.fallback_recommended is False
     assert len(response.answers) >= 1
     assert response.answers[0].subject == "docker rm"
+    assert response.answers[0].verification_status == VerificationStatus.PENDING
 
 
-def test_ask_includes_requires_human_review_claims(
+def test_ask_surfaces_requires_human_review_claims_as_informational_answers(
     engine: QueryEngine, store: ClaimStore
 ) -> None:
-    """Stage 19: REQUIRES_HUMAN_REVIEW claims (curated tools the
-    orchestrator wants a human to look at) now surface in ask too.
-    This matches command_matcher's behavior — informational, not
-    excluded. Only REJECTED / CONFLICT_DETECTED are dropped."""
+    """Review-needed claims are visible, but the response tier must make
+    it explicit that they are not accepted knowledge yet."""
     _add_claim(
         store,
         subject="docker rm",
@@ -343,9 +478,44 @@ def test_ask_includes_requires_human_review_claims(
 
     response = engine.ask(question="how do I delete a docker container")
 
+    assert response.answer_status == "informational"
     assert response.fallback_recommended is False
     assert len(response.answers) >= 1
     assert response.answers[0].subject == "docker rm"
+    assert (
+        response.answers[0].verification_status
+        == VerificationStatus.REQUIRES_HUMAN_REVIEW
+    )
+
+
+def test_ask_prefers_accepted_cli_answer_over_pending_recipe_answer(
+    engine: QueryEngine, store: ClaimStore
+) -> None:
+    accepted = _add_claim(
+        store,
+        subject="docker build",
+        statement="docker build builds an image from a Dockerfile.",
+        tool_id="docker-cli",
+        status=VerificationStatus.ACCEPTED,
+    )
+    _add_claim(
+        store,
+        subject="docker recipe: build an image with Dockerfile",
+        statement="Use docker build -t myapp:dev . from the project root.",
+        tool_id="docker-recipes",
+        status=VerificationStatus.PENDING,
+        level=VerificationLevel.L1_SCHEMA_VALID,
+    )
+
+    response = engine.ask(
+        question="how do I build a docker image from a Dockerfile",
+        tool_id_hint="docker",
+    )
+
+    assert response.answer_status == "accepted"
+    assert response.fallback_recommended is False
+    assert response.answers[0].claim_id == accepted.claim_id
+    assert response.answers[0].verification_status == VerificationStatus.ACCEPTED
 
 
 def test_ask_excludes_rejected_claims(engine: QueryEngine, store: ClaimStore) -> None:

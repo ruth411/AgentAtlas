@@ -1,6 +1,6 @@
 # Ayiru — Backend Package
 
-> This is the installable Python package for [Ayiru](https://github.com/ruth411/ayiru), a verified, machine-readable knowledge layer for AI agents.
+> This is the installable Python package for [Ayiru](https://github.com/ruth411/ayiru), the machine-readable external knowledge layer AI agents query before acting.
 
 After `pip install ayiru`, a single `ayiru` binary is on PATH:
 
@@ -18,6 +18,11 @@ ayiru --version
 The full project README — including architecture, demo scenarios, MCP
 integration setup, and contribution guidelines — lives at the repo root:
 <https://github.com/ruth411/ayiru/blob/main/README.md>.
+
+The backend exposes both compatibility query APIs (`ask`,
+`validate_command`, `search_tools`, `get_tool_spec`) and structured
+surfaces (`resolve_subject`, `get_subject_spec`, `get_capabilities`,
+`get_constraints`, `get_effects`, `resolve_action`, `get_workflow_plan`).
 
 ## What ships in this wheel
 

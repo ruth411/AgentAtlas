@@ -15,11 +15,13 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.schemas.enums import (
+    ClaimType,
     ConfidenceBand,
     EvidenceType,
     RiskLevel,
     TrustLevel,
     VerificationLevel,
+    VerificationStatus,
 )
 
 
@@ -262,6 +264,7 @@ class Answer(BaseModel):
 
     confidence: float = Field(ge=0.0, le=1.0)
     confidence_band: ConfidenceBand
+    verification_status: VerificationStatus
     verification_level: VerificationLevel
     risk_level: RiskLevel | None = None
 
@@ -303,6 +306,7 @@ class AskResponse(BaseModel):
 
     question: str = Field(min_length=1, max_length=512)
     answers: list[Answer] = Field(default_factory=list)
+    answer_status: Literal["accepted", "informational", "miss"]
 
     # When True, the matcher couldn't find a confident match — the caller
     # should fall through to web_search (the v0.2 product thesis: ask first,
@@ -324,6 +328,233 @@ class AskResponse(BaseModel):
         return _require_tz_aware(value)
 
 
+# -------- structured knowledge layer --------
+
+SubjectKind = Literal["tool", "api", "sdk", "adk", "workflow", "subject"]
+CapabilityType = Literal[
+    "existence",
+    "invocation",
+    "configuration",
+    "constraint",
+    "effect",
+    "environment",
+    "deprecation",
+    "workflow",
+    "metadata",
+]
+
+
+class ResolveSubjectRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    subject_hint: str = Field(min_length=1, max_length=256)
+    kind: SubjectKind | None = None
+    family_hint: str | None = Field(default=None, max_length=128)
+    limit: int = Field(default=20, ge=1, le=100)
+
+    @field_validator("family_hint")
+    @classmethod
+    def validate_family_hint(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        return _validate_tool_id(value)
+
+
+class SubjectSummary(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    subject_id: str = Field(min_length=1, max_length=128)
+    subject_kind: SubjectKind
+    name: str = Field(min_length=1, max_length=256)
+    family: str = Field(min_length=1, max_length=128)
+    interfaces: list[str] = Field(default_factory=list)
+    capability_count: int = Field(ge=0)
+    verification_level: VerificationLevel
+    match_reason: str = Field(min_length=1, max_length=256)
+
+
+class ResolveSubjectResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    subject_hint: str = Field(min_length=1, max_length=256)
+    kind: SubjectKind | None = None
+    matches: list[SubjectSummary] = Field(default_factory=list)
+    total: int = Field(ge=0)
+    limit: int = Field(ge=1)
+
+
+class SubjectSpecResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    subject_id: str = Field(min_length=1, max_length=128)
+    subject_kind: SubjectKind
+    name: str = Field(min_length=1, max_length=256)
+    family: str = Field(min_length=1, max_length=128)
+    interfaces: list[str] = Field(default_factory=list)
+    capabilities: list[str] = Field(default_factory=list)
+    workflows: list[str] = Field(default_factory=list)
+    verification_level: VerificationLevel
+    provenance_claim_ids: list[str] = Field(default_factory=list)
+    provenance_evidence_ids: list[str] = Field(default_factory=list)
+
+
+class GetCapabilitiesRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    subject_id: str = Field(min_length=1, max_length=128)
+    capability_types: list[CapabilityType] = Field(default_factory=list, max_length=20)
+    accepted_only: bool = True
+    verification_min: VerificationLevel | None = None
+    limit: int = Field(default=50, ge=1, le=200)
+
+    @field_validator("subject_id")
+    @classmethod
+    def validate_subject_id(cls, value: str) -> str:
+        return _validate_tool_id(value)
+
+
+class CapabilityRecord(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    capability_id: str = Field(min_length=1, max_length=128)
+    subject_id: str = Field(min_length=1, max_length=128)
+    capability_type: CapabilityType
+    claim_type: ClaimType
+    title: str = Field(min_length=1, max_length=512)
+    detail: str = Field(min_length=1)
+    verification_status: VerificationStatus
+    verification_level: VerificationLevel
+    confidence: float = Field(ge=0.0, le=1.0)
+    confidence_band: ConfidenceBand
+    risk_level: RiskLevel | None = None
+    evidence: list[EvidenceCitation] = Field(default_factory=list)
+    relevance_reason: str | None = Field(default=None, max_length=256)
+
+
+class GetCapabilitiesResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    subject_id: str = Field(min_length=1, max_length=128)
+    accepted_only: bool
+    capabilities: list[CapabilityRecord] = Field(default_factory=list)
+    total: int = Field(ge=0)
+    limit: int = Field(ge=1)
+
+
+class GetConstraintsRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    subject_id: str = Field(min_length=1, max_length=128)
+    action_intent: str | None = Field(default=None, max_length=512)
+    accepted_only: bool = True
+
+    @field_validator("subject_id")
+    @classmethod
+    def validate_subject_id(cls, value: str) -> str:
+        return _validate_tool_id(value)
+
+
+class ConstraintSetResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    subject_id: str = Field(min_length=1, max_length=128)
+    action_intent: str | None = Field(default=None, max_length=512)
+    constraints: list[CapabilityRecord] = Field(default_factory=list)
+    total: int = Field(ge=0)
+
+
+class GetEffectsRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    subject_id: str = Field(min_length=1, max_length=128)
+    action_intent: str | None = Field(default=None, max_length=512)
+    accepted_only: bool = True
+
+    @field_validator("subject_id")
+    @classmethod
+    def validate_subject_id(cls, value: str) -> str:
+        return _validate_tool_id(value)
+
+
+class EffectProfileResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    subject_id: str = Field(min_length=1, max_length=128)
+    action_intent: str | None = Field(default=None, max_length=512)
+    effects: list[CapabilityRecord] = Field(default_factory=list)
+    total: int = Field(ge=0)
+    aggregate_risk_level: RiskLevel | None = None
+    requires_confirmation: bool
+
+
+class ResolveActionRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    subject_id: str = Field(min_length=1, max_length=128)
+    action_intent: str = Field(min_length=1, max_length=512)
+    command: str | None = Field(default=None, max_length=512)
+    environment: str | None = Field(default=None, max_length=128)
+    accepted_only: bool = True
+    limit: int = Field(default=5, ge=1, le=20)
+
+    @field_validator("subject_id")
+    @classmethod
+    def validate_subject_id(cls, value: str) -> str:
+        return _validate_tool_id(value)
+
+
+class ResolveActionResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    subject_id: str = Field(min_length=1, max_length=128)
+    action_intent: str = Field(min_length=1, max_length=512)
+    command: str | None = Field(default=None, max_length=512)
+    environment: str | None = Field(default=None, max_length=128)
+    resolution_mode: Literal["command_match", "capability_search"]
+    top_capability: CapabilityRecord | None = None
+    supporting_capabilities: list[CapabilityRecord] = Field(default_factory=list)
+    constraints: list[CapabilityRecord] = Field(default_factory=list)
+    effects: list[CapabilityRecord] = Field(default_factory=list)
+    fallback_recommended: bool
+    safe_to_auto_execute: bool | None = None
+    requires_human_confirmation: bool | None = None
+    risk_level: RiskLevel | None = None
+    verification_status: VerificationStatus | None = None
+    verification_level: VerificationLevel | None = None
+    confidence: float = Field(ge=0.0, le=1.0)
+    confidence_band: ConfidenceBand
+    reasons: list[str] = Field(default_factory=list)
+
+
+class GetWorkflowPlanRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    goal: str = Field(min_length=1, max_length=512)
+    environment: str | None = Field(default=None, max_length=128)
+    limit: int = Field(default=20, ge=1, le=100)
+
+
+class WorkflowPlanSummary(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    workflow_id: str = Field(min_length=1, max_length=128)
+    goal: str = Field(default="", max_length=512)
+    subject_ids: list[str] = Field(default_factory=list)
+    step_count: int = Field(ge=0)
+    aggregate_risk_level: RiskLevel
+    verification_level: VerificationLevel
+    requires_confirmation: bool
+
+
+class WorkflowPlanResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    goal: str = Field(min_length=1, max_length=512)
+    environment: str | None = Field(default=None, max_length=128)
+    plans: list[WorkflowPlanSummary] = Field(default_factory=list)
+    total: int = Field(ge=0)
+
+
 # -------- shared helpers exposed for the engine --------
 
 
@@ -331,16 +562,34 @@ __all__ = [
     "Answer",
     "AskRequest",
     "AskResponse",
+    "CapabilityRecord",
+    "CapabilityType",
+    "ConstraintSetResponse",
     "EvidenceCitation",
     "ExplainRiskRequest",
     "ExplainRiskResponse",
+    "EffectProfileResponse",
+    "GetCapabilitiesRequest",
+    "GetCapabilitiesResponse",
+    "GetConstraintsRequest",
+    "GetEffectsRequest",
+    "GetWorkflowPlanRequest",
+    "ResolveActionRequest",
+    "ResolveActionResponse",
+    "ResolveSubjectRequest",
+    "ResolveSubjectResponse",
     "RiskDimensions",
     "SafeWorkflowRequest",
     "SafeWorkflowResponse",
     "SavingsResponse",
     "SearchToolsResponse",
+    "SubjectSpecResponse",
+    "SubjectSummary",
+    "SubjectKind",
     "ToolMatchSummary",
     "ValidateCommandRequest",
     "ValidateCommandResponse",
+    "WorkflowPlanResponse",
+    "WorkflowPlanSummary",
     "WorkflowSummary",
 ]

@@ -26,9 +26,10 @@ from datetime import datetime, timezone
 from functools import cache
 import json
 import re
-from typing import Any
+from typing import Any, Literal
 
 from app.schemas.enums import (
+    ClaimType,
     RISK_ORDER,
     VERIFICATION_LEVEL_ORDER,
     ConfidenceBand,
@@ -41,13 +42,23 @@ from app.schemas.claim import KnowledgeClaim
 from app.schemas.query import (
     Answer,
     AskResponse,
+    CapabilityRecord,
+    ConstraintSetResponse,
     EvidenceCitation,
     ExplainRiskResponse,
+    EffectProfileResponse,
+    GetCapabilitiesResponse,
     RiskDimensions,
+    ResolveActionResponse,
+    ResolveSubjectResponse,
     SafeWorkflowResponse,
     SearchToolsResponse,
+    SubjectSpecResponse,
+    SubjectSummary,
     ToolMatchSummary,
     ValidateCommandResponse,
+    WorkflowPlanResponse,
+    WorkflowPlanSummary,
     WorkflowSummary,
 )
 from app.schemas.risk import RiskAssessment, RiskDimension
@@ -134,6 +145,38 @@ _STOP_WORDS: frozenset[str] = frozenset({
 # audit data once Stage 18 telemetry lands (the calibration task in
 # plan_v02.md §Stage 18.3 makes the constant a measured number).
 _AVERAGE_WEB_SEARCH_TOKENS = 830
+_INFORMATIONAL_SURFACES: frozenset[str] = frozenset({"recipes", "errors"})
+_TROUBLESHOOTING_TOKENS: frozenset[str] = frozenset(
+    {
+        "debug",
+        "diagnose",
+        "error",
+        "errors",
+        "failed",
+        "failing",
+        "failure",
+        "fix",
+        "resolve",
+        "stacktrace",
+        "timeout",
+        "traceback",
+        "troubleshoot",
+    }
+)
+_WORKFLOW_TOKENS: frozenset[str] = frozenset(
+    {
+        "cookbook",
+        "example",
+        "examples",
+        "flow",
+        "procedure",
+        "recipe",
+        "recipes",
+        "steps",
+        "walkthrough",
+        "workflow",
+    }
+)
 
 
 class QueryEngine:
@@ -210,6 +253,299 @@ class QueryEngine:
         `/canonical/` prefix. The route layer converts `None` into 404."""
         return self._store.get_canonical_tool_spec(tool_id.strip())
 
+    def resolve_subject(
+        self,
+        *,
+        subject_hint: str,
+        kind: str | None = None,
+        family_hint: str | None = None,
+        limit: int = 20,
+    ) -> ResolveSubjectResponse:
+        query = subject_hint.strip()
+        if family_hint:
+            query = family_hint.strip()
+        normalized_query = query.lower()
+        scored_matches: list[tuple[int, SubjectSummary]] = []
+
+        if kind in {None, "tool", "api", "sdk", "adk", "subject"}:
+            tool_matches = self.search_tools(query=query, limit=limit, offset=0)
+            for item in tool_matches.matches:
+                spec = self._store.get_canonical_tool_spec(item.tool_id)
+                if spec is None:
+                    continue
+                summary = _tool_spec_to_subject_summary(spec, match_reason=item.match_reason)
+                if kind is not None and summary.subject_kind != kind:
+                    continue
+                score, _ = _score_tool_spec(spec, normalized_query)
+                scored_matches.append((score, summary))
+
+        if kind in {None, "workflow", "subject"}:
+            workflow_specs = _paginate_all(
+                lambda lim, off: self._store.list_canonical_workflow_specs(
+                    limit=lim,
+                    offset=off,
+                ),
+                page_size=100,
+                hard_cap=2_000,
+            )
+            for spec in workflow_specs:
+                score = _score_workflow_spec(spec, normalized_query)
+                if score <= 0:
+                    continue
+                scored_matches.append(
+                    (
+                        score,
+                        _workflow_spec_to_subject_summary(
+                            spec,
+                            match_reason=_workflow_match_reason(spec, normalized_query),
+                        ),
+                    )
+                )
+
+        scored_matches.sort(
+            key=lambda item: (
+                -item[0],
+                item[1].subject_kind != "tool",
+                item[1].subject_id,
+            )
+        )
+        matches = [summary for _, summary in scored_matches[:limit]]
+        return ResolveSubjectResponse(
+            subject_hint=subject_hint,
+            kind=kind,  # type: ignore[arg-type]
+            matches=matches,
+            total=len(matches),
+            limit=limit,
+        )
+
+    def get_subject_spec(self, *, subject_id: str) -> SubjectSpecResponse | None:
+        tool_spec = self._store.get_canonical_tool_spec(subject_id.strip())
+        if tool_spec is not None:
+            return _tool_spec_to_subject_spec(tool_spec)
+        workflow_spec = self._store.get_canonical_workflow_spec(subject_id.strip())
+        if workflow_spec is not None:
+            return _workflow_spec_to_subject_spec(workflow_spec)
+        return None
+
+    def get_capabilities(
+        self,
+        *,
+        subject_id: str,
+        capability_types: list[str] | None = None,
+        accepted_only: bool = True,
+        verification_min: VerificationLevel | None = None,
+        limit: int = 50,
+    ) -> GetCapabilitiesResponse:
+        capability_types = capability_types or []
+        claims = self._claims_for_subject(subject_id)
+        if not claims:
+            return GetCapabilitiesResponse(
+                subject_id=subject_id,
+                accepted_only=accepted_only,
+                capabilities=[],
+                total=0,
+                limit=limit,
+            )
+        latest_results = self._store.get_latest_verification_results(
+            [claim.claim_id for claim in claims]
+        )
+        capabilities: list[CapabilityRecord] = []
+        for claim in claims:
+            if claim.verification_status in {
+                VerificationStatus.REJECTED,
+                VerificationStatus.CONFLICT_DETECTED,
+            }:
+                continue
+            if accepted_only and claim.verification_status != VerificationStatus.ACCEPTED:
+                continue
+            capability = _claim_to_capability_record(
+                claim,
+                latest_result=latest_results.get(claim.claim_id),
+            )
+            if capability_types and capability.capability_type not in capability_types:
+                continue
+            if (
+                verification_min is not None
+                and VERIFICATION_LEVEL_ORDER[capability.verification_level]
+                < VERIFICATION_LEVEL_ORDER[verification_min]
+            ):
+                continue
+            capabilities.append(capability)
+        capabilities.sort(
+            key=lambda item: (
+                item.verification_status != VerificationStatus.ACCEPTED,
+                -VERIFICATION_LEVEL_ORDER[item.verification_level],
+                -item.confidence,
+                item.capability_id,
+            )
+        )
+        page = capabilities[:limit]
+        return GetCapabilitiesResponse(
+            subject_id=subject_id,
+            accepted_only=accepted_only,
+            capabilities=page,
+            total=len(capabilities),
+            limit=limit,
+        )
+
+    def get_constraints(
+        self,
+        *,
+        subject_id: str,
+        action_intent: str | None = None,
+        accepted_only: bool = True,
+    ) -> ConstraintSetResponse:
+        response = self.get_capabilities(
+            subject_id=subject_id,
+            capability_types=["constraint", "environment"],
+            accepted_only=accepted_only,
+            limit=200,
+        )
+        return ConstraintSetResponse(
+            subject_id=subject_id,
+            action_intent=action_intent,
+            constraints=response.capabilities,
+            total=response.total,
+        )
+
+    def get_effects(
+        self,
+        *,
+        subject_id: str,
+        action_intent: str | None = None,
+        accepted_only: bool = True,
+    ) -> EffectProfileResponse:
+        response = self.get_capabilities(
+            subject_id=subject_id,
+            capability_types=["effect", "deprecation"],
+            accepted_only=accepted_only,
+            limit=200,
+        )
+        aggregate = None
+        if response.capabilities:
+            aggregate = max(
+                (cap.risk_level or RiskLevel.NONE for cap in response.capabilities),
+                key=lambda level: RISK_ORDER[level],
+            )
+        return EffectProfileResponse(
+            subject_id=subject_id,
+            action_intent=action_intent,
+            effects=response.capabilities,
+            total=response.total,
+            aggregate_risk_level=aggregate,
+            requires_confirmation=aggregate in {RiskLevel.HIGH, RiskLevel.CRITICAL},
+        )
+
+    def resolve_action(
+        self,
+        *,
+        subject_id: str,
+        action_intent: str,
+        command: str | None = None,
+        environment: str | None = None,
+        accepted_only: bool = True,
+        limit: int = 5,
+    ) -> ResolveActionResponse:
+        constraints = self.get_constraints(
+            subject_id=subject_id,
+            action_intent=action_intent,
+            accepted_only=accepted_only,
+        )
+        effects = self.get_effects(
+            subject_id=subject_id,
+            action_intent=action_intent,
+            accepted_only=accepted_only,
+        )
+        if command:
+            verdict = self.validate_command(tool_id=subject_id, command=command)
+            top_capability = None
+            if verdict.matched_claim_id:
+                claim = self._store.get(verdict.matched_claim_id)
+                if claim is not None:
+                    latest = self._store.get_latest_verification_result(claim.claim_id)
+                    top_capability = _claim_to_capability_record(
+                        claim,
+                        latest_result=latest,
+                    )
+            supporting = [top_capability] if top_capability is not None else []
+            return ResolveActionResponse(
+                subject_id=subject_id,
+                action_intent=action_intent,
+                command=command,
+                environment=environment,
+                resolution_mode="command_match",
+                top_capability=top_capability,
+                supporting_capabilities=supporting,
+                constraints=constraints.constraints,
+                effects=effects.effects,
+                fallback_recommended=verdict.match_method == "none",
+                safe_to_auto_execute=verdict.safe_to_auto_execute,
+                requires_human_confirmation=verdict.requires_human_confirmation,
+                risk_level=verdict.risk_level,
+                verification_status=top_capability.verification_status if top_capability else None,
+                verification_level=verdict.verification_level,
+                confidence=verdict.confidence,
+                confidence_band=verdict.confidence_band,
+                reasons=list(verdict.reasons),
+            )
+
+        ranked = self._rank_capabilities_for_action(
+            subject_id=subject_id,
+            query=action_intent,
+            accepted_only=accepted_only,
+            limit=limit,
+        )
+        top = ranked[0] if ranked else None
+        fallback = top is None or top.confidence < _ASK_SCORE_THRESHOLD
+        return ResolveActionResponse(
+            subject_id=subject_id,
+            action_intent=action_intent,
+            command=None,
+            environment=environment,
+            resolution_mode="capability_search",
+            top_capability=top,
+            supporting_capabilities=ranked,
+            constraints=constraints.constraints,
+            effects=effects.effects,
+            fallback_recommended=fallback,
+            safe_to_auto_execute=None,
+            requires_human_confirmation=(
+                None if top is None else top.risk_level in {RiskLevel.HIGH, RiskLevel.CRITICAL}
+            ),
+            risk_level=top.risk_level if top else None,
+            verification_status=top.verification_status if top else None,
+            verification_level=top.verification_level if top else None,
+            confidence=top.confidence if top else 0.0,
+            confidence_band=top.confidence_band if top else ConfidenceBand.NONE,
+            reasons=[top.relevance_reason] if top and top.relevance_reason else [],
+        )
+
+    def get_workflow_plan(
+        self,
+        *,
+        goal: str,
+        environment: str | None = None,
+        limit: int = 20,
+    ) -> WorkflowPlanResponse:
+        response = self.find_safe_workflows(goal=goal, environment=environment, limit=limit)
+        return WorkflowPlanResponse(
+            goal=goal,
+            environment=environment,
+            plans=[
+                WorkflowPlanSummary(
+                    workflow_id=match.workflow_id,
+                    goal=match.goal,
+                    subject_ids=match.tool_ids,
+                    step_count=match.step_count,
+                    aggregate_risk_level=match.aggregate_risk_level,
+                    verification_level=match.verification_level,
+                    requires_confirmation=match.requires_confirmation,
+                )
+                for match in response.matches
+            ],
+            total=response.total,
+        )
+
     # -------- ask --------
 
     def ask(
@@ -221,15 +557,15 @@ class QueryEngine:
     ) -> AskResponse:
         """Stage 17 — the headline v0.2 retrieval surface.
 
-        Lexical token-overlap ranking against accepted claims. Mirrors
-        the patterns in `search_tools` and `_score_tool_spec`: pull
-        candidates from the store, score in memory, return the top
-        `limit` with cited evidence.
+        Lexical token-overlap ranking against the local graph. The
+        engine serves two answer tiers:
 
-        Filters to `verification_status='accepted'` only — the matcher
-        deliberately excludes PENDING and REQUIRES_HUMAN_REVIEW claims
-        so the response is never informational on a hit. Stage 19's
-        curated/uncurated split will revisit this with an opt-in flag.
+        - accepted: verification-accepted claims
+        - informational: cited claims still pending review
+
+        Accepted answers win by default. Informational answers are a
+        fallback tier for troubleshooting / workflow guidance or for
+        cases where no accepted claim clears the quality bar.
 
         Returns the same shape on hit OR miss. On miss, `answers=[]`
         and `fallback_recommended=True` — the agent's signal to escalate
@@ -257,6 +593,7 @@ class QueryEngine:
                 answers_returned=0,
                 tokens_saved=0,
                 top_claim_id=None,
+                answer_status="miss",
                 fallback_recommended=True,
                 tool_id_hint=tool_id_hint,
                 fallback_reason="all_stopwords",
@@ -264,6 +601,7 @@ class QueryEngine:
             return AskResponse(
                 question=normalized_question,
                 answers=[],
+                answer_status="miss",
                 fallback_recommended=True,
                 estimated_tokens_saved=0,
                 generated_at=generated_at,
@@ -274,8 +612,8 @@ class QueryEngine:
         if limit > 20:
             limit = 20
 
-        # Pull every accepted claim (optionally narrowed by tool_id_hint).
-        # The v0.2 graph holds ~5k accepted claims after Stage 20; in-memory
+        # Pull every candidate claim (optionally narrowed by tool_id_hint).
+        # The v0.2 graph holds a few thousand claims; in-memory
         # ranking is comfortably under 100ms for that scale. Embeddings +
         # SQL pre-filter land in v0.2.x stretch / v0.3.
         normalized_hint: str | None = None
@@ -341,15 +679,14 @@ class QueryEngine:
                     )
                 )
 
-        # Stage 19: uncurated tools (not in the v2 contract's curated set)
-        # surface with a marker in match_reason so the caller can tell
-        # graph-blessed answers apart from L0 contributions. Loaded once
-        # per ask() call; the inner set lookup is O(1).
+        # Uncurated tools (not in the v2 contract's curated set) surface
+        # with a marker in match_reason so the caller can tell graph-
+        # blessed answers apart from L0 contributions.
         from app.services.claim_store import _curated_tool_ids
         curated_set = _curated_tool_ids()
 
-        # Same exclusion list the matcher uses — never surface claims
-        # whose orchestrator decision explicitly distrusts them.
+        # Never surface claims whose orchestrator decision explicitly
+        # distrusts them.
         excluded_statuses = {
             VerificationStatus.REJECTED,
             VerificationStatus.CONFLICT_DETECTED,
@@ -364,7 +701,16 @@ class QueryEngine:
                 continue
             if claim.tool_id not in curated_set:
                 reason = f"{reason}; uncurated tool ({claim.tool_id})"
-            scored.append((score, claim.claim_id, claim, reason))
+            biased_score, bias_reason = _apply_ask_bias(
+                claim,
+                base_score=score,
+                question_tokens=question_tokens,
+            )
+            if biased_score <= 0.0:
+                continue
+            if bias_reason:
+                reason = f"{reason}; {bias_reason}"
+            scored.append((biased_score, claim.claim_id, claim, reason))
 
         # Stage 22-stretch — semantic re-rank.
         # For each lexically-scored candidate that has a stored embedding,
@@ -376,9 +722,41 @@ class QueryEngine:
         # Sort: score DESC, claim_id ASC (deterministic tie-break).
         scored.sort(key=lambda row: (-row[0], row[1]))
 
-        top = scored[:limit]
-        top_score = top[0][0] if top else 0.0
-        fallback = top_score < _ASK_SCORE_THRESHOLD
+        accepted_scored = [
+            row for row in scored
+            if row[2].verification_status == VerificationStatus.ACCEPTED
+        ]
+        informational_scored = [
+            row for row in scored
+            if row[2].verification_status in {
+                VerificationStatus.PENDING,
+                VerificationStatus.REQUIRES_HUMAN_REVIEW,
+            }
+        ]
+        accepted_top = accepted_scored[:limit]
+        informational_top = informational_scored[:limit]
+        accepted_score = accepted_top[0][0] if accepted_top else 0.0
+        informational_score = informational_top[0][0] if informational_top else 0.0
+
+        top: list[tuple[float, str, KnowledgeClaim, str]] = []
+        answer_status: Literal["accepted", "informational", "miss"] = "miss"
+        fallback = True
+        if (
+            _question_prefers_informational_surface(question_tokens)
+            and informational_score >= _ASK_SCORE_THRESHOLD
+            and informational_score >= accepted_score + 0.05
+        ):
+            top = informational_top
+            answer_status = "informational"
+            fallback = False
+        elif accepted_score >= _ASK_SCORE_THRESHOLD:
+            top = accepted_top
+            answer_status = "accepted"
+            fallback = False
+        elif informational_score >= _ASK_SCORE_THRESHOLD:
+            top = informational_top
+            answer_status = "informational"
+            fallback = False
 
         answers: list[Answer] = []
         if not fallback:
@@ -414,6 +792,7 @@ class QueryEngine:
             answers_returned=len(answers),
             tokens_saved=estimated_savings,
             top_claim_id=top_claim_id,
+            answer_status=answer_status,
             fallback_recommended=fallback,
             tool_id_hint=tool_id_hint,
             fallback_reason=("below_threshold" if fallback else None),
@@ -422,6 +801,7 @@ class QueryEngine:
         return AskResponse(
             question=normalized_question,
             answers=answers,
+            answer_status=answer_status,
             fallback_recommended=fallback,
             estimated_tokens_saved=estimated_savings,
             generated_at=generated_at,
@@ -469,6 +849,73 @@ class QueryEngine:
             return matching
         # Hint given but no exact or prefix match — honest miss.
         return []
+
+    def _claims_for_subject(self, subject_id: str) -> list[KnowledgeClaim]:
+        normalized = subject_id.strip().lower()
+        effective_tool_ids = self._resolve_tool_id_hint(normalized)
+        if effective_tool_ids is None:
+            return []
+        if len(effective_tool_ids) == 0:
+            return []
+        claims: list[KnowledgeClaim] = []
+        for tool_id in effective_tool_ids:
+            claims.extend(
+                _paginate_all(
+                    lambda lim, off, tid=tool_id: self._store.list(
+                        tool_id=tid,
+                        limit=lim,
+                        offset=off,
+                    ),
+                    page_size=int(_query_policy()["default_search_limit"]),
+                    hard_cap=10_000,
+                )
+            )
+        return claims
+
+    def _rank_capabilities_for_action(
+        self,
+        *,
+        subject_id: str,
+        query: str,
+        accepted_only: bool,
+        limit: int,
+    ) -> list[CapabilityRecord]:
+        question_tokens = _tokenize_question(query.strip())
+        claims = self._claims_for_subject(subject_id)
+        latest_results = self._store.get_latest_verification_results(
+            [claim.claim_id for claim in claims]
+        )
+        scored: list[tuple[float, str, KnowledgeClaim, str]] = []
+        for claim in claims:
+            if claim.verification_status in {
+                VerificationStatus.REJECTED,
+                VerificationStatus.CONFLICT_DETECTED,
+            }:
+                continue
+            if accepted_only and claim.verification_status != VerificationStatus.ACCEPTED:
+                continue
+            score, reason = _score_claim_for_question(claim, question_tokens)
+            if score <= 0.0:
+                continue
+            biased_score, bias_reason = _apply_ask_bias(
+                claim,
+                base_score=score,
+                question_tokens=question_tokens,
+            )
+            if bias_reason:
+                reason = f"{reason}; {bias_reason}"
+            scored.append((biased_score, claim.claim_id, claim, reason))
+        scored = self._semantic_rerank(query, scored)
+        scored.sort(key=lambda row: (-row[0], row[1]))
+        return [
+            _claim_to_capability_record(
+                claim,
+                latest_result=latest_results.get(claim.claim_id),
+                relevance_reason=reason,
+                match_score=match_score,
+            )
+            for match_score, _, claim, reason in scored[:limit]
+        ]
 
     def _semantic_rerank(
         self,
@@ -539,6 +986,7 @@ class QueryEngine:
         answers_returned: int,
         tokens_saved: int,
         top_claim_id: str | None,
+        answer_status: str,
         fallback_recommended: bool,
         tool_id_hint: str | None,
         fallback_reason: str | None,
@@ -573,6 +1021,7 @@ class QueryEngine:
                     "answers_returned": answers_returned,
                     "tokens_saved": tokens_saved,
                     "top_claim_id": top_claim_id,
+                    "answer_status": answer_status,
                     "fallback_recommended": fallback_recommended,
                     "tool_id_hint": tool_id_hint,
                     "fallback_reason": fallback_reason,
@@ -942,6 +1391,132 @@ def _project_evidence(evidence: Evidence) -> EvidenceCitation:
     )
 
 
+def _claim_type_to_capability_type(claim_type: ClaimType) -> str:
+    return {
+        ClaimType.TOOL_EXISTS: "existence",
+        ClaimType.CLI_COMMAND_EXISTS: "invocation",
+        ClaimType.CLI_FLAG_EXISTS: "invocation",
+        ClaimType.API_ENDPOINT_EXISTS: "invocation",
+        ClaimType.MCP_TOOL_EXISTS: "invocation",
+        ClaimType.CONFIG_FIELD_EXISTS: "configuration",
+        ClaimType.AUTH_REQUIREMENT: "constraint",
+        ClaimType.ENVIRONMENT_REQUIREMENT: "environment",
+        ClaimType.SIDE_EFFECT: "effect",
+        ClaimType.DESTRUCTIVE_ACTION: "effect",
+        ClaimType.FEATURE_DEPRECATED: "deprecation",
+        ClaimType.WORKFLOW_STEP: "workflow",
+    }.get(claim_type, "metadata")
+
+
+def _claim_to_capability_record(
+    claim: KnowledgeClaim,
+    *,
+    latest_result: VerificationResult | None,
+    relevance_reason: str | None = None,
+    match_score: float | None = None,
+) -> CapabilityRecord:
+    if latest_result is not None:
+        verification_level = latest_result.verification_level
+        confidence = latest_result.confidence
+        confidence_band = latest_result.confidence_band
+    else:
+        verification_level = VerificationLevel.L1_SCHEMA_VALID
+        confidence = claim.confidence or 0.0
+        confidence_band = claim.confidence_band or band_for_score(confidence)
+    if match_score is not None:
+        confidence = max(0.0, min(1.0, match_score))
+        confidence_band = band_for_score(confidence)
+    return CapabilityRecord(
+        capability_id=claim.claim_id,
+        subject_id=claim.tool_id,
+        capability_type=_claim_type_to_capability_type(claim.claim_type),  # type: ignore[arg-type]
+        claim_type=claim.claim_type,
+        title=claim.subject,
+        detail=claim.statement,
+        verification_status=claim.verification_status,
+        verification_level=verification_level,
+        confidence=confidence,
+        confidence_band=confidence_band,
+        risk_level=claim.risk_level,
+        evidence=[_project_evidence(e) for e in claim.evidence],
+        relevance_reason=relevance_reason,
+    )
+
+
+def _subject_kind_for_tool_spec(spec: ToolSpec) -> str:
+    interfaces = {item.lower() for item in spec.interfaces}
+    if any(item in interfaces for item in {"rest", "openapi", "graphql", "api"}):
+        return "api"
+    if any("sdk" in item for item in interfaces):
+        return "sdk"
+    if "adk" in spec.tool_id.lower() or "adk" in spec.name.lower():
+        return "adk"
+    return "tool"
+
+
+def _tool_spec_to_subject_summary(spec: ToolSpec, *, match_reason: str) -> SubjectSummary:
+    family = spec.tool_id.split("-", 1)[0] if "-" in spec.tool_id else spec.tool_id
+    return SubjectSummary(
+        subject_id=spec.tool_id,
+        subject_kind=_subject_kind_for_tool_spec(spec),  # type: ignore[arg-type]
+        name=spec.name,
+        family=family,
+        interfaces=list(spec.interfaces),
+        capability_count=len(spec.capabilities),
+        verification_level=spec.verification_level,
+        match_reason=match_reason,
+    )
+
+
+def _workflow_spec_to_subject_summary(
+    spec: WorkflowSpec, *, match_reason: str
+) -> SubjectSummary:
+    aggregate_risk = max(
+        spec.steps, key=lambda step: RISK_ORDER[step.risk_level]
+    ).risk_level
+    return SubjectSummary(
+        subject_id=spec.workflow_id,
+        subject_kind="workflow",
+        name=spec.goal or spec.workflow_id,
+        family="workflow",
+        interfaces=["workflow"],
+        capability_count=len(spec.steps),
+        verification_level=spec.verification_level,
+        match_reason=match_reason or "workflow goal match",
+    )
+
+
+def _tool_spec_to_subject_spec(spec: ToolSpec) -> SubjectSpecResponse:
+    family = spec.tool_id.split("-", 1)[0] if "-" in spec.tool_id else spec.tool_id
+    return SubjectSpecResponse(
+        subject_id=spec.tool_id,
+        subject_kind=_subject_kind_for_tool_spec(spec),  # type: ignore[arg-type]
+        name=spec.name,
+        family=family,
+        interfaces=list(spec.interfaces),
+        capabilities=list(spec.capabilities),
+        workflows=list(spec.workflows),
+        verification_level=spec.verification_level,
+        provenance_claim_ids=list(spec.provenance.source_claim_ids),
+        provenance_evidence_ids=list(spec.provenance.source_evidence_ids),
+    )
+
+
+def _workflow_spec_to_subject_spec(spec: WorkflowSpec) -> SubjectSpecResponse:
+    return SubjectSpecResponse(
+        subject_id=spec.workflow_id,
+        subject_kind="workflow",
+        name=spec.goal or spec.workflow_id,
+        family=spec.workflow_id,
+        interfaces=[],
+        capabilities=[step.action for step in spec.steps],
+        workflows=[spec.workflow_id],
+        verification_level=spec.verification_level,
+        provenance_claim_ids=list(spec.provenance.source_claim_ids),
+        provenance_evidence_ids=list(spec.provenance.source_evidence_ids),
+    )
+
+
 def _dimensions_from_assessment(assessment: RiskAssessment) -> RiskDimensions:
     """Project the risk engine's `RiskDimension` enum set into the boolean
     dimension flags the explain_risk response exposes. The mapping is
@@ -1097,7 +1672,7 @@ def _claim_to_answer(
     latest_result: VerificationResult | None,
     match_score: float | None = None,
 ) -> Answer:
-    """Project an accepted `KnowledgeClaim` into an `Answer` for the
+    """Project a `KnowledgeClaim` into an `Answer` for the
     AskResponse. Mirrors `_summarise_tool_spec`'s role for search_tools.
 
     `latest_result` is the most recent `VerificationResult` for this
@@ -1142,11 +1717,60 @@ def _claim_to_answer(
         tool_id=claim.tool_id,
         confidence=confidence,
         confidence_band=band_for_score(confidence),
+        verification_status=claim.verification_status,
         verification_level=verification_level,
         risk_level=claim.risk_level,
         evidence=[_project_evidence(e) for e in claim.evidence],
         match_reason=match_reason,
     )
+
+
+def _surface_for_tool_id(tool_id: str) -> str:
+    if "-" not in tool_id:
+        return ""
+    return tool_id.split("-", 1)[1]
+
+
+def _question_prefers_informational_surface(question_tokens: list[str]) -> bool:
+    token_set = set(question_tokens)
+    return bool(token_set & (_TROUBLESHOOTING_TOKENS | _WORKFLOW_TOKENS))
+
+
+def _apply_ask_bias(
+    claim: KnowledgeClaim,
+    *,
+    base_score: float,
+    question_tokens: list[str],
+) -> tuple[float, str]:
+    adjusted = base_score
+    reasons: list[str] = []
+    surface = _surface_for_tool_id(claim.tool_id)
+    token_set = set(question_tokens)
+
+    if claim.verification_status != VerificationStatus.ACCEPTED:
+        adjusted -= 0.08
+        reasons.append(f"status={claim.verification_status.value}")
+
+    if surface == "errors":
+        if token_set & _TROUBLESHOOTING_TOKENS:
+            adjusted += 0.05
+            reasons.append("errors surface fits troubleshooting question")
+        else:
+            adjusted -= 0.18
+            reasons.append("errors surface demoted for general lookup")
+    elif surface == "recipes":
+        if token_set & (_WORKFLOW_TOKENS | _TROUBLESHOOTING_TOKENS):
+            adjusted += 0.02
+            reasons.append("recipes surface fits workflow question")
+        else:
+            adjusted -= 0.10
+            reasons.append("recipes surface demoted for general lookup")
+    elif surface and surface not in _INFORMATIONAL_SURFACES:
+        adjusted += 0.03
+        reasons.append(f"{surface} surface preferred for factual lookup")
+
+    adjusted = max(0.0, adjusted)
+    return adjusted, "; ".join(reasons)
 
 
 # -------- search_tools scoring + summary --------
@@ -1218,6 +1842,23 @@ def _score_workflow_spec(spec: WorkflowSpec, query: str) -> int:
         if overlap:
             return 20 + overlap * 5
     return 0
+
+
+def _workflow_match_reason(spec: WorkflowSpec, query: str) -> str:
+    if not query:
+        return "no-query (all workflows)"
+    goal = (spec.goal or "").lower()
+    if goal == query:
+        return "goal exact"
+    if query in goal:
+        return f"goal substring '{query}'"
+    if goal:
+        goal_tokens = set(goal.split())
+        query_tokens = set(query.split())
+        overlap = goal_tokens & query_tokens
+        if overlap:
+            return f"goal token overlap {sorted(overlap)!r}"
+    return "workflow goal match"
 
 
 def _summarise_workflow_spec(spec: WorkflowSpec) -> WorkflowSummary:
