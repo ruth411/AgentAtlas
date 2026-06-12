@@ -1,0 +1,512 @@
+{
+  "generated_at": "2026-06-12T12:42:11.933591+00:00",
+  "dry_run": false,
+  "family_filter": null,
+  "limit": null,
+  "total_claims_processed": 3637,
+  "before_status_histogram": {
+    "pending": 1440,
+    "requires_human_review": 2191,
+    "accepted": 6
+  },
+  "after_status_histogram": {
+    "pending": 10,
+    "accepted": 1485,
+    "requires_human_review": 2142
+  },
+  "families_with_accepted_claim": 38,
+  "per_family_accepted": {
+    "ansible": 561,
+    "apt": 25,
+    "awk": 58,
+    "brew": 22,
+    "cargo": 53,
+    "curl": 15,
+    "dnf": 8,
+    "docker": 61,
+    "ffmpeg": 14,
+    "gh": 52,
+    "git": 40,
+    "go": 42,
+    "gpg": 15,
+    "helm": 63,
+    "imagemagick": 20,
+    "journalctl": 9,
+    "jq": 5,
+    "kubectl": 57,
+    "openai": 37,
+    "openssl": 33,
+    "pip": 39,
+    "pnpm": 43,
+    "poetry": 34,
+    "postgresql": 37,
+    "rsync": 4,
+    "rust": 45,
+    "sed": 17,
+    "sqlite3": 30,
+    "ssh": 1,
+    "supabase": 32,
+    "systemctl": 1,
+    "terraform": 6,
+    "tmux": 1,
+    "uv": 1,
+    "vercel": 1,
+    "vim": 1,
+    "wget": 1,
+    "yarn": 1
+  },
+  "transitions_count": 1487,
+  "transitions_sample": [
+    {
+      "claim_id": "claim_066e527278b04766b97ed10c3909fbe7",
+      "tool_id": "ansible-cli",
+      "subject": "ansible-playbook --tags and --skip-tags",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_0a0dd5c143044f698c9a28cfe8892879",
+      "tool_id": "ansible-cli",
+      "subject": "ansible-console",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_427dd85cccdc4b06b65345bf1847104e",
+      "tool_id": "ansible-cli",
+      "subject": "ansible-pull",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_47556ba38c754c6aa168dafbb5da79bf",
+      "tool_id": "ansible-cli",
+      "subject": "ansible-vault",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_4ee6045117ba49b8883c9e4a3a905d38",
+      "tool_id": "ansible-cli",
+      "subject": "Ansible collections guide (FQCN, ansible.cfg, namespaces)",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_539862cca40244df9e4923270993e342",
+      "tool_id": "ansible-cli",
+      "subject": "ansible-inventory",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_5a0e14b52871437d8473b44deee4c240",
+      "tool_id": "ansible-cli",
+      "subject": "ansible-vault (CLI)",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_6556fcf917164ecabc11515cd908cfe2",
+      "tool_id": "ansible-cli",
+      "subject": "Installing collections (ansible-galaxy collection install)",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_6ae31813e5954b76b430b026dc1aceda",
+      "tool_id": "ansible-cli",
+      "subject": "Downloading collections offline",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_7cf3a67125694a6c81b8c7b82905e116",
+      "tool_id": "ansible-cli",
+      "subject": "ansible",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_883151244ec045588cdf15d593b87359",
+      "tool_id": "ansible-cli",
+      "subject": "ansible-inventory (CLI)",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_944932e947c8406fbd82009b1d81c296",
+      "tool_id": "ansible-cli",
+      "subject": "Listing installed collections",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_97c6ce910596412394014a80bbd7c176",
+      "tool_id": "ansible-cli",
+      "subject": "ansible (ad-hoc command tool)",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_a470b59e97c848c4b3d51235c365ac43",
+      "tool_id": "ansible-cli",
+      "subject": "Using collections in playbooks (collections: keyword, FQCN)",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_d6c6866ecbdd4874b82ccbf378aa6a6b",
+      "tool_id": "ansible-cli",
+      "subject": "ansible-galaxy user guide (installing roles + collections)",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_e5effc05b65b4bfe96ef11c9e6714a98",
+      "tool_id": "ansible-cli",
+      "subject": "Verifying collection signatures",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_f8f83fa4db36428296aae90e5a02b0b6",
+      "tool_id": "ansible-cli",
+      "subject": "ansible-playbook --start-at-task and --step",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_187ad72fadd04a408a99a136dc081931",
+      "tool_id": "ansible-inventory",
+      "subject": "community.docker.docker_containers (inventory)",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_331c0b3aba28491da29c7ca6d78f7687",
+      "tool_id": "ansible-inventory",
+      "subject": "amazon.aws.aws_ec2 (inventory)",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_38406f7ab7024223b45f3327ebc1242c",
+      "tool_id": "ansible-inventory",
+      "subject": "inventory patterns and host selection",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_3e9684748ade483489dff06fd42b6fb1",
+      "tool_id": "ansible-inventory",
+      "subject": "ansible.builtin.ini (inventory)",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_531c61eacb1d4e669fa228d98e12a209",
+      "tool_id": "ansible-inventory",
+      "subject": "community.general.nmap (inventory)",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_6bb0b696b0e14814b56829afbd4d2d46",
+      "tool_id": "ansible-inventory",
+      "subject": "ansible.builtin.constructed (inventory)",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_82974853b881478f844f394b7cad0945",
+      "tool_id": "ansible-inventory",
+      "subject": "kubernetes.core.k8s (inventory)",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_84d1c12e6da34cafa16e040a6df6c32f",
+      "tool_id": "ansible-inventory",
+      "subject": "ansible.builtin.script (inventory)",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_9e628dc981524595a13f7bad7dcb8991",
+      "tool_id": "ansible-inventory",
+      "subject": "inventory connection details (ssh, local)",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_b4922423b5484270bb8726d68343771c",
+      "tool_id": "ansible-inventory",
+      "subject": "dynamic inventory",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_b720c4b5fd984b37841d865b15bdfddd",
+      "tool_id": "ansible-inventory",
+      "subject": "inventory basics (INI, YAML, group_vars, host_vars)",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_c6f95de4ba3147a69cdb7a9583134e55",
+      "tool_id": "ansible-inventory",
+      "subject": "community.general.proxmox (inventory)",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_ce409f4468434887aff860d56daf2bde",
+      "tool_id": "ansible-inventory",
+      "subject": "community.vmware.vmware_vm_inventory (inventory)",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_d8915ed072c540049221ec97eef34aa0",
+      "tool_id": "ansible-inventory",
+      "subject": "azure.azcollection.azure_rm (inventory)",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_ee6920f694e24451a66c560b664081d0",
+      "tool_id": "ansible-inventory",
+      "subject": "google.cloud.gcp_compute (inventory)",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_f3b995b36c484e509bbad950cd3dd90b",
+      "tool_id": "ansible-inventory",
+      "subject": "ansible.builtin.yaml (inventory)",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_0046666e9bb741f7a8e14271a17771e8",
+      "tool_id": "ansible-modules",
+      "subject": "junipernetworks.junos.junos_vlans",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_007bccaca0924618ad0eb9277d0a05ab",
+      "tool_id": "ansible-modules",
+      "subject": "google.cloud.gcp_compute_network",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_008effc5aca8453fbcbe36587e3568c1",
+      "tool_id": "ansible-modules",
+      "subject": "cisco.nxos.nxos_vlans",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_00f7eb98593c4a8eafae7a4c4b02f3cd",
+      "tool_id": "ansible-modules",
+      "subject": "google.cloud.gcp_compute_image",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_0259934efda94872a4d226b960f194e5",
+      "tool_id": "ansible-modules",
+      "subject": "google.cloud.gcp_compute_subnetwork",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_026238e1e9bc4f94afcaf2d6ebef6e33",
+      "tool_id": "ansible-modules",
+      "subject": "azure.azcollection.azure_rm_subscription_info",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_027535f6d4a849078f4f24e8fa268081",
+      "tool_id": "ansible-modules",
+      "subject": "community.crypto.openssl_certificate",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_0371ad50f282469abc54de53aa9be85c",
+      "tool_id": "ansible-modules",
+      "subject": "community.general.composer",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_03fff76fa5364596b06d4c047f88db9c",
+      "tool_id": "ansible-modules",
+      "subject": "ansible.builtin.subelements (lookup)",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_04a60e2157c6415a8befda336ec583b5",
+      "tool_id": "ansible-modules",
+      "subject": "amazon.aws.iam_managed_policy",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_054019fe6cf4405095aa4b0cf8eaade8",
+      "tool_id": "ansible-modules",
+      "subject": "ansible.builtin.yum_repository",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_05ff61dd3e34401fa4024a53b8b18f3e",
+      "tool_id": "ansible-modules",
+      "subject": "azure.azcollection.azure_rm_mysqlserver",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_07a0b88cb0b94c9388f5dbfc28e030c8",
+      "tool_id": "ansible-modules",
+      "subject": "amazon.aws.s3_bucket_info",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_07f0440dbb92426fa7c722b7e551e8ae",
+      "tool_id": "ansible-modules",
+      "subject": "community.crypto.openssl_publickey_info",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_089b9724a8f34d9486e5e4069f9e5d53",
+      "tool_id": "ansible-modules",
+      "subject": "community.mysql.mysql_role",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_090ec1a786db4f0fae6ce08a6572619e",
+      "tool_id": "ansible-modules",
+      "subject": "community.mongodb.mongodb_index",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    },
+    {
+      "claim_id": "claim_093c82f319e14c2f8510e5d4a223e9bf",
+      "tool_id": "ansible-modules",
+      "subject": "community.general.jenkins_job",
+      "from": "pending",
+      "to": "accepted",
+      "decision": "accepted",
+      "confidence": 0.6
+    }
+  ],
+  "apply_errors": 0
+}

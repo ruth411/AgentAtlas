@@ -65,18 +65,21 @@ Ask the agent: *"how do I open a pull request from my current branch?"*
 It calls `ask()` and gets back:
 
 ```text
-Subject:   gh recipe: open a pull request from current branch
-Statement: Quick: `gh pr create --fill` (auto-fills title + body from commit
-           messages). Full control: `gh pr create --title 'feat: add X'
-           --body 'closes #42' --base main --reviewer alice,bob --label
-           feature`. Draft: add `--draft`. Web (open in browser to finish):
-           `gh pr create --web`. From a fork: gh detects upstream
-           automatically.
-Citation:  https://cli.github.com/manual/gh_pr_create
+Subject:      gh recipe: open a pull request from current branch
+Statement:    Quick: `gh pr create --fill` (auto-fills title + body from commit
+              messages). Full control: `gh pr create --title 'feat: add X'
+              --body 'closes #42' --base main --reviewer alice,bob --label
+              feature`. Draft: add `--draft`. Web (open in browser to finish):
+              `gh pr create --web`. From a fork: gh detects upstream
+              automatically.
+Citation:     https://cli.github.com/manual/gh_pr_create
+Confidence:   0.84  (high band)
+Verification: L1_schema_valid
 ```
 
-No hallucinated flag. No paraphrased blog post. The current canonical
-docs sentence, with the source URL.
+No hallucinated flag. No paraphrased blog post. The current canonical docs
+sentence, with the source URL, a confidence score, and a verification
+level — agents can decide how strict to be on a per-claim basis.
 
 ## What's in the catalog
 

@@ -120,6 +120,35 @@ def test_empty_evidence_yields_zero_score_and_none_band() -> None:
     assert "empty_evidence" in breakdown.caps_applied
 
 
+def test_single_high_trust_official_docs_reaches_moderate_band() -> None:
+    """v2 contract pin: the catalog majority case (one canonical citation
+    from an allowlisted docs host) must reach `moderate` confidence, not
+    `low`. v1 weighted official_docs at 0.45 which left every single-
+    citation claim stuck in `low` — the 2026-06-12 audit found 99% of
+    claims clustered in [0.3, 0.5)."""
+
+    claim = _claim(
+        claim_id="claim_single_docs",
+        subject="gh repo create",
+        statement="`gh repo create` creates a new repository on GitHub.",
+        tool_id="github-cli",
+        evidence=[
+            _evidence_dict(
+                evidence_id="ev_docs",
+                evidence_type=EvidenceType.OFFICIAL_DOCS,
+                source_uri="https://cli.github.com/manual/gh_repo_create",
+                trust_level=TrustLevel.HIGH,
+            )
+        ],
+    )
+
+    breakdown = compute_confidence_breakdown(claim)
+
+    # v2: 0.60 (official_docs) × 1.0 (high) × 1.0 (first) = 0.60
+    assert breakdown.score == 0.6
+    assert breakdown.band == ConfidenceBand.MODERATE
+
+
 # -------- Anti-spam invariants --------
 
 
@@ -154,11 +183,12 @@ def test_spam_of_same_evidence_type_diminishes_quickly() -> None:
 
     breakdown = compute_confidence_breakdown(claim)
 
-    # Local cli_help_output is server-capped at MEDIUM trust. First contributes
-    # 0.40 * 0.60 = 0.24, second contributes 40% of that; everything after is 0.
+    # Local cli_help_output is server-capped at MEDIUM trust. Under v2
+    # weights, first contributes 0.45 * 0.60 = 0.27, second contributes
+    # 40% of that (0.108); everything after is 0.
     nonzero_deltas = [c.delta for c in breakdown.components if c.delta > 0]
-    assert nonzero_deltas == [0.24, 0.096]
-    assert breakdown.score == 0.336
+    assert nonzero_deltas == [0.27, 0.108]
+    assert breakdown.score == 0.378
 
 
 def test_low_trust_only_evidence_is_hard_capped() -> None:
@@ -258,7 +288,10 @@ def test_duplicate_source_uri_is_counted_once_before_high_risk_gate() -> None:
 
     contributing_components = [c for c in breakdown.components if c.delta > 0]
     assert len(contributing_components) == 1
-    assert breakdown.score == 0.45
+    # Under v2, raw 0.60 (official_docs/high) gets capped by
+    # `high_risk_single_stream` (0.5) because only one stream key
+    # remains after dedup of the duplicate source_uri.
+    assert breakdown.score == 0.5
     assert any("Ignored 1 duplicate" in p for p in breakdown.penalties)
 
 
@@ -441,7 +474,10 @@ def test_fake_official_docs_high_trust_is_downgraded_by_server_rules() -> None:
 
     breakdown = compute_confidence_breakdown(claim)
 
-    assert breakdown.score == 0.1125
+    # Under v2: weight 0.60 (official_docs) × 0.25 (low after server
+    # downgrade) × 1.0 (first occurrence) = 0.15. The downgrade-to-low
+    # behavior is what matters; the exact number tracks v2's weight.
+    assert breakdown.score == 0.15
     assert breakdown.components[0].reason.startswith("type=official_docs trust=low")
 
 
@@ -525,7 +561,9 @@ def test_source_repo_allowlist_requires_exact_repo_path() -> None:
 
     breakdown = compute_confidence_breakdown(claim)
 
-    assert breakdown.score == 0.1
+    # Under v2: weight 0.55 (source_code) × 0.25 (low after server
+    # downgrade for unknown repo) × 1.0 (first occurrence) = 0.1375.
+    assert breakdown.score == 0.1375
     assert breakdown.components[0].reason.startswith("type=source_code trust=low")
 
 

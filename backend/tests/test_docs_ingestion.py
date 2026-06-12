@@ -221,6 +221,82 @@ def test_sanitizer_collapses_whitespace() -> None:
     assert _sanitize_html_to_text("<p>foo\n\n\n   bar</p>") == "foo bar"
 
 
+def test_sanitizer_drops_nav_header_footer_and_aside() -> None:
+    """Regression for the 2026-06-12 audit. cli.github.com (and many
+    other docs sites) wrap the page in <nav>/<header>/<footer>. Before
+    this fix, that chrome flowed into the claim statement — the
+    `gh auth login` claim was carrying *"GitHub CLI Take GitHub to the
+    command line Skip to content…"* as its statement instead of the
+    actual command description. The sanitizer now treats those tags
+    the same way it treats `<script>` / `<style>`."""
+
+    html_blob = """
+    <html><body>
+      <nav>Take GitHub to the command line Skip to content</nav>
+      <header>CLI Manual Release notes</header>
+      <p>gh auth login authenticates to GitHub.</p>
+      <aside>Navigation sidebar links</aside>
+      <footer>© GitHub 2026</footer>
+    </body></html>
+    """
+    text = _sanitize_html_to_text(html_blob)
+    assert "gh auth login authenticates to GitHub." in text
+    assert "Skip to content" not in text
+    assert "Release notes" not in text
+    assert "Navigation sidebar" not in text
+    assert "GitHub 2026" not in text
+
+
+def test_sanitizer_prefers_main_content_when_present() -> None:
+    """When the page has a `<main>` element, only text inside it survives.
+    Catches sites that put nav-like chrome in plain <div> wrappers
+    instead of semantic tags — the chrome lives outside <main> and gets
+    discarded."""
+
+    html_blob = """
+    <html><body>
+      <div class="navbar">Skip to content Manual Release notes</div>
+      <main>
+        <h1>gh auth login</h1>
+        <p>Authenticate with a GitHub host. Required scope: repo.</p>
+      </main>
+      <div class="navbar-bottom">© 2026 GitHub Inc.</div>
+    </body></html>
+    """
+    text = _sanitize_html_to_text(html_blob)
+    assert "gh auth login" in text
+    assert "Required scope: repo." in text
+    assert "Skip to content" not in text
+    assert "Manual Release notes" not in text
+    assert "GitHub Inc." not in text
+
+
+def test_sanitizer_supports_role_main() -> None:
+    """`role='main'` is the accessibility equivalent of `<main>` — sites
+    that use ARIA roles instead of semantic tags also benefit from the
+    main-content restriction."""
+
+    html_blob = """
+    <body>
+      <div>page chrome that should be dropped</div>
+      <section role="main"><p>real content</p></section>
+    </body>
+    """
+    text = _sanitize_html_to_text(html_blob)
+    assert "real content" in text
+    assert "page chrome" not in text
+
+
+def test_sanitizer_falls_back_when_no_main_content_tag() -> None:
+    """If the page has no `<main>` / `<article>` / `role='main'`, the
+    extractor falls back to whole-body extraction (minus the
+    always-dropped tags). Old / unstructured pages don't go silent."""
+
+    html_blob = "<html><body><p>just a paragraph in a plain body</p></body></html>"
+    text = _sanitize_html_to_text(html_blob)
+    assert "just a paragraph in a plain body" in text
+
+
 # ---------------------------------------------------------------------------
 # Ingestion happy path (with mock client)
 # ---------------------------------------------------------------------------

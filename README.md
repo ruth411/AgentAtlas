@@ -11,14 +11,15 @@
 
 ### **Verified, cited knowledge for AI agents.**
 
-*Your agent asks a question. Ayiru returns a cited answer from official docs — not a guess from training data months out of date. 2,800+ claims across 60+ tools, every fact backed by a source URL.*
+*Your agent asks a question. Ayiru returns a cited answer from official docs — not a guess from training data months out of date. 3,600+ claims across 38 tool families (157 surfaces), every fact backed by a source URL.*
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-3776AB?logo=python&logoColor=white&style=for-the-badge)](https://www.python.org/downloads/)
 [![Tests](https://img.shields.io/badge/826_tests_✓-2EA44F?style=for-the-badge)](#-verify-it-works)
 [![License MIT](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
 
-[![Claims](https://img.shields.io/badge/claims-2,800%2B-7C3AED?style=flat-square)](#-tool-catalog)
-[![Tools](https://img.shields.io/badge/tools-60%2B-0EA5E9?style=flat-square)](#-tool-catalog)
+[![Claims](https://img.shields.io/badge/claims-3,600%2B-7C3AED?style=flat-square)](#-tool-catalog)
+[![Tools](https://img.shields.io/badge/tool_families-38-0EA5E9?style=flat-square)](#-tool-catalog)
+[![Accepted](https://img.shields.io/badge/verification--accepted-40%25-22C55E?style=flat-square)](#-tool-catalog)
 [![MCP](https://img.shields.io/badge/MCP_ready-F97316?style=flat-square)](#-use-it-with-claude-cursor-cline-mcp)
 
 </div>
@@ -63,7 +64,7 @@ No hallucinated flag. No paraphrased blog post. The exact text from the catalog,
 
 ## What's in the box
 
-- **`ask(question)`** — the headline surface. Cited, ranked answers grounded in 2,800+ claims across 60+ tools (git, kubectl, docker, gh, ffmpeg, postgres, openssl, …). Hybrid lexical + semantic retrieval.
+- **`ask(question)`** — the headline surface. Cited, ranked answers grounded in 3,600+ claims across 38 tool families (157 surfaces) (git, kubectl, docker, gh, ffmpeg, postgres, openssl, …). Hybrid lexical + semantic retrieval.
 - **`search_tools` / `get_tool_spec`** — structured catalog access when you know the tool but not the command.
 - **`validate_command(tool, command)`** *(bonus)* — runs the same risk classifier over a literal command string and returns an advisory `safe_to_auto_execute` verdict. Useful as a second opinion before an agent runs a destructive command; **not** a security boundary against an adversarial agent.
 - **MCP server** — drop into Claude Desktop / Cursor / Cline / Continue via stdio JSON-RPC. Six tools, zero config.
@@ -101,7 +102,7 @@ Or open <http://localhost:8000/docs> for the interactive API.
 ### 🐳 Docker
 **~3 minutes**<br/>
 Zero Python setup<br/>
-Full catalog (2,800 claims)<br/>
+Full catalog (3,600+ claims, 40% verified)<br/>
 <br/>
 [→ Jump to Docker](#-path-1-docker-easiest)
 
@@ -157,7 +158,7 @@ cd ayiru
 docker build -t ayiru .
 ```
 
-> **What's happening?** Docker is building a self-contained image with Python, Ayiru, and the full 2,800-claim catalog. Takes ~2 minutes the first time.
+> **What's happening?** Docker is building a self-contained image with Python, Ayiru, and the full 3,600+ claim catalog (~40% verification-accepted, the rest cited but pending review). Takes ~2 minutes the first time.
 
 #### Step 3 — Run it
 
@@ -254,7 +255,7 @@ Two flavors depending on what you want:
 ayiru seed --reset
 ayiru serve --reload
 
-# (b) Full catalog — 2,800 claims, 60+ tools
+# (b) Full catalog — 3,600+ claims, 38 tool families
 AYIRU_DATABASE_URL="sqlite:///$(pwd)/backend/ayiru_v0.2_bulk.db" \
     ayiru serve --reload
 ```
@@ -423,7 +424,7 @@ The bundled wheel ships **`gh` only** (~130 claims, ~1.5 MB). It's the
 MVP catalog for the install-and-go pitch. The full multi-tool catalog
 (`git`, `docker`, `kubectl`, `ffmpeg`, …) lives in the FastAPI backend
 described above; running it locally via Docker or `pip install ayiru`
-gives you all 2,800+ claims across 60+ tools.
+gives you all 3,600+ claims across 38 tool families (157 surfaces).
 
 <details>
 <summary><b>Dev path: <code>python -m app.mcp_server</code> against the full catalog</b></summary>
@@ -454,7 +455,7 @@ catalog lives in read-only `site-packages`).
 
 ## 📦 Tool Catalog
 
-Ayiru indexes **2,800+ claims across 60+ tools** with full per-command depth. Each "deep" tool is decomposed into **five surfaces** so an agent's query can target the right slice:
+Ayiru indexes **3,600+ claims across 38 tool families (157 surfaces)** with full per-command depth. Each "deep" tool is decomposed into **five surfaces** so an agent's query can target the right slice:
 
 | Surface | What's on it |
 |---|---|
@@ -593,7 +594,7 @@ ayiru/
 ├── backend/
 │   ├── app/                # FastAPI app, MCP server, services
 │   ├── alembic/            # Migrations
-│   ├── ayiru_v0.2_bulk.db  # 🌟 Full catalog (2,800 claims)
+│   ├── ayiru_v0.2_bulk.db  # 🌟 Full catalog (3,600+ claims, ~40% accepted)
 │   └── tests/              # 790 hermetic tests
 ├── clients/python/         # ayiru-client SDK + LangChain adapter
 ├── tools/                  # URL lists + seed scripts (per tool)
