@@ -554,46 +554,47 @@ def _effects_for_subject(
     ]
 
 
-def _effect_profile(
-    subject_id: str,
-    parsed: ParsedHelp,
-) -> tuple[str, bool, bool, bool, bool, bool]:
-    leaf = subject_id.split("-")[-1]
-    text = parsed.raw_help.casefold()
-    destructive = subject_id in {"gh-repo-delete"} or leaf == "delete"
-    mutates_remote = any(
-        token in subject_id
-        for token in (
-            "repo-create",
-            "repo-delete",
-            "repo-edit",
-            "repo-fork",
-            "pr-create",
-            "pr-merge",
-            "pr-close",
-            "pr-review",
-            "issue-create",
-            "issue-close",
-            "issue-comment",
-            "release-create",
-            "workflow-run",
-            "run-rerun",
-            "run-cancel",
-            "secret-set",
-            "variable-set",
-            "codespace-create",
-            "gist-create",
-            "api",
-        )
-    )
-    may_cost_money = subject_id == "gh-codespace-create"
-    may_expose_secrets = subject_id in {
-        "gh-auth-login",
-        "gh-auth-refresh",
-        "gh-auth-token",
-        "gh-secret-set",
-    } or "--show-token" in text
-    reversible = not destructive and subject_id not in {
+# Trailing subcommand tokens that denote an irreversible, data-destroying
+# operation. Token-driven so any newly ingested `gh ... delete` / `... remove`
+# subcommand is classified correctly without a hand-maintained subject allowlist.
+_DESTRUCTIVE_VERBS = frozenset(
+    {"delete", "remove", "rm", "purge", "prune", "destroy", "revoke", "uninstall"}
+)
+# Destructive subjects whose trailing token is not itself a destructive verb.
+_DESTRUCTIVE_SUBJECT_OVERRIDES = frozenset({"gh-repo-delete"})
+# Subjects that change remote GitHub state without destroying data.
+_MUTATING_TOKENS = (
+    "repo-create",
+    "repo-edit",
+    "repo-fork",
+    "repo-archive",
+    "pr-create",
+    "pr-merge",
+    "pr-close",
+    "pr-reopen",
+    "pr-review",
+    "issue-create",
+    "issue-close",
+    "issue-reopen",
+    "issue-comment",
+    "release-create",
+    "workflow-run",
+    "run-rerun",
+    "run-cancel",
+    "secret-set",
+    "variable-set",
+    "codespace-create",
+    "gist-create",
+    "api",
+    "config-set",
+    "alias-set",
+    "alias-import",
+    "extension-install",
+)
+# Mutations that are not trivially reversible (a follow-up command exists but the
+# operation is not a no-op to undo).
+_HARD_TO_REVERSE = frozenset(
+    {
         "gh-pr-merge",
         "gh-pr-close",
         "gh-issue-close",
@@ -602,30 +603,61 @@ def _effect_profile(
         "gh-variable-set",
         "gh-workflow-run",
     }
+)
+
+
+def _is_destructive(subject_id: str) -> bool:
+    leaf = subject_id.split("-")[-1]
+    return leaf in _DESTRUCTIVE_VERBS or subject_id in _DESTRUCTIVE_SUBJECT_OVERRIDES
+
+
+def _effect_profile(
+    subject_id: str,
+    parsed: ParsedHelp,
+) -> tuple[str, bool, bool, bool, bool, bool]:
+    text = parsed.raw_help.casefold()
+    destructive = _is_destructive(subject_id)
+    mutates_remote = destructive or any(
+        token in subject_id for token in _MUTATING_TOKENS
+    )
+    may_cost_money = subject_id == "gh-codespace-create"
+    may_expose_secrets = subject_id in {
+        "gh-auth-login",
+        "gh-auth-refresh",
+        "gh-auth-token",
+        "gh-secret-set",
+    } or "--show-token" in text
+    reversible = not destructive and subject_id not in _HARD_TO_REVERSE
     if destructive:
         return ("destructive", True, False, True, may_cost_money, may_expose_secrets)
     if may_expose_secrets:
         return ("secret_exposure", False, reversible, mutates_remote, may_cost_money, True)
     if may_cost_money:
         return ("cost", False, reversible, mutates_remote, True, may_expose_secrets)
-    if mutates_remote or any(
-        token in subject_id
-        for token in ("config-set", "alias-set", "alias-delete", "alias-import", "extension-install")
-    ):
+    if mutates_remote:
         return ("mutation", False, reversible, mutates_remote, may_cost_money, may_expose_secrets)
     return ("network", False, True, False, False, may_expose_secrets)
 
 
 def _effect_reason(subject_id: str, parsed: ParsedHelp) -> str:
-    if subject_id == "gh-repo-delete":
-        return "Deletes a repository and requires explicit confirmation or --yes."
+    command = " ".join(parsed.command)
+    leaf = subject_id.split("-")[-1]
+    if _is_destructive(subject_id):
+        return (
+            f"`{command}` performs a destructive {leaf} operation; the change is "
+            "irreversible and mutates remote state."
+        )
     if subject_id == "gh-codespace-create":
         return "Creates a remote Codespace, which may consume billable resources."
-    if subject_id in {"gh-auth-token", "gh-secret-set"}:
-        return "Handles sensitive token or secret material."
+    if subject_id in {"gh-auth-token", "gh-secret-set"} or "--show-token" in parsed.raw_help.casefold():
+        return f"`{command}` handles sensitive token or secret material that may be exposed."
+    if subject_id in _HARD_TO_REVERSE:
+        return f"`{command}` changes remote GitHub state in a way that is not trivially reversible."
+    if any(token in subject_id for token in _MUTATING_TOKENS):
+        return f"`{command}` mutates remote GitHub state."
     if "authorization with the" in parsed.raw_help.casefold():
-        return "Help text documents a remote action gated by GitHub authorization."
-    return "Help text describes the command as a read or execute operation against GitHub."
+        return f"`{command}` is a remote action gated by GitHub authorization."
+    return f"`{command}` reads or executes against GitHub without destroying data."
 
 
 def _extract_auth_scopes(text: str) -> list[str]:
@@ -742,7 +774,7 @@ def _risk_level_for_subject(subject_id: str, parsed: ParsedHelp) -> RiskLevel:
 
 
 def _risk_level_for_flag(subject_id: str, flag: ParsedFlag) -> RiskLevel:
-    if subject_id == "gh-repo-delete" and flag.name == "--yes":
+    if _is_destructive(subject_id) and flag.name in {"--yes", "--confirm"}:
         return RiskLevel.CRITICAL
     if flag.name in {"--with-token", "--show-token", "--insecure-storage"}:
         return RiskLevel.HIGH

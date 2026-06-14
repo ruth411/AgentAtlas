@@ -154,6 +154,37 @@ def _gh_structured_subcommand_counts(conn: sqlite3.Connection) -> tuple[int, int
     return structured, _count_gh_contract_subjects()
 
 
+# Trailing subcommand tokens that denote an irreversible destructive operation.
+# Kept in sync with `_DESTRUCTIVE_VERBS` in
+# `backend/app/services/structured_cli_ingestion.py`.
+_DESTRUCTIVE_VERBS = frozenset(
+    {"delete", "remove", "rm", "purge", "prune", "destroy", "revoke", "uninstall"}
+)
+
+
+def _destructive_effect_coverage(conn: sqlite3.Connection) -> dict[str, Any]:
+    """Every subject whose trailing token is a destructive verb must have an
+    effect row flagged `destructive=1`. A miss is a safety-classification bug:
+    an agent would be told a data-destroying command is safe."""
+    if not _table_exists(conn, "subjects") or not _table_exists(conn, "effects"):
+        return {"checked": 0, "misses": []}
+    rows = conn.execute("SELECT subject_id FROM subjects").fetchall()
+    destructive_subjects = [
+        row["subject_id"]
+        for row in rows
+        if row["subject_id"].split("-")[-1] in _DESTRUCTIVE_VERBS
+    ]
+    misses: list[str] = []
+    for subject_id in destructive_subjects:
+        flagged = conn.execute(
+            "SELECT COUNT(*) FROM effects WHERE subject_id=? AND destructive=1",
+            (subject_id,),
+        ).fetchone()[0]
+        if not flagged:
+            misses.append(subject_id)
+    return {"checked": len(destructive_subjects), "misses": sorted(misses)}
+
+
 def audit_catalog(conn: sqlite3.Connection) -> dict[str, Any]:
     total = conn.execute("SELECT COUNT(*) FROM knowledge_claims").fetchone()[0]
     verification_rows = list(
@@ -214,6 +245,7 @@ def audit_catalog(conn: sqlite3.Connection) -> dict[str, Any]:
         "sample_contaminated": contaminated[:10],
         "structured_coverage": _structured_coverage(conn),
         "gh_structured_subcommands": (gh_structured, gh_total),
+        "destructive_effect_coverage": _destructive_effect_coverage(conn),
     }
 
 
@@ -282,6 +314,17 @@ def main() -> int:
 
     gh_structured, gh_total = report["gh_structured_subcommands"]
     print(f"gh_structured_subcommands: {gh_structured}/{gh_total}")
+
+    destructive = report["destructive_effect_coverage"]
+    print(
+        "destructive_effect_coverage: "
+        f"{destructive['checked'] - len(destructive['misses'])}/{destructive['checked']} "
+        "destructive-verb subjects flagged"
+    )
+    if destructive["misses"]:
+        print("  UNFLAGGED destructive subjects (safety bug):")
+        for subject_id in destructive["misses"]:
+            print(f"    {subject_id}")
 
     if report["sample_contaminated"]:
         print("sample_contaminated_accepted_claims:")

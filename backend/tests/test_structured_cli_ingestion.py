@@ -48,6 +48,53 @@ INHERITED FLAGS
 """
 
 
+_SECRET_DELETE_HELP = """Delete a secret on one of the following levels.
+
+USAGE
+  gh secret delete <secret-name> [flags]
+
+FLAGS
+  -a, --app string   Application name
+  -e, --env string   Set deployment environment
+
+INHERITED FLAGS
+  --help   Show help for command
+"""
+
+_EXTENSION_REMOVE_HELP = """Remove an installed extension.
+
+USAGE
+  gh extension remove <name>
+
+INHERITED FLAGS
+  --help   Show help for command
+"""
+
+_REPO_ARCHIVE_HELP = """Archive a GitHub repository.
+
+USAGE
+  gh repo archive [<repository>] [flags]
+
+FLAGS
+  -y, --yes   Skip the confirmation prompt
+
+INHERITED FLAGS
+  --help   Show help for command
+"""
+
+_PR_LIST_HELP = """List pull requests in a repository.
+
+USAGE
+  gh pr list [flags]
+
+FLAGS
+  -s, --state string   Filter by state: {open|closed|merged|all}
+
+INHERITED FLAGS
+  --help   Show help for command
+"""
+
+
 class FakeGhHelpRunner:
     def __init__(self, outputs: dict[tuple[str, ...], str]) -> None:
         self._outputs = outputs
@@ -139,5 +186,87 @@ def test_ingest_gh_is_idempotent_for_same_subjects(tmp_path) -> None:
         assert capability_count == first.capability_rows_written
         assert constraint_count == first.constraint_rows_written
         assert effect_count == first.effect_rows_written
+    finally:
+        conn.close()
+
+
+def _effect_for(conn: sqlite3.Connection, subject_id: str) -> tuple:
+    return conn.execute(
+        "SELECT effect_kind, destructive, reversible, mutates_remote_state, "
+        "json_extract(detail_json, '$.classification_reason') "
+        "FROM effects WHERE subject_id = ?",
+        (subject_id,),
+    ).fetchone()
+
+
+def test_destructive_verb_subcommands_are_flagged_destructive(tmp_path) -> None:
+    db_path = tmp_path / "structured-destructive.db"
+    store = StructuredKnowledgeStore(database_url=f"sqlite:///{db_path}")
+    runner = FakeGhHelpRunner(
+        {
+            ("gh", "secret", "delete", "--help"): _SECRET_DELETE_HELP,
+            ("gh", "extension", "remove", "--help"): _EXTENSION_REMOVE_HELP,
+            ("gh", "repo", "archive", "--help"): _REPO_ARCHIVE_HELP,
+            ("gh", "pr", "list", "--help"): _PR_LIST_HELP,
+        }
+    )
+    StructuredCliIngestionService(store, runner=runner, now=FIXED_TIME).ingest_gh(
+        subject_ids=[
+            "gh-secret-delete",
+            "gh-extension-remove",
+            "gh-repo-archive",
+            "gh-pr-list",
+        ]
+    )
+
+    conn = sqlite3.connect(db_path)
+    try:
+        # `delete` and `remove` leaves are irreversible destructive mutations.
+        kind, destructive, reversible, mutates, reason = _effect_for(conn, "gh-secret-delete")
+        assert (kind, destructive, reversible, mutates) == ("destructive", 1, 0, 1)
+        assert "destructive" in reason and "gh secret delete" in reason
+
+        kind, destructive, reversible, mutates, _ = _effect_for(conn, "gh-extension-remove")
+        assert (kind, destructive, reversible, mutates) == ("destructive", 1, 0, 1)
+
+        # `archive` mutates remote state but does not destroy data.
+        kind, destructive, _, mutates, _ = _effect_for(conn, "gh-repo-archive")
+        assert destructive == 0
+        assert mutates == 1
+
+        # A read-only list command is neither destructive nor mutating.
+        kind, destructive, _, mutates, _ = _effect_for(conn, "gh-pr-list")
+        assert (destructive, mutates) == (0, 0)
+        assert kind == "network"
+    finally:
+        conn.close()
+
+
+def test_effect_reasons_are_per_command_not_a_single_template(tmp_path) -> None:
+    db_path = tmp_path / "structured-reasons.db"
+    store = StructuredKnowledgeStore(database_url=f"sqlite:///{db_path}")
+    runner = FakeGhHelpRunner(
+        {
+            ("gh", "pr", "create", "--help"): _PR_CREATE_HELP,
+            ("gh", "repo", "delete", "--help"): _REPO_DELETE_HELP,
+            ("gh", "secret", "delete", "--help"): _SECRET_DELETE_HELP,
+            ("gh", "pr", "list", "--help"): _PR_LIST_HELP,
+        }
+    )
+    StructuredCliIngestionService(store, runner=runner, now=FIXED_TIME).ingest_gh(
+        subject_ids=["gh-pr-create", "gh-repo-delete", "gh-secret-delete", "gh-pr-list"]
+    )
+
+    conn = sqlite3.connect(db_path)
+    try:
+        reasons = [
+            row[0]
+            for row in conn.execute(
+                "SELECT json_extract(detail_json, '$.classification_reason') FROM effects"
+            ).fetchall()
+        ]
+        # No collapse to one generic string, and every reason names its command.
+        assert len(set(reasons)) >= 3
+        assert all(reason.startswith("`gh ") for reason in reasons)
     finally:
         conn.close()

@@ -6872,6 +6872,84 @@
           "claim_type": "cli_command_exists",
           "subject": "gh api (raw GitHub REST/GraphQL API call)",
           "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_repo_archive",
+          "claim_type": "cli_command_exists",
+          "subject": "gh repo archive (archive a repository)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_secret_delete",
+          "claim_type": "cli_command_exists",
+          "subject": "gh secret delete (delete a repository or org secret)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_variable_delete",
+          "claim_type": "cli_command_exists",
+          "subject": "gh variable delete (delete a variable)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_release_delete",
+          "claim_type": "cli_command_exists",
+          "subject": "gh release delete (delete a release)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_ssh-key_delete",
+          "claim_type": "cli_command_exists",
+          "subject": "gh ssh-key delete (delete an SSH key from your account)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_gpg-key_delete",
+          "claim_type": "cli_command_exists",
+          "subject": "gh gpg-key delete (delete a GPG key from your account)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_label_delete",
+          "claim_type": "cli_command_exists",
+          "subject": "gh label delete (delete a label)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_cache_delete",
+          "claim_type": "cli_command_exists",
+          "subject": "gh cache delete (delete GitHub Actions caches)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_run_delete",
+          "claim_type": "cli_command_exists",
+          "subject": "gh run delete (delete a workflow run)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_issue_delete",
+          "claim_type": "cli_command_exists",
+          "subject": "gh issue delete (permanently delete an issue)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_alias_delete",
+          "claim_type": "cli_command_exists",
+          "subject": "gh alias delete (delete a command alias)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_extension_remove",
+          "claim_type": "cli_command_exists",
+          "subject": "gh extension remove (remove an installed extension)",
+          "evidence_type": "official_docs"
+        },
+        {
+          "url": "https://cli.github.com/manual/gh_codespace_delete",
+          "claim_type": "cli_command_exists",
+          "subject": "gh codespace delete (delete a codespace)",
+          "evidence_type": "official_docs"
         }
       ]
     },
