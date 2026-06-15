@@ -481,6 +481,8 @@ def _constraints_for_subject(
             constraint_id=_stable_row_id(source.subject_id, "constraint", "environment-gh"),
             subject_id=source.subject_id,
             constraint_kind="environment",
+            # The binary requirement is asserted by actually running `gh`.
+            verification_level=VerificationLevel.L3_RUNTIME_VERIFIED,
             detail={
                 "command": " ".join(source.command),
                 "source_url": source.source_url,
@@ -497,6 +499,8 @@ def _constraints_for_subject(
                 constraint_id=_stable_row_id(source.subject_id, "constraint", f"auth-{scope}"),
                 subject_id=source.subject_id,
                 constraint_kind="auth_scope",
+                # Parsed out of the help text, not asserted by execution.
+                verification_level=VerificationLevel.L2_SOURCE_VERIFIED,
                 detail={
                     "command": " ".join(source.command),
                     "source_url": source.source_url,
@@ -512,6 +516,7 @@ def _constraints_for_subject(
                 constraint_id=_stable_row_id(source.subject_id, "constraint", note),
                 subject_id=source.subject_id,
                 constraint_kind="precondition",
+                verification_level=VerificationLevel.L2_SOURCE_VERIFIED,
                 detail={
                     "command": " ".join(source.command),
                     "source_url": source.source_url,
@@ -537,6 +542,8 @@ def _effects_for_subject(
             effect_id=_stable_row_id(source.subject_id, "effect", effect_kind),
             subject_id=source.subject_id,
             effect_kind=effect_kind,
+            # Safety booleans are inferred from help text, not runtime-asserted.
+            verification_level=VerificationLevel.L2_SOURCE_VERIFIED,
             destructive=destructive,
             reversible=reversible,
             mutates_remote_state=mutates_remote_state,

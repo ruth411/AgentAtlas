@@ -270,3 +270,39 @@ def test_effect_reasons_are_per_command_not_a_single_template(tmp_path) -> None:
         assert all(reason.startswith("`gh ") for reason in reasons)
     finally:
         conn.close()
+
+
+def test_inferred_rows_carry_a_lower_verification_level_than_capabilities(tmp_path) -> None:
+    db_path = tmp_path / "structured-levels.db"
+    store = StructuredKnowledgeStore(database_url=f"sqlite:///{db_path}")
+    runner = FakeGhHelpRunner({("gh", "pr", "create", "--help"): _PR_CREATE_HELP})
+    StructuredCliIngestionService(store, runner=runner, now=FIXED_TIME).ingest_gh(
+        subject_ids=["gh-pr-create"]
+    )
+
+    conn = sqlite3.connect(db_path)
+    try:
+        # Runtime-parsed capabilities are genuinely runtime-verified.
+        cap_levels = {
+            row[0]
+            for row in conn.execute("SELECT DISTINCT verification_level FROM capabilities")
+        }
+        assert cap_levels == {"L3_runtime_verified"}
+
+        # Inferred effect classifications must not claim runtime verification.
+        effect_levels = {
+            row[0] for row in conn.execute("SELECT DISTINCT verification_level FROM effects")
+        }
+        assert effect_levels == {"L2_source_verified"}
+
+        # Environment constraints are proven by running the binary (L3); the
+        # auth-scope constraint is parsed from help text (L2).
+        constraint_levels = dict(
+            conn.execute(
+                "SELECT constraint_kind, verification_level FROM constraints"
+            ).fetchall()
+        )
+        assert constraint_levels["environment"] == "L3_runtime_verified"
+        assert constraint_levels["auth_scope"] == "L2_source_verified"
+    finally:
+        conn.close()
