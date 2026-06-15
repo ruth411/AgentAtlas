@@ -61,7 +61,15 @@ DEFAULT_DB = REPO_ROOT / "backend" / "ayiru_v0.2_bulk.db"
 def is_junk(statement: str | None) -> bool:
     if not statement:
         return False
-    return any(marker in statement for marker in _NAV_MARKERS)
+    if any(marker in statement for marker in _NAV_MARKERS):
+        return True
+    # Defer to the canonical chrome detector so this script targets exactly
+    # what the audit and the purge script flag (banners, skip-links, nav
+    # chevrons), not just the substring sample above. Imported lazily because
+    # the backend path is wired into sys.path inside main() before this runs.
+    from app.services.docs_ingestion import _find_page_chrome_markers
+
+    return bool(_find_page_chrome_markers(statement))
 
 
 def first_non_empty_line(text: str, *, fallback: str) -> str:
