@@ -193,6 +193,33 @@ def test_orchestrator_challenges_understated_risk(tmp_path) -> None:
     assert result.risk_assessment.matched_rule_ids == ["gh.repo_delete"]
 
 
+def test_orchestrator_reconciles_benign_medium_reclassification(tmp_path) -> None:
+    """A read-only claim submitted as `low` that the risk model can only
+    classify to its `medium` fallback (no explicit rule) must NOT be forced
+    into human review. The blanket understated-risk gate previously buried
+    ~2,000 such claims; the gate now only hard-fails when the classified risk
+    is genuinely HIGH/CRITICAL, and benign medium reclassifications flow
+    through the normal evidence/confidence gates."""
+    store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
+    claim = _claim(
+        subject="awk field printing",
+        statement="Prints selected fields from each input line.",
+        risk_level=RiskLevel.LOW,
+        source_uri="https://www.gnu.org/software/gawk/manual/",
+    )
+    claim.tool_id = "awk"
+
+    result = CanonOrchestrator(store).verify_claim(claim)
+
+    # The classifier rates it medium (fallback), strictly higher than the
+    # submitted `low` — but it is not dangerous, so it is accepted, not
+    # routed to human review or capped at the understated-risk score.
+    assert result.risk_assessment.risk_level == RiskLevel.MEDIUM
+    assert result.decision == OrchestratorDecision.ACCEPTED
+    assert result.reason_codes == ["TRUSTED_EVIDENCE_NO_CONFLICTS"]
+    assert "UNDERSTATED_RISK" not in result.reason_codes
+
+
 def test_understated_risk_breakdown_components_reconcile_to_capped_score(tmp_path) -> None:
     store = ClaimStore(database_url=f"sqlite:///{tmp_path / 'ayiru.db'}")
     claim = _claim(

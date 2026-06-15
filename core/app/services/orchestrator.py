@@ -133,7 +133,20 @@ class CanonOrchestrator:
                 reasons=policy_violations,
             )
 
-        if is_higher_risk(risk_assessment.risk_level, claim.risk_level):
+        # Risk understatement only hard-fails to human review when the
+        # classifier rates the action HIGH or CRITICAL. A submitter (or an
+        # ingestion lane) lowballing a genuinely dangerous command must be
+        # caught. But the risk model falls back to `medium` for any action
+        # without an explicit rule, so a benign read-only claim submitted as
+        # `low` is "understated" to `medium` purely by that fallback — not by
+        # any real danger. Forcing those into human review buried ~2,000 valid
+        # claims in the queue. For a medium reclassification we adopt the
+        # classifier's verdict and fall through to the normal evidence/
+        # confidence gates; the downstream HIGH/CRITICAL gate (below) still
+        # guards anything actually dangerous.
+        if is_higher_risk(risk_assessment.risk_level, claim.risk_level) and (
+            risk_assessment.risk_level in {RiskLevel.HIGH, RiskLevel.CRITICAL}
+        ):
             breakdown = compute_confidence_breakdown(claim)
             understated_cap = confidence_caps()["understated_risk"]
             capped_score = min(breakdown.score, understated_cap)
