@@ -17,8 +17,8 @@
 [![Tests](https://img.shields.io/badge/850_tests_✓-2EA44F?style=for-the-badge)](#-verify-it-works)
 [![License MIT](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
 
-[![Structured coverage gh](https://img.shields.io/badge/structured--coverage_gh-61%2F61_subcommands-22C55E?style=flat-square)](#-tool-catalog)
-[![Capabilities](https://img.shields.io/badge/typed_capabilities-700%2B-7C3AED?style=flat-square)](#-tool-catalog)
+[![Structured coverage gh](https://img.shields.io/badge/structured--coverage_gh-74%2F74_subcommands-22C55E?style=flat-square)](#-tool-catalog)
+[![Capabilities](https://img.shields.io/badge/typed_capabilities-779-7C3AED?style=flat-square)](#-tool-catalog)
 [![Tool families](https://img.shields.io/badge/tool_families-38-0EA5E9?style=flat-square)](#-tool-catalog)
 [![MCP](https://img.shields.io/badge/MCP_ready-F97316?style=flat-square)](#-use-it-with-claude-cursor-cline-mcp)
 
@@ -66,7 +66,7 @@ print(top.detail["flag_schema"][0])
 ## What's in the box
 
 - **7 structured query tools** advertised over MCP — `resolve_subject`, `get_subject_spec`, `get_capabilities`, `get_constraints`, `get_effects`, `resolve_action`, `get_workflow_plan`. All return typed records; none return prose.
-- **Structured `gh` catalog** — 61 subjects (every gh subcommand), 700+ typed capabilities, 60+ typed constraints, typed effects with `destructive` / `mutates_remote_state` / `reversible` booleans. `L3_runtime_verified`.
+- **Structured `gh` catalog** — 74 subjects (every top-level command plus the major subcommands, including the destructive `delete` / `remove` / `archive` leaves), 779 typed capabilities, 82 typed constraints, typed effects with `destructive` / `mutates_remote_state` / `reversible` booleans. The flag/argv capabilities are `L3_runtime_verified` (parsed from a real `gh --help` run); the effect safety classifications are `L2_source_verified` (inferred from help text, not asserted by an experiment), and every record carries its own `verification_level` so the agent can tell them apart.
 - **Projection fallback** for the other 37 tool families — Ayiru projects structured records over the existing prose catalog when no first-class typed records exist yet. Responses carry `source: structured | projected` so the agent knows the difference.
 - **MCP server** — drop into Claude Desktop / Cursor / Cline / Continue via stdio JSON-RPC. Zero config.
 - **Python SDK** — sync + async clients for every typed surface.
@@ -107,7 +107,7 @@ Or open <http://localhost:8000/docs> for the interactive API.
 ### 🐳 Docker
 **~3 minutes**<br/>
 Zero Python setup<br/>
-Full catalog (3,600+ claims, 40% verified)<br/>
+Full catalog (3,600+ claims, ~740 verified)<br/>
 <br/>
 [→ Jump to Docker](#-path-1-docker-easiest)
 
@@ -163,7 +163,7 @@ cd ayiru
 docker build -t ayiru .
 ```
 
-> **What's happening?** Docker is building a self-contained image with Python, Ayiru, and the full 3,600+ claim catalog (~40% verification-accepted, the rest cited but pending review). Takes ~2 minutes the first time.
+> **What's happening?** Docker is building a self-contained image with Python, Ayiru, and the full 3,600+ claim catalog (~740 verification-accepted after the contamination purge, the rest cited but pending review). Takes ~2 minutes the first time.
 
 #### Step 3 — Run it
 
@@ -448,11 +448,13 @@ that don't share tokens with the catalog rank worse.
 
 ### Catalog scope
 
-The bundled wheel ships **`gh` only** (~130 claims, ~1.5 MB). It's the
-MVP catalog for the install-and-go pitch. The full multi-tool catalog
-(`git`, `docker`, `kubectl`, `ffmpeg`, …) lives in the FastAPI backend
-described above; running it locally via Docker or `pip install ayiru`
-gives you all 3,600+ claims across 38 tool families (157 surfaces).
+The bundled wheel ships the **structured `gh` catalog only** (~1.5 MB):
+74 subjects, 779 typed capabilities, 82 constraints and 74 effects — and
+zero prose claims. It's the typed-first MVP for the install-and-go pitch.
+The full multi-tool prose catalog (`git`, `docker`, `kubectl`, `ffmpeg`,
+…) lives in the FastAPI backend described above; running it locally via
+Docker or `pip install ayiru` adds the broader catalog across 38 tool
+families.
 
 <details>
 <summary><b>Dev path: <code>python -m app.mcp_server</code> against the full catalog</b></summary>
@@ -580,7 +582,7 @@ flowchart LR
 | 📎 **Evidence before publication** | No claim enters the graph without cited evidence. LLM reasoning is never primary evidence. |
 | 📐 **Structured over prose** | Agents submit typed `KnowledgeClaim` objects, not free-form articles. |
 | ⚠️ **Safety is first-class** | Every command is classified by side effects, risk, auth, destructive potential. |
-| 🎚️ **Verification levels are explicit** | Claims expose `L0_unverified` → `L5_human_audited`. No silent inflation. |
+| 🎚️ **Verification levels are explicit** | Every record exposes its own level on the `L0_unverified` → `L5_human_audited` scale. Structured `gh` flag/argv data is `L3_runtime_verified` (parsed from a real `--help` run); inferred effect/constraint classifications are `L2_source_verified`, not silently promoted to L3. |
 | 🔗 **Provenance is preserved** | Every canonical spec traces back to source claims and source bytes. |
 | 🛡️ **Sources are data, not instructions** | Docs, CLI output, MCP metadata are scanned; their instructions are never executed. |
 
@@ -622,7 +624,7 @@ ayiru/
 ├── backend/
 │   ├── app/                # FastAPI app, MCP server, services
 │   ├── alembic/            # Migrations
-│   ├── ayiru_v0.2_bulk.db  # 🌟 Full catalog (3,600+ claims, ~40% accepted)
+│   ├── ayiru_v0.2_bulk.db  # 🌟 Full catalog (3,600+ claims, ~740 accepted)
 │   └── tests/              # 790 hermetic tests
 ├── clients/python/         # ayiru-client SDK + LangChain adapter
 ├── tools/                  # URL lists + seed scripts (per tool)

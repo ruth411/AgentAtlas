@@ -58,6 +58,7 @@ class StructuredConstraint:
     subject_id: str
     constraint_kind: str
     detail: dict[str, Any]
+    verification_level: VerificationLevel = VerificationLevel.L2_SOURCE_VERIFIED
     source: str = "structured_ingestion"
     created_at: datetime | None = None
     updated_at: datetime | None = None
@@ -74,6 +75,7 @@ class StructuredEffect:
     may_cost_money: bool
     may_expose_secrets: bool
     detail: dict[str, Any]
+    verification_level: VerificationLevel = VerificationLevel.L2_SOURCE_VERIFIED
     source: str = "structured_ingestion"
     created_at: datetime | None = None
     updated_at: datetime | None = None
@@ -182,6 +184,7 @@ def _constraint_to_record(item: StructuredConstraint) -> ConstraintRecord:
         constraint_id=item.constraint_id,
         subject_id=item.subject_id,
         constraint_kind=item.constraint_kind,
+        verification_level=item.verification_level.value,
         detail_json=_canonical_json(item.detail),
         source=item.source,
         created_at=item.created_at,
@@ -199,6 +202,7 @@ def _effect_to_record(item: StructuredEffect) -> EffectRecord:
         mutates_remote_state=item.mutates_remote_state,
         may_cost_money=item.may_cost_money,
         may_expose_secrets=item.may_expose_secrets,
+        verification_level=item.verification_level.value,
         detail_json=_canonical_json(item.detail),
         source=item.source,
         created_at=item.created_at,

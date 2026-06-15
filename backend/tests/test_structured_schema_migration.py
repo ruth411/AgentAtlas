@@ -41,8 +41,16 @@ def test_structured_tables_roundtrip_through_latest_migration(tmp_path) -> None:
     inspector = inspect(engine)
     tables_after_upgrade = set(inspector.get_table_names())
     assert STRUCTURED_TABLES <= tables_after_upgrade
+    # Inferred effect / constraint rows carry their own derivation level so
+    # the substrate never silently presents them as runtime-verified.
+    constraint_columns = {col["name"] for col in inspector.get_columns("constraints")}
+    effect_columns = {col["name"] for col in inspector.get_columns("effects")}
+    assert "verification_level" in constraint_columns
+    assert "verification_level" in effect_columns
 
-    command.downgrade(cfg, "-1")
+    # Downgrade past the structured-table creation (0018) so the whole
+    # structured surface roundtrips, not just the latest column addition.
+    command.downgrade(cfg, "0017_add_claim_embedding")
     inspector = inspect(engine)
     tables_after_downgrade = set(inspector.get_table_names())
     assert STRUCTURED_TABLES.isdisjoint(tables_after_downgrade)

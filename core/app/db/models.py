@@ -326,6 +326,10 @@ class ConstraintRecord(Base):
             name="ck_constraints_constraint_kind",
         ),
         CheckConstraint(
+            _allowed_values_sql("verification_level", [item.value for item in VerificationLevel]),
+            name="ck_constraints_verification_level",
+        ),
+        CheckConstraint(
             _allowed_values_sql("source", _STRUCTURED_SOURCES),
             name="ck_constraints_source",
         ),
@@ -338,6 +342,9 @@ class ConstraintRecord(Base):
         index=True,
     )
     constraint_kind: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    # How this row was derived: L3 when asserted by running the binary
+    # (environment constraints), L2 when parsed/inferred from help text.
+    verification_level: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
     detail_json: Mapped[str] = mapped_column(Text, nullable=False)
     source: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
@@ -354,6 +361,10 @@ class EffectRecord(Base):
             name="ck_effects_effect_kind",
         ),
         CheckConstraint(
+            _allowed_values_sql("verification_level", [item.value for item in VerificationLevel]),
+            name="ck_effects_verification_level",
+        ),
+        CheckConstraint(
             _allowed_values_sql("source", _STRUCTURED_SOURCES),
             name="ck_effects_source",
         ),
@@ -366,6 +377,10 @@ class EffectRecord(Base):
         index=True,
     )
     effect_kind: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    # Effect safety booleans are heuristically inferred from help text, not
+    # asserted by a runtime experiment, so they sit at L2_source_verified —
+    # one level below the runtime-parsed capability rows.
+    verification_level: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
     destructive: Mapped[bool] = mapped_column(nullable=False, default=False)
     reversible: Mapped[bool] = mapped_column(nullable=False, default=True)
     mutates_remote_state: Mapped[bool] = mapped_column(nullable=False, default=False)

@@ -6,8 +6,8 @@ Your coding agent calls 7 typed MCP tools and gets back typed records:
 `subject_id`, `capability_type`, `argv_schema`, `flag_schema`, `effect_kind`,
 `verification_level`. No prose, no webpage surfing, no hallucinated flags.
 Ships with a structured-first **`gh` catalog** parsed from real
-`gh ... --help` output — 61 subjects, 700+ typed capabilities, 60+ typed
-constraints, every effect typed. No server, no database to set up, no API key.
+`gh ... --help` output — 74 subjects, 779 typed capabilities, 82 typed
+constraints, 74 typed effects. No server, no database to set up, no API key.
 
 ## Install
 
@@ -107,14 +107,17 @@ parsed from real `--help` output into typed rows:
 
 | Table | Rows | What's in it |
 |---|---|---|
-| `subjects` | 61 | One row per `gh` subcommand (`gh-pr-create`, `gh-repo-delete`, …) |
-| `capabilities` | 700+ | Typed `invocation` / `configuration` / `metadata` rows with `argv_schema` + `flag_schema` |
-| `constraints` | 60+ | Typed auth-scope and environment-precondition rows |
-| `effects` | 60+ | Typed `destructive` / `mutates_remote_state` / `reversible` booleans |
+| `subjects` | 74 | One row per `gh` subcommand (`gh-pr-create`, `gh-repo-delete`, …) including the destructive `delete` / `remove` / `archive` leaves |
+| `capabilities` | 779 | Typed `invocation` / `configuration` / `metadata` rows with `argv_schema` + `flag_schema` |
+| `constraints` | 82 | Typed auth-scope and environment-precondition rows |
+| `effects` | 74 | Typed `destructive` / `mutates_remote_state` / `reversible` booleans |
 
 Total wheel size: ~2 MB (bundled SQLite catalog with pre-computed embeddings).
-`verification_level` on every structured row is `L3_runtime_verified` — the
-parser ran the binary.
+Each row carries its own `verification_level`: the flag/argv `capabilities`
+are `L3_runtime_verified` (the parser ran the binary), while the inferred
+`effects` and text-derived `constraints` are `L2_source_verified` — the
+safety classification is grounded in the help text but not asserted by an
+experiment, and the catalog says so rather than over-claiming L3.
 
 The wider catalog (38 tool families, prose-projection fallback for the 37
 without structured ingestion yet) lives in the FastAPI backend — see the

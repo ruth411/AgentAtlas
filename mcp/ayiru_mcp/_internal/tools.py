@@ -1008,9 +1008,12 @@ _TOOL_REGISTRY: list[McpTool] = [
 def list_tools() -> list[McpTool]:
     """Tools surfaced to MCP clients via the `tools/list` request.
 
-    Excludes tools marked `advertised=False` (currently just `submit_claim`).
-    `find_tool` still resolves hidden tools, so `tools/call` against them
-    works for backend dev contexts and tests.
+    Excludes tools marked `advertised=False`: the legacy prose surfaces
+    (`ask`, `validate_command`, `get_tool_spec`, `search_tools`,
+    `explain_risk`, `get_safe_workflow`) and `submit_claim`. Only the seven
+    structured query tools are advertised. `find_tool` still resolves hidden
+    tools, so `tools/call` against them works for pinned external callers,
+    backend dev contexts, and tests.
     """
     return [tool for tool in _TOOL_REGISTRY if tool.advertised]
 
