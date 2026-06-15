@@ -107,7 +107,7 @@ Or open <http://localhost:8000/docs> for the interactive API.
 ### 🐳 Docker
 **~3 minutes**<br/>
 Zero Python setup<br/>
-Full catalog (3,600+ claims, ~740 verified)<br/>
+Full catalog (3,600+ claims, ~1,590 verified)<br/>
 <br/>
 [→ Jump to Docker](#-path-1-docker-easiest)
 
@@ -163,7 +163,7 @@ cd ayiru
 docker build -t ayiru .
 ```
 
-> **What's happening?** Docker is building a self-contained image with Python, Ayiru, and the full 3,600+ claim catalog (~740 verification-accepted after the contamination purge, the rest cited but pending review). Takes ~2 minutes the first time.
+> **What's happening?** Docker is building a self-contained image with Python, Ayiru, and the full 3,600+ claim catalog (~1,590 verification-accepted across 31 tool families, the rest cited but pending review). Takes ~2 minutes the first time.
 
 #### Step 3 — Run it
 
@@ -624,7 +624,7 @@ ayiru/
 ├── backend/
 │   ├── app/                # FastAPI app, MCP server, services
 │   ├── alembic/            # Migrations
-│   ├── ayiru_v0.2_bulk.db  # 🌟 Full catalog (3,600+ claims, ~740 accepted)
+│   ├── ayiru_v0.2_bulk.db  # 🌟 Full catalog (3,600+ claims, ~1,590 accepted)
 │   └── tests/              # 790 hermetic tests
 ├── clients/python/         # ayiru-client SDK + LangChain adapter
 ├── tools/                  # URL lists + seed scripts (per tool)
