@@ -44,6 +44,11 @@ ayiru.db
 # whole point of that package. Built by tools/scripts/build_slim_catalog.py
 # and committed so a clean checkout produces a functional wheel.
 !mcp/ayiru_mcp/data/catalog.db
+# Exception: the multi-family bulk catalog is the actual product. It is too
+# large and too non-deterministic to rebuild from a clean clone (it depends
+# on a live docs crawl), so a frozen snapshot is committed via Git LFS — see
+# .gitattributes and `make catalog-snapshot`.
+!backend/ayiru_v0.2_bulk.db
 
 # Per-run results / spikes / scratch
 phase0_results.json
