@@ -47,7 +47,7 @@ from app.services.structured_knowledge_store import (  # noqa: E402
     StructuredSubject,
 )
 
-_DOCS = "https://docs.ansible.com/ansible/latest/collections/{path}_module.html"
+_DOCS = "https://docs.ansible.com/ansible/latest/collections/{path}_{ptype}.html"
 # Modules that only read/gather and never change managed state.
 _READ_ONLY = {
     "setup", "gather_facts", "stat", "find", "slurp", "getent", "debug",
@@ -59,10 +59,10 @@ _READ_ONLY = {
 _EXECUTORS = {"command", "shell", "raw", "script", "expect"}
 
 
-def _run_json(bin_dir: Path, collection: str, name: str) -> dict | None:
+def _run_json(bin_dir: Path, collection: str, name: str, ptype: str) -> dict | None:
     fqcn = f"{collection}.{name}"
     proc = subprocess.run(
-        [str(bin_dir / "ansible-doc"), "-t", "module", "--json", fqcn],
+        [str(bin_dir / "ansible-doc"), "-t", ptype, "--json", fqcn],
         capture_output=True, text=True, timeout=60,
     )
     if proc.returncode != 0 or not proc.stdout.strip():
@@ -74,9 +74,9 @@ def _run_json(bin_dir: Path, collection: str, name: str) -> dict | None:
     return data.get(fqcn)
 
 
-def _list_modules(bin_dir: Path, collection: str) -> list[str]:
+def _list_modules(bin_dir: Path, collection: str, ptype: str) -> list[str]:
     proc = subprocess.run(
-        [str(bin_dir / "ansible-doc"), "-l", "-t", "module", "--json", collection],
+        [str(bin_dir / "ansible-doc"), "-l", "-t", ptype, "--json", collection],
         capture_output=True, text=True, timeout=120,
     )
     data = json.loads(proc.stdout)
@@ -99,13 +99,19 @@ def _check_detail(detail: dict) -> dict:
     return detail
 
 
-def _effect(name: str, doc: dict) -> tuple[str, bool, bool, bool, bool, bool, str]:
+def _effect(name: str, doc: dict, ptype: str) -> tuple[str, bool, bool, bool, bool, bool, str]:
     """(effect_kind, destructive, reversible, mutates_remote, may_cost, may_expose, reason)."""
+    fqcn = doc.get("plugin_name") or name
+    # Non-module plugins (lookup/filter/test/inventory/callback/connection)
+    # read or transform data; they do not change managed-host state.
+    if ptype != "module":
+        return ("network", False, True, False, False, False,
+                f"`{fqcn}` is an ansible {ptype} plugin; it reads or transforms data and "
+                "does not change managed-host state.")
     options = doc.get("options", {})
     has_absent = any(
         "absent" in (o.get("choices") or []) for o in options.values()
     )
-    fqcn = doc.get("plugin_name") or name
     # `*_info` / `*_facts` modules (and the curated read-only set) only gather
     # state. This convention is guaranteed by ansible's module-naming policy.
     if name in _READ_ONLY or name.endswith("_info") or name.endswith("_facts"):
@@ -121,16 +127,17 @@ def _effect(name: str, doc: dict) -> tuple[str, bool, bool, bool, bool, bool, st
             f"`{fqcn}` changes managed state on the target host.")
 
 
-def _build_bundle(name: str, mod: dict, captured_at: datetime) -> dict:
+def _build_bundle(name: str, mod: dict, captured_at: datetime, ptype: str = "module") -> dict:
     doc = mod.get("doc", {})
     fqcn = doc.get("plugin_name") or f"ansible.builtin.{name}"
-    # subject_id encodes the full collection path so collection modules never
-    # collide with builtin ones (or each other). ansible.builtin.copy ->
-    # ansible-builtin-copy; community.general.proxmox -> ansible-community-general-proxmox.
-    subject_id = "ansible-" + (
-        fqcn.replace("ansible.builtin", "builtin").replace(".", "-").replace("_", "-")
-    )
-    source_url = _DOCS.format(path=fqcn.replace(".", "/"))
+    # subject_id encodes the plugin type (for non-modules) and the full
+    # collection path so nothing collides: ansible.builtin.copy ->
+    # ansible-builtin-copy; community.general.proxmox ->
+    # ansible-community-general-proxmox; lookup ansible.builtin.env ->
+    # ansible-lookup-builtin-env.
+    path = fqcn.replace("ansible.builtin", "builtin").replace(".", "-").replace("_", "-")
+    subject_id = "ansible-" + (f"{ptype}-" if ptype != "module" else "") + path
+    source_url = _DOCS.format(path=fqcn.replace(".", "/"), ptype=ptype)
     attrs = doc.get("attributes", {}) or {}
 
     subject = StructuredSubject(
@@ -143,7 +150,7 @@ def _build_bundle(name: str, mod: dict, captured_at: datetime) -> dict:
     options = doc.get("options", {}) or {}
     returns = mod.get("return", {}) or {}
     overview = _check_detail({
-        "kind": "module", "fqcn": fqcn, "source_url": source_url,
+        "kind": "module", "fqcn": fqcn, "source_url": source_url, "plugin_type": ptype,
         "short_description": doc.get("short_description") or fqcn,
         "description": doc.get("description") or [],
         "version_added": doc.get("version_added"),
@@ -211,7 +218,7 @@ def _build_bundle(name: str, mod: dict, captured_at: datetime) -> dict:
                 "requirements": doc.get("requirements") or [], "runtime_verified": True},
         created_at=captured_at, updated_at=captured_at,
     )]
-    kind, destr, rev, mut, cost, expose, reason = _effect(name, doc)
+    kind, destr, rev, mut, cost, expose, reason = _effect(name, doc, ptype)
     effects = [StructuredEffect(
         effect_id=_stable_row_id(subject_id, "effect", kind),
         subject_id=subject_id, effect_kind=kind,
@@ -229,22 +236,25 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--ansible-bin-dir", default="/tmp/ansible-extract/venv/bin", type=Path)
     ap.add_argument("--collection", default="ansible.builtin")
+    ap.add_argument("--plugin-type", default="module",
+                    help="ansible-doc plugin type: module, lookup, filter, test, "
+                         "inventory, callback, connection, ...")
     ap.add_argument("--database", required=True)
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
     store = None if args.dry_run else StructuredKnowledgeStore(database_url=args.database)
     now = datetime.now(timezone.utc)
-    modules = _list_modules(args.ansible_bin_dir, args.collection)
+    modules = _list_modules(args.ansible_bin_dir, args.collection, args.plugin_type)
     totals = {"subjects": 0, "capabilities": 0, "constraints": 0, "effects": 0,
               "parameters": 0, "returns": 0, "skipped": 0}
     for name in modules:
-        mod = _run_json(args.ansible_bin_dir, args.collection, name)
+        mod = _run_json(args.ansible_bin_dir, args.collection, name, args.plugin_type)
         if mod is None:
             totals["skipped"] += 1
             print(f"  SKIP {name}: no JSON")
             continue
-        b = _build_bundle(name, mod, now)
+        b = _build_bundle(name, mod, now, args.plugin_type)
         totals["subjects"] += 1
         totals["capabilities"] += len(b["capabilities"])
         totals["constraints"] += len(b["constraints"])
