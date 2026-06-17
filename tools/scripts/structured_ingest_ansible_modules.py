@@ -106,7 +106,9 @@ def _effect(name: str, doc: dict) -> tuple[str, bool, bool, bool, bool, bool, st
         "absent" in (o.get("choices") or []) for o in options.values()
     )
     fqcn = doc.get("plugin_name") or name
-    if name in _READ_ONLY:
+    # `*_info` / `*_facts` modules (and the curated read-only set) only gather
+    # state. This convention is guaranteed by ansible's module-naming policy.
+    if name in _READ_ONLY or name.endswith("_info") or name.endswith("_facts"):
         return ("network", False, True, False, False, False,
                 f"`{fqcn}` reads or gathers state and does not change managed hosts.")
     if name in _EXECUTORS:
@@ -122,7 +124,12 @@ def _effect(name: str, doc: dict) -> tuple[str, bool, bool, bool, bool, bool, st
 def _build_bundle(name: str, mod: dict, captured_at: datetime) -> dict:
     doc = mod.get("doc", {})
     fqcn = doc.get("plugin_name") or f"ansible.builtin.{name}"
-    subject_id = "ansible-builtin-" + name.replace("_", "-")
+    # subject_id encodes the full collection path so collection modules never
+    # collide with builtin ones (or each other). ansible.builtin.copy ->
+    # ansible-builtin-copy; community.general.proxmox -> ansible-community-general-proxmox.
+    subject_id = "ansible-" + (
+        fqcn.replace("ansible.builtin", "builtin").replace(".", "-").replace("_", "-")
+    )
     source_url = _DOCS.format(path=fqcn.replace(".", "/"))
     attrs = doc.get("attributes", {}) or {}
 
