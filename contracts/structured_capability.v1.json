@@ -66,7 +66,7 @@
       "properties": {
         "name": {
           "type": "string",
-          "pattern": "^--[A-Za-z0-9-]+$"
+          "pattern": "^(--[A-Za-z0-9-]+|-[A-Za-z0-9])$"
         },
         "short": {
           "type": [
@@ -210,7 +210,7 @@
           "properties": {
             "program": {
               "type": "string",
-              "const": "gh"
+              "pattern": "^[a-z][a-z0-9-]*$"
             },
             "subcommand_path": {
               "type": "array",
