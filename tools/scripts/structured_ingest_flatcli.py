@@ -61,6 +61,12 @@ _ONE_SPACE = re.compile(
     r"^\s+(-{1,2}[A-Za-z0-9][\w.-]*(?:,\s*-{1,2}[A-Za-z0-9][\w.-]*)*"
     r"(?:\s+(?:<[^>]+>|[A-Za-z][\w-]*)){0,2})\s+(\S.*)$"
 )
+# A bare option line with no description (just the flag, optionally with up to
+# two metavars), e.g. "  -verify_return_error" or "  -in file".
+_BARE_OPT = re.compile(
+    r"^\s+(-{1,2}[A-Za-z0-9][\w.-]*(?:,\s*-{1,2}[A-Za-z0-9][\w.-]*)*"
+    r"(?:\s+(?:<[^>]+>|[A-Za-z][\w-]*)){0,2})\s*$"
+)
 # One token of an option spec: "--long" / "-s" (dots allowed: --http1.1), with
 # an optional metavar tail.
 _OPT_TOKEN = re.compile(r"^(--[A-Za-z0-9][A-Za-z0-9._-]*|-[A-Za-z0-9][A-Za-z0-9._-]*)(?:\s+(.+))?$")
@@ -101,7 +107,15 @@ def _value_meta(metavar: str | None) -> tuple[str | None, str, list[str]]:
 def _parse_optspec(spec: str) -> list[tuple[str, str | None]]:
     out: list[tuple[str, str | None]] = []
     for part in re.split(r",\s+", spec):
-        m = _OPT_TOKEN.match(part.strip())
+        part = part.strip()
+        # The "-[no]name" toggle convention (sqlite3, etc.) is a real pair of
+        # boolean options: expand it to "-name" and "-noname".
+        toggle = re.match(r"^-\[no\]([A-Za-z][\w-]*)$", part)
+        if toggle:
+            out.append((f"-{toggle.group(1)}", None))
+            out.append((f"-no{toggle.group(1)}", None))
+            continue
+        m = _OPT_TOKEN.match(part)
         if m:
             out.append((m.group(1), m.group(2)))
     return out
@@ -120,12 +134,16 @@ def _parse_flags(text: str) -> tuple[list[dict], int]:
         # A flag line starts (after indent) with a dash.
         if re.match(r"^\s+-", line):
             m = _TWO_COL.match(line) or _ONE_SPACE.match(line)
-            if not m:
-                # An option-looking line with no description gap.
-                current = None
-                unparsed += 1
-                continue
-            spec, desc = m.group(1).strip(), m.group(2).strip()
+            if m:
+                spec, desc = m.group(1).strip(), m.group(2).strip()
+            else:
+                mb = _BARE_OPT.match(line)
+                if not mb:
+                    # An option-looking line we can't parse (e.g. "--" marker).
+                    current = None
+                    unparsed += 1
+                    continue
+                spec, desc = mb.group(1).strip(), ""
             tokens = _parse_optspec(spec)
             if not tokens:
                 current = None
@@ -152,7 +170,7 @@ def _parse_flags(text: str) -> tuple[list[dict], int]:
                     "required": False,
                     "deprecated": "deprecated" in desc.lower(),
                     "inherited": False,
-                    "description": desc,
+                    "description": desc or f"{name} (flag; no description in --help)",
                     "default": None,
                     "choices": choices,
                 }
@@ -265,6 +283,16 @@ _REGISTRY: dict[str, FlatTool] = {
         effect=("compute", False, True, False, False, False,
                 "`jq` transforms JSON from stdin/files to stdout; it performs no "
                 "network or destructive filesystem side effects."),
+    ),
+    "sqlite3": FlatTool(
+        program="sqlite3",
+        help_argv=("sqlite3", "--help"),
+        source_url="https://sqlite.org/cli.html",
+        effect=("filesystem", False, True, False, False, False,
+                "`sqlite3` opens, creates and queries a local SQLite database "
+                "file; it reads and writes the local filesystem and performs no "
+                "network or remote side effects (data changes are driven by the "
+                "SQL the caller supplies)."),
     ),
 }
 
