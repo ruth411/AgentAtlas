@@ -131,24 +131,34 @@ def _parse_flags(text: str) -> tuple[list[dict], int]:
         if not line.strip():
             current = None
             continue
-        # A flag line starts (after indent) with a dash.
-        if re.match(r"^\s+-", line):
-            m = _TWO_COL.match(line) or _ONE_SPACE.match(line)
-            if m:
-                spec, desc = m.group(1).strip(), m.group(2).strip()
-            else:
-                mb = _BARE_OPT.match(line)
-                if not mb:
-                    # An option-looking line we can't parse (e.g. "--" marker).
-                    current = None
-                    unparsed += 1
-                    continue
-                spec, desc = mb.group(1).strip(), ""
-            tokens = _parse_optspec(spec)
-            if not tokens:
+        # A real option starts with a dash immediately followed by a non-space
+        # (-x / --long / -append / -# / -[no]x). This excludes prose bullets
+        # ("- Add …") which are dash-then-space.
+        if re.match(r"^\s+-\S", line):
+            # Normalize the 2+-space gap some tools put *after* a short alias
+            # ("-b,  --long" → "-b, --long") so the reliable 2-space column
+            # split (_TWO_COL) finds the real spec→description boundary instead
+            # of truncating at the intra-spec gap.
+            norm = re.sub(r"^(\s+-[A-Za-z0-9],)\s{2,}", r"\1 ", line)
+            # Pick the first split whose option-spec actually yields tokens.
+            # _TWO_COL splits at the description column; _ONE_SPACE greedily
+            # consumes an option cluster for tools with single-space columns.
+            spec = desc = None
+            for matcher in (_TWO_COL, _ONE_SPACE):
+                mm = matcher.match(norm)
+                if mm and _parse_optspec(mm.group(1).strip()):
+                    spec, desc = mm.group(1).strip(), mm.group(2).strip()
+                    break
+            if spec is None:
+                mb = _BARE_OPT.match(norm)
+                if mb and _parse_optspec(mb.group(1).strip()):
+                    spec, desc = mb.group(1).strip(), ""
+            if spec is None:
+                # An option-looking line we can't parse (e.g. "--" marker).
                 current = None
                 unparsed += 1
                 continue
+            tokens = _parse_optspec(spec)
             longs = [(n, mv) for n, mv in tokens if n.startswith("--")]
             shorts = [(n, mv) for n, mv in tokens if not n.startswith("--")]
             metavar = next((mv for _, mv in tokens if mv), None)
