@@ -132,6 +132,128 @@ def _vercel_effect(cmd: str) -> tuple[str, bool, bool, bool, bool, bool, str]:
             f"`{c}` changes remote Vercel/project state.")
 
 
+# ---------------------------------------------------------------- cargo -------
+def _cargo_subcommands() -> list[str]:
+    out = _run(["cargo", "--list"])
+    cmds: list[str] = []
+    for line in out.splitlines():
+        m = re.match(r"^\s{2,}([a-z][a-z0-9-]+)\s{2,}(\S.*)$", line)
+        if m and not m.group(2).startswith("alias:"):
+            cmds.append(m.group(1))
+    return sorted(set(cmds))
+
+
+_CARGO_DESTRUCTIVE = {"remove", "rm", "clean", "uninstall", "yank"}
+_CARGO_NET_MUT = {"add", "update", "install", "fetch", "publish", "package", "generate-lockfile"}
+
+
+def _cargo_effect(cmd: str):
+    c = f"cargo {cmd}"
+    if cmd in _CARGO_DESTRUCTIVE:
+        return ("destructive", True, True, False, False, False,
+                f"`{c}` removes dependencies, build artifacts, or published versions.")
+    if cmd in _CARGO_NET_MUT:
+        return ("mutation", False, True, cmd in {"publish", "yank"}, False, False,
+                f"`{c}` fetches crates over the network and/or changes the manifest/registry.")
+    return ("filesystem", False, True, False, False, False,
+            f"`{c}` compiles or inspects the local package without network mutation.")
+
+
+# ---------------------------------------------------------------- poetry ------
+def _poetry_subcommands() -> list[str]:
+    out = _run(["poetry", "list"])
+    cmds: list[str] = []
+    grab = False
+    for line in out.splitlines():
+        if re.match(r"^Available commands:", line.strip()):
+            grab = True
+            continue
+        if grab:
+            m = re.match(r"^\s{2}([a-z][a-z0-9-]+)\s{2,}\S", line)
+            if m:
+                cmds.append(m.group(1))
+    return sorted(set(cmds))
+
+
+_POETRY_DESTRUCTIVE = {"remove", "cache"}
+_POETRY_NET_MUT = {"add", "install", "update", "lock", "sync", "publish", "self"}
+
+
+def _poetry_effect(cmd: str):
+    c = f"poetry {cmd}"
+    if cmd == "remove":
+        return ("destructive", True, True, False, False, False,
+                f"`{c}` removes packages from the project.")
+    if cmd in _POETRY_NET_MUT:
+        return ("mutation", False, True, cmd == "publish", False, False,
+                f"`{c}` fetches packages over the network and/or changes the environment.")
+    if cmd == "build":
+        return ("filesystem", False, True, False, False, False,
+                f"`{c}` builds local distribution artifacts.")
+    return ("network", False, True, False, False, False,
+            f"`{c}` reads project/package state.")
+
+
+# ----------------------------------------------------------------- pnpm -------
+def _pnpm_subcommands() -> list[str]:
+    out = _run(["pnpm", "--help"])
+    cmds: list[str] = []
+    for line in out.splitlines():
+        if line.strip().startswith("pnpm "):
+            continue
+        m = re.match(r"^\s{2,}(?:[a-z]+,\s+)?([a-z][a-z0-9-]+)\s{2,}\S", line)
+        if m:
+            cmds.append(m.group(1))
+    return sorted(set(cmds))
+
+
+_PNPM_DESTRUCTIVE = {"remove", "rm", "uninstall", "un", "prune"}
+_PNPM_NET_MUT = {"add", "install", "i", "update", "up", "import", "dlx", "create", "patch"}
+
+
+def _pnpm_effect(cmd: str):
+    c = f"pnpm {cmd}"
+    if cmd in _PNPM_DESTRUCTIVE:
+        return ("destructive", True, True, False, False, False,
+                f"`{c}` removes installed packages from the project.")
+    if cmd in _PNPM_NET_MUT:
+        return ("mutation", False, True, cmd in {"publish"}, False, False,
+                f"`{c}` fetches packages over the network and/or changes node_modules.")
+    return ("filesystem", False, True, False, False, False,
+            f"`{c}` runs scripts or inspects the local project.")
+
+
+# -------------------------------------------------------------- supabase ------
+def _supabase_subcommands() -> list[str]:
+    out = _run(["supabase", "--help"])
+    cmds: list[str] = []
+    for line in out.splitlines():
+        m = re.match(r"^\s{2}([a-z][a-z0-9-]+)(?:,\s*[a-z-]+)?\s+\S", line)
+        if m and m.group(1) not in ("completion",):
+            cmds.append(m.group(1))
+    return sorted(set(cmds))
+
+
+_SUPABASE_DESTRUCTIVE = {"unlink", "stop", "delete"}
+_SUPABASE_SECRET = {"login", "logout", "secrets"}
+_SUPABASE_READ = {"status", "inspect", "services", "test", "completion", "help"}
+
+
+def _supabase_effect(cmd: str):
+    c = f"supabase {cmd}"
+    if cmd in _SUPABASE_DESTRUCTIVE:
+        return ("destructive", True, True, cmd != "stop", False, False,
+                f"`{c}` tears down or unlinks a Supabase resource.")
+    if cmd in _SUPABASE_SECRET:
+        return ("secret_exposure", False, True, False, False, True,
+                f"`{c}` handles Supabase access tokens or secrets.")
+    if cmd in _SUPABASE_READ:
+        return ("network", False, True, False, False, False,
+                f"`{c}` reads Supabase project/service state.")
+    return ("mutation", False, True, True, False, False,
+            f"`{c}` changes local or remote Supabase project state.")
+
+
 # --------------------------------------------------------------- shared -------
 _TOOLS = {
     "brew": {
@@ -147,6 +269,26 @@ _TOOLS = {
         "help_argv": lambda cmd: ["vercel", cmd, "--help"],
         "effect": _vercel_effect,
         "source_url": lambda cmd: f"https://vercel.com/docs/cli/{cmd}",
+    },
+    "cargo": {
+        "family": "cargo", "list": _cargo_subcommands,
+        "help_argv": lambda cmd: ["cargo", cmd, "--help"], "effect": _cargo_effect,
+        "source_url": lambda cmd: f"https://doc.rust-lang.org/cargo/commands/cargo-{cmd}.html",
+    },
+    "poetry": {
+        "family": "poetry", "list": _poetry_subcommands,
+        "help_argv": lambda cmd: ["poetry", cmd, "--help"], "effect": _poetry_effect,
+        "source_url": lambda cmd: f"https://python-poetry.org/docs/cli/#{cmd}",
+    },
+    "pnpm": {
+        "family": "pnpm", "list": _pnpm_subcommands,
+        "help_argv": lambda cmd: ["pnpm", cmd, "--help"], "effect": _pnpm_effect,
+        "source_url": lambda cmd: f"https://pnpm.io/cli/{cmd}",
+    },
+    "supabase": {
+        "family": "supabase", "list": _supabase_subcommands,
+        "help_argv": lambda cmd: ["supabase", cmd, "--help"], "effect": _supabase_effect,
+        "source_url": lambda cmd: f"https://supabase.com/docs/reference/cli/supabase-{cmd}",
     },
 }
 

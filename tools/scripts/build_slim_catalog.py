@@ -234,6 +234,9 @@ def build(
     so a structured-only bundle is correct as long as every requested
     family has structured coverage.
     """
+    source_path = source_path.resolve()
+    output_path = output_path.resolve()
+
     if not source_path.is_file():
         raise FileNotFoundError(f"Source DB not found: {source_path}")
 
@@ -313,6 +316,8 @@ def main(argv: list[str] | None = None) -> int:
         ),
     )
     args = parser.parse_args(argv)
+    args.source = args.source.resolve()
+    args.output = args.output.resolve()
     families = [item.strip() for item in args.tool_families.split(",") if item.strip()]
     if not families:
         parser.error("--tool-families must contain at least one family name.")

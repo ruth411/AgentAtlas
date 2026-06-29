@@ -64,12 +64,15 @@ _ONE_SPACE = re.compile(
 # A bare option line with no description (just the flag, optionally with up to
 # two metavars), e.g. "  -verify_return_error" or "  -in file".
 _BARE_OPT = re.compile(
-    r"^\s+(-{1,2}[A-Za-z0-9][\w.-]*(?:,\s*-{1,2}[A-Za-z0-9][\w.-]*)*"
+    r"^\s+(-{1,2}[A-Za-z0-9][\w.-]*(?:=\S+)?(?:,\s*-{1,2}[A-Za-z0-9][\w.-]*(?:=\S+)?)*"
     r"(?:\s+(?:<[^>]+>|[A-Za-z][\w-]*)){0,2})\s*$"
 )
 # One token of an option spec: "--long" / "-s" (dots allowed: --http1.1), with
-# an optional metavar tail.
-_OPT_TOKEN = re.compile(r"^(--[A-Za-z0-9][A-Za-z0-9._-]*|-[A-Za-z0-9][A-Za-z0-9._-]*)(?:\s+(.+))?$")
+# an optional metavar tail given either as "--long=VALUE" or "--long VALUE".
+_OPT_TOKEN = re.compile(
+    r"^(--[A-Za-z0-9][A-Za-z0-9._-]*|-[A-Za-z0-9][A-Za-z0-9._-]*)"
+    r"(?:=(\S+)|\s+(.+))?(?:\.\.\.)?$"
+)
 
 
 @dataclass(frozen=True)
@@ -79,6 +82,9 @@ class FlatTool:
     source_url: str
     # (effect_kind, destructive, reversible, mutates_remote, may_cost, may_expose, reason)
     effect: tuple[str, bool, bool, bool, bool, bool, str]
+    # Some tools (ffmpeg) print options flush-left at column 0; indent them so
+    # the shared parser (which expects indented option lines) can read them.
+    col0: bool = False
 
 
 class FlatCliError(RuntimeError):
@@ -117,7 +123,7 @@ def _parse_optspec(spec: str) -> list[tuple[str, str | None]]:
             continue
         m = _OPT_TOKEN.match(part)
         if m:
-            out.append((m.group(1), m.group(2)))
+            out.append((m.group(1), m.group(2) or m.group(3)))
     return out
 
 
@@ -166,6 +172,10 @@ def _parse_flags(text: str) -> tuple[list[dict], int]:
             names = [n for n, _ in longs] if longs else [s for s, _ in shorts]
             group: list[dict] = []
             for name in names:
+                # A trailing "..." (cargo's "--verbose...") marks a repeatable
+                # option; normalize the name and record repeatability.
+                repeatable = name.endswith("...")
+                name = name[:-3] if repeatable else name
                 if name in seen:
                     continue
                 seen.add(name)
@@ -176,7 +186,7 @@ def _parse_flags(text: str) -> tuple[list[dict], int]:
                     "takes_value": metavar is not None,
                     "value_name": value_name,
                     "value_type": value_type,
-                    "repeatable": False,
+                    "repeatable": repeatable,
                     "required": False,
                     "deprecated": "deprecated" in desc.lower(),
                     "inherited": False,
@@ -304,11 +314,47 @@ _REGISTRY: dict[str, FlatTool] = {
                 "network or remote side effects (data changes are driven by the "
                 "SQL the caller supplies)."),
     ),
+    "rustc": FlatTool(
+        program="rustc",
+        help_argv=("rustc", "--help"),
+        source_url="https://doc.rust-lang.org/rustc/command-line-arguments.html",
+        effect=("filesystem", False, True, False, False, False,
+                "`rustc` compiles Rust source into local binaries/artifacts; no "
+                "network or remote side effects."),
+    ),
+    "psql": FlatTool(
+        program="psql",
+        help_argv=("/opt/homebrew/opt/libpq/bin/psql", "--help"),
+        source_url="https://www.postgresql.org/docs/current/app-psql.html",
+        effect=("network", False, True, True, False, True,
+                "`psql` connects to a PostgreSQL server over the network, can "
+                "transmit credentials, and runs arbitrary SQL that may change "
+                "remote database state."),
+    ),
+    "ffmpeg": FlatTool(
+        program="ffmpeg",
+        help_argv=("ffmpeg", "-h"),
+        source_url="https://ffmpeg.org/ffmpeg.html",
+        effect=("filesystem", False, True, False, False, False,
+                "`ffmpeg` reads and writes local media files; with -y it may "
+                "overwrite outputs. No network or remote side effects by default."),
+        col0=True,
+    ),
+    "magick": FlatTool(
+        program="magick",
+        help_argv=("magick", "-help"),
+        source_url="https://imagemagick.org/script/command-line-options.php",
+        effect=("filesystem", False, True, False, False, False,
+                "`magick` (ImageMagick) reads and writes local image files; no "
+                "network or remote side effects by default."),
+    ),
 }
 
 
 def _ingest(tool: FlatTool, store, now: datetime) -> dict:
     text = _run_help(tool.help_argv)
+    if tool.col0:
+        text = re.sub(r"(?m)^(-[A-Za-z0-9])", r"  \1", text)
     flags, unparsed = _parse_flags(text)
     bundle = _build_bundle(tool, flags, _synopsis(text, tool.program), now)
     if store is not None:
