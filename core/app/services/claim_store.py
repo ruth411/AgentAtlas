@@ -326,6 +326,11 @@ class ClaimStore:
             records = session.scalars(statement).all()
             return [_record_to_structured_subject(record) for record in records]
 
+    def list_distinct_structured_families(self) -> list[str]:
+        with self._session_factory() as session:
+            rows = session.execute(select(SubjectRecord.family).distinct()).all()
+            return sorted(row[0] for row in rows)
+
     def get_structured_subject(self, subject_id: str) -> StructuredSubject | None:
         with self._session_factory() as session:
             record = session.get(SubjectRecord, subject_id)
@@ -364,6 +369,40 @@ class ClaimStore:
             records = session.scalars(statement).all()
             return [_record_to_structured_capability(record) for record in records]
 
+    def list_all_structured_capabilities(
+        self,
+        *,
+        family: str | None = None,
+        capability_types: list[str] | None = None,
+        accepted_only: bool = True,
+        verification_min: VerificationLevel | None = None,
+        limit: int = 100_000,
+    ) -> list[StructuredCapability]:
+        capability_types = capability_types or []
+        statement = select(CapabilityRecord).join(
+            SubjectRecord,
+            SubjectRecord.subject_id == CapabilityRecord.subject_id,
+        )
+        if family is not None:
+            statement = statement.where(SubjectRecord.family == family)
+        if capability_types:
+            statement = statement.where(CapabilityRecord.capability_type.in_(capability_types))
+        if accepted_only:
+            statement = statement.where(
+                CapabilityRecord.verification_status == VerificationStatus.ACCEPTED.value
+            )
+        if verification_min is not None:
+            allowed_levels = [
+                level.value
+                for level, order in VERIFICATION_LEVEL_ORDER.items()
+                if order >= VERIFICATION_LEVEL_ORDER[verification_min]
+            ]
+            statement = statement.where(CapabilityRecord.verification_level.in_(allowed_levels))
+        statement = statement.order_by(CapabilityRecord.capability_id).limit(limit)
+        with self._session_factory() as session:
+            records = session.scalars(statement).all()
+            return [_record_to_structured_capability(record) for record in records]
+
     def list_structured_constraints(
         self,
         *,
@@ -380,6 +419,23 @@ class ClaimStore:
             records = session.scalars(statement).all()
             return [_record_to_structured_constraint(record) for record in records]
 
+    def list_all_structured_constraints(
+        self,
+        *,
+        family: str | None = None,
+        limit: int = 100_000,
+    ) -> list[StructuredConstraint]:
+        statement = select(ConstraintRecord).join(
+            SubjectRecord,
+            SubjectRecord.subject_id == ConstraintRecord.subject_id,
+        )
+        if family is not None:
+            statement = statement.where(SubjectRecord.family == family)
+        statement = statement.order_by(ConstraintRecord.constraint_id).limit(limit)
+        with self._session_factory() as session:
+            records = session.scalars(statement).all()
+            return [_record_to_structured_constraint(record) for record in records]
+
     def list_structured_effects(
         self,
         *,
@@ -392,6 +448,23 @@ class ClaimStore:
             .order_by(EffectRecord.effect_id)
             .limit(limit)
         )
+        with self._session_factory() as session:
+            records = session.scalars(statement).all()
+            return [_record_to_structured_effect(record) for record in records]
+
+    def list_all_structured_effects(
+        self,
+        *,
+        family: str | None = None,
+        limit: int = 100_000,
+    ) -> list[StructuredEffect]:
+        statement = select(EffectRecord).join(
+            SubjectRecord,
+            SubjectRecord.subject_id == EffectRecord.subject_id,
+        )
+        if family is not None:
+            statement = statement.where(SubjectRecord.family == family)
+        statement = statement.order_by(EffectRecord.effect_id).limit(limit)
         with self._session_factory() as session:
             records = session.scalars(statement).all()
             return [_record_to_structured_effect(record) for record in records]
