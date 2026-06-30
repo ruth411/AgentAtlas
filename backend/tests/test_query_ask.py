@@ -609,6 +609,42 @@ def test_ask_returns_fallback_on_empty_graph(engine: QueryEngine) -> None:
     assert response.answers == []
 
 
+def test_ask_reads_structured_only_subjects_when_claim_graph_is_empty(
+    engine: QueryEngine, store: ClaimStore
+) -> None:
+    _seed_structured_gh_subject(store)
+
+    response = engine.ask(
+        question="how do I create a pull request title in gh",
+        tool_id_hint="gh",
+    )
+
+    assert response.answer_status == "accepted"
+    assert response.fallback_recommended is False
+    assert response.answers
+    top = response.answers[0]
+    assert top.tool_id == "gh"
+    assert top.claim_id == "cap-gh-pr-create-invocation"
+    assert top.subject == "gh pr create (create a pull request)"
+    assert top.verification_level == VerificationLevel.L3_RUNTIME_VERIFIED
+    assert "title" in top.statement.lower() or "pull request" in top.statement.lower()
+
+
+def test_ask_structured_only_unknown_hint_returns_honest_miss(
+    engine: QueryEngine, store: ClaimStore
+) -> None:
+    _seed_structured_gh_subject(store)
+
+    response = engine.ask(
+        question="how do I create a pull request",
+        tool_id_hint="mythical-tool",
+    )
+
+    assert response.answer_status == "miss"
+    assert response.fallback_recommended is True
+    assert response.answers == []
+
+
 # ---------------------------------------------------------------------------
 # Acceptance filter
 # ---------------------------------------------------------------------------

@@ -849,6 +849,7 @@ class QueryEngine:
         normalized_hint: str | None = None
         if tool_id_hint is not None:
             normalized_hint = tool_id_hint.strip().lower() or None
+        structured_family_hint = self._resolve_structured_family_hint(normalized_hint)
 
         # Resolve coarse hints (e.g. "ffmpeg") to the surface-decomposed
         # tool_ids that actually exist in the graph (ffmpeg-cli /
@@ -1004,6 +1005,16 @@ class QueryEngine:
                 )
                 for match_score, _, claim, reason in top
             ]
+        elif structured_family_hint != "":
+            answers = self._structured_answers_for_question(
+                normalized_question=normalized_question,
+                question_tokens=question_tokens,
+                family_hint=structured_family_hint,
+                limit=limit,
+            )
+            if answers:
+                answer_status = "accepted"
+                fallback = False
 
         # Heuristic token savings. Zero on fallback so the caller doesn't
         # get a positive savings count for a miss they'll re-route anyway.
@@ -1079,6 +1090,82 @@ class QueryEngine:
             return matching
         # Hint given but no exact or prefix match — honest miss.
         return []
+
+    def _resolve_structured_family_hint(
+        self,
+        normalized_hint: str | None,
+    ) -> str | None:
+        """Map a coarse ask() hint onto a structured family.
+
+        Return value semantics:
+          * ``None`` — no hint given; search all structured families.
+          * ``""`` — explicit hint but no structured family/subject matched.
+          * ``"<family>"`` — search only that structured family.
+        """
+        if normalized_hint is None:
+            return None
+        families = set(self._store.list_distinct_structured_families())
+        if normalized_hint in families:
+            return normalized_hint
+        structured_subject = self._store.get_structured_subject(normalized_hint)
+        if structured_subject is not None:
+            return structured_subject.family
+        base = normalized_hint.split("-", 1)[0]
+        if base in families:
+            return base
+        prefix_matches = sorted(family for family in families if family.startswith(f"{normalized_hint}-"))
+        if prefix_matches:
+            return prefix_matches[0]
+        return ""
+
+    def _structured_answers_for_question(
+        self,
+        *,
+        normalized_question: str,
+        question_tokens: list[str],
+        family_hint: str | None,
+        limit: int,
+    ) -> list[Answer]:
+        subjects = self._store.list_structured_subjects(family=family_hint)
+        subject_map = {subject.subject_id: subject for subject in subjects}
+        scored: list[tuple[float, str, CapabilityRecord, str]] = []
+
+        for item in self._store.list_all_structured_capabilities(
+            family=family_hint,
+            accepted_only=True,
+        ):
+            record = self._structured_capability_to_response_record(item)
+            score, reason = _score_capability_record_for_question(record, question_tokens)
+            if score <= 0.0:
+                continue
+            scored.append((score, record.capability_id, record, reason))
+
+        for item in self._store.list_all_structured_constraints(family=family_hint):
+            record = self._structured_constraint_to_response_record(item)
+            score, reason = _score_capability_record_for_question(record, question_tokens)
+            if score <= 0.0:
+                continue
+            scored.append((score, record.capability_id, record, reason))
+
+        for item in self._store.list_all_structured_effects(family=family_hint):
+            record = self._structured_effect_to_response_record(item)
+            score, reason = _score_capability_record_for_question(record, question_tokens)
+            if score <= 0.0:
+                continue
+            scored.append((score, record.capability_id, record, reason))
+
+        scored.sort(key=lambda row: (-row[0], row[1]))
+        top = scored[:limit]
+        if not top or top[0][0] < _ASK_SCORE_THRESHOLD:
+            return []
+        return [
+            _structured_record_to_answer(
+                record,
+                subject=subject_map.get(record.subject_id),
+                match_reason=reason,
+            )
+            for _, _, record, reason in top
+        ]
 
     def _claims_for_subject(self, subject_id: str) -> list[KnowledgeClaim]:
         normalized = subject_id.strip().lower()
@@ -1890,6 +1977,35 @@ def _score_structured_capability_for_question(
     return score, "; ".join(parts) if parts else "structured token overlap"
 
 
+def _score_capability_record_for_question(
+    capability: CapabilityRecord,
+    question_tokens: list[str],
+) -> tuple[float, str]:
+    if not question_tokens:
+        return 0.0, ""
+    unique_question_tokens = set(question_tokens)
+    title_tokens = set(_tokenize_question(capability.title))
+    detail_tokens = set(_tokenize_question(json.dumps(capability.detail, sort_keys=True)))
+    subject_tokens = set(_tokenize_question(capability.subject_id.replace("-", " ")))
+
+    title_hits = sorted(unique_question_tokens & title_tokens)
+    subject_hits = sorted(unique_question_tokens & subject_tokens)
+    detail_hits = sorted(unique_question_tokens & detail_tokens)
+
+    raw_score = 3.0 * len(title_hits) + 2.0 * len(subject_hits) + 1.0 * len(detail_hits)
+    score = raw_score / (len(unique_question_tokens) * 3.0)
+    if score == 0.0:
+        return 0.0, ""
+    parts: list[str] = []
+    if title_hits:
+        parts.append(f"title hit on {title_hits!r}")
+    if subject_hits:
+        parts.append(f"subject_id hit on {subject_hits!r}")
+    if detail_hits and not title_hits:
+        parts.append(f"detail hit on {detail_hits!r}")
+    return score, "; ".join(parts) if parts else "structured token overlap"
+
+
 def _risk_level_for_structured_effect(effect: StructuredEffect) -> RiskLevel:
     if effect.destructive:
         return RiskLevel.CRITICAL
@@ -2103,6 +2219,55 @@ def _claim_to_answer(
         evidence=[_project_evidence(e) for e in claim.evidence],
         match_reason=match_reason,
     )
+
+
+def _structured_record_to_answer(
+    record: CapabilityRecord,
+    *,
+    subject: StructuredSubject | None,
+    match_reason: str,
+) -> Answer:
+    tool_id = subject.family if subject is not None else record.subject_id.split("-", 1)[0]
+    subject_name = subject.name if subject is not None else record.subject_id
+    return Answer(
+        claim_id=record.capability_id,
+        subject=subject_name,
+        statement=_structured_record_statement(record),
+        tool_id=tool_id,
+        confidence=record.confidence,
+        confidence_band=record.confidence_band,
+        verification_status=record.verification_status,
+        verification_level=record.verification_level,
+        risk_level=record.risk_level,
+        evidence=[],
+        match_reason=match_reason,
+    )
+
+
+def _structured_record_statement(record: CapabilityRecord) -> str:
+    detail = record.detail
+    if isinstance(detail, dict):
+        for key in (
+            "summary_text",
+            "synopsis",
+            "action",
+            "classification_reason",
+            "title",
+        ):
+            value = detail.get(key)
+            if isinstance(value, str) and value.strip():
+                return value.strip()
+        commands = detail.get("commands")
+        if isinstance(commands, list) and commands:
+            first = commands[0]
+            if isinstance(first, str) and first.strip():
+                return first.strip()
+        preconditions = detail.get("preconditions") or detail.get("constraints")
+        if isinstance(preconditions, list) and preconditions:
+            first = preconditions[0]
+            if isinstance(first, str) and first.strip():
+                return first.strip()
+    return record.title
 
 
 def _surface_for_tool_id(tool_id: str) -> str:

@@ -1,0 +1,3265 @@
+{
+  "family": "ffmpeg",
+  "version": "v1",
+  "artifact_id": "ffmpeg-curated-source-v1",
+  "generated_from": {
+    "kind": "legacy_seed_script",
+    "path": "tools/scripts/seed_ffmpeg_errors_recipes.py"
+  },
+  "entries": [
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-error-moov-atom-not-found",
+      "kind": "error",
+      "title": "ffmpeg error: moov atom not found",
+      "statement": "MP4/MOV file is truncated or being written \u2014 the index ('moov atom') hasn't been written yet, or download/upload was cut off. Fix: (1) for downloads in progress, wait until complete; (2) recover with `untrunc <reference.mp4> <broken.mp4>` (open-source recovery tool); (3) try `ffmpeg -err_detect ignore_err -i broken.mp4 -c copy out.mp4` (sometimes recoverable); (4) for live recording, use `-movflags +faststart+frag_keyframe` so the moov is written incrementally.",
+      "source_url": "https://ffmpeg.org/ffmpeg-formats.html",
+      "source_type": "official_docs",
+      "commands": [
+        "untrunc <reference.mp4> <broken.mp4>",
+        "ffmpeg -err_detect ignore_err -i broken.mp4 -c copy out.mp4",
+        "-movflags +faststart+frag_keyframe"
+      ],
+      "steps": [
+        "for downloads in progress, wait until complete",
+        "recover with `untrunc <reference.mp4> <broken.mp4>` (open-source recovery tool)",
+        "try `ffmpeg -err_detect ignore_err -i broken.mp4 -c copy out.mp4` (sometimes recoverable)",
+        "for live recording, use `-movflags +faststart+frag_keyframe` so the moov is written incrementally"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -movflags, ffmpeg, untrunc."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-errors",
+        "legacy_title": "ffmpeg error: moov atom not found"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-error-invalid-data-found-when-processing-input",
+      "kind": "error",
+      "title": "ffmpeg error: Invalid data found when processing input",
+      "statement": "Input file is corrupted, in an unrecognized format, or has a wrong extension. Fix: (1) confirm what it actually is: `ffprobe input.xyz` or `file input.xyz`; (2) force a format: `ffmpeg -f mpegts -i input.xyz out.mp4`; (3) for raw streams: `ffmpeg -f rawvideo -pix_fmt yuv420p -s 1920x1080 -i raw.yuv out.mp4`; (4) ignore decode errors: `-err_detect ignore_err`; (5) for partial recovery: `-fflags +discardcorrupt`.",
+      "source_url": "https://ffmpeg.org/ffmpeg.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffprobe input.xyz",
+        "file input.xyz",
+        "ffmpeg -f mpegts -i input.xyz out.mp4",
+        "ffmpeg -f rawvideo -pix_fmt yuv420p -s 1920x1080 -i raw.yuv out.mp4",
+        "-err_detect ignore_err",
+        "-fflags +discardcorrupt"
+      ],
+      "steps": [
+        "confirm what it actually is: `ffprobe input.xyz` or `file input.xyz`",
+        "force a format: `ffmpeg -f mpegts -i input.xyz out.mp4`",
+        "for raw streams: `ffmpeg -f rawvideo -pix_fmt yuv420p -s 1920x1080 -i raw.yuv out.mp4`",
+        "ignore decode errors: `-err_detect ignore_err`",
+        "for partial recovery: `-fflags +discardcorrupt`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -err_detect, -fflags, ffmpeg, ffprobe, file."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-errors",
+        "legacy_title": "ffmpeg error: Invalid data found when processing input"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-error-stream-specifier-x-in-filtergraph-matches-no-streams",
+      "kind": "error",
+      "title": "ffmpeg error: Stream specifier 'X' in filtergraph matches no streams",
+      "statement": "Your `-map` or filter references a stream index that doesn't exist (e.g. -map 0:1 when there's only 0:0). Fix: (1) list streams first: `ffprobe input.mp4` \u2014 note the [0:0], [0:1] indices; (2) use stream type instead of index: `-map 0:v:0` (first video), `-map 0:a:0` (first audio); (3) optional map (skip silently if missing): `-map 0:s?` (the ? makes it optional); (4) for filter_complex, label outputs: `[0:v]scale=...[vout]` then `-map '[vout]'`.",
+      "source_url": "https://ffmpeg.org/ffmpeg.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-map",
+        "ffprobe input.mp4",
+        "-map 0:v:0",
+        "-map 0:a:0",
+        "-map 0:s?",
+        "-map '[vout]'"
+      ],
+      "steps": [
+        "list streams first: `ffprobe input.mp4` \u2014 note the [0:0], [0:1] indices",
+        "use stream type instead of index: `-map 0:v:0` (first video), `-map 0:a:0` (first audio)",
+        "optional map (skip silently if missing): `-map 0:s?` (the ? makes it optional)",
+        "for filter_complex, label outputs: `[0:v]scale=...[vout]` then `-map '[vout]'`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -map, ffprobe."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-errors",
+        "legacy_title": "ffmpeg error: Stream specifier 'X' in filtergraph matches no streams"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-error-encoder-codec-h264-not-found-for-output-stream",
+      "kind": "error",
+      "title": "ffmpeg error: Encoder (codec h264) not found for output stream",
+      "statement": "Your ffmpeg build doesn't include libx264 (H.264 encoder). Often happens with `--disable-nonfree` builds. Fix: (1) check available encoders: `ffmpeg -encoders | grep 264`; (2) macOS Homebrew: `brew install ffmpeg` (includes libx264); (3) Linux: `apt install ffmpeg` (Ubuntu/Debian default includes libx264); (4) static build: download from `johnvansickle.com/ffmpeg/`; (5) hardware fallback: `-c:v h264_videotoolbox` (macOS) or `-c:v h264_nvenc` (NVIDIA GPU).",
+      "source_url": "https://ffmpeg.org/ffmpeg-codecs.html",
+      "source_type": "official_docs",
+      "commands": [
+        "--disable-nonfree",
+        "ffmpeg -encoders | grep 264",
+        "brew install ffmpeg",
+        "apt install ffmpeg",
+        "johnvansickle.com/ffmpeg/",
+        "-c:v h264_videotoolbox",
+        "-c:v h264_nvenc"
+      ],
+      "steps": [
+        "check available encoders: `ffmpeg -encoders | grep 264`",
+        "macOS Homebrew: `brew install ffmpeg` (includes libx264)",
+        "Linux: `apt install ffmpeg` (Ubuntu/Debian default includes libx264)",
+        "static build: download from `johnvansickle.com/ffmpeg/`",
+        "hardware fallback: `-c:v h264_videotoolbox` (macOS) or `-c:v h264_nvenc` (NVIDIA GPU)"
+      ],
+      "constraints": [
+        "check available encoders: `ffmpeg -encoders | grep 264`",
+        "Requires binaries or commands referenced in examples: --disable-nonfree, -c:v, apt, brew, ffmpeg, johnvansickle.com/ffmpeg/."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-errors",
+        "legacy_title": "ffmpeg error: Encoder (codec h264) not found for output stream"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-error-unable-to-find-a-suitable-output-format",
+      "kind": "error",
+      "title": "ffmpeg error: Unable to find a suitable output format",
+      "statement": "ffmpeg couldn't guess output format \u2014 your filename has no extension or unknown extension. Fix: (1) add proper extension: `out.mp4`, `out.mkv`, `out.mp3`; (2) force format explicitly: `-f mp4 out.bin`; (3) list available muxers: `ffmpeg -formats | grep -E '^.E'`; (4) for stream output: `-f hls`, `-f flv` (rtmp), `-f rtsp`.",
+      "source_url": "https://ffmpeg.org/ffmpeg-formats.html",
+      "source_type": "official_docs",
+      "commands": [
+        "out.mp4",
+        "out.mkv",
+        "out.mp3",
+        "-f mp4 out.bin",
+        "ffmpeg -formats | grep -E '^.E'",
+        "-f hls",
+        "-f flv",
+        "-f rtsp"
+      ],
+      "steps": [
+        "add proper extension: `out.mp4`, `out.mkv`, `out.mp3`",
+        "force format explicitly: `-f mp4 out.bin`",
+        "list available muxers: `ffmpeg -formats | grep -E '^.E'`",
+        "for stream output: `-f hls`, `-f flv` (rtmp), `-f rtsp`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -f, ffmpeg, out.mkv, out.mp3, out.mp4."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-errors",
+        "legacy_title": "ffmpeg error: Unable to find a suitable output format"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-error-permission-denied-output-file-already-exists",
+      "kind": "error",
+      "title": "ffmpeg error: Permission denied / output file already exists",
+      "statement": "Output path not writable, OR file exists and you didn't pass -y to overwrite. Fix: (1) overwrite: `ffmpeg -y -i in.mp4 out.mp4`; (2) never overwrite (safer for batch): `-n` (errors if exists); (3) write permission: `ls -ld <output-dir>` \u2014 should be writable; (4) macOS Gatekeeper: granted Full Disk Access to terminal; (5) if file is in use by player: close player first.",
+      "source_url": "https://ffmpeg.org/ffmpeg.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -y -i in.mp4 out.mp4",
+        "-n",
+        "ls -ld <output-dir>"
+      ],
+      "steps": [
+        "overwrite: `ffmpeg -y -i in.mp4 out.mp4`",
+        "never overwrite (safer for batch): `-n` (errors if exists)",
+        "write permission: `ls -ld <output-dir>` \u2014 should be writable",
+        "macOS Gatekeeper: granted Full Disk Access to terminal",
+        "if file is in use by player: close player first"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -n, ffmpeg, ls."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-errors",
+        "legacy_title": "ffmpeg error: Permission denied / output file already exists"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-error-could-not-write-header-incorrect-codec-parameters",
+      "kind": "error",
+      "title": "ffmpeg error: Could not write header (incorrect codec parameters?)",
+      "statement": "Output muxer rejects the stream codec/pixel format. Most common cause: H.264 in MP4 needs yuv420p (not yuv444 or yuv422). Fix: (1) force pixel format: `-pix_fmt yuv420p`; (2) for libx264 mp4: add `-pix_fmt yuv420p -profile:v high -level 4.0`; (3) check what the codec needs: `ffmpeg -h encoder=libx264`; (4) switch container if codec is right: `out.mkv` accepts almost anything.",
+      "source_url": "https://ffmpeg.org/ffmpeg-formats.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-pix_fmt yuv420p",
+        "-pix_fmt yuv420p -profile:v high -level 4.0",
+        "ffmpeg -h encoder=libx264",
+        "out.mkv"
+      ],
+      "steps": [
+        "force pixel format: `-pix_fmt yuv420p`",
+        "for libx264 mp4: add `-pix_fmt yuv420p -profile:v high -level 4.0`",
+        "check what the codec needs: `ffmpeg -h encoder=libx264`",
+        "switch container if codec is right: `out.mkv` accepts almost anything"
+      ],
+      "constraints": [
+        "check what the codec needs: `ffmpeg -h encoder=libx264`",
+        "Requires binaries or commands referenced in examples: -pix_fmt, ffmpeg, out.mkv."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-errors",
+        "legacy_title": "ffmpeg error: Could not write header (incorrect codec parameters?)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-error-conversion-failed",
+      "kind": "error",
+      "title": "ffmpeg error: Conversion failed!",
+      "statement": "Generic 'exit 1' \u2014 the real reason is in lines above. ffmpeg exits non-zero whenever any stream fails. Fix: (1) scroll up \u2014 the actual error is above this line; (2) re-run with `-loglevel debug` for more detail; (3) for batch scripts, capture stderr: `ffmpeg ... 2>&1 | tee log.txt`; (4) common root causes: unsupported codec, bad filter syntax, missing input.",
+      "source_url": "https://ffmpeg.org/ffmpeg.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-loglevel debug",
+        "ffmpeg ... 2>&1 | tee log.txt"
+      ],
+      "steps": [
+        "scroll up \u2014 the actual error is above this line",
+        "re-run with `-loglevel debug` for more detail",
+        "for batch scripts, capture stderr: `ffmpeg ... 2>&1 | tee log.txt`",
+        "common root causes: unsupported codec, bad filter syntax, missing input"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -loglevel, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-errors",
+        "legacy_title": "ffmpeg error: Conversion failed!"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-error-unknown-encoder-libx264-libx265-libfdk-aac",
+      "kind": "error",
+      "title": "ffmpeg error: Unknown encoder 'libx264' / 'libx265' / 'libfdk_aac'",
+      "statement": "Your ffmpeg build was compiled without that library. Most static distributions exclude non-LGPL codecs. Fix: (1) homebrew: `brew install ffmpeg` (full build); (2) compile from source with `--enable-libx264 --enable-libx265 --enable-libfdk-aac --enable-gpl --enable-nonfree`; (3) alternative for AAC: built-in `aac` encoder (lower quality but works everywhere): `-c:a aac`; (4) alternative for H.264: `-c:v libopenh264` (Cisco's free build); (5) check what's available: `ffmpeg -encoders | grep -i <name>`.",
+      "source_url": "https://ffmpeg.org/ffmpeg-codecs.html",
+      "source_type": "official_docs",
+      "commands": [
+        "brew install ffmpeg",
+        "--enable-libx264 --enable-libx265 --enable-libfdk-aac --enable-gpl --enable-nonfree",
+        "aac",
+        "-c:a aac",
+        "-c:v libopenh264",
+        "ffmpeg -encoders | grep -i <name>"
+      ],
+      "steps": [
+        "homebrew: `brew install ffmpeg` (full build)",
+        "compile from source with `--enable-libx264 --enable-libx265 --enable-libfdk-aac --enable-gpl --enable-nonfree`",
+        "alternative for AAC: built-in `aac` encoder (lower quality but works everywhere): `-c:a aac`",
+        "alternative for H.264: `-c:v libopenh264` (Cisco's free build)",
+        "check what's available: `ffmpeg -encoders | grep -i <name>`"
+      ],
+      "constraints": [
+        "check what's available: `ffmpeg -encoders | grep -i <name>`",
+        "Requires binaries or commands referenced in examples: --enable-libx264, -c:a, -c:v, aac, brew, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-errors",
+        "legacy_title": "ffmpeg error: Unknown encoder 'libx264' / 'libx265' / 'libfdk_aac'"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-error-no-such-filter-x-filter-overlay-not-found",
+      "kind": "error",
+      "title": "ffmpeg error: No such filter: 'X' / Filter 'overlay' not found",
+      "statement": "Filter name typo, OR your build excluded it. Fix: (1) list available filters: `ffmpeg -filters | grep -i <name>`; (2) common typos: `scale` (not 'resize'), `crop` (not 'cut'), `atempo` (not 'speed'); (3) overlay needs `--enable-libavfilter` (always on in standard builds); (4) for subtitle filters: needs `--enable-libass`.",
+      "source_url": "https://ffmpeg.org/ffmpeg-filters.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -filters | grep -i <name>",
+        "scale",
+        "crop",
+        "atempo",
+        "--enable-libavfilter",
+        "--enable-libass"
+      ],
+      "steps": [
+        "list available filters: `ffmpeg -filters | grep -i <name>`",
+        "common typos: `scale` (not 'resize'), `crop` (not 'cut'), `atempo` (not 'speed')",
+        "overlay needs `--enable-libavfilter` (always on in standard builds)",
+        "for subtitle filters: needs `--enable-libass`"
+      ],
+      "constraints": [
+        "overlay needs `--enable-libavfilter` (always on in standard builds)",
+        "for subtitle filters: needs `--enable-libass`",
+        "Requires binaries or commands referenced in examples: --enable-libass, --enable-libavfilter, atempo, crop, ffmpeg, scale."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-errors",
+        "legacy_title": "ffmpeg error: No such filter: 'X' / Filter 'overlay' not found"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-error-error-opening-filters-failed-to-inject-frame-into-filter-ne",
+      "kind": "error",
+      "title": "ffmpeg error: Error opening filters / Failed to inject frame into filter network",
+      "statement": "Bad `-vf` or `-filter_complex` syntax \u2014 usually a quoting / escaping problem. Fix: (1) wrap whole filter in single quotes: `-vf 'scale=1280:720'`; (2) inside filter, escape colon in args: `\\:` for ffmpeg, `\\\\:` inside shell; (3) for drawtext fontfile path: `fontfile=/path/to/font.ttf` (escape colons on Windows); (4) test filter alone: `ffmpeg -i in -vf '<your-filter>' -f null -`.",
+      "source_url": "https://ffmpeg.org/ffmpeg-filters.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-vf",
+        "-filter_complex",
+        "-vf 'scale=1280:720'",
+        "ffmpeg -i in -vf '<your-filter>' -f null -"
+      ],
+      "steps": [
+        "wrap whole filter in single quotes: `-vf 'scale=1280:720'`",
+        "inside filter, escape colon in args: `\\:` for ffmpeg, `\\\\:` inside shell",
+        "for drawtext fontfile path: `fontfile=/path/to/font.ttf` (escape colons on Windows)",
+        "test filter alone: `ffmpeg -i in -vf '<your-filter>' -f null -`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -filter_complex, -vf, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-errors",
+        "legacy_title": "ffmpeg error: Error opening filters / Failed to inject frame into filter network"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-error-output-file-0-does-not-contain-any-stream",
+      "kind": "error",
+      "title": "ffmpeg error: Output file #0 does not contain any stream",
+      "statement": "Your `-vf` / `-filter_complex` produced output but no stream was mapped to the output file. Fix: (1) for simple `-vf`: just check input has streams; (2) for `-filter_complex`: label your final pad and map it: `-filter_complex '[0:v]scale=1280:720[v]' -map '[v]' out.mp4`; (3) include audio too: `-map 0:a` after the video map; (4) for video-only output: `-an` is correct; for audio-only: `-vn`.",
+      "source_url": "https://ffmpeg.org/ffmpeg-filters.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-vf",
+        "-filter_complex",
+        "-filter_complex '[0:v]scale=1280:720[v]' -map '[v]' out.mp4",
+        "-map 0:a",
+        "-an",
+        "-vn"
+      ],
+      "steps": [
+        "for simple `-vf`: just check input has streams",
+        "for `-filter_complex`: label your final pad and map it: `-filter_complex '[0:v]scale=1280:720[v]' -map '[v]' out.mp4`",
+        "include audio too: `-map 0:a` after the video map",
+        "for video-only output: `-an` is correct; for audio-only: `-vn`"
+      ],
+      "constraints": [
+        "for simple `-vf`: just check input has streams",
+        "Requires binaries or commands referenced in examples: -an, -filter_complex, -map, -vf, -vn."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-errors",
+        "legacy_title": "ffmpeg error: Output file #0 does not contain any stream"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-error-too-many-packets-buffered-for-output-stream",
+      "kind": "error",
+      "title": "ffmpeg error: Too many packets buffered for output stream",
+      "statement": "Interleaving overflow \u2014 one stream is way ahead of others in PTS (presentation timestamp). Common with bad input or video+audio drift. Fix: (1) raise the buffer: `-max_muxing_queue_size 9999`; (2) for mismatched stream durations, sync with `-shortest` (truncate to shortest); (3) regen PTS: `-fflags +genpts`; (4) check input: `ffprobe -show_streams input.mp4` \u2014 look for r_frame_rate inconsistencies.",
+      "source_url": "https://ffmpeg.org/ffmpeg.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-max_muxing_queue_size 9999",
+        "-shortest",
+        "-fflags +genpts",
+        "ffprobe -show_streams input.mp4"
+      ],
+      "steps": [
+        "raise the buffer: `-max_muxing_queue_size 9999`",
+        "for mismatched stream durations, sync with `-shortest` (truncate to shortest)",
+        "regen PTS: `-fflags +genpts`",
+        "check input: `ffprobe -show_streams input.mp4` \u2014 look for r_frame_rate inconsistencies"
+      ],
+      "constraints": [
+        "check input: `ffprobe -show_streams input.mp4` \u2014 look for r_frame_rate inconsistencies",
+        "Requires binaries or commands referenced in examples: -fflags, -max_muxing_queue_size, -shortest, ffprobe."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-errors",
+        "legacy_title": "ffmpeg error: Too many packets buffered for output stream"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-error-could-not-find-codec-parameters-for-stream",
+      "kind": "error",
+      "title": "ffmpeg error: Could not find codec parameters for stream",
+      "statement": "Input has missing or unreadable codec headers \u2014 ffmpeg needs to probe more bytes to identify the codec. Fix: (1) increase probe size: `-probesize 100M -analyzeduration 100M -i in.mp4`; (2) for live streams: `-probesize 32 -analyzeduration 0` (less wait); (3) for raw streams, specify everything: `-f rawvideo -pix_fmt yuv420p -s 1920x1080 -framerate 30 -i raw.yuv`; (4) try newer build \u2014 old ffmpeg may not recognize newer codecs (AV1, VVC).",
+      "source_url": "https://ffmpeg.org/ffmpeg-formats.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-probesize 100M -analyzeduration 100M -i in.mp4",
+        "-probesize 32 -analyzeduration 0",
+        "-f rawvideo -pix_fmt yuv420p -s 1920x1080 -framerate 30 -i raw.yuv"
+      ],
+      "steps": [
+        "increase probe size: `-probesize 100M -analyzeduration 100M -i in.mp4`",
+        "for live streams: `-probesize 32 -analyzeduration 0` (less wait)",
+        "for raw streams, specify everything: `-f rawvideo -pix_fmt yuv420p -s 1920x1080 -framerate 30 -i raw.yuv`",
+        "try newer build \u2014 old ffmpeg may not recognize newer codecs (AV1, VVC)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -f, -probesize."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-errors",
+        "legacy_title": "ffmpeg error: Could not find codec parameters for stream"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-error-non-monotonous-dts-in-output-stream",
+      "kind": "error",
+      "title": "ffmpeg error: Non-monotonous DTS in output stream",
+      "statement": "Decode timestamps (DTS) went backward. Common with concat of files that have different timebases, or seeking issues. Fix: (1) regenerate PTS: `-fflags +genpts`; (2) reset timestamps after seek: `-vsync 1` or `-vsync vfr`; (3) for concat: ensure all inputs have identical codec/timebase: `ffprobe` each; (4) for live recording, use `-async 1` for audio sync.",
+      "source_url": "https://ffmpeg.org/ffmpeg.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-fflags +genpts",
+        "-vsync 1",
+        "-vsync vfr",
+        "ffprobe",
+        "-async 1"
+      ],
+      "steps": [
+        "regenerate PTS: `-fflags +genpts`",
+        "reset timestamps after seek: `-vsync 1` or `-vsync vfr`",
+        "for concat: ensure all inputs have identical codec/timebase: `ffprobe` each",
+        "for live recording, use `-async 1` for audio sync"
+      ],
+      "constraints": [
+        "for concat: ensure all inputs have identical codec/timebase: `ffprobe` each",
+        "Requires binaries or commands referenced in examples: -async, -fflags, -vsync, ffprobe."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-errors",
+        "legacy_title": "ffmpeg error: Non-monotonous DTS in output stream"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-error-av-interleaved-write-frame-broken-pipe",
+      "kind": "error",
+      "title": "ffmpeg error: av_interleaved_write_frame(): Broken pipe",
+      "statement": "Downstream consumer of your output (player, ffplay, network) closed the connection. Fix: (1) for streaming: add retry: `-reconnect 1 -reconnect_at_eof 1 -reconnect_streamed 1`; (2) for piping to another tool: confirm the receiver is still running; (3) for RTMP/RTSP: check network stability, try `-flvflags no_duration_filesize`; (4) for `ffmpeg ... | something`, check the consumer's stderr.",
+      "source_url": "https://ffmpeg.org/ffmpeg-protocols.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-reconnect 1 -reconnect_at_eof 1 -reconnect_streamed 1",
+        "-flvflags no_duration_filesize",
+        "ffmpeg ... | something"
+      ],
+      "steps": [
+        "for streaming: add retry: `-reconnect 1 -reconnect_at_eof 1 -reconnect_streamed 1`",
+        "for piping to another tool: confirm the receiver is still running",
+        "for RTMP/RTSP: check network stability, try `-flvflags no_duration_filesize`",
+        "for `ffmpeg ... | something`, check the consumer's stderr"
+      ],
+      "constraints": [
+        "for RTMP/RTSP: check network stability, try `-flvflags no_duration_filesize`",
+        "for `ffmpeg ... | something`, check the consumer's stderr",
+        "Requires binaries or commands referenced in examples: -flvflags, -reconnect, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-errors",
+        "legacy_title": "ffmpeg error: av_interleaved_write_frame(): Broken pipe"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-error-unable-to-parse-option-value-for-filter-complex",
+      "kind": "error",
+      "title": "ffmpeg error: Unable to parse option value for -filter_complex",
+      "statement": "Filter_complex syntax error \u2014 usually unbalanced brackets, missing semicolons, or shell-escaping. Fix: (1) use single quotes: `-filter_complex '[0:v][1:v]overlay=W-w-10:10[out]' -map '[out]'`; (2) separate filters with semicolons, chain with commas: `[0:v]scale=1280:720,format=yuv420p[v]`; (3) label EVERY output if you'll use it: `[v]`, `[a]`; (4) for multi-line readability, use `-filter_complex_script filters.txt`.",
+      "source_url": "https://ffmpeg.org/ffmpeg-filters.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-filter_complex '[0:v][1:v]overlay=W-w-10:10[out]' -map '[out]'",
+        "-filter_complex_script filters.txt"
+      ],
+      "steps": [
+        "use single quotes: `-filter_complex '[0:v][1:v]overlay=W-w-10:10[out]' -map '[out]'`",
+        "separate filters with semicolons, chain with commas: `[0:v]scale=1280:720,format=yuv420p[v]`",
+        "label EVERY output if you'll use it: `[v]`, `[a]`",
+        "for multi-line readability, use `-filter_complex_script filters.txt`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -filter_complex, -filter_complex_script."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-errors",
+        "legacy_title": "ffmpeg error: Unable to parse option value for -filter_complex"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-error-rtsp-timeout-connection-refused",
+      "kind": "error",
+      "title": "ffmpeg error: rtsp:// timeout / Connection refused",
+      "statement": "RTSP / network input failed. Fix: (1) set socket timeout: `-stimeout 5000000` (microseconds, so 5 sec); (2) force TCP transport (more reliable than UDP): `-rtsp_transport tcp`; (3) verify URL works: `ffplay rtsp://...` first; (4) for camera URLs with auth: `rtsp://user:pass@host:554/stream`; (5) for HTTP retries: `-reconnect 1 -reconnect_delay_max 5`.",
+      "source_url": "https://ffmpeg.org/ffmpeg-protocols.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-stimeout 5000000",
+        "-rtsp_transport tcp",
+        "ffplay rtsp://...",
+        "-reconnect 1 -reconnect_delay_max 5"
+      ],
+      "steps": [
+        "set socket timeout: `-stimeout 5000000` (microseconds, so 5 sec)",
+        "force TCP transport (more reliable than UDP): `-rtsp_transport tcp`",
+        "verify URL works: `ffplay rtsp://...` first",
+        "for camera URLs with auth: `rtsp://user:pass@host:554/stream`",
+        "for HTTP retries: `-reconnect 1 -reconnect_delay_max 5`"
+      ],
+      "constraints": [
+        "verify URL works: `ffplay rtsp://...` first",
+        "Requires binaries or commands referenced in examples: -reconnect, -rtsp_transport, -stimeout, ffplay."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-errors",
+        "legacy_title": "ffmpeg error: rtsp:// timeout / Connection refused"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-error-invalid-argument-when-using-ss-before-i-for-fast-seek",
+      "kind": "error",
+      "title": "ffmpeg error: Invalid argument when using -ss before -i for fast seek",
+      "statement": "`-ss <time>` placement matters: BEFORE `-i` is fast (keyframe-aligned, less accurate); AFTER `-i` is accurate (decodes from start, slow). Fix: (1) for keyframe seek (fast): `ffmpeg -ss 00:01:30 -i in.mp4 -c copy out.mp4` \u2014 works with `-c copy`; (2) for exact seek: `ffmpeg -i in.mp4 -ss 00:01:30 -t 30 out.mp4` \u2014 re-encodes, slower; (3) hybrid: `ffmpeg -ss 00:01:25 -i in.mp4 -ss 00:00:05 -t 30 out.mp4` \u2014 fast seek to near, then exact; (4) timestamp formats: `00:01:30.500`, `90.5`, or `90s`.",
+      "source_url": "https://ffmpeg.org/ffmpeg.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-ss <time>",
+        "-i",
+        "ffmpeg -ss 00:01:30 -i in.mp4 -c copy out.mp4",
+        "-c copy",
+        "ffmpeg -i in.mp4 -ss 00:01:30 -t 30 out.mp4",
+        "ffmpeg -ss 00:01:25 -i in.mp4 -ss 00:00:05 -t 30 out.mp4",
+        "00:01:30.500",
+        "90.5"
+      ],
+      "steps": [
+        "for keyframe seek (fast): `ffmpeg -ss 00:01:30 -i in.mp4 -c copy out.mp4` \u2014 works with `-c copy`",
+        "for exact seek: `ffmpeg -i in.mp4 -ss 00:01:30 -t 30 out.mp4` \u2014 re-encodes, slower",
+        "hybrid: `ffmpeg -ss 00:01:25 -i in.mp4 -ss 00:00:05 -t 30 out.mp4` \u2014 fast seek to near, then exact",
+        "timestamp formats: `00:01:30.500`, `90.5`, or `90s`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -c, -i, -ss, 00:01:30.500, 90.5, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-errors",
+        "legacy_title": "ffmpeg error: Invalid argument when using -ss before -i for fast seek"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-error-deprecated-pixel-format-used-make-sure-you-didn-t-mean-yuvj",
+      "kind": "error",
+      "title": "ffmpeg error: deprecated pixel format used, make sure you didn't mean yuvj420p",
+      "statement": "Just a warning, not a failure. yuvj* formats are 'full-range' YUV (0-255), yuv* are 'limited' (16-235). Fix: (1) ignore \u2014 output works fine; (2) silence warning by using explicit `-pix_fmt yuv420p` + `-color_range tv`; (3) for full-range output (rare): `-pix_fmt yuv420p -color_range pc`; (4) most players assume limited range; full range can wash out colors.",
+      "source_url": "https://ffmpeg.org/ffmpeg-utils.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-pix_fmt yuv420p",
+        "-color_range tv",
+        "-pix_fmt yuv420p -color_range pc"
+      ],
+      "steps": [
+        "ignore \u2014 output works fine",
+        "silence warning by using explicit `-pix_fmt yuv420p` + `-color_range tv`",
+        "for full-range output (rare): `-pix_fmt yuv420p -color_range pc`",
+        "most players assume limited range; full range can wash out colors"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -color_range, -pix_fmt."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-errors",
+        "legacy_title": "ffmpeg error: deprecated pixel format used, make sure you didn't mean yuvj420p"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-error-past-duration-x-is-too-large",
+      "kind": "error",
+      "title": "ffmpeg error: Past duration X is too large",
+      "statement": "Repeated warning during long encodes \u2014 audio/video PTS got out of sync. Fix: (1) audio resync: `-async 1` (legacy) or `aresample=async=1` filter; (2) video resync: `-vsync 1` (drop/duplicate to maintain fps) or `-vsync passthrough`; (3) if input has variable framerate: `-r 30` forces constant; (4) for live capture with clock drift, use `-use_wallclock_as_timestamps 1`.",
+      "source_url": "https://ffmpeg.org/ffmpeg.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-async 1",
+        "-vsync 1",
+        "-vsync passthrough",
+        "-r 30",
+        "-use_wallclock_as_timestamps 1"
+      ],
+      "steps": [
+        "audio resync: `-async 1` (legacy) or `aresample=async=1` filter",
+        "video resync: `-vsync 1` (drop/duplicate to maintain fps) or `-vsync passthrough`",
+        "if input has variable framerate: `-r 30` forces constant",
+        "for live capture with clock drift, use `-use_wallclock_as_timestamps 1`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -async, -r, -use_wallclock_as_timestamps, -vsync."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-errors",
+        "legacy_title": "ffmpeg error: Past duration X is too large"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-error-h264-error-while-decoding-mb-corrupt-input",
+      "kind": "error",
+      "title": "ffmpeg error: [h264 @ ...] error while decoding MB / corrupt input",
+      "statement": "Input video has corrupted macroblocks \u2014 green/glitchy frames in source. Fix: (1) tolerate errors: `-err_detect ignore_err -fflags +discardcorrupt -i bad.mp4`; (2) for severely corrupt input, only keyframes might recover: `ffmpeg -i bad.mp4 -vf select='eq(pict_type\\,I)' frames/%04d.png`; (3) for transport stream (.ts) errors, try `-fflags +discardcorrupt+nobuffer`; (4) sometimes re-muxing fixes it: `ffmpeg -i bad.mp4 -c copy fixed.mp4`.",
+      "source_url": "https://ffmpeg.org/ffmpeg.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-err_detect ignore_err -fflags +discardcorrupt -i bad.mp4",
+        "ffmpeg -i bad.mp4 -vf select='eq(pict_type\\,I)' frames/%04d.png",
+        "-fflags +discardcorrupt+nobuffer",
+        "ffmpeg -i bad.mp4 -c copy fixed.mp4"
+      ],
+      "steps": [
+        "tolerate errors: `-err_detect ignore_err -fflags +discardcorrupt -i bad.mp4`",
+        "for severely corrupt input, only keyframes might recover: `ffmpeg -i bad.mp4 -vf select='eq(pict_type\\,I)' frames/%04d.png`",
+        "for transport stream (.ts) errors, try `-fflags +discardcorrupt+nobuffer`",
+        "sometimes re-muxing fixes it: `ffmpeg -i bad.mp4 -c copy fixed.mp4`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -err_detect, -fflags, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-errors",
+        "legacy_title": "ffmpeg error: [h264 @ ...] error while decoding MB / corrupt input"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-error-hwaccel-cuda-videotoolbox-failed-to-initialize",
+      "kind": "error",
+      "title": "ffmpeg error: hwaccel cuda / videotoolbox failed to initialize",
+      "statement": "Hardware acceleration unavailable or misconfigured. Fix: (1) list available hwaccels: `ffmpeg -hwaccels`; (2) macOS: `-hwaccel videotoolbox` (built into all Apple Silicon/Intel Macs); (3) NVIDIA: install CUDA + nvidia-driver, then `-hwaccel cuda -c:v h264_cuvid -c:v h264_nvenc`; (4) Intel QuickSync: `-hwaccel qsv -c:v h264_qsv`; (5) fallback to software is safe: just drop the `-hwaccel` flag.",
+      "source_url": "https://ffmpeg.org/ffmpeg.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -hwaccels",
+        "-hwaccel videotoolbox",
+        "-hwaccel cuda -c:v h264_cuvid -c:v h264_nvenc",
+        "-hwaccel qsv -c:v h264_qsv",
+        "-hwaccel"
+      ],
+      "steps": [
+        "list available hwaccels: `ffmpeg -hwaccels`",
+        "macOS: `-hwaccel videotoolbox` (built into all Apple Silicon/Intel Macs)",
+        "NVIDIA: install CUDA + nvidia-driver, then `-hwaccel cuda -c:v h264_cuvid -c:v h264_nvenc`",
+        "Intel QuickSync: `-hwaccel qsv -c:v h264_qsv`",
+        "fallback to software is safe: just drop the `-hwaccel` flag"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -hwaccel, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-errors",
+        "legacy_title": "ffmpeg error: hwaccel cuda / videotoolbox failed to initialize"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-error-concat-unsafe-filenames-impossible-to-open",
+      "kind": "error",
+      "title": "ffmpeg error: concat: unsafe filenames / Impossible to open",
+      "statement": "Concat demuxer requires explicit safe mode for paths with special chars or absolute paths. Fix: (1) pass `-safe 0`: `ffmpeg -f concat -safe 0 -i list.txt -c copy out.mp4`; (2) list.txt format: each line `file '/abs/path/clip1.mp4'` with single quotes; (3) all files must have same codec/resolution/timebase for `-c copy`; otherwise use concat filter; (4) escape single quotes in filenames: `file 'O\\'Brien.mp4'`.",
+      "source_url": "https://ffmpeg.org/ffmpeg-formats.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-safe 0",
+        "ffmpeg -f concat -safe 0 -i list.txt -c copy out.mp4",
+        "file '/abs/path/clip1.mp4'",
+        "-c copy",
+        "file 'O\\'Brien.mp4'"
+      ],
+      "steps": [
+        "pass `-safe 0`: `ffmpeg -f concat -safe 0 -i list.txt -c copy out.mp4`",
+        "list.txt format: each line `file '/abs/path/clip1.mp4'` with single quotes",
+        "all files must have same codec/resolution/timebase for `-c copy`; otherwise use concat filter",
+        "escape single quotes in filenames: `file 'O\\'Brien.mp4'`"
+      ],
+      "constraints": [
+        "all files must have same codec/resolution/timebase for `-c copy`; otherwise use concat filter",
+        "Requires binaries or commands referenced in examples: -c, -safe, ffmpeg, file."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-errors",
+        "legacy_title": "ffmpeg error: concat: unsafe filenames / Impossible to open"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-error-output-file-is-empty-0-bytes",
+      "kind": "error",
+      "title": "ffmpeg error: Output file is empty / 0 bytes",
+      "statement": "Encoding produced no output. Multiple causes. Fix: (1) input was empty/unreadable \u2014 verify with `ffprobe`; (2) filter dropped everything \u2014 check filter logic; (3) format mismatch (e.g. encoding video to .mp3) \u2014 use right extension; (4) ran with `-vframes 0` or `-t 0` by accident; (5) Ctrl-C'd before any frame was written \u2014 wait longer or use a shorter clip for testing.",
+      "source_url": "https://ffmpeg.org/ffmpeg.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffprobe",
+        "-vframes 0",
+        "-t 0"
+      ],
+      "steps": [
+        "input was empty/unreadable \u2014 verify with `ffprobe`",
+        "filter dropped everything \u2014 check filter logic",
+        "format mismatch (e.g. encoding video to .mp3) \u2014 use right extension",
+        "ran with `-vframes 0` or `-t 0` by accident",
+        "Ctrl-C'd before any frame was written \u2014 wait longer or use a shorter clip for testing"
+      ],
+      "constraints": [
+        "input was empty/unreadable \u2014 verify with `ffprobe`",
+        "filter dropped everything \u2014 check filter logic",
+        "Requires binaries or commands referenced in examples: -t, -vframes, ffprobe."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-errors",
+        "legacy_title": "ffmpeg error: Output file is empty / 0 bytes"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-error-error-opening-input-files-operation-not-permitted-macos",
+      "kind": "error",
+      "title": "ffmpeg error: error opening input files: Operation not permitted (macOS)",
+      "statement": "macOS privacy/security blocked access. Fix: (1) System Settings \u2192 Privacy \u2192 Files and Folders \u2192 grant Terminal/iTerm full disk access; (2) for screen recording: grant Screen Recording permission; (3) for camera: grant Camera permission to the binary; (4) try moving the file to ~/Desktop or ~/Movies (no-permission zones); (5) check with `ls -le file` for ACLs.",
+      "source_url": "https://ffmpeg.org/ffmpeg.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ls -le file"
+      ],
+      "steps": [
+        "System Settings \u2192 Privacy \u2192 Files and Folders \u2192 grant Terminal/iTerm full disk access",
+        "for screen recording: grant Screen Recording permission",
+        "for camera: grant Camera permission to the binary",
+        "try moving the file to ~/Desktop or ~/Movies (no-permission zones)",
+        "check with `ls -le file` for ACLs"
+      ],
+      "constraints": [
+        "check with `ls -le file` for ACLs",
+        "Requires binaries or commands referenced in examples: ls."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-errors",
+        "legacy_title": "ffmpeg error: error opening input files: Operation not permitted (macOS)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-error-buffer-queue-overflow-dropping",
+      "kind": "error",
+      "title": "ffmpeg error: Buffer queue overflow, dropping",
+      "statement": "A filter (often `overlay`, `xfade`, `concat`) can't process frames fast enough \u2014 input piles up. Fix: (1) for overlay: ensure both inputs have aligned PTS \u2014 add `setpts=PTS-STARTPTS` before overlay; (2) for concat filter: ensure all inputs have same resolution/fps (scale + fps filter first); (3) for slow filter chains: pre-render intermediate to file, then chain; (4) check CPU: filters are mostly single-threaded.",
+      "source_url": "https://ffmpeg.org/ffmpeg-filters.html",
+      "source_type": "official_docs",
+      "commands": [
+        "overlay",
+        "xfade",
+        "concat"
+      ],
+      "steps": [
+        "for overlay: ensure both inputs have aligned PTS \u2014 add `setpts=PTS-STARTPTS` before overlay",
+        "for concat filter: ensure all inputs have same resolution/fps (scale + fps filter first)",
+        "for slow filter chains: pre-render intermediate to file, then chain",
+        "check CPU: filters are mostly single-threaded"
+      ],
+      "constraints": [
+        "for overlay: ensure both inputs have aligned PTS \u2014 add `setpts=PTS-STARTPTS` before overlay",
+        "for concat filter: ensure all inputs have same resolution/fps (scale + fps filter first)",
+        "check CPU: filters are mostly single-threaded",
+        "Requires binaries or commands referenced in examples: concat, overlay, xfade."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-errors",
+        "legacy_title": "ffmpeg error: Buffer queue overflow, dropping"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-error-estimating-duration-from-bitrate-this-may-be-inaccurate",
+      "kind": "error",
+      "title": "ffmpeg error: Estimating duration from bitrate, this may be inaccurate",
+      "statement": "Warning (not fatal) \u2014 input has no duration metadata, so ffmpeg guesses from bitrate. Fix: (1) ignore for static files (output will be correct); (2) for streams with no duration (RTMP, RTSP, MPEG-TS): expected; (3) to set explicit duration: `-t 60` (limit) or `-to 00:01:30` (until); (4) for accurate duration on a raw file, re-mux first: `ffmpeg -i raw.ts -c copy fixed.mp4`.",
+      "source_url": "https://ffmpeg.org/ffmpeg-formats.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-t 60",
+        "-to 00:01:30",
+        "ffmpeg -i raw.ts -c copy fixed.mp4"
+      ],
+      "steps": [
+        "ignore for static files (output will be correct)",
+        "for streams with no duration (RTMP, RTSP, MPEG-TS): expected",
+        "to set explicit duration: `-t 60` (limit) or `-to 00:01:30` (until)",
+        "for accurate duration on a raw file, re-mux first: `ffmpeg -i raw.ts -c copy fixed.mp4`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -t, -to, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-errors",
+        "legacy_title": "ffmpeg error: Estimating duration from bitrate, this may be inaccurate"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-error-cannot-store-exact-duration-in-mp4-could-not-find-tag-for-c",
+      "kind": "error",
+      "title": "ffmpeg error: Cannot store exact duration in MP4 / Could not find tag for codec",
+      "statement": "MP4 container can't hold a specific codec (e.g. AC3 audio, ProRes video in some builds). Fix: (1) switch container to MKV: `out.mkv` accepts almost everything; (2) transcode audio: `-c:a aac` (AC3\u2192AAC for MP4); (3) check container support: `ffmpeg -h muxer=mp4` shows supported codecs; (4) for ProRes, output to MOV: `out.mov`.",
+      "source_url": "https://ffmpeg.org/ffmpeg-formats.html",
+      "source_type": "official_docs",
+      "commands": [
+        "out.mkv",
+        "-c:a aac",
+        "ffmpeg -h muxer=mp4",
+        "out.mov"
+      ],
+      "steps": [
+        "switch container to MKV: `out.mkv` accepts almost everything",
+        "transcode audio: `-c:a aac` (AC3\u2192AAC for MP4)",
+        "check container support: `ffmpeg -h muxer=mp4` shows supported codecs",
+        "for ProRes, output to MOV: `out.mov`"
+      ],
+      "constraints": [
+        "check container support: `ffmpeg -h muxer=mp4` shows supported codecs",
+        "Requires binaries or commands referenced in examples: -c:a, ffmpeg, out.mkv, out.mov."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-errors",
+        "legacy_title": "ffmpeg error: Cannot store exact duration in MP4 / Could not find tag for codec"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-error-x265-error-input-picture-width-height-not-divisible-by-mini",
+      "kind": "error",
+      "title": "ffmpeg error: x265 [error]: input picture width/height not divisible by minimum CU size",
+      "statement": "H.265 (libx265) needs dimensions divisible by 8 (or 16 for some profiles). Fix: (1) crop to nearest even: `-vf 'crop=trunc(iw/2)*2:trunc(ih/2)*2'`; (2) for divisible-by-8: `-vf 'crop=trunc(iw/8)*8:trunc(ih/8)*8'`; (3) pad instead of crop: `-vf 'pad=ceil(iw/8)*8:ceil(ih/8)*8'`; (4) common with iPhone screen recordings (390x844 etc) \u2014 needs cropping for H.265.",
+      "source_url": "https://ffmpeg.org/ffmpeg-codecs.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-vf 'crop=trunc(iw/2)*2:trunc(ih/2)*2'",
+        "-vf 'crop=trunc(iw/8)*8:trunc(ih/8)*8'",
+        "-vf 'pad=ceil(iw/8)*8:ceil(ih/8)*8'"
+      ],
+      "steps": [
+        "crop to nearest even: `-vf 'crop=trunc(iw/2)*2:trunc(ih/2)*2'`",
+        "for divisible-by-8: `-vf 'crop=trunc(iw/8)*8:trunc(ih/8)*8'`",
+        "pad instead of crop: `-vf 'pad=ceil(iw/8)*8:ceil(ih/8)*8'`",
+        "common with iPhone screen recordings (390x844 etc) \u2014 needs cropping for H.265"
+      ],
+      "constraints": [
+        "common with iPhone screen recordings (390x844 etc) \u2014 needs cropping for H.265",
+        "Requires binaries or commands referenced in examples: -vf."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-errors",
+        "legacy_title": "ffmpeg error: x265 [error]: input picture width/height not divisible by minimum CU size"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-trim-a-clip-without-re-encoding-fast-lossless",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: trim a clip without re-encoding (fast, lossless)",
+      "statement": "Cut a section of video instantly. `ffmpeg -ss 00:01:30 -to 00:02:00 -i in.mp4 -c copy out.mp4`. `-c copy` skips re-encoding (no quality loss, near-instant). Caveat: cuts at nearest keyframe before -ss, so timing may be slightly off (typically <2s). For frame-accurate trim with re-encode: `ffmpeg -i in.mp4 -ss 00:01:30 -to 00:02:00 -c:v libx264 -c:a aac out.mp4` (place -ss after -i).",
+      "source_url": "https://ffmpeg.org/ffmpeg.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -ss 00:01:30 -to 00:02:00 -i in.mp4 -c copy out.mp4",
+        "-c copy",
+        "ffmpeg -i in.mp4 -ss 00:01:30 -to 00:02:00 -c:v libx264 -c:a aac out.mp4"
+      ],
+      "steps": [
+        "Cut a section of video instantly. `ffmpeg -ss 00:01:30 -to 00:02:00 -i in.mp4 -c copy out.mp4`. `-c copy` skips re-encoding (no quality loss, near-instant). Caveat: cuts at nearest keyframe before -ss, so timing may be slightly off (typically <2s). For frame-accurate trim with re-encode: `ffmpeg -i in.mp4 -ss 00:01:30 -to 00:02:00 -c:v libx264 -c:a aac out.mp4` (place -ss after -i)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -c, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: trim a clip without re-encoding (fast, lossless)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-convert-any-video-to-mp4-h-264-aac",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: convert any video to MP4 (H.264 + AAC)",
+      "statement": "Universal format. `ffmpeg -i in.mov -c:v libx264 -preset medium -crf 23 -c:a aac -b:a 128k -movflags +faststart out.mp4`. Tunable: `-crf 18` = visually lossless, `-crf 23` = good, `-crf 28` = small file. `-preset slow` = better compression, slower; `-preset ultrafast` = fast, larger. `-movflags +faststart` moves moov atom to start (web streaming).",
+      "source_url": "https://ffmpeg.org/ffmpeg-codecs.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -i in.mov -c:v libx264 -preset medium -crf 23 -c:a aac -b:a 128k -movflags +faststart out.mp4",
+        "-crf 18",
+        "-crf 23",
+        "-crf 28",
+        "-preset slow",
+        "-preset ultrafast",
+        "-movflags +faststart"
+      ],
+      "steps": [
+        "Universal format. `ffmpeg -i in.mov -c:v libx264 -preset medium -crf 23 -c:a aac -b:a 128k -movflags +faststart out.mp4`. Tunable: `-crf 18` = visually lossless, `-crf 23` = good, `-crf 28` = small file. `-preset slow` = better compression, slower; `-preset ultrafast` = fast, larger. `-movflags +faststart` moves moov atom to start (web streaming)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -crf, -movflags, -preset, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: convert any video to MP4 (H.264 + AAC)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-extract-audio-track-to-mp3-aac",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: extract audio track to MP3 / AAC",
+      "statement": "Audio only, drop video. MP3: `ffmpeg -i in.mp4 -vn -c:a libmp3lame -q:a 2 out.mp3` (q:a 0=best, 9=worst). AAC: `ffmpeg -i in.mp4 -vn -c:a aac -b:a 192k out.m4a`. Lossless extract (if input audio is already mp3/aac): `-vn -c:a copy out.aac`. Specific track when multiple: `-map 0:a:1` (second audio track).",
+      "source_url": "https://ffmpeg.org/ffmpeg-codecs.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -i in.mp4 -vn -c:a libmp3lame -q:a 2 out.mp3",
+        "ffmpeg -i in.mp4 -vn -c:a aac -b:a 192k out.m4a",
+        "-vn -c:a copy out.aac",
+        "-map 0:a:1"
+      ],
+      "steps": [
+        "Audio only, drop video. MP3: `ffmpeg -i in.mp4 -vn -c:a libmp3lame -q:a 2 out.mp3` (q:a 0=best, 9=worst). AAC: `ffmpeg -i in.mp4 -vn -c:a aac -b:a 192k out.m4a`. Lossless extract (if input audio is already mp3/aac): `-vn -c:a copy out.aac`. Specific track when multiple: `-map 0:a:1` (second audio track)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -map, -vn, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: extract audio track to MP3 / AAC"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-remove-mute-audio-from-video",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: remove (mute) audio from video",
+      "statement": "Drop audio track entirely. `ffmpeg -i in.mp4 -c copy -an out.mp4`. `-an` = no audio. `-c copy` keeps video as-is (instant). To replace silence (some players want a track): `ffmpeg -i in.mp4 -f lavfi -i anullsrc -c:v copy -c:a aac -shortest out.mp4`. To keep only specific audio language: `-map 0:v -map 0:a:m:language:eng`.",
+      "source_url": "https://ffmpeg.org/ffmpeg.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -i in.mp4 -c copy -an out.mp4",
+        "-an",
+        "-c copy",
+        "ffmpeg -i in.mp4 -f lavfi -i anullsrc -c:v copy -c:a aac -shortest out.mp4",
+        "-map 0:v -map 0:a:m:language:eng"
+      ],
+      "steps": [
+        "Drop audio track entirely. `ffmpeg -i in.mp4 -c copy -an out.mp4`. `-an` = no audio. `-c copy` keeps video as-is (instant). To replace silence (some players want a track): `ffmpeg -i in.mp4 -f lavfi -i anullsrc -c:v copy -c:a aac -shortest out.mp4`. To keep only specific audio language: `-map 0:v -map 0:a:m:language:eng`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -an, -c, -map, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: remove (mute) audio from video"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-replace-audio-in-video",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: replace audio in video",
+      "statement": "Swap soundtrack. `ffmpeg -i video.mp4 -i audio.mp3 -map 0:v -map 1:a -c:v copy -c:a aac -shortest out.mp4`. `-shortest` cuts output to whichever input ends first. For exact sync (audio shorter than video, pad silence): `-filter_complex '[1:a]apad' -shortest`. To delay audio by N seconds: `-itsoffset N -i audio.mp3` before -i.",
+      "source_url": "https://ffmpeg.org/ffmpeg.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -i video.mp4 -i audio.mp3 -map 0:v -map 1:a -c:v copy -c:a aac -shortest out.mp4",
+        "-shortest",
+        "-filter_complex '[1:a]apad' -shortest",
+        "-itsoffset N -i audio.mp3"
+      ],
+      "steps": [
+        "Swap soundtrack. `ffmpeg -i video.mp4 -i audio.mp3 -map 0:v -map 1:a -c:v copy -c:a aac -shortest out.mp4`. `-shortest` cuts output to whichever input ends first. For exact sync (audio shorter than video, pad silence): `-filter_complex '[1:a]apad' -shortest`. To delay audio by N seconds: `-itsoffset N -i audio.mp3` before -i"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -filter_complex, -itsoffset, -shortest, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: replace audio in video"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-concatenate-multiple-videos-same-codec-fast",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: concatenate multiple videos (same codec, fast)",
+      "statement": "Demuxer concat for identical-codec inputs. (1) Create list.txt: `file 'part1.mp4'\\nfile 'part2.mp4'\\nfile 'part3.mp4'`. (2) Run: `ffmpeg -f concat -safe 0 -i list.txt -c copy out.mp4`. Requirements: all files MUST have same codec, resolution, fps, audio sample rate. Verify with `ffprobe`. For mixed: use concat filter (next recipe).",
+      "source_url": "https://ffmpeg.org/ffmpeg-formats.html",
+      "source_type": "official_docs",
+      "commands": [
+        "file 'part1.mp4'\\nfile 'part2.mp4'\\nfile 'part3.mp4'",
+        "ffmpeg -f concat -safe 0 -i list.txt -c copy out.mp4",
+        "ffprobe"
+      ],
+      "steps": [
+        "Demuxer concat for identical-codec inputs",
+        "Create list.txt: `file 'part1.mp4'\\nfile 'part2.mp4'\\nfile 'part3.mp4'`",
+        "Run: `ffmpeg -f concat -safe 0 -i list.txt -c copy out.mp4`. Requirements: all files MUST have same codec, resolution, fps, audio sample rate. Verify with `ffprobe`. For mixed: use concat filter (next recipe)"
+      ],
+      "constraints": [
+        "Run: `ffmpeg -f concat -safe 0 -i list.txt -c copy out.mp4`. Requirements: all files MUST have same codec, resolution, fps, audio sample rate. Verify with `ffprobe`. For mixed: use concat filter (next recipe)",
+        "Requires binaries or commands referenced in examples: ffmpeg, ffprobe, file."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: concatenate multiple videos (same codec, fast)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-concatenate-videos-with-different-codecs-concat-filter",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: concatenate videos with different codecs (concat filter)",
+      "statement": "Re-encode while joining (handles different codecs/resolutions). `ffmpeg -i a.mp4 -i b.mp4 -i c.mp4 -filter_complex '[0:v][0:a][1:v][1:a][2:v][2:a]concat=n=3:v=1:a=1[v][a]' -map '[v]' -map '[a]' out.mp4`. `n=3` is input count, `v=1` and `a=1` enable video/audio. Inputs are re-encoded \u2014 slower but works with any mix of formats.",
+      "source_url": "https://ffmpeg.org/ffmpeg-filters.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -i a.mp4 -i b.mp4 -i c.mp4 -filter_complex '[0:v][0:a][1:v][1:a][2:v][2:a]concat=n=3:v=1:a=1[v][a]' -map '[v]' -map '[a]' out.mp4"
+      ],
+      "steps": [
+        "Re-encode while joining (handles different codecs/resolutions). `ffmpeg -i a.mp4 -i b.mp4 -i c.mp4 -filter_complex '[0:v][0:a][1:v][1:a][2:v][2:a]concat=n=3:v=1:a=1[v][a]' -map '[v]' -map '[a]' out.mp4`. `n=3` is input count, `v=1` and `a=1` enable video/audio. Inputs are re-encoded \u2014 slower but works with any mix of formats"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: concatenate videos with different codecs (concat filter)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-resize-scale-video-to-specific-dimensions",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: resize / scale video to specific dimensions",
+      "statement": "Common operation. `ffmpeg -i in.mp4 -vf 'scale=1280:720' out.mp4`. Keep aspect ratio (auto width): `-vf 'scale=-2:720'` (-2 forces even number). Downscale only (skip if smaller): `-vf 'scale=min(iw\\,1280):-2'`. Common presets: 1080p=`1920:1080`, 720p=`1280:720`, 480p=`854:480`. For Apple devices, ensure dimensions are even: use `-2` not `-1`.",
+      "source_url": "https://ffmpeg.org/ffmpeg-filters.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -i in.mp4 -vf 'scale=1280:720' out.mp4",
+        "-vf 'scale=-2:720'",
+        "-vf 'scale=min(iw\\,1280):-2'",
+        "1920:1080",
+        "1280:720",
+        "854:480",
+        "-2",
+        "-1"
+      ],
+      "steps": [
+        "Common operation. `ffmpeg -i in.mp4 -vf 'scale=1280:720' out.mp4`. Keep aspect ratio (auto width): `-vf 'scale=-2:720'` (-2 forces even number). Downscale only (skip if smaller): `-vf 'scale=min(iw\\,1280):-2'`. Common presets: 1080p=`1920:1080`, 720p=`1280:720`, 480p=`854:480`. For Apple devices, ensure dimensions are even: use `-2` not `-1`"
+      ],
+      "constraints": [
+        "Common operation. `ffmpeg -i in.mp4 -vf 'scale=1280:720' out.mp4`. Keep aspect ratio (auto width): `-vf 'scale=-2:720'` (-2 forces even number). Downscale only (skip if smaller): `-vf 'scale=min(iw\\,1280):-2'`. Common presets: 1080p=`1920:1080`, 720p=`1280:720`, 480p=`854:480`. For Apple devices, ensure dimensions are even: use `-2` not `-1`",
+        "Requires binaries or commands referenced in examples: -1, -2, -vf, 1280:720, 1920:1080, 854:480, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: resize / scale video to specific dimensions"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-crop-video-to-specific-region",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: crop video to specific region",
+      "statement": "Cut a rectangle. `ffmpeg -i in.mp4 -vf 'crop=w:h:x:y' out.mp4` \u2014 w/h are output size, x/y is top-left of crop. Example crop center 1080x1080 square: `-vf 'crop=1080:1080:(iw-1080)/2:(ih-1080)/2'`. Crop to 16:9 from 4:3: `-vf 'crop=iw:iw*9/16'`. Auto-detect black bars (first ~3 sec): `ffmpeg -i in.mp4 -vf cropdetect -f null -` then use suggested crop.",
+      "source_url": "https://ffmpeg.org/ffmpeg-filters.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -i in.mp4 -vf 'crop=w:h:x:y' out.mp4",
+        "-vf 'crop=1080:1080:(iw-1080)/2:(ih-1080)/2'",
+        "-vf 'crop=iw:iw*9/16'",
+        "ffmpeg -i in.mp4 -vf cropdetect -f null -"
+      ],
+      "steps": [
+        "Cut a rectangle. `ffmpeg -i in.mp4 -vf 'crop=w:h:x:y' out.mp4` \u2014 w/h are output size, x/y is top-left of crop. Example crop center 1080x1080 square: `-vf 'crop=1080:1080:(iw-1080)/2:(ih-1080)/2'`. Crop to 16:9 from 4:3: `-vf 'crop=iw:iw*9/16'`. Auto-detect black bars (first ~3 sec): `ffmpeg -i in.mp4 -vf cropdetect -f null -` then use suggested crop"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -vf, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: crop video to specific region"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-rotate-video-by-90-180-270-degrees",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: rotate video by 90/180/270 degrees",
+      "statement": "Transpose filters. 90\u00b0 clockwise: `-vf 'transpose=1'`. 90\u00b0 counter-clockwise: `-vf 'transpose=2'`. 180\u00b0: `-vf 'transpose=2,transpose=2'` or `-vf 'hflip,vflip'`. Arbitrary angle: `-vf 'rotate=30*PI/180:fillcolor=black'`. Some phones store rotation as metadata; strip it: `-metadata:s:v:0 rotate=0` or `-noautorotate`.",
+      "source_url": "https://ffmpeg.org/ffmpeg-filters.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-vf 'transpose=1'",
+        "-vf 'transpose=2'",
+        "-vf 'transpose=2,transpose=2'",
+        "-vf 'hflip,vflip'",
+        "-vf 'rotate=30*PI/180:fillcolor=black'",
+        "-metadata:s:v:0 rotate=0",
+        "-noautorotate"
+      ],
+      "steps": [
+        "Transpose filters. 90\u00b0 clockwise: `-vf 'transpose=1'`. 90\u00b0 counter-clockwise: `-vf 'transpose=2'`. 180\u00b0: `-vf 'transpose=2,transpose=2'` or `-vf 'hflip,vflip'`. Arbitrary angle: `-vf 'rotate=30*PI/180:fillcolor=black'`. Some phones store rotation as metadata; strip it: `-metadata:s:v:0 rotate=0` or `-noautorotate`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -metadata:s:v:0, -noautorotate, -vf."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: rotate video by 90/180/270 degrees"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-change-video-speed-fast-slow-motion",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: change video speed (fast/slow motion)",
+      "statement": "Speed up 2x (video + audio): `ffmpeg -i in.mp4 -filter_complex '[0:v]setpts=0.5*PTS[v];[0:a]atempo=2.0[a]' -map '[v]' -map '[a]' out.mp4`. Slow down 0.5x: `setpts=2.0*PTS` and `atempo=0.5`. `atempo` range is 0.5\u20132.0 \u2014 chain for more: `atempo=2.0,atempo=2.0` = 4x. Video-only fast: `-vf 'setpts=0.5*PTS' -an`.",
+      "source_url": "https://ffmpeg.org/ffmpeg-filters.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -i in.mp4 -filter_complex '[0:v]setpts=0.5*PTS[v];[0:a]atempo=2.0[a]' -map '[v]' -map '[a]' out.mp4",
+        "atempo",
+        "-vf 'setpts=0.5*PTS' -an"
+      ],
+      "steps": [
+        "Speed up 2x (video + audio): `ffmpeg -i in.mp4 -filter_complex '[0:v]setpts=0.5*PTS[v];[0:a]atempo=2.0[a]' -map '[v]' -map '[a]' out.mp4`. Slow down 0.5x: `setpts=2.0*PTS` and `atempo=0.5`. `atempo` range is 0.5\u20132.0 \u2014 chain for more: `atempo=2.0,atempo=2.0` = 4x. Video-only fast: `-vf 'setpts=0.5*PTS' -an`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -vf, atempo, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: change video speed (fast/slow motion)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-take-a-screenshot-single-frame-at-timestamp",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: take a screenshot / single frame at timestamp",
+      "statement": "Extract a frame. `ffmpeg -ss 00:01:30 -i in.mp4 -vframes 1 -q:v 2 frame.jpg`. `-q:v 2` = high JPEG quality (1=best, 31=worst). PNG (lossless): `frame.png`. First keyframe only (fastest): place -ss before -i (above). Frame-exact (slower): `ffmpeg -i in.mp4 -ss 00:01:30 -vframes 1 frame.png`.",
+      "source_url": "https://ffmpeg.org/ffmpeg.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -ss 00:01:30 -i in.mp4 -vframes 1 -q:v 2 frame.jpg",
+        "-q:v 2",
+        "frame.png",
+        "ffmpeg -i in.mp4 -ss 00:01:30 -vframes 1 frame.png"
+      ],
+      "steps": [
+        "Extract a frame. `ffmpeg -ss 00:01:30 -i in.mp4 -vframes 1 -q:v 2 frame.jpg`. `-q:v 2` = high JPEG quality (1=best, 31=worst). PNG (lossless): `frame.png`. First keyframe only (fastest): place -ss before -i (above). Frame-exact (slower): `ffmpeg -i in.mp4 -ss 00:01:30 -vframes 1 frame.png`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -q:v, ffmpeg, frame.png."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: take a screenshot / single frame at timestamp"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-generate-thumbnail-grid-contact-sheet",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: generate thumbnail grid (contact sheet)",
+      "statement": "Overview image. `ffmpeg -i in.mp4 -vf 'fps=1/60,scale=320:-1,tile=4x4' contact.png`. `fps=1/60` = one frame per minute, `tile=4x4` = 16-thumbnail grid. For longer videos: `fps=1/300` (every 5 min). Add timestamps: `-vf 'fps=1/60,scale=320:-1,drawtext=text=%{pts\\\\:hms}:fontsize=20:x=10:y=10:fontcolor=white,tile=4x4'`.",
+      "source_url": "https://ffmpeg.org/ffmpeg-filters.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -i in.mp4 -vf 'fps=1/60,scale=320:-1,tile=4x4' contact.png",
+        "-vf 'fps=1/60,scale=320:-1,drawtext=text=%{pts\\\\:hms}:fontsize=20:x=10:y=10:fontcolor=white,tile=4x4'"
+      ],
+      "steps": [
+        "Overview image. `ffmpeg -i in.mp4 -vf 'fps=1/60,scale=320:-1,tile=4x4' contact.png`. `fps=1/60` = one frame per minute, `tile=4x4` = 16-thumbnail grid. For longer videos: `fps=1/300` (every 5 min). Add timestamps: `-vf 'fps=1/60,scale=320:-1,drawtext=text=%{pts\\\\:hms}:fontsize=20:x=10:y=10:fontcolor=white,tile=4x4'`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -vf, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: generate thumbnail grid (contact sheet)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-convert-video-to-animated-gif",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: convert video to animated GIF",
+      "statement": "Two-pass for quality (single-pass gives banding). Pass 1 (palette): `ffmpeg -i in.mp4 -vf 'fps=10,scale=480:-1:flags=lanczos,palettegen' palette.png`. Pass 2 (use palette): `ffmpeg -i in.mp4 -i palette.png -filter_complex 'fps=10,scale=480:-1:flags=lanczos[x];[x][1:v]paletteuse' out.gif`. Smaller: lower fps (8-12), smaller scale (320), or convert to mp4 instead (most platforms autoplay).",
+      "source_url": "https://ffmpeg.org/ffmpeg-filters.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -i in.mp4 -vf 'fps=10,scale=480:-1:flags=lanczos,palettegen' palette.png",
+        "ffmpeg -i in.mp4 -i palette.png -filter_complex 'fps=10,scale=480:-1:flags=lanczos[x];[x][1:v]paletteuse' out.gif"
+      ],
+      "steps": [
+        "Two-pass for quality (single-pass gives banding). Pass 1 (palette): `ffmpeg -i in.mp4 -vf 'fps=10,scale=480:-1:flags=lanczos,palettegen' palette.png`. Pass 2 (use palette): `ffmpeg -i in.mp4 -i palette.png -filter_complex 'fps=10,scale=480:-1:flags=lanczos[x];[x][1:v]paletteuse' out.gif`. Smaller: lower fps (8-12), smaller scale",
+        ", or convert to mp4 instead (most platforms autoplay)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: convert video to animated GIF"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-reverse-a-video",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: reverse a video",
+      "statement": "Play backward. `ffmpeg -i in.mp4 -vf reverse -af areverse out.mp4`. Both filters buffer entire input in RAM \u2014 for long videos: split into chunks first. Video-only reverse (silent): `-vf reverse -an`. Reverse loop effect (forward then backward): `ffmpeg -i in.mp4 -filter_complex '[0]reverse[r];[0][r]concat=n=2:v=1' out.mp4`.",
+      "source_url": "https://ffmpeg.org/ffmpeg-filters.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -i in.mp4 -vf reverse -af areverse out.mp4",
+        "-vf reverse -an",
+        "ffmpeg -i in.mp4 -filter_complex '[0]reverse[r];[0][r]concat=n=2:v=1' out.mp4"
+      ],
+      "steps": [
+        "Play backward. `ffmpeg -i in.mp4 -vf reverse -af areverse out.mp4`. Both filters buffer entire input in RAM \u2014 for long videos: split into chunks first. Video-only reverse (silent): `-vf reverse -an`. Reverse loop effect (forward then backward): `ffmpeg -i in.mp4 -filter_complex '[0]reverse[r];[0][r]concat=n=2:v=1' out.mp4`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -vf, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: reverse a video"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-burn-hardcode-subtitles-into-video",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: burn (hardcode) subtitles into video",
+      "statement": "Permanent subtitles in pixels. From .srt: `ffmpeg -i in.mp4 -vf 'subtitles=subs.srt' -c:a copy out.mp4`. With styling: `-vf 'subtitles=subs.srt:force_style=Fontsize=24,PrimaryColour=&HFFFFFF,OutlineColour=&H000000'`. From .ass (advanced subs): `-vf 'ass=subs.ass'`. Burn one specific track from MKV: `-vf 'subtitles=in.mkv:si=0'` (subtitle index 0).",
+      "source_url": "https://ffmpeg.org/ffmpeg-filters.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -i in.mp4 -vf 'subtitles=subs.srt' -c:a copy out.mp4",
+        "-vf 'subtitles=subs.srt:force_style=Fontsize=24,PrimaryColour=&HFFFFFF,OutlineColour=&H000000'",
+        "-vf 'ass=subs.ass'",
+        "-vf 'subtitles=in.mkv:si=0'"
+      ],
+      "steps": [
+        "Permanent subtitles in pixels. From .srt: `ffmpeg -i in.mp4 -vf 'subtitles=subs.srt' -c:a copy out.mp4`. With styling: `-vf 'subtitles=subs.srt:force_style=Fontsize=24,PrimaryColour=&HFFFFFF,OutlineColour=&H000000'`. From .ass (advanced subs): `-vf 'ass=subs.ass'`. Burn one specific track from MKV: `-vf 'subtitles=in.mkv:si=0'` (subtitle index 0)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -vf, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: burn (hardcode) subtitles into video"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-mux-soft-subtitles-into-mp4-mkv",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: mux soft subtitles into MP4/MKV",
+      "statement": "Embed subtitles as separate track (toggleable). MKV: `ffmpeg -i in.mp4 -i subs.srt -c:v copy -c:a copy -c:s srt out.mkv`. MP4 needs mov_text codec: `ffmpeg -i in.mp4 -i subs.srt -c:v copy -c:a copy -c:s mov_text -metadata:s:s:0 language=eng out.mp4`. Multiple languages: add `-i en.srt -i es.srt -map 0 -map 1 -map 2 -metadata:s:s:0 language=eng -metadata:s:s:1 language=spa`.",
+      "source_url": "https://ffmpeg.org/ffmpeg.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -i in.mp4 -i subs.srt -c:v copy -c:a copy -c:s srt out.mkv",
+        "ffmpeg -i in.mp4 -i subs.srt -c:v copy -c:a copy -c:s mov_text -metadata:s:s:0 language=eng out.mp4",
+        "-i en.srt -i es.srt -map 0 -map 1 -map 2 -metadata:s:s:0 language=eng -metadata:s:s:1 language=spa"
+      ],
+      "steps": [
+        "Embed subtitles as separate track (toggleable). MKV: `ffmpeg -i in.mp4 -i subs.srt -c:v copy -c:a copy -c:s srt out.mkv`. MP4 needs mov_text codec: `ffmpeg -i in.mp4 -i subs.srt -c:v copy -c:a copy -c:s mov_text -metadata:s:s:0 language=eng out.mp4`. Multiple languages: add `-i en.srt -i es.srt -map 0 -map 1 -map 2 -metadata:s:s:0 language=eng -metadata:s:s:1 language=spa`"
+      ],
+      "constraints": [
+        "Embed subtitles as separate track (toggleable). MKV: `ffmpeg -i in.mp4 -i subs.srt -c:v copy -c:a copy -c:s srt out.mkv`. MP4 needs mov_text codec: `ffmpeg -i in.mp4 -i subs.srt -c:v copy -c:a copy -c:s mov_text -metadata:s:s:0 language=eng out.mp4`. Multiple languages: add `-i en.srt -i es.srt -map 0 -map 1 -map 2 -metadata:s:s:0 language=eng -metadata:s:s:1 language=spa`",
+        "Requires binaries or commands referenced in examples: -i, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: mux soft subtitles into MP4/MKV"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-add-watermark-overlay-image-on-video",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: add watermark / overlay image on video",
+      "statement": "Logo bottom-right. `ffmpeg -i in.mp4 -i logo.png -filter_complex 'overlay=W-w-10:H-h-10' out.mp4`. W/H = main video, w/h = overlay. Positions: top-left=`10:10`, top-right=`W-w-10:10`, bottom-left=`10:H-h-10`, center=`(W-w)/2:(H-h)/2`. Semi-transparent: pre-process logo with alpha or `-filter_complex '[1:v]format=rgba,colorchannelmixer=aa=0.5[lg];[0:v][lg]overlay=10:10'`. Timed (10-20s only): `overlay=10:10:enable='between(t,10,20)'`.",
+      "source_url": "https://ffmpeg.org/ffmpeg-filters.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -i in.mp4 -i logo.png -filter_complex 'overlay=W-w-10:H-h-10' out.mp4",
+        "10:10",
+        "W-w-10:10",
+        "10:H-h-10",
+        "-filter_complex '[1:v]format=rgba,colorchannelmixer=aa=0.5[lg];[0:v][lg]overlay=10:10'"
+      ],
+      "steps": [
+        "Logo bottom-right. `ffmpeg -i in.mp4 -i logo.png -filter_complex 'overlay=W-w-10:H-h-10' out.mp4`. W/H = main video, w/h = overlay. Positions: top-left=`10:10`, top-right=`W-w-10:10`, bottom-left=`10:H-h-10`, center=`(W-w)/2:(H-h)/2`. Semi-transparent: pre-process logo with alpha or `-filter_complex '[1:v]format=rgba,colorchannelmixer=aa=0.5[lg];[0:v][lg]overlay=10:10'`. Timed (10-20s only): `overlay=10:10:enable='between(t,10,20)'`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -filter_complex, 10:10, 10:H-h-10, W-w-10:10, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: add watermark / overlay image on video"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-hls-live-streaming-output",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: HLS live streaming output",
+      "statement": "Apple HTTP Live Streaming segments. `ffmpeg -i in.mp4 -c:v libx264 -c:a aac -hls_time 6 -hls_list_size 0 -f hls out.m3u8`. Produces out.m3u8 (playlist) + out0.ts, out1.ts ... segments. Live (keep rolling window): `-hls_list_size 5 -hls_flags delete_segments`. Multi-bitrate: needs `-filter_complex` with split + scale per quality level.",
+      "source_url": "https://ffmpeg.org/ffmpeg-formats.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -i in.mp4 -c:v libx264 -c:a aac -hls_time 6 -hls_list_size 0 -f hls out.m3u8",
+        "-hls_list_size 5 -hls_flags delete_segments",
+        "-filter_complex"
+      ],
+      "steps": [
+        "Apple HTTP Live Streaming segments. `ffmpeg -i in.mp4 -c:v libx264 -c:a aac -hls_time 6 -hls_list_size 0 -f hls out.m3u8`. Produces out.m3u8 (playlist) + out0.ts, out1.ts ... segments. Live (keep rolling window): `-hls_list_size 5 -hls_flags delete_segments`. Multi-bitrate: needs `-filter_complex` with split + scale per quality level"
+      ],
+      "constraints": [
+        "Apple HTTP Live Streaming segments. `ffmpeg -i in.mp4 -c:v libx264 -c:a aac -hls_time 6 -hls_list_size 0 -f hls out.m3u8`. Produces out.m3u8 (playlist) + out0.ts, out1.ts ... segments. Live (keep rolling window): `-hls_list_size 5 -hls_flags delete_segments`. Multi-bitrate: needs `-filter_complex` with split + scale per quality level",
+        "Requires binaries or commands referenced in examples: -filter_complex, -hls_list_size, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: HLS live streaming output"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-stream-to-rtmp-youtube-twitch-live",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: stream to RTMP (YouTube/Twitch live)",
+      "statement": "Push to streaming endpoint. `ffmpeg -re -i in.mp4 -c:v libx264 -preset veryfast -b:v 3000k -c:a aac -b:a 160k -f flv rtmp://a.rtmp.youtube.com/live2/<stream-key>`. `-re` reads input at native rate (real-time, for VOD\u2192live). Skip `-re` for live capture inputs. Twitch: `rtmp://live.twitch.tv/app/<stream-key>`.",
+      "source_url": "https://ffmpeg.org/ffmpeg-protocols.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -re -i in.mp4 -c:v libx264 -preset veryfast -b:v 3000k -c:a aac -b:a 160k -f flv rtmp://a.rtmp.youtube.com/live2/<stream-key>",
+        "-re"
+      ],
+      "steps": [
+        "Push to streaming endpoint. `ffmpeg -re -i in.mp4 -c:v libx264 -preset veryfast -b:v 3000k -c:a aac -b:a 160k -f flv rtmp://a.rtmp.youtube.com/live2/<stream-key>`. `-re` reads input at native rate (real-time, for VOD\u2192live). Skip `-re` for live capture inputs. Twitch: `rtmp://live.twitch.tv/app/<stream-key>`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -re, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: stream to RTMP (YouTube/Twitch live)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-loop-video-n-times",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: loop video N times",
+      "statement": "Repeat input. Loop demuxer: `ffmpeg -stream_loop 4 -i in.mp4 -c copy out.mp4` (plays 5x \u2014 initial + 4 loops). Infinite: `-stream_loop -1` (only useful for streaming output). GIF loop forever: append `-loop 0` for the output. Loop concat (more reliable for re-encode): list same file N times in concat list.txt.",
+      "source_url": "https://ffmpeg.org/ffmpeg.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -stream_loop 4 -i in.mp4 -c copy out.mp4",
+        "-stream_loop -1",
+        "-loop 0"
+      ],
+      "steps": [
+        "Repeat input. Loop demuxer: `ffmpeg -stream_loop 4 -i in.mp4 -c copy out.mp4` (plays 5x \u2014 initial + 4 loops). Infinite: `-stream_loop -1` (only useful for streaming output). GIF loop forever: append `-loop 0` for the output. Loop concat (more reliable for re-encode): list same file N times in concat list.txt"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -loop, -stream_loop, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: loop video N times"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-generate-silent-audio-file",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: generate silent audio file",
+      "statement": "Silence of specific duration. `ffmpeg -f lavfi -i anullsrc=channel_layout=stereo:sample_rate=44100 -t 60 silence.mp3`. For WAV: `silence.wav`. For specific format: `-f lavfi -i anullsrc=cl=mono:r=16000 -t 5 silence.wav` (16kHz mono). Useful for padding audio tracks or creating timing.",
+      "source_url": "https://ffmpeg.org/ffmpeg-filters.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -f lavfi -i anullsrc=channel_layout=stereo:sample_rate=44100 -t 60 silence.mp3",
+        "silence.wav",
+        "-f lavfi -i anullsrc=cl=mono:r=16000 -t 5 silence.wav"
+      ],
+      "steps": [
+        "Silence of specific duration. `ffmpeg -f lavfi -i anullsrc=channel_layout=stereo:sample_rate=44100 -t 60 silence.mp3`. For WAV: `silence.wav`. For specific format: `-f lavfi -i anullsrc=cl=mono:r=16000 -t 5 silence.wav` (16kHz mono). Useful for padding audio tracks or creating timing"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -f, ffmpeg, silence.wav."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: generate silent audio file"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-generate-test-pattern-video",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: generate test pattern video",
+      "statement": "Synthetic video for testing. Color bars: `ffmpeg -f lavfi -i 'smptebars=size=1920x1080:rate=30' -t 10 bars.mp4`. Solid color: `-i 'color=c=red:size=1920x1080:rate=30'`. With test tone: `-f lavfi -i 'sine=frequency=1000:sample_rate=48000'`. Combine: `-f lavfi -i 'testsrc=size=1280x720:rate=30' -f lavfi -i 'sine=frequency=440' -t 10 test.mp4`.",
+      "source_url": "https://ffmpeg.org/ffmpeg-filters.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -f lavfi -i 'smptebars=size=1920x1080:rate=30' -t 10 bars.mp4",
+        "-i 'color=c=red:size=1920x1080:rate=30'",
+        "-f lavfi -i 'sine=frequency=1000:sample_rate=48000'",
+        "-f lavfi -i 'testsrc=size=1280x720:rate=30' -f lavfi -i 'sine=frequency=440' -t 10 test.mp4"
+      ],
+      "steps": [
+        "Synthetic video for testing. Color bars: `ffmpeg -f lavfi -i 'smptebars=size=1920x1080:rate=30' -t 10 bars.mp4`. Solid color: `-i 'color=c=red:size=1920x1080:rate=30'`. With test tone: `-f lavfi -i 'sine=frequency=1000:sample_rate=48000'`. Combine: `-f lavfi -i 'testsrc=size=1280x720:rate=30' -f lavfi -i 'sine=frequency=440' -t 10 test.mp4`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -f, -i, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: generate test pattern video"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-capture-webcam-on-macos-avfoundation",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: capture webcam on macOS (avfoundation)",
+      "statement": "Mac built-in camera. List devices: `ffmpeg -f avfoundation -list_devices true -i ''`. Capture: `ffmpeg -f avfoundation -framerate 30 -i '0' -c:v libx264 -preset ultrafast cam.mp4`. Camera + mic: `-i '0:1'` (video device 0, audio device 1). Specific resolution: `-video_size 1280x720` before -i. Press 'q' to stop cleanly.",
+      "source_url": "https://ffmpeg.org/ffmpeg-devices.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -f avfoundation -list_devices true -i ''",
+        "ffmpeg -f avfoundation -framerate 30 -i '0' -c:v libx264 -preset ultrafast cam.mp4",
+        "-i '0:1'",
+        "-video_size 1280x720"
+      ],
+      "steps": [
+        "Mac built-in camera. List devices: `ffmpeg -f avfoundation -list_devices true -i ''`. Capture: `ffmpeg -f avfoundation -framerate 30 -i '0' -c:v libx264 -preset ultrafast cam.mp4`. Camera + mic: `-i '0:1'` (video device 0, audio device 1). Specific resolution: `-video_size 1280x720` before -i. Press 'q' to stop cleanly"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -i, -video_size, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: capture webcam on macOS (avfoundation)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-record-screen-on-macos",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: record screen on macOS",
+      "statement": "Screen capture via avfoundation. List screens: `ffmpeg -f avfoundation -list_devices true -i ''`. Screen 1 is typically '1' or '2' (after cameras). Capture: `ffmpeg -f avfoundation -framerate 30 -i '1' -c:v libx264 -preset ultrafast -crf 23 screen.mp4`. With system audio (needs BlackHole/Loopback): `-i '1:2'`. Requires Screen Recording permission in System Settings \u2192 Privacy.",
+      "source_url": "https://ffmpeg.org/ffmpeg-devices.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -f avfoundation -list_devices true -i ''",
+        "ffmpeg -f avfoundation -framerate 30 -i '1' -c:v libx264 -preset ultrafast -crf 23 screen.mp4",
+        "-i '1:2'"
+      ],
+      "steps": [
+        "Screen capture via avfoundation. List screens: `ffmpeg -f avfoundation -list_devices true -i ''`. Screen 1 is typically '1' or '2' (after cameras). Capture: `ffmpeg -f avfoundation -framerate 30 -i '1' -c:v libx264 -preset ultrafast -crf 23 screen.mp4`. With system audio (needs BlackHole/Loopback): `-i '1:2'`. Requires Screen Recording permission in System Settings \u2192 Privacy"
+      ],
+      "constraints": [
+        "Screen capture via avfoundation. List screens: `ffmpeg -f avfoundation -list_devices true -i ''`. Screen 1 is typically '1' or '2' (after cameras). Capture: `ffmpeg -f avfoundation -framerate 30 -i '1' -c:v libx264 -preset ultrafast -crf 23 screen.mp4`. With system audio (needs BlackHole/Loopback): `-i '1:2'`. Requires Screen Recording permission in System Settings \u2192 Privacy",
+        "Requires binaries or commands referenced in examples: -i, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: record screen on macOS"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-two-pass-h-264-encode-for-target-bitrate",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: two-pass H.264 encode for target bitrate",
+      "statement": "Better quality at a known file size. Pass 1: `ffmpeg -y -i in.mp4 -c:v libx264 -b:v 2M -pass 1 -an -f null /dev/null`. Pass 2: `ffmpeg -i in.mp4 -c:v libx264 -b:v 2M -pass 2 -c:a aac -b:a 128k out.mp4`. Useful when you NEED a specific file size (-b:v 2M \u2248 ~15 MB/min). For quality-first, prefer single-pass CRF (`-crf 23`).",
+      "source_url": "https://ffmpeg.org/ffmpeg-codecs.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -y -i in.mp4 -c:v libx264 -b:v 2M -pass 1 -an -f null /dev/null",
+        "ffmpeg -i in.mp4 -c:v libx264 -b:v 2M -pass 2 -c:a aac -b:a 128k out.mp4",
+        "-crf 23"
+      ],
+      "steps": [
+        "Better quality at a known file size. Pass 1: `ffmpeg -y -i in.mp4 -c:v libx264 -b:v 2M -pass 1 -an -f null /dev/null`. Pass 2: `ffmpeg -i in.mp4 -c:v libx264 -b:v 2M -pass 2 -c:a aac -b:a 128k out.mp4`. Useful when you NEED a specific file size (-b:v 2M \u2248 ~15 MB/min). For quality-first, prefer single-pass CRF (`-crf 23`)"
+      ],
+      "constraints": [
+        "Better quality at a known file size. Pass 1: `ffmpeg -y -i in.mp4 -c:v libx264 -b:v 2M -pass 1 -an -f null /dev/null`. Pass 2: `ffmpeg -i in.mp4 -c:v libx264 -b:v 2M -pass 2 -c:a aac -b:a 128k out.mp4`. Useful when you NEED a specific file size (-b:v 2M \u2248 ~15 MB/min). For quality-first, prefer single-pass CRF (`-crf 23`)",
+        "Requires binaries or commands referenced in examples: -crf, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: two-pass H.264 encode for target bitrate"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-convert-to-h-265-hevc-for-smaller-files",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: convert to H.265 (HEVC) for smaller files",
+      "statement": "About 50% smaller than H.264 at same quality. `ffmpeg -i in.mp4 -c:v libx265 -preset medium -crf 28 -c:a aac -b:a 128k out.mp4`. CRF guide: 18=lossless, 24=high, 28=default, 32=small. MP4 needs the HVC1 tag for Apple compat: `-tag:v hvc1`. Caveats: slower encode; older players don't support; iOS Photos prefers .mov container.",
+      "source_url": "https://ffmpeg.org/ffmpeg-codecs.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -i in.mp4 -c:v libx265 -preset medium -crf 28 -c:a aac -b:a 128k out.mp4",
+        "-tag:v hvc1"
+      ],
+      "steps": [
+        "About 50% smaller than H.264 at same quality. `ffmpeg -i in.mp4 -c:v libx265 -preset medium -crf 28 -c:a aac -b:a 128k out.mp4`. CRF guide: 18=lossless, 24=high, 28=default, 32=small. MP4 needs the HVC1 tag for Apple compat: `-tag:v hvc1`. Caveats: slower encode; older players don't support; iOS Photos prefers .mov container"
+      ],
+      "constraints": [
+        "About 50% smaller than H.264 at same quality. `ffmpeg -i in.mp4 -c:v libx265 -preset medium -crf 28 -c:a aac -b:a 128k out.mp4`. CRF guide: 18=lossless, 24=high, 28=default, 32=small. MP4 needs the HVC1 tag for Apple compat: `-tag:v hvc1`. Caveats: slower encode; older players don't support; iOS Photos prefers .mov container",
+        "Requires binaries or commands referenced in examples: -tag:v, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: convert to H.265 (HEVC) for smaller files"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-hardware-accelerated-encode-videotoolbox-on-macos",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: hardware-accelerated encode (videotoolbox on macOS)",
+      "statement": "Fast encoding using GPU. H.264: `ffmpeg -i in.mp4 -c:v h264_videotoolbox -b:v 5M -c:a aac out.mp4`. HEVC: `-c:v hevc_videotoolbox -b:v 3M`. Much faster than libx264 but lower compression efficiency (need higher bitrate for same quality). Decode also: `-hwaccel videotoolbox -i in.mp4`. NVIDIA equivalent: `-c:v h264_nvenc` (NVENC).",
+      "source_url": "https://ffmpeg.org/ffmpeg-codecs.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -i in.mp4 -c:v h264_videotoolbox -b:v 5M -c:a aac out.mp4",
+        "-c:v hevc_videotoolbox -b:v 3M",
+        "-hwaccel videotoolbox -i in.mp4",
+        "-c:v h264_nvenc"
+      ],
+      "steps": [
+        "Fast encoding using GPU. H.264: `ffmpeg -i in.mp4 -c:v h264_videotoolbox -b:v 5M -c:a aac out.mp4`. HEVC: `-c:v hevc_videotoolbox -b:v 3M`. Much faster than libx264 but lower compression efficiency (need higher bitrate for same quality). Decode also: `-hwaccel videotoolbox -i in.mp4`. NVIDIA equivalent: `-c:v h264_nvenc` (NVENC)"
+      ],
+      "constraints": [
+        "Fast encoding using GPU. H.264: `ffmpeg -i in.mp4 -c:v h264_videotoolbox -b:v 5M -c:a aac out.mp4`. HEVC: `-c:v hevc_videotoolbox -b:v 3M`. Much faster than libx264 but lower compression efficiency (need higher bitrate for same quality). Decode also: `-hwaccel videotoolbox -i in.mp4`. NVIDIA equivalent: `-c:v h264_nvenc` (NVENC)",
+        "Requires binaries or commands referenced in examples: -c:v, -hwaccel, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: hardware-accelerated encode (videotoolbox on macOS)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-inspect-media-file-with-ffprobe",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: inspect media file with ffprobe",
+      "statement": "Show streams + metadata. Basic: `ffprobe in.mp4` (human-readable). JSON output: `ffprobe -v error -show_streams -show_format -of json in.mp4`. Just duration: `ffprobe -v error -show_entries format=duration -of csv=p=0 in.mp4`. Just video codec: `ffprobe -v error -select_streams v:0 -show_entries stream=codec_name -of csv=p=0 in.mp4`. Frame-by-frame: `ffprobe -show_frames in.mp4`.",
+      "source_url": "https://ffmpeg.org/ffprobe.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffprobe in.mp4",
+        "ffprobe -v error -show_streams -show_format -of json in.mp4",
+        "ffprobe -v error -show_entries format=duration -of csv=p=0 in.mp4",
+        "ffprobe -v error -select_streams v:0 -show_entries stream=codec_name -of csv=p=0 in.mp4",
+        "ffprobe -show_frames in.mp4"
+      ],
+      "steps": [
+        "Show streams + metadata. Basic: `ffprobe in.mp4` (human-readable). JSON output: `ffprobe -v error -show_streams -show_format -of json in.mp4`. Just duration: `ffprobe -v error -show_entries format=duration -of csv=p=0 in.mp4`. Just video codec: `ffprobe -v error -select_streams v:0 -show_entries stream=codec_name -of csv=p=0 in.mp4`. Frame-by-frame: `ffprobe -show_frames in.mp4`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ffprobe."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: inspect media file with ffprobe"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-fade-in-fade-out-video-and-audio",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: fade in / fade out video and audio",
+      "statement": "Smooth opening/closing. Video fade in (0-3s): `-vf 'fade=t=in:st=0:d=3'`. Video fade out (last 3s of 60s clip): `-vf 'fade=t=out:st=57:d=3'`. Both: `-vf 'fade=t=in:st=0:d=3,fade=t=out:st=57:d=3'`. Audio fade: `-af 'afade=t=in:st=0:d=3,afade=t=out:st=57:d=3'`. Combined: use `-filter_complex` and map both.",
+      "source_url": "https://ffmpeg.org/ffmpeg-filters.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-vf 'fade=t=in:st=0:d=3'",
+        "-vf 'fade=t=out:st=57:d=3'",
+        "-vf 'fade=t=in:st=0:d=3,fade=t=out:st=57:d=3'",
+        "-af 'afade=t=in:st=0:d=3,afade=t=out:st=57:d=3'",
+        "-filter_complex"
+      ],
+      "steps": [
+        "Smooth opening/closing. Video fade in (0-3s): `-vf 'fade=t=in:st=0:d=3'`. Video fade out (last 3s of 60s clip): `-vf 'fade=t=out:st=57:d=3'`. Both: `-vf 'fade=t=in:st=0:d=3,fade=t=out:st=57:d=3'`. Audio fade: `-af 'afade=t=in:st=0:d=3,afade=t=out:st=57:d=3'`. Combined: use `-filter_complex` and map both"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -af, -filter_complex, -vf."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: fade in / fade out video and audio"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-mix-two-audio-tracks-together",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: mix two audio tracks together",
+      "statement": "Overlay sound (e.g., music + voiceover). `ffmpeg -i voice.mp3 -i music.mp3 -filter_complex 'amix=inputs=2:duration=longest' mixed.mp3`. Volume control per input: `-filter_complex '[0:a]volume=1.0[a0];[1:a]volume=0.3[a1];[a0][a1]amix=inputs=2'`. Side-by-side stereo (no mix): `-filter_complex '[0:a][1:a]amerge=inputs=2'`. Duck music while voice plays: needs `sidechaincompress` filter.",
+      "source_url": "https://ffmpeg.org/ffmpeg-filters.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -i voice.mp3 -i music.mp3 -filter_complex 'amix=inputs=2:duration=longest' mixed.mp3",
+        "-filter_complex '[0:a]volume=1.0[a0];[1:a]volume=0.3[a1];[a0][a1]amix=inputs=2'",
+        "-filter_complex '[0:a][1:a]amerge=inputs=2'",
+        "sidechaincompress"
+      ],
+      "steps": [
+        "Overlay sound (e.g., music + voiceover). `ffmpeg -i voice.mp3 -i music.mp3 -filter_complex 'amix=inputs=2:duration=longest' mixed.mp3`. Volume control per input: `-filter_complex '[0:a]volume=1.0[a0];[1:a]volume=0.3[a1];[a0][a1]amix=inputs=2'`. Side-by-side stereo (no mix): `-filter_complex '[0:a][1:a]amerge=inputs=2'`. Duck music while voice plays: needs `sidechaincompress` filter"
+      ],
+      "constraints": [
+        "Overlay sound (e.g., music + voiceover). `ffmpeg -i voice.mp3 -i music.mp3 -filter_complex 'amix=inputs=2:duration=longest' mixed.mp3`. Volume control per input: `-filter_complex '[0:a]volume=1.0[a0];[1:a]volume=0.3[a1];[a0][a1]amix=inputs=2'`. Side-by-side stereo (no mix): `-filter_complex '[0:a][1:a]amerge=inputs=2'`. Duck music while voice plays: needs `sidechaincompress` filter",
+        "Requires binaries or commands referenced in examples: -filter_complex, ffmpeg, sidechaincompress."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: mix two audio tracks together"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-extract-frames-as-png-sequence",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: extract frames as PNG sequence",
+      "statement": "Every frame. `ffmpeg -i in.mp4 frame_%04d.png` (frame_0001.png ...). Every 5 sec: `ffmpeg -i in.mp4 -vf 'fps=1/5' frame_%04d.png`. Only keyframes (I-frames): `ffmpeg -i in.mp4 -vf 'select=eq(pict_type\\,I)' -vsync vfr keyframe_%04d.png`. Specific range: `-ss 00:01:00 -t 10 -i in.mp4 frame_%04d.png`. Reverse (frames \u2192 video): `ffmpeg -framerate 30 -i frame_%04d.png out.mp4`.",
+      "source_url": "https://ffmpeg.org/ffmpeg.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -i in.mp4 frame_%04d.png",
+        "ffmpeg -i in.mp4 -vf 'fps=1/5' frame_%04d.png",
+        "ffmpeg -i in.mp4 -vf 'select=eq(pict_type\\,I)' -vsync vfr keyframe_%04d.png",
+        "-ss 00:01:00 -t 10 -i in.mp4 frame_%04d.png",
+        "ffmpeg -framerate 30 -i frame_%04d.png out.mp4"
+      ],
+      "steps": [
+        "Every frame. `ffmpeg -i in.mp4 frame_%04d.png` (frame_0001.png ...). Every 5 sec: `ffmpeg -i in.mp4 -vf 'fps=1/5' frame_%04d.png`. Only keyframes (I-frames): `ffmpeg -i in.mp4 -vf 'select=eq(pict_type\\,I)' -vsync vfr keyframe_%04d.png`. Specific range: `-ss 00:01:00 -t 10 -i in.mp4 frame_%04d.png`. Reverse (frames \u2192 video): `ffmpeg -framerate 30 -i frame_%04d.png out.mp4`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -ss, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: extract frames as PNG sequence"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-normalize-audio-volume-loudness",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: normalize audio volume (loudness)",
+      "statement": "Match broadcast loudness standard. One-pass: `ffmpeg -i in.mp4 -af 'loudnorm=I=-16:LRA=11:TP=-1.5' out.mp4` (target: -16 LUFS, common for web). Streaming defaults: YouTube/Spotify ~-14 LUFS, broadcast -23 LUFS. Two-pass (more accurate): pass 1 prints measurements (`-af 'loudnorm=I=-16:print_format=json'`), pass 2 uses them. Simple peak normalize: `-af 'dynaudnorm'` or `-af 'volume=2.0'`.",
+      "source_url": "https://ffmpeg.org/ffmpeg-filters.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -i in.mp4 -af 'loudnorm=I=-16:LRA=11:TP=-1.5' out.mp4",
+        "-af 'loudnorm=I=-16:print_format=json'",
+        "-af 'dynaudnorm'",
+        "-af 'volume=2.0'"
+      ],
+      "steps": [
+        "Match broadcast loudness standard. One-pass: `ffmpeg -i in.mp4 -af 'loudnorm=I=-16:LRA=11:TP=-1.5' out.mp4` (target: -16 LUFS, common for web). Streaming defaults: YouTube/Spotify ~-14 LUFS, broadcast -23 LUFS. Two-pass (more accurate): pass 1 prints measurements (`-af 'loudnorm=I=-16:print_format=json'`), pass 2 uses them. Simple peak normalize: `-af 'dynaudnorm'` or `-af 'volume=2.0'`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -af, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: normalize audio volume (loudness)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-change-video-frame-rate-fps",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: change video frame rate (fps)",
+      "statement": "Re-time without changing duration. To 30fps: `ffmpeg -i in.mp4 -vf 'fps=30' -c:a copy out.mp4`. For variable\u2192constant fps: `-vf fps=30 -vsync cfr`. Slow without sound change (interpolated, smooth slo-mo): `-vf 'minterpolate=fps=60'` (slow, may artifact). Decimate (drop every other frame, half fps): `-vf 'decimate'`. For 24fps cinema: `-vf 'fps=24'`.",
+      "source_url": "https://ffmpeg.org/ffmpeg-filters.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -i in.mp4 -vf 'fps=30' -c:a copy out.mp4",
+        "-vf fps=30 -vsync cfr",
+        "-vf 'minterpolate=fps=60'",
+        "-vf 'decimate'",
+        "-vf 'fps=24'"
+      ],
+      "steps": [
+        "Re-time without changing duration. To 30fps: `ffmpeg -i in.mp4 -vf 'fps=30' -c:a copy out.mp4`. For variable\u2192constant fps: `-vf fps=30 -vsync cfr`. Slow without sound change (interpolated, smooth slo-mo): `-vf 'minterpolate=fps=60'` (slow, may artifact). Decimate (drop every other frame, half fps): `-vf 'decimate'`. For 24fps cinema: `-vf 'fps=24'`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -vf, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: change video frame rate (fps)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-split-video-into-chunks-of-n-seconds",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: split video into chunks of N seconds",
+      "statement": "Segment muxer. `ffmpeg -i in.mp4 -c copy -map 0 -segment_time 60 -reset_timestamps 1 -f segment chunk_%03d.mp4`. Creates chunk_000.mp4, chunk_001.mp4 ... each ~60 sec. Cuts at keyframes (not exact). For exact cuts: re-encode (drop `-c copy`). By size: not directly supported \u2014 calculate time from bitrate. For HLS-style: see HLS recipe.",
+      "source_url": "https://ffmpeg.org/ffmpeg-formats.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -i in.mp4 -c copy -map 0 -segment_time 60 -reset_timestamps 1 -f segment chunk_%03d.mp4",
+        "-c copy"
+      ],
+      "steps": [
+        "Segment muxer. `ffmpeg -i in.mp4 -c copy -map 0 -segment_time 60 -reset_timestamps 1 -f segment chunk_%03d.mp4`. Creates chunk_000.mp4, chunk_001.mp4 ... each ~60 sec. Cuts at keyframes (not exact). For exact cuts: re-encode (drop `-c copy`). By size: not directly supported \u2014 calculate time from bitrate. For HLS-style: see HLS recipe"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -c, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: split video into chunks of N seconds"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-recipe-ffmpeg-recipe-deinterlace-footage",
+      "kind": "recipe",
+      "title": "ffmpeg recipe: deinterlace footage",
+      "statement": "Remove interlace artifacts (from old TV/camera). Simple: `-vf yadif`. Higher quality: `-vf bwdif` or `-vf 'yadif=mode=1:parity=auto'`. Double framerate (use both fields): `-vf 'yadif=mode=1'` then expect 60fps output from 30i. To detect interlacing: `ffmpeg -i in.mp4 -vf idet -f null -` (look for TFF/BFF/Progressive counts).",
+      "source_url": "https://ffmpeg.org/ffmpeg-filters.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-vf yadif",
+        "-vf bwdif",
+        "-vf 'yadif=mode=1:parity=auto'",
+        "-vf 'yadif=mode=1'",
+        "ffmpeg -i in.mp4 -vf idet -f null -"
+      ],
+      "steps": [
+        "Remove interlace artifacts (from old TV/camera). Simple: `-vf yadif`. Higher quality: `-vf bwdif` or `-vf 'yadif=mode=1:parity=auto'`. Double framerate (use both fields): `-vf 'yadif=mode=1'` then expect 60fps output from 30i. To detect interlacing: `ffmpeg -i in.mp4 -vf idet -f null -` (look for TFF/BFF/Progressive counts)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -vf, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-recipes",
+        "legacy_title": "ffmpeg recipe: deinterlace footage"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-map-stream-mapping",
+      "kind": "error",
+      "title": "ffmpeg -map (stream mapping)",
+      "statement": "`-map [-]input_file_id[:stream_specifier]` selects which input streams go to which output. Examples: `-map 0:v` = all video from input 0, `-map 0:v:0` = first video stream, `-map 0:a:m:language:eng` = English audio. Negative excludes: `-map 0 -map -0:s` = everything except subtitles. For filter_complex outputs: `-map '[outlabel]'`. Without -map, ffmpeg picks one stream of each type automatically.",
+      "source_url": "https://ffmpeg.org/ffmpeg.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-map [-]input_file_id[:stream_specifier]",
+        "-map 0:v",
+        "-map 0:v:0",
+        "-map 0:a:m:language:eng",
+        "-map 0 -map -0:s",
+        "-map '[outlabel]'"
+      ],
+      "steps": [
+        "`-map [-]input_file_id[:stream_specifier]` selects which input streams go to which output. Examples: `-map 0:v` = all video from input 0, `-map 0:v:0` = first video stream, `-map 0:a:m:language:eng` = English audio. Negative excludes: `-map 0 -map -0:s` = everything except subtitles. For filter_complex outputs: `-map '[outlabel]'`. Without -map, ffmpeg picks one stream of each type automatically"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -map."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-cli",
+        "legacy_title": "ffmpeg -map (stream mapping)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-y-n-overwrite-output",
+      "kind": "error",
+      "title": "ffmpeg -y / -n (overwrite output)",
+      "statement": "`-y` = overwrite output file without asking. `-n` = never overwrite (exit error if file exists). Default behavior is to prompt interactively, which breaks scripts. Always pass `-y` in CI/batch scripts. Example: `ffmpeg -y -i in.mp4 -c:v libx264 out.mp4`.",
+      "source_url": "https://ffmpeg.org/ffmpeg.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-y",
+        "-n",
+        "ffmpeg -y -i in.mp4 -c:v libx264 out.mp4"
+      ],
+      "steps": [
+        "`-y` = overwrite output file without asking. `-n` = never overwrite (exit error if file exists). Default behavior is to prompt interactively, which breaks scripts. Always pass `-y` in CI/batch scripts. Example: `ffmpeg -y -i in.mp4 -c:v libx264 out.mp4`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -n, -y, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-cli",
+        "legacy_title": "ffmpeg -y / -n (overwrite output)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-b-v-set-video-bitrate",
+      "kind": "error",
+      "title": "ffmpeg -b:v (set video bitrate)",
+      "statement": "`-b:v 2M` sets target video bitrate to 2 megabits/sec. Suffixes: K, M, G. Per-stream variant: `-b:v:0 5M` (first video stream). Combine with `-maxrate` + `-bufsize` for streaming: `-b:v 3M -maxrate 3M -bufsize 6M`. Quality-first alternative (single-pass): `-crf 23` (libx264) \u2014 usually preferred over fixed bitrate.",
+      "source_url": "https://ffmpeg.org/ffmpeg-codecs.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-b:v 2M",
+        "-b:v:0 5M",
+        "-maxrate",
+        "-bufsize",
+        "-b:v 3M -maxrate 3M -bufsize 6M",
+        "-crf 23"
+      ],
+      "steps": [
+        "`-b:v 2M` sets target video bitrate to 2 megabits/sec. Suffixes: K, M, G. Per-stream variant: `-b:v:0 5M` (first video stream). Combine with `-maxrate` + `-bufsize` for streaming: `-b:v 3M -maxrate 3M -bufsize 6M`. Quality-first alternative (single-pass): `-crf 23` (libx264) \u2014 usually preferred over fixed bitrate"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -b:v, -b:v:0, -bufsize, -crf, -maxrate."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-cli",
+        "legacy_title": "ffmpeg -b:v (set video bitrate)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-c-codec-set-codec",
+      "kind": "error",
+      "title": "ffmpeg -c / -codec (set codec)",
+      "statement": "`-c:v libx264` = video codec, `-c:a aac` = audio codec, `-c:s mov_text` = subtitle codec. Stream-copy (no re-encode): `-c:v copy` or `-c copy` (all streams). List available: `ffmpeg -encoders` or `ffmpeg -decoders`. Per-stream: `-c:v:0 libx264 -c:v:1 libx265` (different per stream).",
+      "source_url": "https://ffmpeg.org/ffmpeg.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-c:v libx264",
+        "-c:a aac",
+        "-c:s mov_text",
+        "-c:v copy",
+        "-c copy",
+        "ffmpeg -encoders",
+        "ffmpeg -decoders",
+        "-c:v:0 libx264 -c:v:1 libx265"
+      ],
+      "steps": [
+        "`-c:v libx264` = video codec, `-c:a aac` = audio codec, `-c:s mov_text` = subtitle codec. Stream-copy (no re-encode): `-c:v copy` or `-c copy` (all streams). List available: `ffmpeg -encoders` or `ffmpeg -decoders`. Per-stream: `-c:v:0 libx264 -c:v:1 libx265` (different per stream)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -c, -c:a, -c:s, -c:v, -c:v:0, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-cli",
+        "legacy_title": "ffmpeg -c / -codec (set codec)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-ss-seek-input",
+      "kind": "error",
+      "title": "ffmpeg -ss (seek input)",
+      "statement": "`-ss <time>` seeks to position. Placement matters: BEFORE `-i` = fast (keyframe-aligned), AFTER `-i` = accurate (decodes from start). Time formats: `00:01:30`, `00:01:30.500`, or `90.5` (seconds). For trim with stream-copy use before: `-ss 00:01:30 -i in.mp4 -c copy`. Pair with `-t <duration>` or `-to <endtime>`.",
+      "source_url": "https://ffmpeg.org/ffmpeg.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-ss <time>",
+        "-i",
+        "00:01:30",
+        "00:01:30.500",
+        "90.5",
+        "-ss 00:01:30 -i in.mp4 -c copy",
+        "-t <duration>",
+        "-to <endtime>"
+      ],
+      "steps": [
+        "`-ss <time>` seeks to position. Placement matters: BEFORE `-i` = fast (keyframe-aligned), AFTER `-i` = accurate (decodes from start). Time formats: `00:01:30`, `00:01:30.500`, or `90.5` (seconds). For trim with stream-copy use before: `-ss 00:01:30 -i in.mp4 -c copy`. Pair with `-t <duration>` or `-to <endtime>`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -i, -ss, -t, -to, 00:01:30, 00:01:30.500, 90.5."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-cli",
+        "legacy_title": "ffmpeg -ss (seek input)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-t-to-duration-end-time",
+      "kind": "error",
+      "title": "ffmpeg -t / -to (duration / end-time)",
+      "statement": "`-t 30` = output 30 seconds. `-to 00:02:00` = output until timestamp 2:00. If both given, `-t` wins. Position relative to `-ss` if seeking. Example: `ffmpeg -ss 60 -t 30 -i in.mp4 out.mp4` = 30 sec starting at 1:00.",
+      "source_url": "https://ffmpeg.org/ffmpeg.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-t 30",
+        "-to 00:02:00",
+        "-t",
+        "-ss",
+        "ffmpeg -ss 60 -t 30 -i in.mp4 out.mp4"
+      ],
+      "steps": [
+        "`-t 30` = output 30 seconds. `-to 00:02:00` = output until timestamp 2:00. If both given, `-t` wins. Position relative to `-ss` if seeking. Example: `ffmpeg -ss 60 -t 30 -i in.mp4 out.mp4` = 30 sec starting at 1:00"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -ss, -t, -to, ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-cli",
+        "legacy_title": "ffmpeg -t / -to (duration / end-time)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-vf-af-filter-complex-apply-filters",
+      "kind": "error",
+      "title": "ffmpeg -vf / -af / -filter_complex (apply filters)",
+      "statement": "`-vf <chain>` = video filters on default video stream. `-af <chain>` = audio filters. `-filter_complex <graph>` = multi-input / multi-output filters (overlay, concat, mix). Chain filters with comma: `-vf 'scale=1280:720,format=yuv420p'`. Sequence multiple chains with semicolon: `-filter_complex '[0:v]scale=1280:720[v];[v][1:v]overlay=10:10'`.",
+      "source_url": "https://ffmpeg.org/ffmpeg-filters.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-vf <chain>",
+        "-af <chain>",
+        "-filter_complex <graph>",
+        "-vf 'scale=1280:720,format=yuv420p'",
+        "-filter_complex '[0:v]scale=1280:720[v];[v][1:v]overlay=10:10'"
+      ],
+      "steps": [
+        "`-vf <chain>` = video filters on default video stream. `-af <chain>` = audio filters. `-filter_complex <graph>` = multi-input / multi-output filters (overlay, concat, mix). Chain filters with comma: `-vf 'scale=1280:720,format=yuv420p'`. Sequence multiple chains with semicolon: `-filter_complex '[0:v]scale=1280:720[v];[v][1:v]overlay=10:10'`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -af, -filter_complex, -vf."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-cli",
+        "legacy_title": "ffmpeg -vf / -af / -filter_complex (apply filters)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-loglevel-v-verbosity",
+      "kind": "error",
+      "title": "ffmpeg -loglevel / -v (verbosity)",
+      "statement": "`-loglevel <level>` or shorthand `-v <level>`. Levels: quiet, panic, fatal, error, warning, info (default), verbose, debug, trace. Silent for scripts: `-loglevel error` (errors only, no progress). Debug a problem: `-loglevel debug` or `-v debug`. Hide banner: `-hide_banner`. Combine: `-hide_banner -loglevel error`.",
+      "source_url": "https://ffmpeg.org/ffmpeg.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-loglevel <level>",
+        "-v <level>",
+        "-loglevel error",
+        "-loglevel debug",
+        "-v debug",
+        "-hide_banner",
+        "-hide_banner -loglevel error"
+      ],
+      "steps": [
+        "`-loglevel <level>` or shorthand `-v <level>`. Levels: quiet, panic, fatal, error, warning, info (default), verbose, debug, trace. Silent for scripts: `-loglevel error` (errors only, no progress). Debug a problem: `-loglevel debug` or `-v debug`. Hide banner: `-hide_banner`. Combine: `-hide_banner -loglevel error`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -hide_banner, -loglevel, -v."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-cli",
+        "legacy_title": "ffmpeg -loglevel / -v (verbosity)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-scale-filter-resize-video",
+      "kind": "error",
+      "title": "ffmpeg scale filter (resize video)",
+      "statement": "`scale=<width>:<height>` resizes video. Specific size: `scale=1280:720`. Auto width preserving aspect: `scale=-2:720` (-2 forces even, -1 may be odd). Max constraint: `scale='min(1920,iw)':-2`. With algorithm: `scale=1280:720:flags=lanczos` (lanczos = high quality). Available flags: fast_bilinear, bilinear, bicubic, lanczos (default for downscale), spline.",
+      "source_url": "https://ffmpeg.org/ffmpeg-filters.html",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "`scale=<width>:<height>` resizes video. Specific size: `scale=1280:720`. Auto width preserving aspect: `scale=-2:720` (-2 forces even, -1 may be odd). Max constraint: `scale='min(1920,iw)':-2`. With algorithm: `scale=1280:720:flags=lanczos` (lanczos = high quality). Available flags: fast_bilinear, bilinear, bicubic, lanczos (default for downscale), spline"
+      ],
+      "constraints": [],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-filters",
+        "legacy_title": "ffmpeg scale filter (resize video)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-overlay-filter-composite-video",
+      "kind": "error",
+      "title": "ffmpeg overlay filter (composite video)",
+      "statement": "`overlay=<x>:<y>` places one video on top of another. Top-left at (10,10): `overlay=10:10`. Bottom-right: `overlay=W-w-10:H-h-10` (W/H=main, w/h=overlay). Center: `overlay=(W-w)/2:(H-h)/2`. Time-gated: `overlay=10:10:enable='between(t,5,15)'` (only seconds 5-15). Used in `-filter_complex`: `[0:v][1:v]overlay=10:10[out]`.",
+      "source_url": "https://ffmpeg.org/ffmpeg-filters.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-filter_complex"
+      ],
+      "steps": [
+        "`overlay=<x>:<y>` places one video on top of another. Top-left at (10,10): `overlay=10:10`. Bottom-right: `overlay=W-w-10:H-h-10` (W/H=main, w/h=overlay). Center: `overlay=(W-w)/2:(H-h)/2`. Time-gated: `overlay=10:10:enable='between(t,5,15)'` (only seconds 5-15). Used in `-filter_complex`: `[0:v][1:v]overlay=10:10[out]`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -filter_complex."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-filters",
+        "legacy_title": "ffmpeg overlay filter (composite video)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-crop-filter",
+      "kind": "error",
+      "title": "ffmpeg crop filter",
+      "statement": "`crop=<w>:<h>:<x>:<y>` cuts a rectangle. w/h = output size, x/y = top-left of crop region. Center crop 1080x1080: `crop=1080:1080:(iw-1080)/2:(ih-1080)/2`. Crop to even dimensions (required for H.264): `crop=trunc(iw/2)*2:trunc(ih/2)*2`. Auto-detect black bars: run `ffmpeg -i in.mp4 -vf cropdetect -f null -` first.",
+      "source_url": "https://ffmpeg.org/ffmpeg-filters.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ffmpeg -i in.mp4 -vf cropdetect -f null -"
+      ],
+      "steps": [
+        "`crop=<w>:<h>:<x>:<y>` cuts a rectangle. w/h = output size, x/y = top-left of crop region. Center crop 1080x1080: `crop=1080:1080:(iw-1080)/2:(ih-1080)/2`. Crop to even dimensions (required for H.264): `crop=trunc(iw/2)*2:trunc(ih/2)*2`. Auto-detect black bars: run `ffmpeg -i in.mp4 -vf cropdetect -f null -` first"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ffmpeg."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-filters",
+        "legacy_title": "ffmpeg crop filter"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "ffmpeg-error-ffmpeg-drawtext-filter-text-overlay",
+      "kind": "error",
+      "title": "ffmpeg drawtext filter (text overlay)",
+      "statement": "Add text on video. `drawtext=fontfile=/path/to/font.ttf:text='Hello':fontsize=48:fontcolor=white:x=20:y=20`. Use system font (macOS): `fontfile=/System/Library/Fonts/Helvetica.ttc`. Dynamic text: `text='%{pts\\\\:hms}'` (timestamp), `text='%{frame_num}'`. With background box: `drawtext=...:box=1:boxcolor=black@0.5:boxborderw=10`. Requires `--enable-libfreetype`.",
+      "source_url": "https://ffmpeg.org/ffmpeg-filters.html",
+      "source_type": "official_docs",
+      "commands": [
+        "--enable-libfreetype"
+      ],
+      "steps": [
+        "Add text on video. `drawtext=fontfile=/path/to/font.ttf:text='Hello':fontsize=48:fontcolor=white:x=20:y=20`. Use system font (macOS): `fontfile=/System/Library/Fonts/Helvetica.ttc`. Dynamic text: `text='%{pts\\\\:hms}'` (timestamp), `text='%{frame_num}'`. With background box: `drawtext=...:box=1:boxcolor=black@0.5:boxborderw=10`. Requires `--enable-libfreetype`"
+      ],
+      "constraints": [
+        "Add text on video. `drawtext=fontfile=/path/to/font.ttf:text='Hello':fontsize=48:fontcolor=white:x=20:y=20`. Use system font (macOS): `fontfile=/System/Library/Fonts/Helvetica.ttc`. Dynamic text: `text='%{pts\\\\:hms}'` (timestamp), `text='%{frame_num}'`. With background box: `drawtext=...:box=1:boxcolor=black@0.5:boxborderw=10`. Requires `--enable-libfreetype`",
+        "Requires binaries or commands referenced in examples: --enable-libfreetype."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "ffmpeg-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_ffmpeg_errors_recipes.py",
+        "legacy_tool_id": "ffmpeg-filters",
+        "legacy_title": "ffmpeg drawtext filter (text overlay)"
+      },
+      "confidence": 0.9
+    }
+  ]
+}

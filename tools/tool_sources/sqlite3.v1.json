@@ -1,0 +1,2699 @@
+{
+  "family": "sqlite3",
+  "version": "v1",
+  "artifact_id": "sqlite3-curated-source-v1",
+  "generated_from": {
+    "kind": "legacy_seed_script",
+    "path": "tools/scripts/seed_sqlite3_errors_recipes.py"
+  },
+  "entries": [
+    {
+      "entry_id": "sqlite3-error-sqlite3-error-database-is-locked-sqlite-busy",
+      "kind": "error",
+      "title": "sqlite3 error: database is locked (SQLITE_BUSY)",
+      "statement": "Another connection holds a lock incompatible with yours. Fix: (1) enable WAL mode for concurrent reads + one writer: `PRAGMA journal_mode=WAL;`; (2) bump busy timeout: `PRAGMA busy_timeout = 5000;` (5s \u2014 connection waits instead of erroring); (3) at app level: retry with exponential backoff on SQLITE_BUSY; (4) check for long-running readers \u2014 `BEGIN; SELECT...;` without COMMIT blocks writers; (5) for high-concurrency: SQLite isn't ideal \u2014 consider Postgres.",
+      "source_url": "https://sqlite.org/wal.html",
+      "source_type": "official_docs",
+      "commands": [
+        "PRAGMA journal_mode=WAL;",
+        "PRAGMA busy_timeout = 5000;"
+      ],
+      "steps": [
+        "enable WAL mode for concurrent reads + one writer: `PRAGMA journal_mode=WAL;`",
+        "bump busy timeout: `PRAGMA busy_timeout = 5000;` (5s \u2014 connection waits instead of erroring)",
+        "at app level: retry with exponential backoff on SQLITE_BUSY",
+        "check for long-running readers \u2014 `BEGIN; SELECT...;` without COMMIT blocks writers",
+        "for high-concurrency: SQLite isn't ideal \u2014 consider Postgres"
+      ],
+      "constraints": [
+        "check for long-running readers \u2014 `BEGIN; SELECT...;` without COMMIT blocks writers",
+        "Requires binaries or commands referenced in examples: PRAGMA."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-errors",
+        "legacy_title": "sqlite3 error: database is locked (SQLITE_BUSY)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sqlite3-error-sqlite3-error-database-disk-image-is-malformed-sqlite-corrupt",
+      "kind": "error",
+      "title": "sqlite3 error: database disk image is malformed (SQLITE_CORRUPT)",
+      "statement": "File-level corruption \u2014 pages reference each other inconsistently. Fix: (1) check: `PRAGMA integrity_check;` (lists problems) or `PRAGMA quick_check;` (faster); (2) dump + reload: `sqlite3 corrupt.db .dump | sqlite3 fresh.db` recovers what's salvageable; (3) for recent corruption: restore from backup; (4) common causes: filesystem crash mid-write, network filesystems (NFS) \u2014 never put SQLite on NFS for writes; (5) verify hardware: bad disk sectors, RAM errors. Run `smartctl`, `memtest`.",
+      "source_url": "https://sqlite.org/backup.html",
+      "source_type": "official_docs",
+      "commands": [
+        "PRAGMA integrity_check;",
+        "PRAGMA quick_check;",
+        "sqlite3 corrupt.db .dump | sqlite3 fresh.db",
+        "smartctl",
+        "memtest"
+      ],
+      "steps": [
+        "check: `PRAGMA integrity_check;` (lists problems) or `PRAGMA quick_check;` (faster)",
+        "dump + reload: `sqlite3 corrupt.db .dump | sqlite3 fresh.db` recovers what's salvageable",
+        "for recent corruption: restore from backup",
+        "common causes: filesystem crash mid-write, network filesystems (NFS) \u2014 never put SQLite on NFS for writes",
+        "verify hardware: bad disk sectors, RAM errors. Run `smartctl`, `memtest`"
+      ],
+      "constraints": [
+        "check: `PRAGMA integrity_check;` (lists problems) or `PRAGMA quick_check;` (faster)",
+        "verify hardware: bad disk sectors, RAM errors. Run `smartctl`, `memtest`",
+        "Requires binaries or commands referenced in examples: PRAGMA, memtest, smartctl, sqlite3."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-errors",
+        "legacy_title": "sqlite3 error: database disk image is malformed (SQLITE_CORRUPT)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sqlite3-error-sqlite3-error-no-such-table-x",
+      "kind": "error",
+      "title": "sqlite3 error: no such table: <X>",
+      "statement": "Table doesn't exist in the connected database. Fix: (1) list tables: `.tables` (CLI) or `SELECT name FROM sqlite_schema WHERE type='table';`; (2) check current DB: `.databases` in CLI (you may be in main vs attached); (3) for ATTACH'd database: qualify name: `SELECT * FROM other_db.tablename`; (4) case-sensitive lookup: SQLite matches case-insensitively by default but quoted identifiers preserve case; (5) typo check \u2014 `sqlite_schema` (modern) replaces older `sqlite_master`.",
+      "source_url": "https://sqlite.org/lang_createtable.html",
+      "source_type": "official_docs",
+      "commands": [
+        ".tables",
+        "SELECT name FROM sqlite_schema WHERE type='table';",
+        ".databases",
+        "SELECT * FROM other_db.tablename",
+        "sqlite_schema",
+        "sqlite_master"
+      ],
+      "steps": [
+        "list tables: `.tables` (CLI) or `SELECT name FROM sqlite_schema WHERE type='table';`",
+        "check current DB: `.databases` in CLI (you may be in main vs attached)",
+        "for ATTACH'd database: qualify name: `SELECT * FROM other_db.tablename`",
+        "case-sensitive lookup: SQLite matches case-insensitively by default but quoted identifiers preserve case",
+        "typo check \u2014 `sqlite_schema` (modern) replaces older `sqlite_master`"
+      ],
+      "constraints": [
+        "check current DB: `.databases` in CLI (you may be in main vs attached)",
+        "typo check \u2014 `sqlite_schema` (modern) replaces older `sqlite_master`",
+        "Requires binaries or commands referenced in examples: .databases, .tables, SELECT, sqlite_master, sqlite_schema."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-errors",
+        "legacy_title": "sqlite3 error: no such table: <X>"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sqlite3-error-sqlite3-error-no-such-column-x",
+      "kind": "error",
+      "title": "sqlite3 error: no such column: <X>",
+      "statement": "Column missing or scope wrong. Fix: (1) describe table: `.schema <table>` or `PRAGMA table_info(<table>);`; (2) for joins: qualify with table: `users.name` not `name`; (3) for aliases inside same query: column aliases (`AS`) defined in SELECT aren't available in WHERE; use HAVING or subquery; (4) for typos with quoted names: SQLite quietly accepts `\"missing_column\"` as a string literal in SELECT \u2014 only fails in WHERE. Use `[col]` or single backticks for safety.",
+      "source_url": "https://sqlite.org/lang_naming.html",
+      "source_type": "official_docs",
+      "commands": [
+        ".schema <table>",
+        "PRAGMA table_info(<table>);",
+        "users.name",
+        "name",
+        "AS"
+      ],
+      "steps": [
+        "describe table: `.schema <table>` or `PRAGMA table_info(<table>);`",
+        "for joins: qualify with table: `users.name` not `name`",
+        "for aliases inside same query: column aliases (`AS`) defined in SELECT aren't available in WHERE; use HAVING or subquery",
+        "for typos with quoted names: SQLite quietly accepts `\"missing_column\"` as a string literal in SELECT \u2014 only fails in WHERE. Use `[col]` or single backticks for safety"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: .schema, AS, PRAGMA, name, users.name."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-errors",
+        "legacy_title": "sqlite3 error: no such column: <X>"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sqlite3-error-sqlite3-error-unique-constraint-failed-table-col",
+      "kind": "error",
+      "title": "sqlite3 error: UNIQUE constraint failed: <table>.<col>",
+      "statement": "INSERT or UPDATE would create a duplicate where a UNIQUE constraint forbids it. Fix: (1) UPSERT: `INSERT INTO t(id, name) VALUES (1, 'a') ON CONFLICT(id) DO UPDATE SET name = excluded.name;`; (2) INSERT OR IGNORE: silently skip duplicates: `INSERT OR IGNORE INTO t VALUES (...);`; (3) INSERT OR REPLACE: deletes old row + inserts new (CAREFUL \u2014 triggers + foreign keys cascade); (4) for auto-id seqs out of sync after import: `UPDATE sqlite_sequence SET seq = (SELECT max(id) FROM t) WHERE name = 't';`; (5) for soft delete: include `deleted_at IS NULL` in a partial unique index.",
+      "source_url": "https://sqlite.org/lang_upsert.html",
+      "source_type": "official_docs",
+      "commands": [
+        "INSERT INTO t(id, name) VALUES (1, 'a') ON CONFLICT(id) DO UPDATE SET name = excluded.name;",
+        "INSERT OR IGNORE INTO t VALUES (...);",
+        "UPDATE sqlite_sequence SET seq = (SELECT max(id) FROM t) WHERE name = 't';",
+        "deleted_at IS NULL"
+      ],
+      "steps": [
+        "UPSERT: `INSERT INTO t(id, name) VALUES (1, 'a') ON CONFLICT(id) DO UPDATE SET name = excluded.name;`",
+        "INSERT OR IGNORE: silently skip duplicates: `INSERT OR IGNORE INTO t VALUES (...);`",
+        "INSERT OR REPLACE: deletes old row + inserts new (CAREFUL \u2014 triggers + foreign keys cascade)",
+        "for auto-id seqs out of sync after import: `UPDATE sqlite_sequence SET seq = (SELECT max(id) FROM t) WHERE name = 't';`",
+        "for soft delete: include `deleted_at IS NULL` in a partial unique index"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: INSERT, UPDATE, deleted_at."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-errors",
+        "legacy_title": "sqlite3 error: UNIQUE constraint failed: <table>.<col>"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sqlite3-error-sqlite3-error-not-null-constraint-failed-table-col",
+      "kind": "error",
+      "title": "sqlite3 error: NOT NULL constraint failed: <table>.<col>",
+      "statement": "Provided NULL for a NOT NULL column. Fix: (1) ensure your INSERT names all NOT NULL columns: `INSERT INTO t (a, b) VALUES (1, 2);`; (2) provide a DEFAULT: `CREATE TABLE t (created_at TEXT NOT NULL DEFAULT (datetime('now')));`; (3) for migrations adding NOT NULL to existing column: must provide DEFAULT or pre-fill: `ALTER TABLE t ADD COLUMN c TEXT NOT NULL DEFAULT '';`; (4) for ON CONFLICT recovery: `INSERT ... ON CONFLICT DO UPDATE SET c = ifnull(excluded.c, 'default');`.",
+      "source_url": "https://sqlite.org/lang_createtable.html",
+      "source_type": "official_docs",
+      "commands": [
+        "INSERT INTO t (a, b) VALUES (1, 2);",
+        "CREATE TABLE t (created_at TEXT NOT NULL DEFAULT (datetime('now')));",
+        "ALTER TABLE t ADD COLUMN c TEXT NOT NULL DEFAULT '';",
+        "INSERT ... ON CONFLICT DO UPDATE SET c = ifnull(excluded.c, 'default');"
+      ],
+      "steps": [
+        "ensure your INSERT names all NOT NULL columns: `INSERT INTO t (a, b) VALUES (1, 2);`",
+        "provide a DEFAULT: `CREATE TABLE t (created_at TEXT NOT NULL DEFAULT (datetime('now')));`",
+        "for migrations adding NOT NULL to existing column: must provide DEFAULT or pre-fill: `ALTER TABLE t ADD COLUMN c TEXT NOT NULL DEFAULT '';`",
+        "for ON CONFLICT recovery: `INSERT ... ON CONFLICT DO UPDATE SET c = ifnull(excluded.c, 'default');`"
+      ],
+      "constraints": [
+        "ensure your INSERT names all NOT NULL columns: `INSERT INTO t (a, b) VALUES (1, 2);`",
+        "for migrations adding NOT NULL to existing column: must provide DEFAULT or pre-fill: `ALTER TABLE t ADD COLUMN c TEXT NOT NULL DEFAULT '';`",
+        "Requires binaries or commands referenced in examples: ALTER, CREATE, INSERT."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-errors",
+        "legacy_title": "sqlite3 error: NOT NULL constraint failed: <table>.<col>"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sqlite3-error-sqlite3-error-foreign-key-constraint-failed",
+      "kind": "error",
+      "title": "sqlite3 error: FOREIGN KEY constraint failed",
+      "statement": "INSERT references nonexistent parent, OR DELETE of parent with dependent rows (without CASCADE). Fix: (1) IMPORTANT: foreign keys are OFF by default in SQLite \u2014 enable per-connection: `PRAGMA foreign_keys = ON;`; (2) insert parent first, then child; (3) for cascading: `FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE`; (4) for circular refs: defer with `DEFERRABLE INITIALLY DEFERRED` (limited support \u2014 not all FK options work like Postgres); (5) for transactional bulk delete: `BEGIN; PRAGMA defer_foreign_keys = 1; ...; COMMIT;` (deferred-FK in transaction).",
+      "source_url": "https://sqlite.org/pragma.html",
+      "source_type": "official_docs",
+      "commands": [
+        "PRAGMA foreign_keys = ON;",
+        "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE",
+        "DEFERRABLE INITIALLY DEFERRED"
+      ],
+      "steps": [
+        "IMPORTANT: foreign keys are OFF by default in SQLite \u2014 enable per-connection: `PRAGMA foreign_keys = ON;`",
+        "insert parent first, then child",
+        "for cascading: `FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE`",
+        "for circular refs: defer with `DEFERRABLE INITIALLY DEFERRED` (limited support \u2014 not all FK options work like Postgres)",
+        "for transactional bulk delete: `BEGIN; PRAGMA defer_foreign_keys = 1; ...; COMMIT;` (deferred-FK in transaction)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: DEFERRABLE, FOREIGN, PRAGMA."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-errors",
+        "legacy_title": "sqlite3 error: FOREIGN KEY constraint failed"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sqlite3-error-sqlite3-error-check-constraint-failed-name",
+      "kind": "error",
+      "title": "sqlite3 error: CHECK constraint failed: <name>",
+      "statement": "Value violates a CHECK constraint. Fix: (1) view the constraint: `.schema <table>` shows the CHECK clause; (2) common: `CHECK (age >= 0)` rejects negative ages; (3) to allow: relax or remove the constraint via `ALTER TABLE` (modern SQLite allows ALTER for renames; for CHECK changes use 12-step process: create new table with desired schema, copy data, drop old, rename); (4) for nullable values: CHECK with NULL: `value IS NULL OR value > 0`.",
+      "source_url": "https://sqlite.org/lang_createtable.html",
+      "source_type": "official_docs",
+      "commands": [
+        ".schema <table>",
+        "CHECK (age >= 0)",
+        "ALTER TABLE",
+        "value IS NULL OR value > 0"
+      ],
+      "steps": [
+        "view the constraint: `.schema <table>` shows the CHECK clause",
+        "common: `CHECK (age >= 0)` rejects negative ages",
+        "to allow: relax or remove the constraint via `ALTER TABLE` (modern SQLite allows ALTER for renames; for CHECK changes use 12-step process: create new table with desired schema, copy data, drop old, rename)",
+        "for nullable values: CHECK with NULL: `value IS NULL OR value > 0`"
+      ],
+      "constraints": [
+        "view the constraint: `.schema <table>` shows the CHECK clause",
+        "common: `CHECK (age >= 0)` rejects negative ages",
+        "to allow: relax or remove the constraint via `ALTER TABLE` (modern SQLite allows ALTER for renames; for CHECK changes use 12-step process: create new table with desired schema, copy data, drop old, rename)",
+        "for nullable values: CHECK with NULL: `value IS NULL OR value > 0`",
+        "Requires binaries or commands referenced in examples: .schema, ALTER, CHECK, value."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-errors",
+        "legacy_title": "sqlite3 error: CHECK constraint failed: <name>"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sqlite3-error-sqlite3-error-attempt-to-write-a-readonly-database",
+      "kind": "error",
+      "title": "sqlite3 error: attempt to write a readonly database",
+      "statement": "Database opened read-only or file/dir not writable. Fix: (1) check file perms: `ls -la file.db` \u2014 must be writable; (2) check directory perms: SQLite needs to create journal files in same dir; (3) for WAL mode: needs to create `-wal` and `-shm` files alongside; (4) verify open mode: in Python `sqlite3.connect('file.db', uri=True)` defaults read-write but URI like `file:db?mode=ro` is read-only; (5) for containers: ensure user inside container can write the volume.",
+      "source_url": "https://sqlite.org/cli.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ls -la file.db",
+        "-wal",
+        "-shm"
+      ],
+      "steps": [
+        "check file perms: `ls -la file.db` \u2014 must be writable",
+        "check directory perms: SQLite needs to create journal files in same dir",
+        "for WAL mode: needs to create `-wal` and `-shm` files alongside",
+        "verify open mode: in Python `sqlite3.connect('file.db', uri=True)` defaults read-write but URI like `file:db?mode=ro` is read-only",
+        "for containers: ensure user inside container can write the volume"
+      ],
+      "constraints": [
+        "check file perms: `ls -la file.db` \u2014 must be writable",
+        "check directory perms: SQLite needs to create journal files in same dir",
+        "for WAL mode: needs to create `-wal` and `-shm` files alongside",
+        "verify open mode: in Python `sqlite3.connect('file.db', uri=True)` defaults read-write but URI like `file:db?mode=ro` is read-only",
+        "for containers: ensure user inside container can write the volume",
+        "Requires binaries or commands referenced in examples: -shm, -wal, ls."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-errors",
+        "legacy_title": "sqlite3 error: attempt to write a readonly database"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sqlite3-error-sqlite3-error-unable-to-open-database-file",
+      "kind": "error",
+      "title": "sqlite3 error: unable to open database file",
+      "statement": "File path wrong, parent dir doesn't exist, or perms forbid. Fix: (1) absolute path is safest: `sqlite3 /full/path/to/file.db`; (2) for new database: parent dir must exist (sqlite3 creates the file but not directories); (3) check perms on the parent dir; (4) for in-memory: `:memory:` (single connection) or `file::memory:?cache=shared` (multi-connection in same process).",
+      "source_url": "https://sqlite.org/cli.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sqlite3 /full/path/to/file.db",
+        ":memory:"
+      ],
+      "steps": [
+        "absolute path is safest: `sqlite3 /full/path/to/file.db`",
+        "for new database: parent dir must exist (sqlite3 creates the file but not directories)",
+        "check perms on the parent dir",
+        "for in-memory: `:memory:` (single connection) or `file::memory:?cache=shared` (multi-connection in same process)"
+      ],
+      "constraints": [
+        "for new database: parent dir must exist (sqlite3 creates the file but not directories)",
+        "check perms on the parent dir",
+        "Requires binaries or commands referenced in examples: :memory:, sqlite3."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-errors",
+        "legacy_title": "sqlite3 error: unable to open database file"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sqlite3-error-sqlite3-error-file-is-not-a-database-file-is-encrypted",
+      "kind": "error",
+      "title": "sqlite3 error: file is not a database / file is encrypted",
+      "statement": "Opening a file that isn't a SQLite database (or is encrypted via SQLCipher and you don't have key). Fix: (1) check header: `xxd file.db | head -1` \u2014 should start with `SQLite format 3\\x00`; (2) for SQLCipher: provide the key via `PRAGMA key = 'your-key';` immediately after open; (3) verify the file isn't truncated: `wc -c file.db` \u2014 should be a multiple of page size (default 4096); (4) you might be opening a Postgres dump / CSV / etc. by mistake.",
+      "source_url": "https://sqlite.org/cli.html",
+      "source_type": "official_docs",
+      "commands": [
+        "xxd file.db | head -1",
+        "SQLite format 3\\x00",
+        "PRAGMA key = 'your-key';",
+        "wc -c file.db"
+      ],
+      "steps": [
+        "check header: `xxd file.db | head -1` \u2014 should start with `SQLite format 3\\x00`",
+        "for SQLCipher: provide the key via `PRAGMA key = 'your-key';` immediately after open",
+        "verify the file isn't truncated: `wc -c file.db` \u2014 should be a multiple of page size (default 4096)",
+        "you might be opening a Postgres dump / CSV / etc. by mistake"
+      ],
+      "constraints": [
+        "check header: `xxd file.db | head -1` \u2014 should start with `SQLite format 3\\x00`",
+        "verify the file isn't truncated: `wc -c file.db` \u2014 should be a multiple of page size (default 4096)",
+        "Requires binaries or commands referenced in examples: PRAGMA, SQLite, wc, xxd."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-errors",
+        "legacy_title": "sqlite3 error: file is not a database / file is encrypted"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sqlite3-error-sqlite3-error-database-or-disk-is-full",
+      "kind": "error",
+      "title": "sqlite3 error: database or disk is full",
+      "statement": "Filesystem out of space, OR file size limit hit. Fix: (1) check disk: `df -h $(dirname file.db)`; (2) WAL files can grow huge \u2014 checkpoint: `PRAGMA wal_checkpoint(TRUNCATE);`; (3) VACUUM to reclaim deleted space: `VACUUM;` (rewrites entire DB \u2014 large I/O); (4) page-count limit: 281TB max (2^41 bytes) \u2014 almost never hit; (5) for embedded systems: SQLITE_DEFAULT_PAGE_SIZE compile option.",
+      "source_url": "https://sqlite.org/wal.html",
+      "source_type": "official_docs",
+      "commands": [
+        "df -h $(dirname file.db)",
+        "PRAGMA wal_checkpoint(TRUNCATE);"
+      ],
+      "steps": [
+        "check disk: `df -h $(dirname file.db)`",
+        "WAL files can grow huge \u2014 checkpoint: `PRAGMA wal_checkpoint(TRUNCATE);`",
+        "VACUUM to reclaim deleted space: `VACUUM;` (rewrites entire DB \u2014 large I/O)",
+        "page-count limit: 281TB max (2^41 bytes) \u2014 almost never hit",
+        "for embedded systems: SQLITE_DEFAULT_PAGE_SIZE compile option"
+      ],
+      "constraints": [
+        "check disk: `df -h $(dirname file.db)`",
+        "WAL files can grow huge \u2014 checkpoint: `PRAGMA wal_checkpoint(TRUNCATE);`",
+        "Requires binaries or commands referenced in examples: PRAGMA, df."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-errors",
+        "legacy_title": "sqlite3 error: database or disk is full"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sqlite3-error-sqlite3-error-cannot-start-a-transaction-within-a-transaction",
+      "kind": "error",
+      "title": "sqlite3 error: cannot start a transaction within a transaction",
+      "statement": "Nested BEGIN without SAVEPOINT. Fix: (1) use SAVEPOINT for nesting: `SAVEPOINT sp1; ...; RELEASE sp1;` (or `ROLLBACK TO sp1;`); (2) check that previous transaction is closed: `COMMIT;` or `ROLLBACK;` first; (3) Python: `conn.commit()` or use `with conn:` context manager which auto-commits; (4) for automatic transaction wrapping: SQLite is in autocommit mode by default until you issue BEGIN.",
+      "source_url": "https://sqlite.org/lang_savepoint.html",
+      "source_type": "official_docs",
+      "commands": [
+        "SAVEPOINT sp1; ...; RELEASE sp1;",
+        "ROLLBACK TO sp1;",
+        "with conn:"
+      ],
+      "steps": [
+        "use SAVEPOINT for nesting: `SAVEPOINT sp1; ...; RELEASE sp1;` (or `ROLLBACK TO sp1;`)",
+        "check that previous transaction is closed: `COMMIT;` or `ROLLBACK;` first",
+        "Python: `conn.commit()` or use `with conn:` context manager which auto-commits",
+        "for automatic transaction wrapping: SQLite is in autocommit mode by default until you issue BEGIN"
+      ],
+      "constraints": [
+        "check that previous transaction is closed: `COMMIT;` or `ROLLBACK;` first",
+        "Requires binaries or commands referenced in examples: ROLLBACK, SAVEPOINT, with."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-errors",
+        "legacy_title": "sqlite3 error: cannot start a transaction within a transaction"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sqlite3-error-sqlite3-error-cannot-rollback-no-transaction-is-active",
+      "kind": "error",
+      "title": "sqlite3 error: cannot ROLLBACK - no transaction is active",
+      "statement": "ROLLBACK without prior BEGIN. Fix: (1) only ROLLBACK after BEGIN; (2) check transaction state: in CLI, status command or just attempt a `SELECT` and observe; (3) Python: catch the OperationalError; (4) for safe retry pattern: `try: cur.execute(\"BEGIN\"); ...; conn.commit(); except: conn.rollback();`.",
+      "source_url": "https://sqlite.org/lang_transaction.html",
+      "source_type": "official_docs",
+      "commands": [
+        "SELECT",
+        "try: cur.execute(\"BEGIN\"); ...; conn.commit(); except: conn.rollback();"
+      ],
+      "steps": [
+        "only ROLLBACK after BEGIN",
+        "check transaction state: in CLI, status command or just attempt a `SELECT` and observe",
+        "Python: catch the OperationalError",
+        "for safe retry pattern: `try: cur.execute(\"BEGIN\"); ...; conn.commit(); except: conn.rollback();`"
+      ],
+      "constraints": [
+        "check transaction state: in CLI, status command or just attempt a `SELECT` and observe",
+        "Requires binaries or commands referenced in examples: SELECT, try:."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-errors",
+        "legacy_title": "sqlite3 error: cannot ROLLBACK - no transaction is active"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sqlite3-error-sqlite3-error-sql-logic-error-syntax-error",
+      "kind": "error",
+      "title": "sqlite3 error: SQL logic error: syntax error",
+      "statement": "Parser couldn't make sense of the SQL. Fix: (1) error usually points at the offending token; (2) common: missing comma in column list, wrong quoting (use `'` for strings, `\"` for identifiers, `[col]` or backticks also work for identifiers); (3) reserved words: `order`, `user`, `transaction` etc need quoting if used as names; (4) check parens: `(...)` matching; (5) for multiline scripts: stray `;` early ends a statement.",
+      "source_url": "https://sqlite.org/lang.html",
+      "source_type": "official_docs",
+      "commands": [
+        "order",
+        "user",
+        "transaction"
+      ],
+      "steps": [
+        "error usually points at the offending token",
+        "common: missing comma in column list, wrong quoting (use `'` for strings, `\"` for identifiers, `[col]` or backticks also work for identifiers)",
+        "reserved words: `order`, `user`, `transaction` etc need quoting if used as names",
+        "check parens: `(...)` matching",
+        "for multiline scripts: stray `;` early ends a statement"
+      ],
+      "constraints": [
+        "reserved words: `order`, `user`, `transaction` etc need quoting if used as names",
+        "check parens: `(...)` matching",
+        "Requires binaries or commands referenced in examples: order, transaction, user."
+      ],
+      "effect": {
+        "kind": "secret_exposure",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": true,
+        "risk_level": "high",
+        "reasons": [
+          "The action references secrets, tokens, or API keys."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-errors",
+        "legacy_title": "sqlite3 error: SQL logic error: syntax error"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sqlite3-error-sqlite3-error-too-many-sql-variables-sqlite-limit-variable-number",
+      "kind": "error",
+      "title": "sqlite3 error: too many SQL variables (SQLITE_LIMIT_VARIABLE_NUMBER)",
+      "statement": "More than 999 placeholders in one statement (SQLite default limit \u2014 32766 in 3.32+). Fix: (1) batch in chunks of 500: split your IN clause into multiple queries; (2) use temporary table: `CREATE TEMP TABLE ids(id); INSERT INTO ids VALUES ...; SELECT * FROM t WHERE id IN (SELECT id FROM ids);`; (3) recompile SQLite with `SQLITE_MAX_VARIABLE_NUMBER=32766` (most modern distros already do this); (4) check current limit: programmatically `sqlite3_limit(db, SQLITE_LIMIT_VARIABLE_NUMBER, -1);`.",
+      "source_url": "https://sqlite.org/limits.html",
+      "source_type": "official_docs",
+      "commands": [
+        "CREATE TEMP TABLE ids(id); INSERT INTO ids VALUES ...; SELECT * FROM t WHERE id IN (SELECT id FROM ids);"
+      ],
+      "steps": [
+        "batch in chunks of 500: split your IN clause into multiple queries",
+        "use temporary table: `CREATE TEMP TABLE ids(id); INSERT INTO ids VALUES ...; SELECT * FROM t WHERE id IN (SELECT id FROM ids);`",
+        "recompile SQLite with `SQLITE_MAX_VARIABLE_NUMBER=32766` (most modern distros already do this)",
+        "check current limit: programmatically `sqlite3_limit(db, SQLITE_LIMIT_VARIABLE_NUMBER, -1);`"
+      ],
+      "constraints": [
+        "check current limit: programmatically `sqlite3_limit(db, SQLITE_LIMIT_VARIABLE_NUMBER, -1);`",
+        "Requires binaries or commands referenced in examples: CREATE."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-errors",
+        "legacy_title": "sqlite3 error: too many SQL variables (SQLITE_LIMIT_VARIABLE_NUMBER)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sqlite3-error-sqlite3-error-interrupted-sqlite-interrupt",
+      "kind": "error",
+      "title": "sqlite3 error: interrupted (SQLITE_INTERRUPT)",
+      "statement": "User pressed Ctrl-C or app called `sqlite3_interrupt()`. Fix: (1) for CLI: just retry; (2) for app: catch the interrupted error; transaction is automatically rolled back; (3) for long queries: consider `PRAGMA query_only = ON;` for read-only sessions to prevent accidental long writes; (4) avoid interrupting during ANALYZE / VACUUM \u2014 these don't resume well.",
+      "source_url": "https://sqlite.org/cli.html",
+      "source_type": "official_docs",
+      "commands": [
+        "PRAGMA query_only = ON;"
+      ],
+      "steps": [
+        "for CLI: just retry",
+        "for app: catch the interrupted error; transaction is automatically rolled back",
+        "for long queries: consider `PRAGMA query_only = ON;` for read-only sessions to prevent accidental long writes",
+        "avoid interrupting during ANALYZE / VACUUM \u2014 these don't resume well"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: PRAGMA."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-errors",
+        "legacy_title": "sqlite3 error: interrupted (SQLITE_INTERRUPT)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sqlite3-error-sqlite3-error-read-import-file-not-found",
+      "kind": "error",
+      "title": "sqlite3 error: .read / .import file not found",
+      "statement": "Dot-command's file argument doesn't exist. Fix: (1) check cwd: dot-commands use cwd, not script dir; `pwd` first; (2) tilde doesn't expand in dot-commands: use full path; (3) for `.import`: `.import --csv --skip 1 data.csv my_table` (modern, with header skip); (4) `.read script.sql` runs SQL from file; relative to cwd.",
+      "source_url": "https://sqlite.org/cli.html",
+      "source_type": "official_docs",
+      "commands": [
+        "pwd",
+        ".import",
+        ".import --csv --skip 1 data.csv my_table",
+        ".read script.sql"
+      ],
+      "steps": [
+        "check cwd: dot-commands use cwd, not script dir; `pwd` first",
+        "tilde doesn't expand in dot-commands: use full path",
+        "for `.import`: `.import --csv --skip 1 data.csv my_table` (modern, with header skip)",
+        "`.read script.sql` runs SQL from file; relative to cwd"
+      ],
+      "constraints": [
+        "check cwd: dot-commands use cwd, not script dir; `pwd` first",
+        "Requires binaries or commands referenced in examples: .import, .read, pwd."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-errors",
+        "legacy_title": "sqlite3 error: .read / .import file not found"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sqlite3-error-sqlite3-error-import-csv-column-count-mismatch",
+      "kind": "error",
+      "title": "sqlite3 error: .import CSV column count mismatch",
+      "statement": "CSV row has wrong number of columns. Fix: (1) check delimiter: `.separator ','` or `.mode csv` (handles quoting properly); (2) for header-aware import: `.import --csv --skip 1 file.csv table_name` (3.32+); (3) for mismatched columns: pre-process with sed/awk, OR create table matching CSV's column count and migrate; (4) for embedded newlines: use `--ascii` mode if you control the export.",
+      "source_url": "https://sqlite.org/cli.html",
+      "source_type": "official_docs",
+      "commands": [
+        ".separator ','",
+        ".mode csv",
+        ".import --csv --skip 1 file.csv table_name",
+        "--ascii"
+      ],
+      "steps": [
+        "check delimiter: `.separator ','` or `.mode csv` (handles quoting properly)",
+        "for header-aware import: `.import --csv --skip 1 file.csv table_name` (3.32+)",
+        "for mismatched columns: pre-process with sed/awk, OR create table matching CSV's column count and migrate",
+        "for embedded newlines: use `--ascii` mode if you control the export"
+      ],
+      "constraints": [
+        "check delimiter: `.separator ','` or `.mode csv` (handles quoting properly)",
+        "Requires binaries or commands referenced in examples: --ascii, .import, .mode, .separator."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-errors",
+        "legacy_title": "sqlite3 error: .import CSV column count mismatch"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sqlite3-error-sqlite3-error-column-ambiguous-after-join",
+      "kind": "error",
+      "title": "sqlite3 error: column ambiguous after join",
+      "statement": "Same column name in multiple joined tables \u2014 must qualify. Fix: (1) qualify: `users.id, posts.user_id`; (2) for shared key: `USING (id)` collapses both sides into one; (3) for clarity: use AS to disambiguate: `users.id AS user_id, posts.id AS post_id`; (4) for `SELECT *` from join: explicitly list columns instead.",
+      "source_url": "https://sqlite.org/lang_select.html",
+      "source_type": "official_docs",
+      "commands": [
+        "USING (id)",
+        "users.id AS user_id, posts.id AS post_id",
+        "SELECT *"
+      ],
+      "steps": [
+        "qualify: `users.id, posts.user_id`",
+        "for shared key: `USING (id)` collapses both sides into one",
+        "for clarity: use AS to disambiguate: `users.id AS user_id, posts.id AS post_id`",
+        "for `SELECT *` from join: explicitly list columns instead"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: SELECT, USING, users.id."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-errors",
+        "legacy_title": "sqlite3 error: column ambiguous after join"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sqlite3-error-sqlite3-error-integer-overflow-numeric-overflow",
+      "kind": "error",
+      "title": "sqlite3 error: integer overflow / numeric overflow",
+      "statement": "Value too big for INTEGER type. Fix: (1) SQLite INTEGER is up to 8 bytes (i64, -2^63 to 2^63-1); (2) for bigger numbers: store as TEXT and do arithmetic in app; (3) for monetary values: store as integer cents (avoid REAL float imprecision); (4) explicit cast: `CAST(x AS REAL)` for large products that would overflow int.",
+      "source_url": "https://sqlite.org/datatype3.html",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "SQLite INTEGER is up to 8 bytes (i64, -2^63 to 2^63-1)",
+        "for bigger numbers: store as TEXT and do arithmetic in app",
+        "for monetary values: store as integer cents (avoid REAL float imprecision)",
+        "explicit cast: `CAST(x AS REAL)` for large products that would overflow int"
+      ],
+      "constraints": [],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-errors",
+        "legacy_title": "sqlite3 error: integer overflow / numeric overflow"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sqlite3-error-sqlite3-error-cannot-drop-sqlite-sequence-sqlite-schema",
+      "kind": "error",
+      "title": "sqlite3 error: cannot drop sqlite_sequence / sqlite_schema",
+      "statement": "System tables can't be dropped or directly modified. Fix: (1) for `sqlite_sequence` (used by AUTOINCREMENT): can DELETE rows: `DELETE FROM sqlite_sequence WHERE name = 't';` (resets the seq for that table); (2) `sqlite_schema` (formerly `sqlite_master`): read-only schema info; (3) to drop a table cleanly: `DROP TABLE t;` (handles all metadata).",
+      "source_url": "https://sqlite.org/lang_droptable.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sqlite_sequence",
+        "DELETE FROM sqlite_sequence WHERE name = 't';",
+        "sqlite_schema",
+        "sqlite_master",
+        "DROP TABLE t;"
+      ],
+      "steps": [
+        "for `sqlite_sequence` (used by AUTOINCREMENT): can DELETE rows: `DELETE FROM sqlite_sequence WHERE name = 't';` (resets the seq for that table)",
+        "`sqlite_schema` (formerly `sqlite_master`): read-only schema info",
+        "to drop a table cleanly: `DROP TABLE t;` (handles all metadata)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: DELETE, DROP, sqlite_master, sqlite_schema, sqlite_sequence."
+      ],
+      "effect": {
+        "kind": "destructive",
+        "destructive": true,
+        "reversible": false,
+        "mutates_remote_state": true,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "critical",
+        "reasons": [
+          "Dropping databases or tables can irreversibly destroy persisted data."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-errors",
+        "legacy_title": "sqlite3 error: cannot drop sqlite_sequence / sqlite_schema"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sqlite3-error-sqlite3-error-attach-x-as-y-cannot-attach-with-name-main",
+      "kind": "error",
+      "title": "sqlite3 error: ATTACH 'X' AS Y: cannot attach with name 'main'",
+      "statement": "`main` is reserved for the connection's primary DB. Fix: (1) pick another name: `ATTACH 'other.db' AS other;`; (2) max attached: 10 by default (SQLITE_LIMIT_ATTACHED), 125 hard limit; (3) for queries across: qualify: `SELECT * FROM other.tablename;`; (4) detach: `DETACH other;`.",
+      "source_url": "https://sqlite.org/lang_attach.html",
+      "source_type": "official_docs",
+      "commands": [
+        "main",
+        "ATTACH 'other.db' AS other;",
+        "SELECT * FROM other.tablename;",
+        "DETACH other;"
+      ],
+      "steps": [
+        "pick another name: `ATTACH 'other.db' AS other;`",
+        "max attached: 10 by default (SQLITE_LIMIT_ATTACHED), 125 hard limit",
+        "for queries across: qualify: `SELECT * FROM other.tablename;`",
+        "detach: `DETACH other;`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ATTACH, DETACH, SELECT, main."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-errors",
+        "legacy_title": "sqlite3 error: ATTACH 'X' AS Y: cannot attach with name 'main'"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sqlite3-error-sqlite3-error-wal-file-growing-forever",
+      "kind": "error",
+      "title": "sqlite3 error: WAL file growing forever",
+      "statement": "WAL accumulates transactions until checkpoint. If readers are very slow, checkpoints can't truncate. Fix: (1) periodic forced checkpoint: `PRAGMA wal_checkpoint(TRUNCATE);` (blocks until done); (2) configure auto: `PRAGMA wal_autocheckpoint = 1000;` (checkpoint after 1000 pages \u2014 default); (3) for embedded apps: connection close triggers checkpoint; (4) for long-running readers: hold their transactions briefly; (5) if WAL file becomes huge: connection close (or app restart) + manual `wal_checkpoint(RESTART)` resets it.",
+      "source_url": "https://sqlite.org/wal.html",
+      "source_type": "official_docs",
+      "commands": [
+        "PRAGMA wal_checkpoint(TRUNCATE);",
+        "PRAGMA wal_autocheckpoint = 1000;"
+      ],
+      "steps": [
+        "periodic forced checkpoint: `PRAGMA wal_checkpoint(TRUNCATE);` (blocks until done)",
+        "configure auto: `PRAGMA wal_autocheckpoint = 1000;` (checkpoint after 1000 pages \u2014 default)",
+        "for embedded apps: connection close triggers checkpoint",
+        "for long-running readers: hold their transactions briefly",
+        "if WAL file becomes huge: connection close (or app restart) + manual `wal_checkpoint(RESTART)` resets it"
+      ],
+      "constraints": [
+        "periodic forced checkpoint: `PRAGMA wal_checkpoint(TRUNCATE);` (blocks until done)",
+        "configure auto: `PRAGMA wal_autocheckpoint = 1000;` (checkpoint after 1000 pages \u2014 default)",
+        "for embedded apps: connection close triggers checkpoint",
+        "if WAL file becomes huge: connection close (or app restart) + manual `wal_checkpoint(RESTART)` resets it",
+        "Requires binaries or commands referenced in examples: PRAGMA."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-errors",
+        "legacy_title": "sqlite3 error: WAL file growing forever"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sqlite3-error-sqlite3-error-on-conflict-clause-does-not-match-any-constraint",
+      "kind": "error",
+      "title": "sqlite3 error: ON CONFLICT clause does not match any constraint",
+      "statement": "`ON CONFLICT(col)` references a column without UNIQUE/PRIMARY KEY constraint. Fix: (1) only columns with UNIQUE constraint can be conflict targets; (2) create the constraint first: `CREATE UNIQUE INDEX idx_email ON users(email);`; (3) for composite: `ON CONFLICT(col1, col2)` needs UNIQUE on the same combination; (4) alternative without ON CONFLICT: `INSERT OR REPLACE` (uses any UNIQUE \u2014 be careful with triggers).",
+      "source_url": "https://sqlite.org/lang_upsert.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ON CONFLICT(col)",
+        "CREATE UNIQUE INDEX idx_email ON users(email);",
+        "ON CONFLICT(col1, col2)",
+        "INSERT OR REPLACE"
+      ],
+      "steps": [
+        "only columns with UNIQUE constraint can be conflict targets",
+        "create the constraint first: `CREATE UNIQUE INDEX idx_email ON users(email);`",
+        "for composite: `ON CONFLICT(col1, col2)` needs UNIQUE on the same combination",
+        "alternative without ON CONFLICT: `INSERT OR REPLACE` (uses any UNIQUE \u2014 be careful with triggers)"
+      ],
+      "constraints": [
+        "for composite: `ON CONFLICT(col1, col2)` needs UNIQUE on the same combination",
+        "Requires binaries or commands referenced in examples: CREATE, INSERT, ON."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-errors",
+        "legacy_title": "sqlite3 error: ON CONFLICT clause does not match any constraint"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sqlite3-error-sqlite3-error-foreign-keys-disabled-silently",
+      "kind": "error",
+      "title": "sqlite3 error: foreign keys disabled (silently)",
+      "statement": "Foreign keys are off by default \u2014 common surprise. INSERT/DELETE that should fail silently succeed. Fix: (1) ALWAYS enable per-connection: `PRAGMA foreign_keys = ON;` \u2014 must be issued on each new connection; (2) for libraries: many ORMs do this automatically; for raw connections, do it manually; (3) for migrations: temporarily disable: `PRAGMA foreign_keys = OFF;` then re-enable + `PRAGMA foreign_key_check;` to verify; (4) check status: `PRAGMA foreign_keys;` returns 0 (off) or 1 (on).",
+      "source_url": "https://sqlite.org/pragma.html",
+      "source_type": "official_docs",
+      "commands": [
+        "PRAGMA foreign_keys = ON;",
+        "PRAGMA foreign_keys = OFF;",
+        "PRAGMA foreign_key_check;",
+        "PRAGMA foreign_keys;"
+      ],
+      "steps": [
+        "ALWAYS enable per-connection: `PRAGMA foreign_keys = ON;` \u2014 must be issued on each new connection",
+        "for libraries: many ORMs do this automatically; for raw connections, do it manually",
+        "for migrations: temporarily disable: `PRAGMA foreign_keys = OFF;` then re-enable + `PRAGMA foreign_key_check;` to verify",
+        "check status: `PRAGMA foreign_keys;` returns 0 (off) or 1 (on)"
+      ],
+      "constraints": [
+        "ALWAYS enable per-connection: `PRAGMA foreign_keys = ON;` \u2014 must be issued on each new connection",
+        "for migrations: temporarily disable: `PRAGMA foreign_keys = OFF;` then re-enable + `PRAGMA foreign_key_check;` to verify",
+        "check status: `PRAGMA foreign_keys;` returns 0 (off) or 1 (on)",
+        "Requires binaries or commands referenced in examples: PRAGMA."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-errors",
+        "legacy_title": "sqlite3 error: foreign keys disabled (silently)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sqlite3-error-sqlite3-error-text-encoding-mismatch-invalid-byte-sequence",
+      "kind": "error",
+      "title": "sqlite3 error: text encoding mismatch / invalid byte sequence",
+      "statement": "Mixed UTF-8 / UTF-16 / non-UTF data inserted into text column. Fix: (1) default encoding is UTF-8 \u2014 set explicitly at DB creation: `PRAGMA encoding = 'UTF-8';`; (2) for binary data: use BLOB column type, not TEXT; (3) for legacy CSV with weird encoding: convert with `iconv -f LATIN1 -t UTF-8 file.csv > clean.csv` before import; (4) check: `PRAGMA encoding;` reports current.",
+      "source_url": "https://sqlite.org/datatype3.html",
+      "source_type": "official_docs",
+      "commands": [
+        "PRAGMA encoding = 'UTF-8';",
+        "iconv -f LATIN1 -t UTF-8 file.csv > clean.csv",
+        "PRAGMA encoding;"
+      ],
+      "steps": [
+        "default encoding is UTF-8 \u2014 set explicitly at DB creation: `PRAGMA encoding = 'UTF-8';`",
+        "for binary data: use BLOB column type, not TEXT",
+        "for legacy CSV with weird encoding: convert with `iconv -f LATIN1 -t UTF-8 file.csv > clean.csv` before import",
+        "check: `PRAGMA encoding;` reports current"
+      ],
+      "constraints": [
+        "check: `PRAGMA encoding;` reports current",
+        "Requires binaries or commands referenced in examples: PRAGMA, iconv."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-errors",
+        "legacy_title": "sqlite3 error: text encoding mismatch / invalid byte sequence"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sqlite3-error-sqlite3-error-recursive-trigger-max-recursion-exceeded",
+      "kind": "error",
+      "title": "sqlite3 error: recursive trigger / max recursion exceeded",
+      "statement": "Trigger that calls SQL that fires another trigger that fires the original \u2192 infinite recursion. Fix: (1) by default triggers don't recurse into themselves but cross-trigger recursion is possible; (2) disable recursion: `PRAGMA recursive_triggers = OFF;` (default OFF in some versions, ON in others); (3) use WHEN clauses to break recursion: `CREATE TRIGGER ... WHEN NEW.flag = 0 ...`; (4) check recursion depth: `PRAGMA max_trigger_depth;` (default 1000).",
+      "source_url": "https://sqlite.org/pragma.html",
+      "source_type": "official_docs",
+      "commands": [
+        "PRAGMA recursive_triggers = OFF;",
+        "CREATE TRIGGER ... WHEN NEW.flag = 0 ...",
+        "PRAGMA max_trigger_depth;"
+      ],
+      "steps": [
+        "by default triggers don't recurse into themselves but cross-trigger recursion is possible",
+        "disable recursion: `PRAGMA recursive_triggers = OFF;` (default OFF in some versions, ON in others)",
+        "use WHEN clauses to break recursion: `CREATE TRIGGER ... WHEN NEW.flag = 0 ...`",
+        "check recursion depth: `PRAGMA max_trigger_depth;` (default 1000)"
+      ],
+      "constraints": [
+        "check recursion depth: `PRAGMA max_trigger_depth;` (default 1000)",
+        "Requires binaries or commands referenced in examples: CREATE, PRAGMA."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-errors",
+        "legacy_title": "sqlite3 error: recursive trigger / max recursion exceeded"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sqlite3-error-sqlite3-error-cannot-use-generated-columns-in-insert",
+      "kind": "error",
+      "title": "sqlite3 error: cannot use generated columns in INSERT",
+      "statement": "Generated columns are computed \u2014 you can't INSERT into them directly. Fix: (1) omit generated columns from INSERT column list: `INSERT INTO t (a, b) VALUES (1, 2);` where `c GENERATED ALWAYS AS (a + b)` exists; (2) for ALTER TABLE generated col: `ALTER TABLE t ADD COLUMN c GENERATED ALWAYS AS (a + b);`; (3) STORED vs VIRTUAL: STORED takes disk space, VIRTUAL computes on read.",
+      "source_url": "https://sqlite.org/lang_createtable.html",
+      "source_type": "official_docs",
+      "commands": [
+        "INSERT INTO t (a, b) VALUES (1, 2);",
+        "c GENERATED ALWAYS AS (a + b)",
+        "ALTER TABLE t ADD COLUMN c GENERATED ALWAYS AS (a + b);"
+      ],
+      "steps": [
+        "omit generated columns from INSERT column list: `INSERT INTO t (a, b) VALUES (1, 2);` where `c GENERATED ALWAYS AS (a + b)` exists",
+        "for ALTER TABLE generated col: `ALTER TABLE t ADD COLUMN c GENERATED ALWAYS AS (a + b);`",
+        "STORED vs VIRTUAL: STORED takes disk space, VIRTUAL computes on read"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ALTER, INSERT, c."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-errors",
+        "legacy_title": "sqlite3 error: cannot use generated columns in INSERT"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sqlite3-error-sqlite3-error-json-path-doesn-t-exist-returns-null",
+      "kind": "error",
+      "title": "sqlite3 error: JSON path doesn't exist (returns NULL)",
+      "statement": "JSON1 functions return NULL when the path is missing \u2014 not an error, but often unexpected. Fix: (1) check existence: `json_extract(j, '$.path') IS NOT NULL`; (2) provide default: `coalesce(json_extract(j, '$.path'), 'default')`; (3) for arrays: `json_extract(j, '$.arr[0]')` \u2014 `[0]` is 0-indexed; (4) for validation: `json_valid(j)` returns 1 / 0; (5) modern syntax: `j -> '$.path'` returns JSON, `j ->> '$.path'` returns text/scalar.",
+      "source_url": "https://sqlite.org/json1.html",
+      "source_type": "official_docs",
+      "commands": [
+        "j -> '$.path'",
+        "j ->> '$.path'"
+      ],
+      "steps": [
+        "check existence: `json_extract(j, '$.path') IS NOT NULL`",
+        "provide default: `coalesce(json_extract(j, '$.path'), 'default')`",
+        "for arrays: `json_extract(j, '$.arr[0]')` \u2014 `[0]` is 0-indexed",
+        "for validation: `json_valid(j)` returns 1 / 0",
+        "modern syntax: `j -> '$.path'` returns JSON, `j ->> '$.path'` returns text/scalar"
+      ],
+      "constraints": [
+        "check existence: `json_extract(j, '$.path') IS NOT NULL`",
+        "Requires binaries or commands referenced in examples: j."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-errors",
+        "legacy_title": "sqlite3 error: JSON path doesn't exist (returns NULL)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-open-create-a-database",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: open / create a database",
+      "statement": "Create + open: `sqlite3 mydb.db` (creates if missing). Memory-only: `sqlite3 :memory:`. Read-only: `sqlite3 -readonly mydb.db` or URI `file:mydb.db?mode=ro`. From script: `sqlite3 mydb.db < init.sql` (run schema then exit). Run one command: `sqlite3 mydb.db 'SELECT * FROM users;'`. Persistent CLI history: `~/.sqlite_history` is auto-saved.",
+      "source_url": "https://sqlite.org/cli.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sqlite3 mydb.db",
+        "sqlite3 :memory:",
+        "sqlite3 -readonly mydb.db",
+        "sqlite3 mydb.db < init.sql",
+        "sqlite3 mydb.db 'SELECT * FROM users;'"
+      ],
+      "steps": [
+        "Create + open: `sqlite3 mydb.db` (creates if missing). Memory-only: `sqlite3 :memory:`. Read-only: `sqlite3 -readonly mydb.db` or URI `file:mydb.db?mode=ro`. From script: `sqlite3 mydb.db < init.sql` (run schema then exit). Run one command: `sqlite3 mydb.db 'SELECT * FROM users;'`. Persistent CLI history: `~/.sqlite_history` is auto-saved"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: sqlite3."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: open / create a database"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-useful-cli-dot-commands",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: useful CLI dot-commands",
+      "statement": "`.tables` \u2014 list tables. `.schema [<table>]` \u2014 show CREATE statements. `.indexes [<table>]` \u2014 show indexes. `.databases` \u2014 list attached. `.headers on` \u2014 show column names. `.mode <table|csv|column|line|json|html>` \u2014 output format. `.timer on` \u2014 show query time. `.read file.sql` \u2014 run script. `.import data.csv table` \u2014 bulk load CSV. `.dump` \u2014 full SQL dump. `.quit` (or Ctrl-D).",
+      "source_url": "https://sqlite.org/cli.html",
+      "source_type": "official_docs",
+      "commands": [
+        ".tables",
+        ".schema [<table>]",
+        ".indexes [<table>]",
+        ".databases",
+        ".headers on",
+        ".mode <table|csv|column|line|json|html>",
+        ".timer on",
+        ".read file.sql"
+      ],
+      "steps": [
+        "`.tables` \u2014 list tables. `.schema [<table>]` \u2014 show CREATE statements. `.indexes [<table>]` \u2014 show indexes. `.databases` \u2014 list attached. `.headers on` \u2014 show column names. `.mode <table|csv|column|line|json|html>` \u2014 output format. `.timer on` \u2014 show query time. `.read file.sql` \u2014 run script. `.import data.csv table` \u2014 bulk load CSV. `.dump` \u2014 full SQL dump. `.quit` (or Ctrl-D)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: .databases, .headers, .indexes, .mode, .read, .schema, .tables, .timer."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: useful CLI dot-commands"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-configure-output-format-for-queries",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: configure output format for queries",
+      "statement": "Default: pipe-separated. Better: `.headers on; .mode column;` \u2014 aligned columns with names. CSV (with proper quoting): `.mode csv`. JSON (each row as JSON object): `.mode json`. HTML table: `.mode html`. Quoted (re-usable as INSERT VALUES): `.mode quote`. Wide tables: `.mode list` is often more readable than columns. Set width per col: `.width 20 30 10` (for column mode).",
+      "source_url": "https://sqlite.org/cli.html",
+      "source_type": "official_docs",
+      "commands": [
+        ".headers on; .mode column;",
+        ".mode csv",
+        ".mode json",
+        ".mode html",
+        ".mode quote",
+        ".mode list",
+        ".width 20 30 10"
+      ],
+      "steps": [
+        "Default: pipe-separated. Better: `.headers on; .mode column;` \u2014 aligned columns with names. CSV (with proper quoting): `.mode csv`. JSON (each row as JSON object): `.mode json`. HTML table: `.mode html`. Quoted (re-usable as INSERT VALUES): `.mode quote`. Wide tables: `.mode list` is often more readable than columns. Set width per col: `.width 20 30 10` (for column mode)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: .headers, .mode, .width."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: configure output format for queries"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-import-csv-file",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: import CSV file",
+      "statement": "Modern (header-aware): `.mode csv; .headers on; .import --csv --skip 1 data.csv users`. Without `--skip 1` the header row would become a row of data. For existing table: column order in CSV must match table order. For NULL values: by default treats empty as empty string; `.nullvalue NULL` to recognize literal `NULL`. For tab-separated: `.mode tabs; .import data.tsv users`.",
+      "source_url": "https://sqlite.org/cli.html",
+      "source_type": "official_docs",
+      "commands": [
+        ".mode csv; .headers on; .import --csv --skip 1 data.csv users",
+        "--skip 1",
+        ".nullvalue NULL",
+        "NULL",
+        ".mode tabs; .import data.tsv users"
+      ],
+      "steps": [
+        "Modern (header-aware): `.mode csv; .headers on; .import --csv --skip 1 data.csv users`. Without `--skip 1` the header row would become a row of data. For existing table: column order in CSV must match table order. For NULL values: by default treats empty as empty string; `.nullvalue NULL` to recognize literal `NULL`. For tab-separated: `.mode tabs; .import data.tsv users`"
+      ],
+      "constraints": [
+        "Modern (header-aware): `.mode csv; .headers on; .import --csv --skip 1 data.csv users`. Without `--skip 1` the header row would become a row of data. For existing table: column order in CSV must match table order. For NULL values: by default treats empty as empty string; `.nullvalue NULL` to recognize literal `NULL`. For tab-separated: `.mode tabs; .import data.tsv users`",
+        "Requires binaries or commands referenced in examples: --skip, .mode, .nullvalue, NULL."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: import CSV file"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-export-query-results-to-csv",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: export query results to CSV",
+      "statement": "From CLI: `.headers on; .mode csv; .output users.csv; SELECT * FROM users; .output stdout;`. One-liner from shell: `sqlite3 -header -csv mydb.db 'SELECT * FROM users' > users.csv`. For tab-separated: `sqlite3 -separator $'\\t' mydb.db 'SELECT * FROM users' > users.tsv`. JSON output: `sqlite3 -json mydb.db 'SELECT * FROM users' > users.json`.",
+      "source_url": "https://sqlite.org/cli.html",
+      "source_type": "official_docs",
+      "commands": [
+        ".headers on; .mode csv; .output users.csv; SELECT * FROM users; .output stdout;",
+        "sqlite3 -header -csv mydb.db 'SELECT * FROM users' > users.csv",
+        "sqlite3 -separator $'\\t' mydb.db 'SELECT * FROM users' > users.tsv",
+        "sqlite3 -json mydb.db 'SELECT * FROM users' > users.json"
+      ],
+      "steps": [
+        "From CLI: `.headers on; .mode csv; .output users.csv; SELECT * FROM users; .output stdout;`. One-liner from shell: `sqlite3 -header -csv mydb.db 'SELECT * FROM users' > users.csv`. For tab-separated: `sqlite3 -separator $'\\t' mydb.db 'SELECT * FROM users' > users.tsv`. JSON output: `sqlite3 -json mydb.db 'SELECT * FROM users' > users.json`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: .headers, sqlite3."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: export query results to CSV"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-backup-a-database-online-no-downtime",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: backup a database (online, no downtime)",
+      "statement": "Modern: `VACUUM INTO 'backup.db';` (atomic, no lock contention with writers). CLI: `sqlite3 source.db \".backup 'backup.db'\"` (uses internal backup API). Dump as SQL: `sqlite3 source.db .dump > backup.sql` (huge but version-portable). Restore from dump: `sqlite3 fresh.db < backup.sql`. For active databases: backup API (`.backup`) is best \u2014 copies pages incrementally without blocking long.",
+      "source_url": "https://sqlite.org/backup.html",
+      "source_type": "official_docs",
+      "commands": [
+        "VACUUM INTO 'backup.db';",
+        "sqlite3 source.db \".backup 'backup.db'\"",
+        "sqlite3 source.db .dump > backup.sql",
+        "sqlite3 fresh.db < backup.sql",
+        ".backup"
+      ],
+      "steps": [
+        "Modern: `VACUUM INTO 'backup.db';` (atomic, no lock contention with writers). CLI: `sqlite3 source.db \".backup 'backup.db'\"` (uses internal backup API). Dump as SQL: `sqlite3 source.db .dump > backup.sql` (huge but version-portable). Restore from dump: `sqlite3 fresh.db < backup.sql`. For active databases: backup API (`.backup`) is best \u2014 copies pages incrementally without blocking long"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: .backup, VACUUM, sqlite3."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: backup a database (online, no downtime)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-enable-wal-mode-for-concurrent-reads",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: enable WAL mode for concurrent reads",
+      "statement": "`PRAGMA journal_mode = WAL;` (one-time per database \u2014 persists). Benefits: multiple readers + one writer concurrent; commit is faster (writes to WAL not main DB); reads don't block writes. Trade-offs: creates `-wal` and `-shm` files alongside; doesn't work over network filesystems. Verify: `PRAGMA journal_mode;` returns `wal`. Checkpoint to merge WAL into main: `PRAGMA wal_checkpoint(TRUNCATE);`.",
+      "source_url": "https://sqlite.org/wal.html",
+      "source_type": "official_docs",
+      "commands": [
+        "PRAGMA journal_mode = WAL;",
+        "-wal",
+        "-shm",
+        "PRAGMA journal_mode;",
+        "wal",
+        "PRAGMA wal_checkpoint(TRUNCATE);"
+      ],
+      "steps": [
+        "`PRAGMA journal_mode = WAL;` (one-time per database \u2014 persists). Benefits: multiple readers + one writer concurrent; commit is faster (writes to WAL not main DB); reads don't block writes. Trade-offs: creates `-wal` and `-shm` files alongside; doesn't work over network filesystems. Verify: `PRAGMA journal_mode;` returns `wal`. Checkpoint to merge WAL into main: `PRAGMA wal_checkpoint(TRUNCATE);`"
+      ],
+      "constraints": [
+        "`PRAGMA journal_mode = WAL;` (one-time per database \u2014 persists). Benefits: multiple readers + one writer concurrent; commit is faster (writes to WAL not main DB); reads don't block writes. Trade-offs: creates `-wal` and `-shm` files alongside; doesn't work over network filesystems. Verify: `PRAGMA journal_mode;` returns `wal`. Checkpoint to merge WAL into main: `PRAGMA wal_checkpoint(TRUNCATE);`",
+        "Requires binaries or commands referenced in examples: -shm, -wal, PRAGMA, wal."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: enable WAL mode for concurrent reads"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-enable-foreign-keys",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: enable foreign keys",
+      "statement": "MUST run on every connection (default is OFF for legacy compat): `PRAGMA foreign_keys = ON;`. Verify: `PRAGMA foreign_keys;` returns 1. In CREATE TABLE: `FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE`. Verify all existing data conforms: `PRAGMA foreign_key_check;` returns rows for violations. Disable for bulk import: `PRAGMA foreign_keys = OFF;` then re-enable + check.",
+      "source_url": "https://sqlite.org/pragma.html",
+      "source_type": "official_docs",
+      "commands": [
+        "PRAGMA foreign_keys = ON;",
+        "PRAGMA foreign_keys;",
+        "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE",
+        "PRAGMA foreign_key_check;",
+        "PRAGMA foreign_keys = OFF;"
+      ],
+      "steps": [
+        "MUST run on every connection (default is OFF for legacy compat): `PRAGMA foreign_keys = ON;`. Verify: `PRAGMA foreign_keys;` returns 1. In CREATE TABLE: `FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE`. Verify all existing data conforms: `PRAGMA foreign_key_check;` returns rows for violations. Disable for bulk import: `PRAGMA foreign_keys = OFF;` then re-enable + check"
+      ],
+      "constraints": [
+        "MUST run on every connection (default is OFF for legacy compat): `PRAGMA foreign_keys = ON;`. Verify: `PRAGMA foreign_keys;` returns 1. In CREATE TABLE: `FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE`. Verify all existing data conforms: `PRAGMA foreign_key_check;` returns rows for violations. Disable for bulk import: `PRAGMA foreign_keys = OFF;` then re-enable + check",
+        "Requires binaries or commands referenced in examples: FOREIGN, PRAGMA."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: enable foreign keys"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-create-table-with-proper-types-constraints",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: CREATE TABLE with proper types + constraints",
+      "statement": "```sql\\nCREATE TABLE users (\\n    id INTEGER PRIMARY KEY,           -- auto-increments by default\\n    email TEXT NOT NULL UNIQUE,\\n    name TEXT NOT NULL,\\n    age INTEGER CHECK (age >= 0),\\n    created_at TEXT NOT NULL DEFAULT (datetime('now')),\\n    metadata TEXT CHECK (json_valid(metadata) OR metadata IS NULL)\\n);\\n```. Storage classes: NULL, INTEGER, REAL, TEXT, BLOB. Type affinity is loose \u2014 `TEXT` accepts numbers. STRICT mode (3.37+): `CREATE TABLE users (...) STRICT;` enforces declared types.",
+      "source_url": "https://sqlite.org/lang_createtable.html",
+      "source_type": "official_docs",
+      "commands": [
+        ". Storage classes: NULL, INTEGER, REAL, TEXT, BLOB. Type affinity is loose \u2014",
+        "accepts numbers. STRICT mode (3.37+):"
+      ],
+      "steps": [
+        "```sql\\nCREATE TABLE users (\\n id INTEGER PRIMARY KEY, -- auto-increments by default\\n email TEXT NOT NULL UNIQUE,\\n name TEXT NOT NULL,\\n age INTEGER CHECK (age >= 0),\\n created_at TEXT NOT NULL DEFAULT (datetime('now')),\\n metadata TEXT CHECK (json_valid(metadata) OR metadata IS NULL)\\n);\\n```. Storage classes: NULL, INTEGER, REAL, TEXT, BLOB. Type affinity is loose \u2014 `TEXT` accepts numbers. STRICT mode (3.37+): `CREATE TABLE users (...) STRICT;` enforces declared types"
+      ],
+      "constraints": [
+        "```sql\\nCREATE TABLE users (\\n id INTEGER PRIMARY KEY, -- auto-increments by default\\n email TEXT NOT NULL UNIQUE,\\n name TEXT NOT NULL,\\n age INTEGER CHECK (age >= 0),\\n created_at TEXT NOT NULL DEFAULT (datetime('now')),\\n metadata TEXT CHECK (json_valid(metadata) OR metadata IS NULL)\\n);\\n```. Storage classes: NULL, INTEGER, REAL, TEXT, BLOB. Type affinity is loose \u2014 `TEXT` accepts numbers. STRICT mode (3.37+): `CREATE TABLE users (...) STRICT;` enforces declared types",
+        "Requires binaries or commands referenced in examples: ., accepts."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: CREATE TABLE with proper types + constraints"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-create-index-regular-unique-partial",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: CREATE INDEX (regular, unique, partial)",
+      "statement": "Regular: `CREATE INDEX idx_email ON users(email);`. Unique: `CREATE UNIQUE INDEX idx_email ON users(email);`. Composite: `CREATE INDEX idx_user_created ON posts(user_id, created_at);`. Partial (filter rows that get indexed): `CREATE INDEX idx_active ON users(email) WHERE deleted_at IS NULL;`. Expression index: `CREATE INDEX idx_lower_email ON users(lower(email));` \u2014 then query `WHERE lower(email) = 'alice@x'` uses it. Drop: `DROP INDEX idx_email;`.",
+      "source_url": "https://sqlite.org/lang_createindex.html",
+      "source_type": "official_docs",
+      "commands": [
+        "CREATE INDEX idx_email ON users(email);",
+        "CREATE UNIQUE INDEX idx_email ON users(email);",
+        "CREATE INDEX idx_user_created ON posts(user_id, created_at);",
+        "CREATE INDEX idx_active ON users(email) WHERE deleted_at IS NULL;",
+        "CREATE INDEX idx_lower_email ON users(lower(email));",
+        "WHERE lower(email) = 'alice@x'",
+        "DROP INDEX idx_email;"
+      ],
+      "steps": [
+        "Regular: `CREATE INDEX idx_email ON users(email);`. Unique: `CREATE UNIQUE INDEX idx_email ON users(email);`. Composite: `CREATE INDEX idx_user_created ON posts(user_id, created_at);`. Partial (filter rows that get indexed): `CREATE INDEX idx_active ON users(email) WHERE deleted_at IS NULL;`. Expression index: `CREATE INDEX idx_lower_email ON users(lower(email));` \u2014 then query `WHERE lower(email) = 'alice@x'` uses it. Drop: `DROP INDEX idx_email;`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: CREATE, DROP, WHERE."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: CREATE INDEX (regular, unique, partial)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-upsert-insert-on-conflict",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: UPSERT (INSERT ... ON CONFLICT)",
+      "statement": "Skip duplicate: `INSERT INTO users (id, name) VALUES (1, 'a') ON CONFLICT(id) DO NOTHING;`. Update on conflict: `INSERT INTO users (id, name, updated_at) VALUES (1, 'a', datetime('now')) ON CONFLICT(id) DO UPDATE SET name = excluded.name, updated_at = excluded.updated_at;`. `excluded` refers to row that would have been inserted. Conditional update: `... ON CONFLICT(id) DO UPDATE SET name = excluded.name WHERE users.updated_at < excluded.updated_at;`. Multi-column conflict: `ON CONFLICT(col1, col2)` needs matching UNIQUE constraint.",
+      "source_url": "https://sqlite.org/lang_upsert.html",
+      "source_type": "official_docs",
+      "commands": [
+        "INSERT INTO users (id, name) VALUES (1, 'a') ON CONFLICT(id) DO NOTHING;",
+        "INSERT INTO users (id, name, updated_at) VALUES (1, 'a', datetime('now')) ON CONFLICT(id) DO UPDATE SET name = excluded.name, updated_at = excluded.updated_at;",
+        "excluded",
+        "... ON CONFLICT(id) DO UPDATE SET name = excluded.name WHERE users.updated_at < excluded.updated_at;",
+        "ON CONFLICT(col1, col2)"
+      ],
+      "steps": [
+        "Skip duplicate: `INSERT INTO users (id, name) VALUES (1, 'a') ON CONFLICT(id) DO NOTHING;`. Update on conflict: `INSERT INTO users (id, name, updated_at) VALUES (1, 'a', datetime('now')) ON CONFLICT(id) DO UPDATE SET name = excluded.name, updated_at = excluded.updated_at;`. `excluded` refers to row that would have been inserted. Conditional update: `... ON CONFLICT(id) DO UPDATE SET name = excluded.name WHERE users.updated_at < excluded.updated_at;`. Multi-column conflict: `ON CONFLICT(col1, col2)` needs matching UNIQUE constraint"
+      ],
+      "constraints": [
+        "Skip duplicate: `INSERT INTO users (id, name) VALUES (1, 'a') ON CONFLICT(id) DO NOTHING;`. Update on conflict: `INSERT INTO users (id, name, updated_at) VALUES (1, 'a', datetime('now')) ON CONFLICT(id) DO UPDATE SET name = excluded.name, updated_at = excluded.updated_at;`. `excluded` refers to row that would have been inserted. Conditional update: `... ON CONFLICT(id) DO UPDATE SET name = excluded.name WHERE users.updated_at < excluded.updated_at;`. Multi-column conflict: `ON CONFLICT(col1, col2)` needs matching UNIQUE constraint",
+        "Requires binaries or commands referenced in examples: ..., INSERT, ON, excluded."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: UPSERT (INSERT ... ON CONFLICT)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-update-with-values-from-another-table-update-from-3-33",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: UPDATE with values from another table (UPDATE FROM, 3.33+)",
+      "statement": "```sql\\nUPDATE products\\nSET price = pricing.new_price\\nFROM pricing\\nWHERE pricing.product_id = products.id\\n  AND pricing.effective_date <= date('now');\\n```. Pre-3.33: subquery \u2014 `UPDATE products SET price = (SELECT new_price FROM pricing WHERE pricing.product_id = products.id);`. RETURNING clause (3.35+): `UPDATE ... RETURNING id, price;` gives back updated rows.",
+      "source_url": "https://sqlite.org/lang_update.html",
+      "source_type": "official_docs",
+      "commands": [
+        ". Pre-3.33: subquery \u2014",
+        ". RETURNING clause (3.35+):"
+      ],
+      "steps": [
+        "```sql\\nUPDATE products\\nSET price = pricing.new_price\\nFROM pricing\\nWHERE pricing.product_id = products.id\\n AND pricing.effective_date <= date('now');\\n```. Pre-3.33: subquery \u2014 `UPDATE products SET price = (SELECT new_price FROM pricing WHERE pricing.product_id = products.id);`. RETURNING clause (3.35+): `UPDATE ... RETURNING id, price;` gives back updated rows"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: .."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: UPDATE with values from another table (UPDATE FROM, 3.33+)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-delete-with-subquery-delete-returning",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: DELETE with subquery / DELETE returning",
+      "statement": "Subquery: `DELETE FROM users WHERE id IN (SELECT id FROM users_to_delete);`. Range: `DELETE FROM logs WHERE created_at < date('now', '-30 days');`. Soft delete: `UPDATE users SET deleted_at = datetime('now') WHERE id = ?;` is usually better than hard DELETE. RETURNING (3.35+): `DELETE FROM users WHERE id = 5 RETURNING *;`. TRUNCATE-like: SQLite has no TRUNCATE \u2014 use `DELETE FROM users;` then `VACUUM;` to reclaim space.",
+      "source_url": "https://sqlite.org/lang_delete.html",
+      "source_type": "official_docs",
+      "commands": [
+        "DELETE FROM users WHERE id IN (SELECT id FROM users_to_delete);",
+        "DELETE FROM logs WHERE created_at < date('now', '-30 days');",
+        "UPDATE users SET deleted_at = datetime('now') WHERE id = ?;",
+        "DELETE FROM users WHERE id = 5 RETURNING *;",
+        "DELETE FROM users;"
+      ],
+      "steps": [
+        "Subquery: `DELETE FROM users WHERE id IN (SELECT id FROM users_to_delete);`. Range: `DELETE FROM logs WHERE created_at < date('now', '-30 days');`. Soft delete: `UPDATE users SET deleted_at = datetime('now') WHERE id = ?;` is usually better than hard DELETE. RETURNING (3.35+): `DELETE FROM users WHERE id = 5 RETURNING *;`. TRUNCATE-like: SQLite has no TRUNCATE \u2014 use `DELETE FROM users;` then `VACUUM;` to reclaim space"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: DELETE, UPDATE."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: DELETE with subquery / DELETE returning"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-common-table-expressions-cte",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: common table expressions (CTE)",
+      "statement": "```sql\\nWITH active_users AS (\\n    SELECT * FROM users WHERE deleted_at IS NULL\\n),\\nrecent_orders AS (\\n    SELECT * FROM orders WHERE created_at > date('now', '-7 days')\\n)\\nSELECT u.name, COUNT(o.id) AS order_count\\nFROM active_users u\\nLEFT JOIN recent_orders o ON o.user_id = u.id\\nGROUP BY u.id;\\n```. Improves readability for complex queries. Each CTE is computed once, then referenced.",
+      "source_url": "https://sqlite.org/lang_with.html",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "```sql\\nWITH active_users AS (\\n SELECT * FROM users WHERE deleted_at IS NULL\\n),\\nrecent_orders AS (\\n SELECT * FROM orders WHERE created_at > date('now', '-7 days')\\n)\\nSELECT u.name, COUNT(o.id) AS order_count\\nFROM active_users u\\nLEFT JOIN recent_orders o ON o.user_id = u.id\\nGROUP BY u.id;\\n```. Improves readability for complex queries. Each CTE is computed once, then referenced"
+      ],
+      "constraints": [],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: common table expressions (CTE)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-recursive-cte-graph-tree-traversal",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: recursive CTE (graph / tree traversal)",
+      "statement": "Generate series: `WITH RECURSIVE n(i) AS (SELECT 1 UNION ALL SELECT i+1 FROM n WHERE i < 10) SELECT * FROM n;`. Tree traversal: ```sql\\nWITH RECURSIVE descendants AS (\\n    SELECT id, parent_id, name FROM categories WHERE id = 1\\n    UNION ALL\\n    SELECT c.id, c.parent_id, c.name FROM categories c\\n    JOIN descendants d ON c.parent_id = d.id\\n)\\nSELECT * FROM descendants;\\n```. Always include a terminating condition.",
+      "source_url": "https://sqlite.org/lang_with.html",
+      "source_type": "official_docs",
+      "commands": [
+        "WITH RECURSIVE n(i) AS (SELECT 1 UNION ALL SELECT i+1 FROM n WHERE i < 10) SELECT * FROM n;"
+      ],
+      "steps": [
+        "Generate series: `WITH RECURSIVE n(i) AS (SELECT 1 UNION ALL SELECT i+1 FROM n WHERE i < 10) SELECT * FROM n;`. Tree traversal: ```sql\\nWITH RECURSIVE descendants AS (\\n SELECT id, parent_id, name FROM categories WHERE id = 1\\n UNION ALL\\n SELECT c.id, c.parent_id, c.name FROM categories c\\n JOIN descendants d ON c.parent_id = d.id\\n)\\nSELECT * FROM descendants;\\n```. Always include a terminating condition"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: WITH."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: recursive CTE (graph / tree traversal)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-window-functions",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: window functions",
+      "statement": "Row number: `SELECT name, ROW_NUMBER() OVER (ORDER BY score DESC) AS rank FROM players;`. Running total: `SELECT day, amount, SUM(amount) OVER (ORDER BY day) AS cumulative FROM sales;`. Partition: `SELECT category, name, RANK() OVER (PARTITION BY category ORDER BY price DESC) AS rk FROM products;`. Lag/lead: `SELECT day, amount, LAG(amount, 1) OVER (ORDER BY day) AS prev FROM sales;`. Available 3.25+ (2018).",
+      "source_url": "https://sqlite.org/windowfunctions.html",
+      "source_type": "official_docs",
+      "commands": [
+        "SELECT name, ROW_NUMBER() OVER (ORDER BY score DESC) AS rank FROM players;",
+        "SELECT day, amount, SUM(amount) OVER (ORDER BY day) AS cumulative FROM sales;",
+        "SELECT category, name, RANK() OVER (PARTITION BY category ORDER BY price DESC) AS rk FROM products;",
+        "SELECT day, amount, LAG(amount, 1) OVER (ORDER BY day) AS prev FROM sales;"
+      ],
+      "steps": [
+        "Row number: `SELECT name, ROW_NUMBER() OVER (ORDER BY score DESC) AS rank FROM players;`. Running total: `SELECT day, amount, SUM(amount) OVER (ORDER BY day) AS cumulative FROM sales;`. Partition: `SELECT category, name, RANK() OVER (PARTITION BY category ORDER BY price DESC) AS rk FROM products;`. Lag/lead: `SELECT day, amount, LAG(amount, 1) OVER (ORDER BY day) AS prev FROM sales;`. Available 3.25+"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: SELECT."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: window functions"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-json-queries-with-json1",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: JSON queries with JSON1",
+      "statement": "Extract: `SELECT json_extract(data, '$.name') FROM events;`. Modern operator (3.38+): `SELECT data -> '$.name' FROM events;` (returns JSON), `SELECT data ->> '$.name' FROM events;` (returns scalar/text). Filter: `SELECT * FROM events WHERE data ->> '$.type' = 'login';`. Index for JSON path: `CREATE INDEX idx_event_type ON events(data ->> '$.type');`. Validate: `json_valid(data)` returns 1/0. Build: `json_object('name', 'alice', 'age', 30)`. Array: `json_array(1, 2, 3)`. Iterate: `json_each(data, '$.tags')` returns rows.",
+      "source_url": "https://sqlite.org/json1.html",
+      "source_type": "official_docs",
+      "commands": [
+        "SELECT json_extract(data, '$.name') FROM events;",
+        "SELECT data -> '$.name' FROM events;",
+        "SELECT data ->> '$.name' FROM events;",
+        "SELECT * FROM events WHERE data ->> '$.type' = 'login';",
+        "CREATE INDEX idx_event_type ON events(data ->> '$.type');"
+      ],
+      "steps": [
+        "Extract: `SELECT json_extract(data, '$.name') FROM events;`. Modern operator (3.38+): `SELECT data -> '$.name' FROM events;` (returns JSON), `SELECT data ->> '$.name' FROM events;` (returns scalar/text). Filter: `SELECT * FROM events WHERE data ->> '$.type' = 'login';`. Index for JSON path: `CREATE INDEX idx_event_type ON events(data ->> '$.type');`. Validate: `json_valid(data)` returns 1/0. Build: `json_object('name', 'alice', 'age', 30)`. Array: `json_array(1, 2, 3)`. Iterate: `json_each(data, '$.tags')` returns rows"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: CREATE, SELECT."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: JSON queries with JSON1"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-full-text-search-with-fts5",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: full-text search with FTS5",
+      "statement": "Create virtual table: `CREATE VIRTUAL TABLE docs_fts USING fts5(title, body);`. Insert: `INSERT INTO docs_fts (title, body) VALUES ('Title', 'Lorem ipsum');`. Search: `SELECT * FROM docs_fts WHERE docs_fts MATCH 'lorem';`. Phrase: `MATCH '\"lorem ipsum\"'`. Column-specific: `MATCH 'title:lorem'`. Ranking: `SELECT *, bm25(docs_fts) AS score FROM docs_fts WHERE docs_fts MATCH 'lorem' ORDER BY score;`. Highlight: `highlight(docs_fts, 1, '<b>', '</b>')`.",
+      "source_url": "https://sqlite.org/fts5.html",
+      "source_type": "official_docs",
+      "commands": [
+        "CREATE VIRTUAL TABLE docs_fts USING fts5(title, body);",
+        "INSERT INTO docs_fts (title, body) VALUES ('Title', 'Lorem ipsum');",
+        "SELECT * FROM docs_fts WHERE docs_fts MATCH 'lorem';",
+        "MATCH '\"lorem ipsum\"'",
+        "MATCH 'title:lorem'",
+        "SELECT *, bm25(docs_fts) AS score FROM docs_fts WHERE docs_fts MATCH 'lorem' ORDER BY score;"
+      ],
+      "steps": [
+        "Create virtual table: `CREATE VIRTUAL TABLE docs_fts USING fts5(title, body);`. Insert: `INSERT INTO docs_fts (title, body) VALUES ('Title', 'Lorem ipsum');`. Search: `SELECT * FROM docs_fts WHERE docs_fts MATCH 'lorem';`. Phrase: `MATCH '\"lorem ipsum\"'`. Column-specific: `MATCH 'title:lorem'`. Ranking: `SELECT *, bm25(docs_fts) AS score FROM docs_fts WHERE docs_fts MATCH 'lorem' ORDER BY score;`. Highlight: `highlight(docs_fts, 1, '<b>', '</b>')`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: CREATE, INSERT, MATCH, SELECT."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: full-text search with FTS5"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-attach-multiple-databases",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: ATTACH multiple databases",
+      "statement": "`ATTACH DATABASE 'other.db' AS other;`. Cross-DB query: `SELECT * FROM main.users JOIN other.events USING (user_id);`. Copy a table: `INSERT INTO main.users SELECT * FROM other.users;`. Detach: `DETACH other;`. For testing: `ATTACH ':memory:' AS scratch;` gives a temp DB. Limit: 10 attached by default; bump with SQLITE_LIMIT_ATTACHED.",
+      "source_url": "https://sqlite.org/lang_attach.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ATTACH DATABASE 'other.db' AS other;",
+        "SELECT * FROM main.users JOIN other.events USING (user_id);",
+        "INSERT INTO main.users SELECT * FROM other.users;",
+        "DETACH other;",
+        "ATTACH ':memory:' AS scratch;"
+      ],
+      "steps": [
+        "`ATTACH DATABASE 'other.db' AS other;`. Cross-DB query: `SELECT * FROM main.users JOIN other.events USING (user_id);`. Copy a table: `INSERT INTO main.users SELECT * FROM other.users;`. Detach: `DETACH other;`. For testing: `ATTACH ':memory:' AS scratch;` gives a temp DB. Limit: 10 attached by default; bump with SQLITE_LIMIT_ATTACHED"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ATTACH, DETACH, INSERT, SELECT."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: ATTACH multiple databases"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-explain-query-plan",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: EXPLAIN QUERY PLAN",
+      "statement": "`EXPLAIN QUERY PLAN SELECT * FROM users WHERE email = 'x';`. Output shows whether SQLite uses an index or a table scan. Look for `USING INDEX` (good) vs `SCAN TABLE` (often bad on large tables). Detailed bytecode: `EXPLAIN SELECT ...;` (low-level VDBE instructions). For tooling: tools like DBeaver and DataGrip show query plans graphically. Improve plans: add indexes for WHERE/JOIN columns, run `ANALYZE` to update stats.",
+      "source_url": "https://sqlite.org/lang_explain.html",
+      "source_type": "official_docs",
+      "commands": [
+        "EXPLAIN QUERY PLAN SELECT * FROM users WHERE email = 'x';",
+        "USING INDEX",
+        "SCAN TABLE",
+        "EXPLAIN SELECT ...;",
+        "ANALYZE"
+      ],
+      "steps": [
+        "`EXPLAIN QUERY PLAN SELECT * FROM users WHERE email = 'x';`. Output shows whether SQLite uses an index or a table scan. Look for `USING INDEX` (good) vs `SCAN TABLE` (often bad on large tables). Detailed bytecode: `EXPLAIN SELECT ...;` (low-level VDBE instructions). For tooling: tools like DBeaver and DataGrip show query plans graphically. Improve plans: add indexes for WHERE/JOIN columns, run `ANALYZE` to update stats"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ANALYZE, EXPLAIN, SCAN, USING."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: EXPLAIN QUERY PLAN"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-vacuum-to-reclaim-space-defragment",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: VACUUM to reclaim space + defragment",
+      "statement": "`VACUUM;` rewrites entire DB \u2014 reclaims space from deleted rows, defragments, repacks. Cost: doubles disk during operation, can be slow on huge DBs. Auto-VACUUM (incremental): `PRAGMA auto_vacuum = INCREMENTAL;` (must be set at DB creation), then `PRAGMA incremental_vacuum(N);` periodically. FULL auto: `PRAGMA auto_vacuum = FULL;` \u2014 slower writes but always compact. Quick win: `VACUUM INTO 'compact.db';` creates compacted copy without locking original long.",
+      "source_url": "https://sqlite.org/lang_vacuum.html",
+      "source_type": "official_docs",
+      "commands": [
+        "PRAGMA auto_vacuum = INCREMENTAL;",
+        "PRAGMA incremental_vacuum(N);",
+        "PRAGMA auto_vacuum = FULL;",
+        "VACUUM INTO 'compact.db';"
+      ],
+      "steps": [
+        "`VACUUM;` rewrites entire DB \u2014 reclaims space from deleted rows, defragments, repacks. Cost: doubles disk during operation, can be slow on huge DBs. Auto-VACUUM (incremental): `PRAGMA auto_vacuum = INCREMENTAL;` (must be set at DB creation), then `PRAGMA incremental_vacuum(N);` periodically. FULL auto: `PRAGMA auto_vacuum = FULL;` \u2014 slower writes but always compact. Quick win: `VACUUM INTO 'compact.db';` creates compacted copy without locking original long"
+      ],
+      "constraints": [
+        "`VACUUM;` rewrites entire DB \u2014 reclaims space from deleted rows, defragments, repacks. Cost: doubles disk during operation, can be slow on huge DBs. Auto-VACUUM (incremental): `PRAGMA auto_vacuum = INCREMENTAL;` (must be set at DB creation), then `PRAGMA incremental_vacuum(N);` periodically. FULL auto: `PRAGMA auto_vacuum = FULL;` \u2014 slower writes but always compact. Quick win: `VACUUM INTO 'compact.db';` creates compacted copy without locking original long",
+        "Requires binaries or commands referenced in examples: PRAGMA, VACUUM."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: VACUUM to reclaim space + defragment"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-transactions-begin-commit-rollback",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: transactions (BEGIN / COMMIT / ROLLBACK)",
+      "statement": "Explicit: `BEGIN; INSERT ...; UPDATE ...; COMMIT;`. Or rollback: `BEGIN; ...; ROLLBACK;`. Modes: `BEGIN IMMEDIATE;` (acquires reserved lock immediately \u2014 prevents SQLITE_BUSY at COMMIT in WAL mode); `BEGIN EXCLUSIVE;` (excludes other readers too \u2014 rarely needed in WAL). Implicit: every statement outside BEGIN is its own transaction. For bulk inserts: wrap in single transaction \u2014 100-1000x faster than per-row commits.",
+      "source_url": "https://sqlite.org/lang_transaction.html",
+      "source_type": "official_docs",
+      "commands": [
+        "BEGIN IMMEDIATE;",
+        "BEGIN EXCLUSIVE;"
+      ],
+      "steps": [
+        "Explicit: `BEGIN; INSERT ...; UPDATE ...; COMMIT;`. Or rollback: `BEGIN; ...; ROLLBACK;`. Modes: `BEGIN IMMEDIATE;` (acquires reserved lock immediately \u2014 prevents SQLITE_BUSY at COMMIT in WAL mode); `BEGIN EXCLUSIVE;` (excludes other readers too \u2014 rarely needed in WAL). Implicit: every statement outside BEGIN is its own transaction. For bulk inserts: wrap in single transaction \u2014 100-1000x faster than per-row commits"
+      ],
+      "constraints": [
+        "Explicit: `BEGIN; INSERT ...; UPDATE ...; COMMIT;`. Or rollback: `BEGIN; ...; ROLLBACK;`. Modes: `BEGIN IMMEDIATE;` (acquires reserved lock immediately \u2014 prevents SQLITE_BUSY at COMMIT in WAL mode); `BEGIN EXCLUSIVE;` (excludes other readers too \u2014 rarely needed in WAL). Implicit: every statement outside BEGIN is its own transaction. For bulk inserts: wrap in single transaction \u2014 100-1000x faster than per-row commits",
+        "Requires binaries or commands referenced in examples: BEGIN."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: transactions (BEGIN / COMMIT / ROLLBACK)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-savepoint-for-nested-transactions",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: SAVEPOINT for nested transactions",
+      "statement": "```sql\\nBEGIN;\\nINSERT INTO outer ...;\\nSAVEPOINT inner;\\nINSERT INTO middle ...;\\n  SAVEPOINT inner2;\\n  INSERT INTO leaf ...;\\n  ROLLBACK TO inner2; -- undo leaf insert\\nRELEASE inner; -- commit middle\\nCOMMIT; -- commit outer\\n```. ROLLBACK TO doesn't end transaction \u2014 continues. RELEASE merges savepoint into parent. Use case: partial undo in long transactions.",
+      "source_url": "https://sqlite.org/lang_savepoint.html",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "```sql\\nBEGIN;\\nINSERT INTO outer ...;\\nSAVEPOINT inner;\\nINSERT INTO middle ...;\\n SAVEPOINT inner2;\\n INSERT INTO leaf ...;\\n ROLLBACK TO inner2; -- undo leaf insert\\nRELEASE inner; -- commit middle\\nCOMMIT; -- commit outer\\n```. ROLLBACK TO doesn't end transaction \u2014 continues. RELEASE merges savepoint into parent. Use case: partial undo in long transactions"
+      ],
+      "constraints": [],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: SAVEPOINT for nested transactions"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-date-time-functions",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: date/time functions",
+      "statement": "Current: `SELECT datetime('now');` (UTC by default). Local: `SELECT datetime('now', 'localtime');`. Format: `SELECT strftime('%Y-%m-%d %H:%M', 'now');`. Parse: `SELECT datetime('2026-06-01T12:00:00Z');`. Arithmetic: `SELECT date('now', '-7 days');` or `SELECT datetime('now', '+1 month', '-2 hours');`. Julian day: `SELECT julianday('now') - julianday('2026-01-01');` (days between).",
+      "source_url": "https://sqlite.org/lang_datefunc.html",
+      "source_type": "official_docs",
+      "commands": [
+        "SELECT datetime('now');",
+        "SELECT datetime('now', 'localtime');",
+        "SELECT strftime('%Y-%m-%d %H:%M', 'now');",
+        "SELECT datetime('2026-06-01T12:00:00Z');",
+        "SELECT date('now', '-7 days');",
+        "SELECT datetime('now', '+1 month', '-2 hours');",
+        "SELECT julianday('now') - julianday('2026-01-01');"
+      ],
+      "steps": [
+        "Current: `SELECT datetime('now');` (UTC by default). Local: `SELECT datetime('now', 'localtime');`. Format: `SELECT strftime('%Y-%m-%d %H:%M', 'now');`. Parse: `SELECT datetime('2026-06-01T12:00:00Z');`. Arithmetic: `SELECT date('now', '-7 days');` or `SELECT datetime('now', '+1 month', '-2 hours');`. Julian day: `SELECT julianday('now') - julianday('2026-01-01');` (days between)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: SELECT."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: date/time functions"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-generated-columns-computed-fields",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: generated columns (computed fields)",
+      "statement": "```sql\\nCREATE TABLE products (\\n    id INTEGER PRIMARY KEY,\\n    price REAL,\\n    tax_rate REAL,\\n    total_price REAL GENERATED ALWAYS AS (price * (1 + tax_rate)) VIRTUAL\\n);\\n```. VIRTUAL: computed on read (no disk cost, no index possible without expression-index). STORED: computed on write, stored on disk (can be indexed). Use case: denormalize derived fields without app-level logic. Cannot be INSERT/UPDATE'd directly.",
+      "source_url": "https://sqlite.org/lang_createtable.html",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "```sql\\nCREATE TABLE products (\\n id INTEGER PRIMARY KEY,\\n price REAL,\\n tax_rate REAL,\\n total_price REAL GENERATED ALWAYS AS (price * (1 + tax_rate)) VIRTUAL\\n);\\n```. VIRTUAL: computed on read (no disk cost, no index possible without expression-index). STORED: computed on write, stored on disk (can be indexed). Use case: denormalize derived fields without app-level logic. Cannot be INSERT/UPDATE'd directly"
+      ],
+      "constraints": [],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: generated columns (computed fields)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-triggers-audit-derived-constraint",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: triggers (audit, derived, constraint)",
+      "statement": "```sql\\nCREATE TRIGGER audit_user_update\\nAFTER UPDATE ON users\\nFOR EACH ROW\\nBEGIN\\n    INSERT INTO audit_log (user_id, changed_at, old_email)\\n    VALUES (NEW.id, datetime('now'), OLD.email);\\nEND;\\n```. Events: BEFORE/AFTER + INSERT/UPDATE/DELETE. `NEW.col` / `OLD.col` references row state. Drop: `DROP TRIGGER audit_user_update;`. Disable temporarily: no native disable \u2014 drop + recreate.",
+      "source_url": "https://sqlite.org/lang_createtable.html",
+      "source_type": "official_docs",
+      "commands": [
+        ". Events: BEFORE/AFTER + INSERT/UPDATE/DELETE.",
+        "references row state. Drop:"
+      ],
+      "steps": [
+        "```sql\\nCREATE TRIGGER audit_user_update\\nAFTER UPDATE ON users\\nFOR EACH ROW\\nBEGIN\\n INSERT INTO audit_log (user_id, changed_at, old_email)\\n VALUES (NEW.id, datetime('now'), OLD.email);\\nEND;\\n```. Events: BEFORE/AFTER + INSERT/UPDATE/DELETE. `NEW.col` / `OLD.col` references row state. Drop: `DROP TRIGGER audit_user_update;`. Disable temporarily: no native disable \u2014 drop + recreate"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ., references."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: triggers (audit, derived, constraint)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-schema-migrations-with-user-version",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: schema migrations with user_version",
+      "statement": "Pattern: ```sql\\nPRAGMA user_version;  -- returns current version (default 0)\\nBEGIN;\\nALTER TABLE users ADD COLUMN bio TEXT;\\nPRAGMA user_version = 2;\\nCOMMIT;\\n```. App reads version on startup + applies migrations in order. For complex changes (drop column pre-3.35, change CHECK): 12-step recreate-table process. Tools: golang-migrate, alembic (SQLAlchemy), Atlas, sqlite-utils.",
+      "source_url": "https://sqlite.org/pragma.html",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "Pattern: ```sql\\nPRAGMA user_version; -- returns current version (default 0)\\nBEGIN;\\nALTER TABLE users ADD COLUMN bio TEXT;\\nPRAGMA user_version = 2;\\nCOMMIT;\\n```. App reads version on startup + applies migrations in order. For complex changes (drop column pre-3.35, change CHECK): 12-step recreate-table process. Tools: golang-migrate, alembic (SQLAlchemy), Atlas, sqlite-utils"
+      ],
+      "constraints": [
+        "Pattern: ```sql\\nPRAGMA user_version; -- returns current version (default 0)\\nBEGIN;\\nALTER TABLE users ADD COLUMN bio TEXT;\\nPRAGMA user_version = 2;\\nCOMMIT;\\n```. App reads version on startup + applies migrations in order. For complex changes (drop column pre-3.35, change CHECK): 12-step recreate-table process. Tools: golang-migrate, alembic (SQLAlchemy), Atlas, sqlite-utils"
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: schema migrations with user_version"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-python-sqlite3-module-basics",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: Python sqlite3 module basics",
+      "statement": "```python\\nimport sqlite3\\nconn = sqlite3.connect('mydb.db')\\nconn.execute('PRAGMA foreign_keys = ON')\\nconn.row_factory = sqlite3.Row  # dict-like rows\\ncur = conn.cursor()\\ncur.execute('SELECT * FROM users WHERE email = ?', ('alice@x',))\\nfor row in cur:\\n    print(row['name'])\\nwith conn:  # context manager auto-commits or rolls back\\n    conn.execute('INSERT INTO users (name, email) VALUES (?, ?)', ('Bob', 'b@x'))\\nconn.close()\\n```",
+      "source_url": "https://sqlite.org/cli.html",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "```python\\nimport sqlite3\\nconn = sqlite3.connect('mydb.db')\\nconn.execute('PRAGMA foreign_keys = ON')\\nconn.row_factory = sqlite3.Row # dict-like rows\\ncur = conn.cursor()\\ncur.execute('SELECT * FROM users WHERE email = ?', ('alice@x',))\\nfor row in cur:\\n print(row['name'])\\nwith conn: # context manager auto-commits or rolls back\\n conn.execute('INSERT INTO users (name, email) VALUES (?, ?)', ('Bob', 'b@x'))\\nconn.close()\\n```"
+      ],
+      "constraints": [],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: Python sqlite3 module basics"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-optimize-for-read-heavy-workloads",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: optimize for read-heavy workloads",
+      "statement": "Combined PRAGMAs for read-tuning: ```sql\\nPRAGMA journal_mode = WAL;\\nPRAGMA synchronous = NORMAL;  -- vs FULL (default) \u2014 minor durability trade-off\\nPRAGMA cache_size = -64000;   -- 64MB cache (negative = KiB)\\nPRAGMA temp_store = MEMORY;   -- temp tables in RAM\\nPRAGMA mmap_size = 268435456; -- 256MB memory-mapped I/O\\n```. Run `ANALYZE;` after bulk loads to refresh query planner stats.",
+      "source_url": "https://sqlite.org/pragma.html",
+      "source_type": "official_docs",
+      "commands": [
+        ". Run"
+      ],
+      "steps": [
+        "Combined PRAGMAs for read-tuning: ```sql\\nPRAGMA journal_mode = WAL;\\nPRAGMA synchronous = NORMAL; -- vs FULL (default) \u2014 minor durability trade-off\\nPRAGMA cache_size = -64000; -- 64MB cache (negative = KiB)\\nPRAGMA temp_store = MEMORY; -- temp tables in RAM\\nPRAGMA mmap_size = 268435456; -- 256MB memory-mapped I/O\\n```. Run `ANALYZE;` after bulk loads to refresh query planner stats"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: .."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: optimize for read-heavy workloads"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-strict-tables-for-type-safety-3-37",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: STRICT tables for type safety (3.37+)",
+      "statement": "`CREATE TABLE users (id INTEGER, name TEXT NOT NULL) STRICT;`. In STRICT mode: declared types are enforced. INSERT 'abc' into INTEGER column \u2192 error. Allowed types: INT, INTEGER, REAL, TEXT, BLOB, ANY. Use case: when you want type safety like Postgres. Trade-off: less flexible \u2014 many SQLite-isms (storing arbitrary data in any column) don't work.",
+      "source_url": "https://sqlite.org/lang_createtable.html",
+      "source_type": "official_docs",
+      "commands": [
+        "CREATE TABLE users (id INTEGER, name TEXT NOT NULL) STRICT;"
+      ],
+      "steps": [
+        "`CREATE TABLE users (id INTEGER, name TEXT NOT NULL) STRICT;`. In STRICT mode: declared types are enforced. INSERT 'abc' into INTEGER column \u2192 error. Allowed types: INT, INTEGER, REAL, TEXT, BLOB, ANY. Use case: when you want type safety like Postgres. Trade-off: less flexible \u2014 many SQLite-isms (storing arbitrary data in any column) don't work"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: CREATE."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: STRICT tables for type safety (3.37+)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-returning-clause-3-35-for-insert-update-delete",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: RETURNING clause (3.35+) for INSERT/UPDATE/DELETE",
+      "statement": "Get back what was affected: `INSERT INTO users (name) VALUES ('Alice') RETURNING id, created_at;`. On UPDATE: `UPDATE products SET price = price * 1.1 WHERE category = 'a' RETURNING id, price AS new_price;`. On DELETE: `DELETE FROM events WHERE created_at < date('now', '-30 days') RETURNING id;`. Use case: get the auto-incremented ID without separate query (`last_insert_rowid()` works too but RETURNING is per-statement).",
+      "source_url": "https://sqlite.org/lang_insert.html",
+      "source_type": "official_docs",
+      "commands": [
+        "INSERT INTO users (name) VALUES ('Alice') RETURNING id, created_at;",
+        "UPDATE products SET price = price * 1.1 WHERE category = 'a' RETURNING id, price AS new_price;",
+        "DELETE FROM events WHERE created_at < date('now', '-30 days') RETURNING id;"
+      ],
+      "steps": [
+        "Get back what was affected: `INSERT INTO users (name) VALUES ('Alice') RETURNING id, created_at;`. On UPDATE: `UPDATE products SET price = price * 1.1 WHERE category = 'a' RETURNING id, price AS new_price;`. On DELETE: `DELETE FROM events WHERE created_at < date('now', '-30 days') RETURNING id;`. Use case: get the auto-incremented ID without separate query (`last_insert_rowid()` works too but RETURNING is per-statement)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: DELETE, INSERT, UPDATE."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: RETURNING clause (3.35+) for INSERT/UPDATE/DELETE"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-bulk-insert-performance",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: bulk insert performance",
+      "statement": "```sql\\nBEGIN;\\nINSERT INTO t (a, b) VALUES (...), (...), (...);  -- bulk values\\n-- ... up to 500 rows per INSERT\\nCOMMIT;\\n```. 1000-10000x faster than per-row commits. For huge: read file in Python + use `executemany`: `cur.executemany('INSERT ...', rows)`. Pre-create indexes AFTER bulk load (insert without index, then `CREATE INDEX`). Use `PRAGMA synchronous = OFF;` + WAL for fastest (risky \u2014 data loss on power failure).",
+      "source_url": "https://sqlite.org/lang_insert.html",
+      "source_type": "official_docs",
+      "commands": [
+        ". 1000-10000x faster than per-row commits. For huge: read file in Python + use",
+        ". Pre-create indexes AFTER bulk load (insert without index, then"
+      ],
+      "steps": [
+        "```sql\\nBEGIN;\\nINSERT INTO t (a, b) VALUES (...), (...), (...); -- bulk values\\n-- ... up to 500 rows per INSERT\\nCOMMIT;\\n```. 1000-10000x faster than per-row commits. For huge: read file in Python + use `executemany`: `cur.executemany('INSERT ...', rows)`. Pre-create indexes AFTER bulk load (insert without index, then `CREATE INDEX`). Use `PRAGMA synchronous = OFF;` + WAL for fastest (risky \u2014 data loss on power failure)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: .."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: bulk insert performance"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-check-verify-database-integrity",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: check + verify database integrity",
+      "statement": "Quick: `PRAGMA quick_check;` \u2014 fast, catches most issues. Thorough: `PRAGMA integrity_check;` \u2014 full check (slow on huge DBs). Foreign keys: `PRAGMA foreign_key_check;` \u2014 lists rows violating FK. Stats: `ANALYZE;` updates the planner's stats. Run periodically (daily/weekly) on production DBs.",
+      "source_url": "https://sqlite.org/pragma.html",
+      "source_type": "official_docs",
+      "commands": [
+        "PRAGMA quick_check;",
+        "PRAGMA integrity_check;",
+        "PRAGMA foreign_key_check;"
+      ],
+      "steps": [
+        "Quick: `PRAGMA quick_check;` \u2014 fast, catches most issues. Thorough: `PRAGMA integrity_check;` \u2014 full check (slow on huge DBs). Foreign keys: `PRAGMA foreign_key_check;` \u2014 lists rows violating FK. Stats: `ANALYZE;` updates the planner's stats. Run periodically (daily/weekly) on production DBs"
+      ],
+      "constraints": [
+        "Quick: `PRAGMA quick_check;` \u2014 fast, catches most issues. Thorough: `PRAGMA integrity_check;` \u2014 full check (slow on huge DBs). Foreign keys: `PRAGMA foreign_key_check;` \u2014 lists rows violating FK. Stats: `ANALYZE;` updates the planner's stats. Run periodically (daily/weekly) on production DBs",
+        "Requires binaries or commands referenced in examples: PRAGMA."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: check + verify database integrity"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-identifying-slow-queries",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: identifying slow queries",
+      "statement": "Enable timer: `.timer on` in CLI shows duration per query. For deeper: `EXPLAIN QUERY PLAN <query>` shows execution strategy. Find missing indexes: any `SCAN TABLE` on a large table is suspect. Update stats: `ANALYZE;` (re-run after bulk inserts). Page cache hit ratio: `PRAGMA cache_size` affects this; bigger cache = fewer disk reads.",
+      "source_url": "https://sqlite.org/lang_explain.html",
+      "source_type": "official_docs",
+      "commands": [
+        ".timer on",
+        "EXPLAIN QUERY PLAN <query>",
+        "SCAN TABLE",
+        "PRAGMA cache_size"
+      ],
+      "steps": [
+        "Enable timer: `.timer on` in CLI shows duration per query. For deeper: `EXPLAIN QUERY PLAN <query>` shows execution strategy. Find missing indexes: any `SCAN TABLE` on a large table is suspect. Update stats: `ANALYZE;` (re-run after bulk inserts). Page cache hit ratio: `PRAGMA cache_size` affects this; bigger cache = fewer disk reads"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: .timer, EXPLAIN, PRAGMA, SCAN."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: identifying slow queries"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sqlite3-recipe-sqlite3-recipe-production-ready-sqlite-db-config",
+      "kind": "recipe",
+      "title": "sqlite3 recipe: production-ready sqlite.db config",
+      "statement": "On every connection: ```sql\\nPRAGMA journal_mode = WAL;\\nPRAGMA synchronous = NORMAL;\\nPRAGMA foreign_keys = ON;\\nPRAGMA busy_timeout = 5000;\\nPRAGMA cache_size = -64000;\\nPRAGMA temp_store = MEMORY;\\n```. Daily: `PRAGMA optimize;` (3.18+ \u2014 incremental stats update). Weekly: `PRAGMA wal_checkpoint(TRUNCATE);` (keeps WAL bounded). Monthly: `VACUUM;` (if heavy DELETEs) or `VACUUM INTO 'compact.db';` for online compaction.",
+      "source_url": "https://sqlite.org/wal.html",
+      "source_type": "official_docs",
+      "commands": [
+        ". Daily:"
+      ],
+      "steps": [
+        "On every connection: ```sql\\nPRAGMA journal_mode = WAL;\\nPRAGMA synchronous = NORMAL;\\nPRAGMA foreign_keys = ON;\\nPRAGMA busy_timeout = 5000;\\nPRAGMA cache_size = -64000;\\nPRAGMA temp_store = MEMORY;\\n```. Daily: `PRAGMA optimize;` (3.18+ \u2014 incremental stats update). Weekly: `PRAGMA wal_checkpoint(TRUNCATE);` (keeps WAL bounded). Monthly: `VACUUM;` (if heavy DELETEs) or `VACUUM INTO 'compact.db';` for online compaction"
+      ],
+      "constraints": [
+        "On every connection: ```sql\\nPRAGMA journal_mode = WAL;\\nPRAGMA synchronous = NORMAL;\\nPRAGMA foreign_keys = ON;\\nPRAGMA busy_timeout = 5000;\\nPRAGMA cache_size = -64000;\\nPRAGMA temp_store = MEMORY;\\n```. Daily: `PRAGMA optimize;` (3.18+ \u2014 incremental stats update). Weekly: `PRAGMA wal_checkpoint(TRUNCATE);` (keeps WAL bounded). Monthly: `VACUUM;` (if heavy DELETEs) or `VACUUM INTO 'compact.db';` for online compaction",
+        "Requires binaries or commands referenced in examples: .."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sqlite3-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sqlite3_errors_recipes.py",
+        "legacy_tool_id": "sqlite3-recipes",
+        "legacy_title": "sqlite3 recipe: production-ready sqlite.db config"
+      },
+      "confidence": 0.92
+    }
+  ]
+}

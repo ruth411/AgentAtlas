@@ -52,7 +52,18 @@ _CAPABILITY_TYPES = [
     "metadata",
 ]
 _CONSTRAINT_KINDS = ["auth_scope", "environment", "precondition", "deprecation"]
-_EFFECT_KINDS = ["mutation", "destructive", "cost", "secret_exposure", "network"]
+_EFFECT_KINDS = [
+    "mutation",
+    "destructive",
+    "cost",
+    "secret_exposure",
+    "network",
+    # Local-only effects, for tools that touch neither the network nor remote
+    # state: "filesystem" (reads/writes local files, e.g. sed -i, sqlite3) and
+    # "compute" (pure transform with no side effects, e.g. jq).
+    "filesystem",
+    "compute",
+]
 _STRUCTURED_SOURCES = ["structured_ingestion", "prose_projection"]
 
 

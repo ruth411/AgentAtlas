@@ -1,0 +1,2711 @@
+{
+  "family": "go",
+  "version": "v1",
+  "artifact_id": "go-curated-source-v1",
+  "generated_from": {
+    "kind": "legacy_seed_script",
+    "path": "tools/scripts/seed_go_errors_recipes.py"
+  },
+  "entries": [
+    {
+      "entry_id": "go-error-go-error-cannot-find-module-providing-package-name",
+      "kind": "error",
+      "title": "go error: cannot find module providing package <name>",
+      "statement": "`go` couldn't resolve an import. Either the module isn't required in go.mod, the path is wrong, or the proxy can't reach it. Fix: (1) `go mod tidy` adds missing requires + removes unused; (2) explicit: `go get github.com/foo/bar@latest` (or `@v1.2.3`); (3) typo? double-check the import path on pkg.go.dev; (4) private repo? configure `GOPRIVATE`: `go env -w GOPRIVATE=github.com/myorg/*`; (5) check proxy reachability: `GOPROXY=direct go get ...` to bypass proxy.",
+      "source_url": "https://go.dev/ref/mod",
+      "source_type": "official_docs",
+      "commands": [
+        "go",
+        "go mod tidy",
+        "go get github.com/foo/bar@latest",
+        "GOPRIVATE",
+        "go env -w GOPRIVATE=github.com/myorg/*"
+      ],
+      "steps": [
+        "`go mod tidy` adds missing requires + removes unused",
+        "explicit: `go get github.com/foo/bar@latest` (or `@v1.2.3`)",
+        "typo? double-check the import path on pkg.go.dev",
+        "private repo? configure `GOPRIVATE`: `go env -w GOPRIVATE=github.com/myorg/*`",
+        "check proxy reachability: `GOPROXY=direct go get ...` to bypass proxy"
+      ],
+      "constraints": [
+        "`go mod tidy` adds missing requires + removes unused",
+        "typo? double-check the import path on pkg.go.dev",
+        "check proxy reachability: `GOPROXY=direct go get ...` to bypass proxy",
+        "Requires binaries or commands referenced in examples: GOPRIVATE, go."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-errors",
+        "legacy_title": "go error: cannot find module providing package <name>"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "go-error-go-error-go-mod-file-not-found-in-current-directory-or-any-parent-direct",
+      "kind": "error",
+      "title": "go error: go.mod file not found in current directory or any parent directory",
+      "statement": "Not in a Go module \u2014 every Go project needs go.mod (or you're in GOPATH-mode for legacy code). Fix: (1) initialize: `go mod init github.com/user/project` (path should match where it lives); (2) `cd` to a directory inside a module; (3) for legacy GOPATH workflow (rare now): `go env -w GO111MODULE=off` and put code under `$GOPATH/src/...` (NOT recommended for new code).",
+      "source_url": "https://go.dev/doc/modules/managing-dependencies",
+      "source_type": "official_docs",
+      "commands": [
+        "go mod init github.com/user/project",
+        "cd",
+        "go env -w GO111MODULE=off"
+      ],
+      "steps": [
+        "initialize: `go mod init github.com/user/project` (path should match where it lives)",
+        "`cd` to a directory inside a module",
+        "for legacy GOPATH workflow (rare now): `go env -w GO111MODULE=off` and put code under `$GOPATH/src/...` (NOT recommended for new code)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: cd, go."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-errors",
+        "legacy_title": "go error: go.mod file not found in current directory or any parent directory"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "go-error-go-error-package-x-is-not-in-std-not-in-standard-library",
+      "kind": "error",
+      "title": "go error: package X is not in std / not in standard library",
+      "statement": "You imported a name that doesn't exist in stdlib (typo, removed package, or third-party that needs to be `go get`'d). Fix: (1) check name on https://pkg.go.dev/std; (2) common typos: `math/rand` (not `math.rand`), `encoding/json` (not `json`), `net/http` (not `http`); (3) external pkg: `go get example.com/pkg && go mod tidy`; (4) deprecated stdlib (e.g. `io/ioutil`): replace with modern equivalents (`os.ReadFile`, `io.ReadAll`).",
+      "source_url": "https://pkg.go.dev",
+      "source_type": "official_docs",
+      "commands": [
+        "go get",
+        "math/rand",
+        "math.rand",
+        "encoding/json",
+        "json",
+        "net/http",
+        "http",
+        "go get example.com/pkg && go mod tidy"
+      ],
+      "steps": [
+        "check name on https://pkg.go.dev/std",
+        "common typos: `math/rand` (not `math.rand`), `encoding/json` (not `json`), `net/http` (not `http`)",
+        "external pkg: `go get example.com/pkg && go mod tidy`",
+        "deprecated stdlib (e.g. `io/ioutil`): replace with modern equivalents (`os.ReadFile`, `io.ReadAll`)"
+      ],
+      "constraints": [
+        "check name on https://pkg.go.dev/std",
+        "Requires binaries or commands referenced in examples: encoding/json, go, http, json, math.rand, math/rand, net/http."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-errors",
+        "legacy_title": "go error: package X is not in std / not in standard library"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "go-error-go-error-ambiguous-import-found-package-x-in-multiple-modules",
+      "kind": "error",
+      "title": "go error: ambiguous import: found package X in multiple modules",
+      "statement": "Two requires in go.mod provide the same import path \u2014 usually after a fork rename. Fix: (1) check: `go mod why -m <pkg>` shows why each module is required; (2) add a `replace` directive: `replace example.com/old => example.com/new v1.2.3`; (3) `go mod tidy` to clean up; (4) for monorepo: use `go work` (workspaces).",
+      "source_url": "https://go.dev/ref/mod",
+      "source_type": "official_docs",
+      "commands": [
+        "go mod why -m <pkg>",
+        "replace",
+        "replace example.com/old => example.com/new v1.2.3",
+        "go mod tidy",
+        "go work"
+      ],
+      "steps": [
+        "check: `go mod why -m <pkg>` shows why each module is required",
+        "add a `replace` directive: `replace example.com/old => example.com/new v1.2.3`",
+        "`go mod tidy` to clean up",
+        "for monorepo: use `go work` (workspaces)"
+      ],
+      "constraints": [
+        "check: `go mod why -m <pkg>` shows why each module is required",
+        "Requires binaries or commands referenced in examples: go, replace."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-errors",
+        "legacy_title": "go error: ambiguous import: found package X in multiple modules"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "go-error-go-error-checksum-mismatch-verifying-x-checksum-mismatch",
+      "kind": "error",
+      "title": "go error: checksum mismatch / verifying X: checksum mismatch",
+      "statement": "go.sum content disagrees with what go just downloaded \u2014 either tampered module, hash drift after force-push, or stale sum. Fix: (1) safe: `go mod verify` confirms scope; (2) if you trust upstream's change: delete the offending lines in go.sum and `go mod tidy`; (3) for transient: `GOFLAGS=-insecure` (DO NOT use in CI); (4) check GOPROXY: `go env GOPROXY` \u2014 sum-checking goes through sumdb (`go env GOSUMDB`).",
+      "source_url": "https://go.dev/ref/mod",
+      "source_type": "official_docs",
+      "commands": [
+        "go mod verify",
+        "go mod tidy",
+        "go env GOPROXY",
+        "go env GOSUMDB"
+      ],
+      "steps": [
+        "safe: `go mod verify` confirms scope",
+        "if you trust upstream's change: delete the offending lines in go.sum and `go mod tidy`",
+        "for transient: `GOFLAGS=-insecure` (DO NOT use in CI)",
+        "check GOPROXY: `go env GOPROXY` \u2014 sum-checking goes through sumdb (`go env GOSUMDB`)"
+      ],
+      "constraints": [
+        "safe: `go mod verify` confirms scope",
+        "check GOPROXY: `go env GOPROXY` \u2014 sum-checking goes through sumdb (`go env GOSUMDB`)",
+        "Requires binaries or commands referenced in examples: go."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-errors",
+        "legacy_title": "go error: checksum mismatch / verifying X: checksum mismatch"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "go-error-go-error-cgo-c-compiler-not-found-exec-gcc-not-found",
+      "kind": "error",
+      "title": "go error: cgo: C compiler not found / exec: gcc: not found",
+      "statement": "Code uses cgo but no C compiler is installed (or CGO_ENABLED=0 in a context that needs it). Fix: (1) install: macOS `xcode-select --install`; Linux `apt install build-essential`; (2) pin compiler: `CC=clang go build`; (3) disable cgo (pure-Go build): `CGO_ENABLED=0 go build`; (4) for static linking: `CGO_ENABLED=0 GOOS=linux go build -ldflags='-extldflags=-static'`.",
+      "source_url": "https://go.dev/cmd/go/",
+      "source_type": "official_docs",
+      "commands": [
+        "xcode-select --install",
+        "apt install build-essential"
+      ],
+      "steps": [
+        "install: macOS `xcode-select --install`; Linux `apt install build-essential`",
+        "pin compiler: `CC=clang go build`",
+        "disable cgo (pure-Go build): `CGO_ENABLED=0 go build`",
+        "for static linking: `CGO_ENABLED=0 GOOS=linux go build -ldflags='-extldflags=-static'`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: apt, xcode-select."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-errors",
+        "legacy_title": "go error: cgo: C compiler not found / exec: gcc: not found"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "go-error-go-panic-runtime-error-invalid-memory-address-or-nil-pointer-dereference",
+      "kind": "error",
+      "title": "go panic: runtime error: invalid memory address or nil pointer dereference",
+      "statement": "You dereferenced a nil pointer \u2014 most common Go runtime panic. Fix: (1) check pointers before use: `if x != nil { x.Method() }`; (2) for map of pointers: assign to a variable first: `if v, ok := m[k]; ok && v != nil { v.Method() }`; (3) returned from a function? check error first: `if r, err := f(); err == nil { r.Use() }`; (4) interface nil-trap: `var x *T = nil; var i interface{} = x` \u2014 `i != nil` is TRUE (the interface has a type tag).",
+      "source_url": "https://pkg.go.dev/errors",
+      "source_type": "official_docs",
+      "commands": [
+        "if x != nil { x.Method() }",
+        "if v, ok := m[k]; ok && v != nil { v.Method() }",
+        "if r, err := f(); err == nil { r.Use() }",
+        "var x *T = nil; var i interface{} = x",
+        "i != nil"
+      ],
+      "steps": [
+        "check pointers before use: `if x != nil { x.Method() }`",
+        "for map of pointers: assign to a variable first: `if v, ok := m[k]; ok && v != nil { v.Method() }`",
+        "returned from a function? check error first: `if r, err := f(); err == nil { r.Use() }`",
+        "interface nil-trap: `var x *T = nil; var i interface{} = x` \u2014 `i != nil` is TRUE (the interface has a type tag)"
+      ],
+      "constraints": [
+        "check pointers before use: `if x != nil { x.Method() }`",
+        "returned from a function? check error first: `if r, err := f(); err == nil { r.Use() }`",
+        "Requires binaries or commands referenced in examples: i, if, var."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-errors",
+        "legacy_title": "go panic: runtime error: invalid memory address or nil pointer dereference"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "go-error-go-panic-runtime-error-index-out-of-range",
+      "kind": "error",
+      "title": "go panic: runtime error: index out of range",
+      "statement": "Slice/array index \u2265 len(). Fix: (1) check `if i < len(s) { ... }` before access; (2) use `range` instead of indexed loops where possible; (3) for slice modification: `if i >= len(s) { s = append(s, ...) }`; (4) common after `strings.Split`: the result is len \u2265 1, but the parts might be empty strings \u2014 index into substring carefully.",
+      "source_url": "https://pkg.go.dev/builtin",
+      "source_type": "official_docs",
+      "commands": [
+        "if i < len(s) { ... }",
+        "range",
+        "if i >= len(s) { s = append(s, ...) }",
+        "strings.Split"
+      ],
+      "steps": [
+        "check `if i < len(s) { ... }` before access",
+        "use `range` instead of indexed loops where possible",
+        "for slice modification: `if i >= len(s) { s = append(s, ...) }`",
+        "common after `strings.Split`: the result is len \u2265 1, but the parts might be empty strings \u2014 index into substring carefully"
+      ],
+      "constraints": [
+        "check `if i < len(s) { ... }` before access",
+        "Requires binaries or commands referenced in examples: if, range, strings.Split."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-errors",
+        "legacy_title": "go panic: runtime error: index out of range"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "go-error-go-panic-runtime-error-integer-divide-by-zero",
+      "kind": "error",
+      "title": "go panic: runtime error: integer divide by zero",
+      "statement": "Self-explanatory but easy to miss. Fix: (1) check denominator: `if b != 0 { return a / b }`; (2) for float math (always returns \u00b1Inf or NaN, never panics): conversion only panics on int; (3) modulo: `a % 0` also panics.",
+      "source_url": "https://pkg.go.dev/builtin",
+      "source_type": "official_docs",
+      "commands": [
+        "if b != 0 { return a / b }",
+        "a % 0"
+      ],
+      "steps": [
+        "check denominator: `if b != 0 { return a / b }`",
+        "for float math (always returns \u00b1Inf or NaN, never panics): conversion only panics on int",
+        "modulo: `a % 0` also panics"
+      ],
+      "constraints": [
+        "check denominator: `if b != 0 { return a / b }`",
+        "Requires binaries or commands referenced in examples: a, if."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-errors",
+        "legacy_title": "go panic: runtime error: integer divide by zero"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "go-error-go-fatal-error-all-goroutines-are-asleep-deadlock",
+      "kind": "error",
+      "title": "go fatal error: all goroutines are asleep - deadlock!",
+      "statement": "Main goroutine is blocked waiting on a channel/mutex/wg that will never unblock. Detected by Go runtime only when ALL goroutines are blocked. Fix: (1) classic: forgot `close(ch)` after writer is done so receiver hangs; (2) buffered channel full + no reader: close + drain; (3) WaitGroup never reaches 0 \u2014 missing `wg.Done()` or wrong wg.Add count; (4) for debugging: print goroutine stacks with `kill -ABRT <pid>` or `runtime.Stack()`.",
+      "source_url": "https://pkg.go.dev/sync",
+      "source_type": "official_docs",
+      "commands": [
+        "kill -ABRT <pid>"
+      ],
+      "steps": [
+        "classic: forgot `close(ch)` after writer is done so receiver hangs",
+        "buffered channel full + no reader: close + drain",
+        "WaitGroup never reaches 0 \u2014 missing `wg.Done()` or wrong wg.Add count",
+        "for debugging: print goroutine stacks with `kill -ABRT <pid>` or `runtime.Stack()`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: kill."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-errors",
+        "legacy_title": "go fatal error: all goroutines are asleep - deadlock!"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "go-error-go-fatal-error-concurrent-map-writes",
+      "kind": "error",
+      "title": "go fatal error: concurrent map writes",
+      "statement": "Maps in Go are NOT safe for concurrent use. Two goroutines writing the same map \u2192 fatal. Fix: (1) protect with `sync.Mutex`; (2) read-mostly: `sync.RWMutex` (RLock for readers); (3) high-throughput: `sync.Map` (specialized, not always faster \u2014 measure); (4) for per-shard sharded maps: split by key hash; (5) `go run -race` detects this BEFORE production.",
+      "source_url": "https://pkg.go.dev/sync",
+      "source_type": "official_docs",
+      "commands": [
+        "sync.Mutex",
+        "sync.RWMutex",
+        "sync.Map",
+        "go run -race"
+      ],
+      "steps": [
+        "protect with `sync.Mutex`",
+        "read-mostly: `sync.RWMutex` (RLock for readers)",
+        "high-throughput: `sync.Map` (specialized, not always faster \u2014 measure)",
+        "for per-shard sharded maps: split by key hash",
+        "`go run -race` detects this BEFORE production"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: go, sync.Map, sync.Mutex, sync.RWMutex."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-errors",
+        "legacy_title": "go fatal error: concurrent map writes"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "go-error-go-panic-send-on-closed-channel-close-of-closed-channel",
+      "kind": "error",
+      "title": "go panic: send on closed channel / close of closed channel",
+      "statement": "Channel was closed by one goroutine while another tried to send/close it. Fix: (1) golden rule: ONLY the sender closes \u2014 never the receiver; (2) for multiple senders: use a separate done-channel + sync.Once for close; (3) check before sending: `select { case ch <- v: default: }` is NOT safe alone; (4) idiomatic pattern: producer closes when its work is done, consumers loop on `for v := range ch`.",
+      "source_url": "https://pkg.go.dev/builtin",
+      "source_type": "official_docs",
+      "commands": [
+        "select { case ch <- v: default: }",
+        "for v := range ch"
+      ],
+      "steps": [
+        "golden rule: ONLY the sender closes \u2014 never the receiver",
+        "for multiple senders: use a separate done-channel + sync.Once for close",
+        "check before sending: `select { case ch <- v: default: }` is NOT safe alone",
+        "idiomatic pattern: producer closes when its work is done, consumers loop on `for v := range ch`"
+      ],
+      "constraints": [
+        "check before sending: `select { case ch <- v: default: }` is NOT safe alone",
+        "Requires binaries or commands referenced in examples: for, select."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-errors",
+        "legacy_title": "go panic: send on closed channel / close of closed channel"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "go-error-go-compile-error-cannot-use-x-type-y-as-type-z-in-argument-to",
+      "kind": "error",
+      "title": "go compile error: cannot use X (type Y) as type Z in argument to ...",
+      "statement": "Type mismatch. Go is strict \u2014 no implicit conversion between named types, even if underlying types match. Fix: (1) explicit convert: `MyType(x)` if underlying types match; (2) for int/float: explicit `int(f)` or `float64(i)`; (3) for strings/bytes: `[]byte(s)` or `string(b)`; (4) interface satisfaction: must implement ALL methods exactly (including pointer vs value receiver).",
+      "source_url": "https://go.dev/ref/spec",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "explicit convert: `MyType(x)` if underlying types match",
+        "for int/float: explicit `int(f)` or `float64(i)`",
+        "for strings/bytes: `[]byte(s)` or `string(b)`",
+        "interface satisfaction: must implement ALL methods exactly (including pointer vs value receiver)"
+      ],
+      "constraints": [
+        "interface satisfaction: must implement ALL methods exactly (including pointer vs value receiver)"
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-errors",
+        "legacy_title": "go compile error: cannot use X (type Y) as type Z in argument to ..."
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "go-error-go-compile-error-declared-and-not-used-declared-but-not-used",
+      "kind": "error",
+      "title": "go compile error: declared and not used / declared but not used",
+      "statement": "Go refuses to compile if a variable is declared but never read. Imports too. Fix: (1) use it; (2) intentionally unused: `_ = x` (assign to underscore) or rename declaration to `_, foo := f()`; (3) for unused import (during refactor): use `_ \"package\"` for side-effect imports (database drivers, init); (4) `go vet` and `goimports` will clean these up.",
+      "source_url": "https://go.dev/ref/spec",
+      "source_type": "official_docs",
+      "commands": [
+        "_ = x",
+        "_ \"package\"",
+        "go vet",
+        "goimports"
+      ],
+      "steps": [
+        "use it",
+        "intentionally unused: `_ = x` (assign to underscore) or rename declaration to `_, foo := f()`",
+        "for unused import (during refactor): use `_ \"package\"` for side-effect imports (database drivers, init)",
+        "`go vet` and `goimports` will clean these up"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: _, go, goimports."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-errors",
+        "legacy_title": "go compile error: declared and not used / declared but not used"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "go-error-go-compile-error-imported-and-not-used-x",
+      "kind": "error",
+      "title": "go compile error: imported and not used: \"X\"",
+      "statement": "Same rule as unused variables \u2014 Go won't compile with unused imports. Fix: (1) remove the line; (2) `goimports -w .` does this automatically; (3) side-effect import (init only, never used directly): `import _ \"github.com/lib/pq\"`; (4) configure editor to format on save with goimports.",
+      "source_url": "https://go.dev/cmd/go/",
+      "source_type": "official_docs",
+      "commands": [
+        "goimports -w .",
+        "import _ \"github.com/lib/pq\""
+      ],
+      "steps": [
+        "remove the line",
+        "`goimports -w .` does this automatically",
+        "side-effect import (init only, never used directly): `import _ \"github.com/lib/pq\"`",
+        "configure editor to format on save with goimports"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: goimports, import."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-errors",
+        "legacy_title": "go compile error: imported and not used: \"X\""
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "go-error-go-compile-error-cannot-assign-to-struct-field-x-in-map-unaddressable",
+      "kind": "error",
+      "title": "go compile error: cannot assign to struct field X in map / unaddressable",
+      "statement": "Map values aren't addressable \u2014 you can't mutate fields in-place. Fix: (1) replace whole value: `m[k] = T{Field: newValue}`; (2) use map of POINTERS: `map[string]*T` then `m[k].Field = ...` (but watch nil); (3) read-modify-write: `v := m[k]; v.Field = ...; m[k] = v`; (4) same applies to string indices \u2014 strings are immutable.",
+      "source_url": "https://go.dev/ref/spec",
+      "source_type": "official_docs",
+      "commands": [
+        "v := m[k]; v.Field = ...; m[k] = v"
+      ],
+      "steps": [
+        "replace whole value: `m[k] = T{Field: newValue}`",
+        "use map of POINTERS: `map[string]*T` then `m[k].Field = ...` (but watch nil)",
+        "read-modify-write: `v := m[k]; v.Field = ...; m[k] = v`",
+        "same applies to string indices \u2014 strings are immutable"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: v."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-errors",
+        "legacy_title": "go compile error: cannot assign to struct field X in map / unaddressable"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "go-error-go-runtime-assignment-to-entry-in-nil-map",
+      "kind": "error",
+      "title": "go runtime: assignment to entry in nil map",
+      "statement": "You wrote to a map that's nil (never initialized \u2014 `var m map[string]int` defaults to nil). Fix: (1) initialize: `m := map[string]int{}` or `m := make(map[string]int)`; (2) for struct field maps: initialize in constructor; (3) reading from nil map is OK (returns zero value) \u2014 only writes panic.",
+      "source_url": "https://pkg.go.dev/builtin",
+      "source_type": "official_docs",
+      "commands": [
+        "var m map[string]int",
+        "m := map[string]int{}",
+        "m := make(map[string]int)"
+      ],
+      "steps": [
+        "initialize: `m := map[string]int{}` or `m := make(map[string]int)`",
+        "for struct field maps: initialize in constructor",
+        "reading from nil map is OK (returns zero value) \u2014 only writes panic"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: m, var."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-errors",
+        "legacy_title": "go runtime: assignment to entry in nil map"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "go-error-go-compile-error-multiple-value-x-in-single-value-context",
+      "kind": "error",
+      "title": "go compile error: multiple-value X in single-value context",
+      "statement": "A function returns multiple values but you're using it in a context that expects one. Fix: (1) accept all returns: `a, b := f()` (or use _ for ones you skip: `a, _ := f()`); (2) error pattern: `if v, err := f(); err == nil { use(v) }`; (3) inside expression: store result in a var first.",
+      "source_url": "https://go.dev/ref/spec",
+      "source_type": "official_docs",
+      "commands": [
+        "if v, err := f(); err == nil { use(v) }"
+      ],
+      "steps": [
+        "accept all returns: `a, b := f()` (or use _ for ones you skip: `a, _ := f()`)",
+        "error pattern: `if v, err := f(); err == nil { use(v) }`",
+        "inside expression: store result in a var first"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: if."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-errors",
+        "legacy_title": "go compile error: multiple-value X in single-value context"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "go-error-go-compile-error-missing-return-at-end-of-function",
+      "kind": "error",
+      "title": "go compile error: missing return at end of function",
+      "statement": "Function declares a return type but a code path doesn't return. Fix: (1) add explicit return at end; (2) common cause: `for` loops with no return below \u2014 even infinite loops need a hint; (3) for non-returning paths: `panic(\"unreachable\")` makes intent clear; (4) Go does NOT infer 'this loop runs forever' \u2014 be explicit.",
+      "source_url": "https://go.dev/ref/spec",
+      "source_type": "official_docs",
+      "commands": [
+        "for"
+      ],
+      "steps": [
+        "add explicit return at end",
+        "common cause: `for` loops with no return below \u2014 even infinite loops need a hint",
+        "for non-returning paths: `panic(\"unreachable\")` makes intent clear",
+        "Go does NOT infer 'this loop runs forever' \u2014 be explicit"
+      ],
+      "constraints": [
+        "common cause: `for` loops with no return below \u2014 even infinite loops need a hint",
+        "Requires binaries or commands referenced in examples: for."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-errors",
+        "legacy_title": "go compile error: missing return at end of function"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "go-error-go-error-flag-provided-but-not-defined-name",
+      "kind": "error",
+      "title": "go error: flag provided but not defined: -<name>",
+      "statement": "Using `flag.Parse()` but the flag wasn't registered. Fix: (1) register: `var v string; flag.StringVar(&v, \"name\", \"default\", \"usage\")` BEFORE `flag.Parse()`; (2) typo check; (3) for unknown flags accepted: use `flag.CommandLine.Parse()` with custom `ErrorHandling = flag.ContinueOnError`; (4) for multiple positional args after flags: use `flag.Args()`.",
+      "source_url": "https://pkg.go.dev/flag",
+      "source_type": "official_docs",
+      "commands": [
+        "var v string; flag.StringVar(&v, \"name\", \"default\", \"usage\")",
+        "ErrorHandling = flag.ContinueOnError"
+      ],
+      "steps": [
+        "register: `var v string; flag.StringVar(&v, \"name\", \"default\", \"usage\")` BEFORE `flag.Parse()`",
+        "typo check",
+        "for unknown flags accepted: use `flag.CommandLine.Parse()` with custom `ErrorHandling = flag.ContinueOnError`",
+        "for multiple positional args after flags: use `flag.Args()`"
+      ],
+      "constraints": [
+        "typo check",
+        "Requires binaries or commands referenced in examples: ErrorHandling, var."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-errors",
+        "legacy_title": "go error: flag provided but not defined: -<name>"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "go-error-go-error-context-deadline-exceeded",
+      "kind": "error",
+      "title": "go error: context deadline exceeded",
+      "statement": "An operation outlasted its `context.WithTimeout`/`WithDeadline`. Fix: (1) extend the timeout if legitimately slow; (2) inspect: `if errors.Is(err, context.DeadlineExceeded) { ... }`; (3) propagate context through call stack \u2014 don't use `context.Background()` deep in code; (4) HTTP clients: `client := &http.Client{Timeout: 30*time.Second}` is per-request total; (5) for partial work: check `ctx.Err()` between iterations.",
+      "source_url": "https://pkg.go.dev/context",
+      "source_type": "official_docs",
+      "commands": [
+        "context.WithTimeout",
+        "WithDeadline",
+        "if errors.Is(err, context.DeadlineExceeded) { ... }",
+        "client := &http.Client{Timeout: 30*time.Second}"
+      ],
+      "steps": [
+        "extend the timeout if legitimately slow",
+        "inspect: `if errors.Is(err, context.DeadlineExceeded) { ... }`",
+        "propagate context through call stack \u2014 don't use `context.Background()` deep in code",
+        "HTTP clients: `client := &http.Client{Timeout: 30*time.Second}` is per-request total",
+        "for partial work: check `ctx.Err()` between iterations"
+      ],
+      "constraints": [
+        "for partial work: check `ctx.Err()` between iterations",
+        "Requires binaries or commands referenced in examples: WithDeadline, client, context.WithTimeout, if."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-errors",
+        "legacy_title": "go error: context deadline exceeded"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "go-error-go-error-context-canceled",
+      "kind": "error",
+      "title": "go error: context canceled",
+      "statement": "Parent context was canceled (caller used cancel func) before operation completed. Usually expected \u2014 not always an 'error'. Fix: (1) check with `errors.Is(err, context.Canceled)` to handle differently from real errors; (2) for HTTP servers: client disconnected \u2014 usually fine to log + return; (3) for graceful shutdown: contexts cancel together \u2014 propagate `ctx` everywhere.",
+      "source_url": "https://pkg.go.dev/context",
+      "source_type": "official_docs",
+      "commands": [
+        "ctx"
+      ],
+      "steps": [
+        "check with `errors.Is(err, context.Canceled)` to handle differently from real errors",
+        "for HTTP servers: client disconnected \u2014 usually fine to log + return",
+        "for graceful shutdown: contexts cancel together \u2014 propagate `ctx` everywhere"
+      ],
+      "constraints": [
+        "check with `errors.Is(err, context.Canceled)` to handle differently from real errors",
+        "Requires binaries or commands referenced in examples: ctx."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-errors",
+        "legacy_title": "go error: context canceled"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "go-error-go-error-tls-handshake-error-x509-certificate-signed-by-unknown-authorit",
+      "kind": "error",
+      "title": "go error: tls: handshake error / x509: certificate signed by unknown authority",
+      "statement": "HTTPS cert verification failed \u2014 usually wrong root CA, self-signed cert, or stale system trust store. Fix: (1) add CA to system trust store: macOS `Keychain Access \u2192 System \u2192 Certificates`; (2) per-request (dev only): `http.Client{Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}}` \u2014 NEVER prod; (3) custom CA pool: load PEM into `x509.CertPool` and use `tls.Config{RootCAs: pool}`; (4) hostname mismatch: SAN must include the hostname.",
+      "source_url": "https://pkg.go.dev/crypto/tls",
+      "source_type": "official_docs",
+      "commands": [
+        "Keychain Access \u2192 System \u2192 Certificates",
+        "x509.CertPool"
+      ],
+      "steps": [
+        "add CA to system trust store: macOS `Keychain Access \u2192 System \u2192 Certificates`",
+        "per-request (dev only): `http.Client{Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}}` \u2014 NEVER prod",
+        "custom CA pool: load PEM into `x509.CertPool` and use `tls.Config{RootCAs: pool}`",
+        "hostname mismatch: SAN must include the hostname"
+      ],
+      "constraints": [
+        "per-request (dev only): `http.Client{Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}}` \u2014 NEVER prod",
+        "hostname mismatch: SAN must include the hostname",
+        "Requires binaries or commands referenced in examples: Keychain, x509.CertPool."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-errors",
+        "legacy_title": "go error: tls: handshake error / x509: certificate signed by unknown authority"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "go-error-go-error-dial-tcp-connection-refused",
+      "kind": "error",
+      "title": "go error: dial tcp: connection refused",
+      "statement": "Nothing listening on the address/port. Fix: (1) verify server is running on that port: `lsof -i :8080` or `netstat -an | grep 8080`; (2) typo in address (localhost vs 127.0.0.1 vs hostname); (3) firewall blocking; (4) for Docker: container needs to expose the port: `docker run -p 8080:8080`; (5) wait for service to be ready: retry with backoff in tests.",
+      "source_url": "https://pkg.go.dev/net",
+      "source_type": "official_docs",
+      "commands": [
+        "lsof -i :8080",
+        "netstat -an | grep 8080",
+        "docker run -p 8080:8080"
+      ],
+      "steps": [
+        "verify server is running on that port: `lsof -i :8080` or `netstat -an | grep 8080`",
+        "typo in address (localhost vs 127.0.0.1 vs hostname)",
+        "firewall blocking",
+        "for Docker: container needs to expose the port: `docker run -p 8080:8080`",
+        "wait for service to be ready: retry with backoff in tests"
+      ],
+      "constraints": [
+        "verify server is running on that port: `lsof -i :8080` or `netstat -an | grep 8080`",
+        "for Docker: container needs to expose the port: `docker run -p 8080:8080`",
+        "Requires binaries or commands referenced in examples: docker, lsof, netstat."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-errors",
+        "legacy_title": "go error: dial tcp: connection refused"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "go-error-go-error-read-connection-reset-by-peer-eof-unexpected",
+      "kind": "error",
+      "title": "go error: read: connection reset by peer / EOF unexpected",
+      "statement": "Remote closed the TCP connection unexpectedly (often during long requests, idle timeouts, or server crash). Fix: (1) implement retry with backoff (common in HTTP clients); (2) check server's `IdleTimeout` / `ReadHeaderTimeout` \u2014 extend if too aggressive; (3) for keepalive issues: set `Transport.IdleConnTimeout`; (4) load balancer between you + server may be dropping idle conns \u2014 match its timeout.",
+      "source_url": "https://pkg.go.dev/net/http",
+      "source_type": "official_docs",
+      "commands": [
+        "IdleTimeout",
+        "ReadHeaderTimeout",
+        "Transport.IdleConnTimeout"
+      ],
+      "steps": [
+        "implement retry with backoff (common in HTTP clients)",
+        "check server's `IdleTimeout` / `ReadHeaderTimeout` \u2014 extend if too aggressive",
+        "for keepalive issues: set `Transport.IdleConnTimeout`",
+        "load balancer between you + server may be dropping idle conns \u2014 match its timeout"
+      ],
+      "constraints": [
+        "check server's `IdleTimeout` / `ReadHeaderTimeout` \u2014 extend if too aggressive",
+        "Requires binaries or commands referenced in examples: IdleTimeout, ReadHeaderTimeout, Transport.IdleConnTimeout."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-errors",
+        "legacy_title": "go error: read: connection reset by peer / EOF unexpected"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "go-error-go-error-json-cannot-unmarshal-x-into-go-value-of-type-y",
+      "kind": "error",
+      "title": "go error: json: cannot unmarshal X into Go value of type Y",
+      "statement": "JSON shape doesn't match your struct. Fix: (1) check field types: `int` won't accept `\"42\"`; use `json.Number` or `string` field then convert; (2) optional fields: use pointer (`*int`) \u2014 nil means absent; (3) flexible types: `interface{}` or `json.RawMessage` to defer parsing; (4) date format: `time.Time` expects RFC3339 by default \u2014 custom: implement `UnmarshalJSON`; (5) for arrays vs objects: union with `interface{}` and type-switch.",
+      "source_url": "https://pkg.go.dev/encoding/json",
+      "source_type": "official_docs",
+      "commands": [
+        "int",
+        "json.Number",
+        "string",
+        "json.RawMessage",
+        "time.Time",
+        "UnmarshalJSON"
+      ],
+      "steps": [
+        "check field types: `int` won't accept `\"42\"`; use `json.Number` or `string` field then convert",
+        "optional fields: use pointer (`*int`) \u2014 nil means absent",
+        "flexible types: `interface{}` or `json.RawMessage` to defer parsing",
+        "date format: `time.Time` expects RFC3339 by default \u2014 custom: implement `UnmarshalJSON`",
+        "for arrays vs objects: union with `interface{}` and type-switch"
+      ],
+      "constraints": [
+        "check field types: `int` won't accept `\"42\"`; use `json.Number` or `string` field then convert",
+        "Requires binaries or commands referenced in examples: UnmarshalJSON, int, json.Number, json.RawMessage, string, time.Time."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-errors",
+        "legacy_title": "go error: json: cannot unmarshal X into Go value of type Y"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "go-error-go-error-sql-no-rows-in-result-set",
+      "kind": "error",
+      "title": "go error: sql: no rows in result set",
+      "statement": "`db.QueryRow().Scan(...)` returns this when 0 rows match. Fix: (1) check: `if errors.Is(err, sql.ErrNoRows) { return nil, ErrNotFound }` (treat as 'not found'); (2) for 'zero is OK' queries (e.g. COUNT): use `Query()` + iterate, not `QueryRow`; (3) for batch queries: `Query` + `rows.Next()` loop; rows.Err() catches scan errors.",
+      "source_url": "https://pkg.go.dev/database/sql",
+      "source_type": "official_docs",
+      "commands": [
+        "if errors.Is(err, sql.ErrNoRows) { return nil, ErrNotFound }",
+        "QueryRow",
+        "Query"
+      ],
+      "steps": [
+        "check: `if errors.Is(err, sql.ErrNoRows) { return nil, ErrNotFound }` (treat as 'not found')",
+        "for 'zero is OK' queries (e.g. COUNT): use `Query()` + iterate, not `QueryRow`",
+        "for batch queries: `Query` + `rows.Next()` loop; rows.Err() catches scan errors"
+      ],
+      "constraints": [
+        "check: `if errors.Is(err, sql.ErrNoRows) { return nil, ErrNotFound }` (treat as 'not found')",
+        "Requires binaries or commands referenced in examples: Query, QueryRow, if."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-errors",
+        "legacy_title": "go error: sql: no rows in result set"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "go-error-go-error-fork-exec-no-such-file-or-directory",
+      "kind": "error",
+      "title": "go error: fork/exec: no such file or directory",
+      "statement": "`os/exec` couldn't find the binary. Fix: (1) use absolute path: `exec.Command(\"/usr/bin/git\", ...)`; (2) for PATH lookup: `exec.LookPath(\"git\")` returns the resolved path; (3) check PATH from your program: `os.Getenv(\"PATH\")` might differ from shell PATH; (4) shebang scripts: must be executable (`chmod +x`).",
+      "source_url": "https://pkg.go.dev/os/exec",
+      "source_type": "official_docs",
+      "commands": [
+        "os/exec",
+        "chmod +x"
+      ],
+      "steps": [
+        "use absolute path: `exec.Command(\"/usr/bin/git\", ...)`",
+        "for PATH lookup: `exec.LookPath(\"git\")` returns the resolved path",
+        "check PATH from your program: `os.Getenv(\"PATH\")` might differ from shell PATH",
+        "shebang scripts: must be executable (`chmod +x`)"
+      ],
+      "constraints": [
+        "check PATH from your program: `os.Getenv(\"PATH\")` might differ from shell PATH",
+        "shebang scripts: must be executable (`chmod +x`)",
+        "Requires binaries or commands referenced in examples: chmod, os/exec."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-errors",
+        "legacy_title": "go error: fork/exec: no such file or directory"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "go-error-go-error-imported-package-is-a-main-package-not-a-library",
+      "kind": "error",
+      "title": "go error: imported package is a main package (not a library)",
+      "statement": "You tried to import a `package main` from another module. Only libraries can be imported. Fix: (1) move shared code to a separate package (e.g. `internal/foo`); (2) leave `main` for the binary entry point only; (3) for re-exporting in monorepos: factor the code into a `pkg/<name>` subdirectory.",
+      "source_url": "https://go.dev/ref/spec",
+      "source_type": "official_docs",
+      "commands": [
+        "package main",
+        "internal/foo",
+        "main"
+      ],
+      "steps": [
+        "move shared code to a separate package (e.g. `internal/foo`)",
+        "leave `main` for the binary entry point only",
+        "for re-exporting in monorepos: factor the code into a `pkg/<name>` subdirectory"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: internal/foo, main, package."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-errors",
+        "legacy_title": "go error: imported package is a main package (not a library)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "go-error-go-panic-send-on-closed-channel-during-shutdown",
+      "kind": "error",
+      "title": "go panic: send on closed channel during shutdown",
+      "statement": "Producer didn't notice consumer signaled stop. Fix: (1) pattern: producer reads from a done-channel (`select { case <-done: return; case ch <- v: }`); (2) close the work-channel from PRODUCER side only; (3) for fan-out: use `errgroup` (`golang.org/x/sync/errgroup`) \u2014 handles cancellation + error propagation cleanly.",
+      "source_url": "https://pkg.go.dev/sync",
+      "source_type": "official_docs",
+      "commands": [
+        "select { case <-done: return; case ch <- v: }",
+        "errgroup",
+        "golang.org/x/sync/errgroup"
+      ],
+      "steps": [
+        "pattern: producer reads from a done-channel (`select { case <-done: return; case ch <- v: }`)",
+        "close the work-channel from PRODUCER side only",
+        "for fan-out: use `errgroup` (`golang.org/x/sync/errgroup`) \u2014 handles cancellation + error propagation cleanly"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: errgroup, golang.org/x/sync/errgroup, select."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-errors",
+        "legacy_title": "go panic: send on closed channel during shutdown"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-initialize-a-new-module",
+      "kind": "recipe",
+      "title": "go recipe: initialize a new module",
+      "statement": "`go mod init github.com/user/project` (path should match where the repo lives). Creates go.mod with the module path + go version. Then write your code and `go run .`. For a CLI: `go build -o myapp .`. Multiple commands in one repo? Put each `package main` in `cmd/<name>/` subdirs.",
+      "source_url": "https://go.dev/doc/tutorial/create-module",
+      "source_type": "official_docs",
+      "commands": [
+        "go mod init github.com/user/project",
+        "go run .",
+        "go build -o myapp .",
+        "package main"
+      ],
+      "steps": [
+        "`go mod init github.com/user/project` (path should match where the repo lives). Creates go.mod with the module path + go version. Then write your code and `go run .`. For a CLI: `go build -o myapp .`. Multiple commands in one repo? Put each `package main` in `cmd/<name>/` subdirs"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: go, package."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: initialize a new module"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-add-update-remove-dependencies",
+      "kind": "recipe",
+      "title": "go recipe: add / update / remove dependencies",
+      "statement": "Add: `go get example.com/pkg` (latest) or `go get example.com/pkg@v1.2.3` (specific). Update all to latest: `go get -u ./...`. Patch updates only: `go get -u=patch ./...`. Major version: must explicitly opt in: `go get example.com/pkg/v2`. Remove unused (after deleting imports): `go mod tidy`. Inspect: `go list -m all` (all transitive).",
+      "source_url": "https://go.dev/doc/modules/managing-dependencies",
+      "source_type": "official_docs",
+      "commands": [
+        "go get example.com/pkg",
+        "go get example.com/pkg@v1.2.3",
+        "go get -u ./...",
+        "go get -u=patch ./...",
+        "go get example.com/pkg/v2",
+        "go mod tidy",
+        "go list -m all"
+      ],
+      "steps": [
+        "Add: `go get example.com/pkg` (latest) or `go get example.com/pkg@v1.2.3` (specific). Update all to latest: `go get -u ./...`. Patch updates only: `go get -u=patch ./...`. Major version: must explicitly opt in: `go get example.com/pkg/v2`. Remove unused (after deleting imports): `go mod tidy`. Inspect: `go list -m all` (all transitive)"
+      ],
+      "constraints": [
+        "Add: `go get example.com/pkg` (latest) or `go get example.com/pkg@v1.2.3` (specific). Update all to latest: `go get -u ./...`. Patch updates only: `go get -u=patch ./...`. Major version: must explicitly opt in: `go get example.com/pkg/v2`. Remove unused (after deleting imports): `go mod tidy`. Inspect: `go list -m all` (all transitive)",
+        "Requires binaries or commands referenced in examples: go."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: add / update / remove dependencies"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-vendor-dependencies-for-reproducible-builds",
+      "kind": "recipe",
+      "title": "go recipe: vendor dependencies for reproducible builds",
+      "statement": "`go mod vendor` copies all deps into `vendor/` directory. Subsequent builds use vendor by default (Go 1.14+). Useful for: corporate compliance, offline builds, slow proxies. Trade-off: bloats repo. Switch back to module mode: `rm -rf vendor && go build -mod=mod`. Force vendor: `go build -mod=vendor`.",
+      "source_url": "https://go.dev/ref/mod",
+      "source_type": "official_docs",
+      "commands": [
+        "go mod vendor",
+        "vendor/",
+        "rm -rf vendor && go build -mod=mod",
+        "go build -mod=vendor"
+      ],
+      "steps": [
+        "`go mod vendor` copies all deps into `vendor/` directory. Subsequent builds use vendor by default (Go 1.14+). Useful for: corporate compliance, offline builds, slow proxies. Trade-off: bloats repo. Switch back to module mode: `rm -rf vendor && go build -mod=mod`. Force vendor: `go build -mod=vendor`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: go, rm, vendor/."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: vendor dependencies for reproducible builds"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-run-tests-single-all-package-with-verbose",
+      "kind": "recipe",
+      "title": "go recipe: run tests (single, all, package, with verbose)",
+      "statement": "All tests in current package: `go test`. All recursively: `go test ./...`. One test: `go test -run TestFoo`. Regex: `go test -run 'TestFoo.*'`. Verbose: `-v`. Short mode (skip slow ones): `-short`. Specific package: `go test github.com/me/proj/pkg`. Watch logs in real-time: `go test -v ./...`.",
+      "source_url": "https://pkg.go.dev/testing",
+      "source_type": "official_docs",
+      "commands": [
+        "go test",
+        "go test ./...",
+        "go test -run TestFoo",
+        "go test -run 'TestFoo.*'",
+        "-v",
+        "-short",
+        "go test github.com/me/proj/pkg",
+        "go test -v ./..."
+      ],
+      "steps": [
+        "All tests in current package: `go test`. All recursively: `go test ./...`. One test: `go test -run TestFoo`. Regex: `go test -run 'TestFoo.*'`. Verbose: `-v`. Short mode (skip slow ones): `-short`. Specific package: `go test github.com/me/proj/pkg`. Watch logs in real-time: `go test -v ./...`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -short, -v, go."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: run tests (single, all, package, with verbose)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-run-with-race-detector",
+      "kind": "recipe",
+      "title": "go recipe: run with race detector",
+      "statement": "`go run -race main.go` or `go test -race ./...`. Catches data races at runtime. ~5-10x slower + uses more memory \u2014 use in dev/CI, not prod. Race detector reports stack traces of conflicting accesses. Combine with `-count=N` to repeatedly run tests (catches flaky races).",
+      "source_url": "https://go.dev/cmd/go/",
+      "source_type": "official_docs",
+      "commands": [
+        "go run -race main.go",
+        "go test -race ./..."
+      ],
+      "steps": [
+        "`go run -race main.go` or `go test -race ./...`. Catches data races at runtime. ~5-10x slower + uses more memory \u2014 use in dev/CI, not prod. Race detector reports stack traces of conflicting accesses. Combine with `-count=N` to repeatedly run tests (catches flaky races)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: go."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: run with race detector"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-run-benchmarks",
+      "kind": "recipe",
+      "title": "go recipe: run benchmarks",
+      "statement": "Write `func BenchmarkX(b *testing.B) { for i := 0; i < b.N; i++ { ... } }` in a `_test.go` file. Run: `go test -bench=. -benchmem`. Specific: `-bench=BenchmarkFoo`. Compare runs: `go test -bench=. -count=5 > old.txt`, change code, `go test -bench=. -count=5 > new.txt`, then `benchstat old.txt new.txt`. Profile during bench: `-cpuprofile cpu.out -memprofile mem.out`.",
+      "source_url": "https://pkg.go.dev/testing",
+      "source_type": "official_docs",
+      "commands": [
+        "func BenchmarkX(b *testing.B) { for i := 0; i < b.N; i++ { ... } }",
+        "_test.go",
+        "go test -bench=. -benchmem",
+        "go test -bench=. -count=5 > old.txt",
+        "go test -bench=. -count=5 > new.txt",
+        "benchstat old.txt new.txt",
+        "-cpuprofile cpu.out -memprofile mem.out"
+      ],
+      "steps": [
+        "Write `func BenchmarkX(b *testing.B) { for i := 0; i < b.N; i++ { ... } }` in a `_test.go` file. Run: `go test -bench=. -benchmem`. Specific: `-bench=BenchmarkFoo`. Compare runs: `go test -bench=. -count=5 > old.txt`, change code, `go test -bench=. -count=5 > new.txt`, then `benchstat old.txt new.txt`. Profile during bench: `-cpuprofile cpu.out -memprofile mem.out`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -cpuprofile, _test.go, benchstat, func, go."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: run benchmarks"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-measure-code-coverage",
+      "kind": "recipe",
+      "title": "go recipe: measure code coverage",
+      "statement": "`go test -cover` shows percentage. Coverage profile: `go test -coverprofile=c.out ./...`. HTML view: `go tool cover -html=c.out -o cov.html && open cov.html`. Per-function: `go tool cover -func=c.out`. For multi-package: `go test -coverpkg=./... -coverprofile=c.out ./...`.",
+      "source_url": "https://pkg.go.dev/testing",
+      "source_type": "official_docs",
+      "commands": [
+        "go test -cover",
+        "go test -coverprofile=c.out ./...",
+        "go tool cover -html=c.out -o cov.html && open cov.html",
+        "go tool cover -func=c.out",
+        "go test -coverpkg=./... -coverprofile=c.out ./..."
+      ],
+      "steps": [
+        "`go test -cover` shows percentage. Coverage profile: `go test -coverprofile=c.out ./...`. HTML view: `go tool cover -html=c.out -o cov.html && open cov.html`. Per-function: `go tool cover -func=c.out`. For multi-package: `go test -coverpkg=./... -coverprofile=c.out ./...`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: go."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: measure code coverage"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-cross-compile-for-different-os-arch",
+      "kind": "recipe",
+      "title": "go recipe: cross-compile for different OS / ARCH",
+      "statement": "`GOOS=linux GOARCH=amd64 go build -o app-linux .` (Linux on x86_64). macOS Apple Silicon: `GOOS=darwin GOARCH=arm64`. Windows: `GOOS=windows GOARCH=amd64`. List all: `go tool dist list`. Static binary (no dynamic linking): `CGO_ENABLED=0 GOOS=linux go build -ldflags='-s -w' -o app .` \u2014 `-s -w` strips symbols + DWARF.",
+      "source_url": "https://go.dev/cmd/go/",
+      "source_type": "official_docs",
+      "commands": [
+        "go tool dist list",
+        "-s -w"
+      ],
+      "steps": [
+        "`GOOS=linux GOARCH=amd64 go build -o app-linux .` (Linux on x86_64). macOS Apple Silicon: `GOOS=darwin GOARCH=arm64`. Windows: `GOOS=windows GOARCH=amd64`. List all: `go tool dist list`. Static binary (no dynamic linking): `CGO_ENABLED=0 GOOS=linux go build -ldflags='-s -w' -o app .` \u2014 `-s -w` strips symbols + DWARF"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -s, go."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: cross-compile for different OS / ARCH"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-reduce-binary-size",
+      "kind": "recipe",
+      "title": "go recipe: reduce binary size",
+      "statement": "Strip symbols + DWARF: `go build -ldflags='-s -w' .`. Disable cgo: `CGO_ENABLED=0` (also removes glibc dependency). Trim paths: `-trimpath` removes absolute paths from build. Further: `upx app` (external compressor, 50-70% smaller, slight startup cost). Combined: `CGO_ENABLED=0 go build -ldflags='-s -w' -trimpath -o app .`.",
+      "source_url": "https://go.dev/cmd/go/",
+      "source_type": "official_docs",
+      "commands": [
+        "go build -ldflags='-s -w' .",
+        "-trimpath",
+        "upx app"
+      ],
+      "steps": [
+        "Strip symbols + DWARF: `go build -ldflags='-s -w' .`. Disable cgo: `CGO_ENABLED=0` (also removes glibc dependency). Trim paths: `-trimpath` removes absolute paths from build. Further: `upx app` (external compressor, 50-70% smaller, slight startup cost). Combined: `CGO_ENABLED=0 go build -ldflags='-s -w' -trimpath -o app .`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -trimpath, go, upx."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: reduce binary size"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-embed-files-into-a-binary",
+      "kind": "recipe",
+      "title": "go recipe: embed files into a binary",
+      "statement": "Go 1.16+ embed package. ```go\nimport _ \"embed\"\n//go:embed config.json\nvar configJSON []byte\n//go:embed templates/*.html\nvar tmplFS embed.FS\n```\nDirectory: `//go:embed assets` + `embed.FS`. Multiple patterns: `//go:embed *.txt *.md`. Access: `data, _ := tmplFS.ReadFile(\"templates/index.html\")`.",
+      "source_url": "https://pkg.go.dev/embed",
+      "source_type": "official_docs",
+      "commands": [
+        "go import _ \"embed\" //go:embed config.json var configJSON []byte //go:embed templates/*.html var tmplFS embed.FS",
+        "Directory:",
+        ". Multiple patterns:",
+        ". Access:"
+      ],
+      "steps": [
+        "Go 1.16+ embed package. ```go import _ \"embed\" //go:embed config.json var configJSON []byte //go:embed templates/*.html var tmplFS embed.FS ``` Directory: `//go:embed assets` + `embed.FS`. Multiple patterns: `//go:embed *.txt *.md`. Access: `data, _ := tmplFS.ReadFile(\"templates/index.html\")`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ., Directory:, go."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: embed files into a binary"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-use-generics-type-parameters",
+      "kind": "recipe",
+      "title": "go recipe: use generics (type parameters)",
+      "statement": "Go 1.18+. ```go\nfunc Map[T, U any](s []T, f func(T) U) []U {\n    r := make([]U, len(s))\n    for i, v := range s { r[i] = f(v) }\n    return r\n}\n// Usage: lengths := Map(words, func(s string) int { return len(s) })\n```\nConstraints: `comparable` (==, !=), `any` (interface{}), or custom interface like `interface{ ~int | ~float64 }`. Stdlib generics: `slices.Sort`, `maps.Keys`, `cmp.Less`.",
+      "source_url": "https://go.dev/ref/spec",
+      "source_type": "official_docs",
+      "commands": [
+        "go func Map[T, U any](s []T, f func(T) U) []U { r := make([]U, len(s)) for i, v := range s { r[i] = f(v) } return r } // Usage: lengths := Map(words, func(s string) int { return len(s) })",
+        "Constraints:",
+        ". Stdlib generics:"
+      ],
+      "steps": [
+        "Go 1.18+. ```go func Map[T, U any](s []T, f func(T) U) []U { r := make([]U, len(s)) for i, v := range s { r[i] = f(v) } return r } // Usage: lengths := Map(words, func(s string) int { return len(s) }) ``` Constraints: `comparable` (==, !=), `any` (interface{}), or custom interface like `interface{ ~int | ~float64 }`. Stdlib generics: `slices.Sort`, `maps.Keys`, `cmp.Less`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ., Constraints:, go."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: use generics (type parameters)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-launch-goroutines-wait-with-waitgroup",
+      "kind": "recipe",
+      "title": "go recipe: launch goroutines + wait with WaitGroup",
+      "statement": "```go\nvar wg sync.WaitGroup\nfor _, task := range tasks {\n    wg.Add(1)\n    go func(t Task) {\n        defer wg.Done()\n        t.Run()\n    }(task)  // capture by value\n}\nwg.Wait()\n```\nCRITICAL: pass loop var into goroutine (`func(t Task)`), don't close over loop var (Go 1.22+ fixed this, but be explicit). For errors: use `errgroup.Group` instead \u2014 collects first error and supports cancellation.",
+      "source_url": "https://pkg.go.dev/sync",
+      "source_type": "official_docs",
+      "commands": [
+        "go var wg sync.WaitGroup for _, task := range tasks { wg.Add(1) go func(t Task) { defer wg.Done() t.Run() }(task) // capture by value } wg.Wait()",
+        "CRITICAL: pass loop var into goroutine ("
+      ],
+      "steps": [
+        "```go var wg sync.WaitGroup for _, task := range tasks { wg.Add",
+        "go func(t Task) { defer wg.Done() t.Run() }(task) // capture by value } wg.Wait() ``` CRITICAL: pass loop var into goroutine (`func(t Task)`), don't close over loop var (Go 1.22+ fixed this, but be explicit). For errors: use `errgroup.Group` instead \u2014 collects first error and supports cancellation"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: CRITICAL:, go."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: launch goroutines + wait with WaitGroup"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-use-context-for-timeout",
+      "kind": "recipe",
+      "title": "go recipe: use context for timeout",
+      "statement": "```go\nctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)\ndefer cancel()  // ALWAYS defer cancel \u2014 releases resources\nreq, _ := http.NewRequestWithContext(ctx, \"GET\", url, nil)\nresp, err := http.DefaultClient.Do(req)\nif errors.Is(err, context.DeadlineExceeded) { /* timed out */ }\n```\nPropagate: pass ctx as FIRST argument to any func that might block. Inherit deadline: `context.WithTimeout(parentCtx, ...)`.",
+      "source_url": "https://pkg.go.dev/context",
+      "source_type": "official_docs",
+      "commands": [
+        "Propagate: pass ctx as FIRST argument to any func that might block. Inherit deadline:"
+      ],
+      "steps": [
+        "```go ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second) defer cancel() // ALWAYS defer cancel \u2014 releases resources req, _ := http.NewRequestWithContext(ctx, \"GET\", url, nil) resp, err := http.DefaultClient.Do(req) if errors.Is(err, context.DeadlineExceeded) { /* timed out */ } ``` Propagate: pass ctx as FIRST argument to any func that might block. Inherit deadline: `context.WithTimeout(parentCtx, ...)`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: Propagate:."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: use context for timeout"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-use-context-for-cancellation",
+      "kind": "recipe",
+      "title": "go recipe: use context for cancellation",
+      "statement": "```go\nctx, cancel := context.WithCancel(parent)\ndefer cancel()\ngo work(ctx)\n// later, to stop work:\ncancel()\n```\nInside the worker: `select { case <-ctx.Done(): return ctx.Err(); case ... }`. For graceful shutdown of HTTP server: `srv.Shutdown(ctx)` where ctx has deadline for grace period.",
+      "source_url": "https://pkg.go.dev/context",
+      "source_type": "official_docs",
+      "commands": [
+        "go ctx, cancel := context.WithCancel(parent) defer cancel() go work(ctx) // later, to stop work: cancel()",
+        "Inside the worker:",
+        ". For graceful shutdown of HTTP server:"
+      ],
+      "steps": [
+        "```go ctx, cancel := context.WithCancel(parent) defer cancel() go work(ctx) // later, to stop work: cancel() ``` Inside the worker: `select { case <-ctx.Done(): return ctx.Err(); case ... }`. For graceful shutdown of HTTP server: `srv.Shutdown(ctx)` where ctx has deadline for grace period"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ., Inside, go."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: use context for cancellation"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-use-select-for-timeout-multiple-channels",
+      "kind": "recipe",
+      "title": "go recipe: use select for timeout / multiple channels",
+      "statement": "```go\nselect {\ncase msg := <-ch:\n    handle(msg)\ncase <-time.After(5 * time.Second):\n    return errors.New(\"timeout\")\ncase <-ctx.Done():\n    return ctx.Err()\n}\n```\nDefault case (non-blocking): `default: /* try next */`. Caveat: `time.After` leaks the timer until it fires \u2014 for hot loops use `time.NewTimer` + `timer.Stop()`.",
+      "source_url": "https://pkg.go.dev/time",
+      "source_type": "official_docs",
+      "commands": [
+        "go select { case msg := <-ch: handle(msg) case <-time.After(5 * time.Second): return errors.New(\"timeout\") case <-ctx.Done(): return ctx.Err() }",
+        "Default case (non-blocking):",
+        ". Caveat:",
+        "leaks the timer until it fires \u2014 for hot loops use"
+      ],
+      "steps": [
+        "```go select { case msg := <-ch: handle(msg) case <-time.After(5 * time.Second): return errors.New(\"timeout\") case <-ctx.Done(): return ctx.Err() } ``` Default case (non-blocking): `default: /* try next */`. Caveat: `time.After` leaks the timer until it fires \u2014 for hot loops use `time.NewTimer` + `timer.Stop()`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ., Default, go, leaks."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: use select for timeout / multiple channels"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-protect-shared-state-with-sync-mutex-rwmutex",
+      "kind": "recipe",
+      "title": "go recipe: protect shared state with sync.Mutex / RWMutex",
+      "statement": "```go\ntype Counter struct {\n    mu sync.Mutex\n    n  int\n}\nfunc (c *Counter) Inc() {\n    c.mu.Lock()\n    defer c.mu.Unlock()\n    c.n++\n}\n```\nRead-heavy: use `sync.RWMutex` \u2014 `RLock()`/`RUnlock()` for readers. Always pair Lock/Unlock with `defer`. For lock-free counters: `sync/atomic.Int64.Add(...)`.",
+      "source_url": "https://pkg.go.dev/sync",
+      "source_type": "official_docs",
+      "commands": [
+        "go type Counter struct { mu sync.Mutex n int } func (c *Counter) Inc() { c.mu.Lock() defer c.mu.Unlock() c.n++ }",
+        "Read-heavy: use",
+        "for readers. Always pair Lock/Unlock with",
+        ". For lock-free counters:"
+      ],
+      "steps": [
+        "```go type Counter struct { mu sync.Mutex n int } func (c *Counter) Inc() { c.mu.Lock() defer c.mu.Unlock() c.n++ } ``` Read-heavy: use `sync.RWMutex` \u2014 `RLock()`/`RUnlock()` for readers. Always pair Lock/Unlock with `defer`. For lock-free counters: `sync/atomic.Int64.Add(...)`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ., Read-heavy:, for, go."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: protect shared state with sync.Mutex / RWMutex"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-lazy-initialization-with-sync-once",
+      "kind": "recipe",
+      "title": "go recipe: lazy initialization with sync.Once",
+      "statement": "```go\nvar (\n    once sync.Once\n    instance *DB\n)\nfunc GetDB() *DB {\n    once.Do(func() {\n        instance = connect()\n    })\n    return instance\n}\n```\nGuaranteed to run exactly once even with concurrent calls. Modern (Go 1.21+): `sync.OnceValue[T any]` and `sync.OnceFunc` cleaner alternatives.",
+      "source_url": "https://pkg.go.dev/sync",
+      "source_type": "official_docs",
+      "commands": [
+        "go var ( once sync.Once instance *DB ) func GetDB() *DB { once.Do(func() { instance = connect() }) return instance }",
+        "Guaranteed to run exactly once even with concurrent calls. Modern (Go 1.21+):",
+        "and"
+      ],
+      "steps": [
+        "```go var ( once sync.Once instance *DB ) func GetDB() *DB { once.Do(func() { instance = connect() }) return instance } ``` Guaranteed to run exactly once even with concurrent calls. Modern (Go 1.21+): `sync.OnceValue[T any]` and `sync.OnceFunc` cleaner alternatives"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: Guaranteed, and, go."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: lazy initialization with sync.Once"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-parse-json-into-a-struct",
+      "kind": "recipe",
+      "title": "go recipe: parse JSON into a struct",
+      "statement": "```go\ntype User struct {\n    Name  string `json:\"name\"`\n    Email string `json:\"email,omitempty\"`\n    Age   int    `json:\"age\"`\n}\nvar u User\nif err := json.Unmarshal(data, &u); err != nil { return err }\n```\nUnknown fields silently dropped \u2014 to error: `dec := json.NewDecoder(r); dec.DisallowUnknownFields()`. From file: `data, _ := os.ReadFile(p); json.Unmarshal(data, &u)`. From HTTP body: `json.NewDecoder(r.Body).Decode(&u)`.",
+      "source_url": "https://pkg.go.dev/encoding/json",
+      "source_type": "official_docs",
+      "commands": [
+        "go type User struct { Name string",
+        "Email string",
+        "Age int",
+        "Unknown fields silently dropped \u2014 to error:",
+        ". From file:",
+        ". From HTTP body:"
+      ],
+      "steps": [
+        "```go type User struct { Name string `json:\"name\"` Email string `json:\"email,omitempty\"` Age int `json:\"age\"` } var u User if err := json.Unmarshal(data, &u); err != nil { return err } ``` Unknown fields silently dropped \u2014 to error: `dec := json.NewDecoder(r); dec.DisallowUnknownFields()`. From file: `data, _ := os.ReadFile(p); json.Unmarshal(data, &u)`. From HTTP body: `json.NewDecoder(r.Body).Decode(&u)`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ., Age, Email, Unknown, go."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: parse JSON into a struct"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-marshal-struct-to-json",
+      "kind": "recipe",
+      "title": "go recipe: marshal struct to JSON",
+      "statement": "`b, err := json.Marshal(u)` produces compact JSON. Pretty: `b, _ := json.MarshalIndent(u, \"\", \"  \")`. To file: `os.WriteFile(\"out.json\", b, 0644)`. To HTTP response: `json.NewEncoder(w).Encode(u)` (don't forget `w.Header().Set(\"Content-Type\", \"application/json\")`). Custom marshaling: implement `MarshalJSON() ([]byte, error)`.",
+      "source_url": "https://pkg.go.dev/encoding/json",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "`b, err := json.Marshal(u)` produces compact JSON. Pretty: `b, _ := json.MarshalIndent(u, \"\", \" \")`. To file: `os.WriteFile(\"out.json\", b, 0644)`. To HTTP response: `json.NewEncoder(w).Encode(u)` (don't forget `w.Header().Set(\"Content-Type\", \"application/json\")`). Custom marshaling: implement `MarshalJSON() ([]byte, error)`"
+      ],
+      "constraints": [],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: marshal struct to JSON"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-make-an-http-get-post-request",
+      "kind": "recipe",
+      "title": "go recipe: make an HTTP GET / POST request",
+      "statement": "GET: `resp, err := http.Get(url); defer resp.Body.Close(); body, _ := io.ReadAll(resp.Body)`. POST JSON: ```go\nbody, _ := json.Marshal(payload)\nresp, err := http.Post(url, \"application/json\", bytes.NewReader(body))\ndefer resp.Body.Close()\n```. Custom: ```go\nreq, _ := http.NewRequestWithContext(ctx, \"POST\", url, bytes.NewReader(body))\nreq.Header.Set(\"Authorization\", \"Bearer \"+token)\nclient := &http.Client{Timeout: 30 * time.Second}\nresp, err := client.Do(req)\n```. ALWAYS `defer resp.Body.Close()` and drain or you'll leak conns.",
+      "source_url": "https://pkg.go.dev/net/http",
+      "source_type": "official_docs",
+      "commands": [
+        "go body, _ := json.Marshal(payload) resp, err := http.Post(url, \"application/json\", bytes.NewReader(body)) defer resp.Body.Close()",
+        ". Custom:",
+        "go req, _ := http.NewRequestWithContext(ctx, \"POST\", url, bytes.NewReader(body)) req.Header.Set(\"Authorization\", \"Bearer \"+token) client := &http.Client{Timeout: 30 * time.Second} resp, err := client.Do(req)",
+        ". ALWAYS"
+      ],
+      "steps": [
+        "GET: `resp, err := http.Get(url); defer resp.Body.Close(); body, _ := io.ReadAll(resp.Body)`. POST JSON: ```go body, _ := json.Marshal(payload) resp, err := http.Post(url, \"application/json\", bytes.NewReader(body)) defer resp.Body.Close() ```. Custom: ```go req, _ := http.NewRequestWithContext(ctx, \"POST\", url, bytes.NewReader(body)) req.Header.Set(\"Authorization\", \"Bearer \"+token) client := &http.Client{Timeout: 30 * time.Second} resp, err := client.Do(req) ```. ALWAYS `defer resp.Body.Close()` and drain or you'll leak conns"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ., go."
+      ],
+      "effect": {
+        "kind": "secret_exposure",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": true,
+        "risk_level": "high",
+        "reasons": [
+          "The action references secrets, tokens, or API keys."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: make an HTTP GET / POST request"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-build-a-basic-http-server",
+      "kind": "recipe",
+      "title": "go recipe: build a basic HTTP server",
+      "statement": "```go\nhttp.HandleFunc(\"/hello\", func(w http.ResponseWriter, r *http.Request) {\n    fmt.Fprintln(w, \"hi\")\n})\nlog.Fatal(http.ListenAndServe(\":8080\", nil))\n```\nProduction: configure timeouts. ```go\nsrv := &http.Server{\n    Addr: \":8080\",\n    Handler: mux,\n    ReadHeaderTimeout: 5 * time.Second,\n    ReadTimeout: 30 * time.Second,\n    WriteTimeout: 30 * time.Second,\n    IdleTimeout: 120 * time.Second,\n}\nsrv.ListenAndServe()\n```",
+      "source_url": "https://pkg.go.dev/net/http",
+      "source_type": "official_docs",
+      "commands": [
+        "go http.HandleFunc(\"/hello\", func(w http.ResponseWriter, r *http.Request) { fmt.Fprintln(w, \"hi\") }) log.Fatal(http.ListenAndServe(\":8080\", nil))",
+        "Production: configure timeouts.",
+        "go srv := &http.Server{ Addr: \":8080\", Handler: mux, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 30 * time.Second, WriteTimeout: 30 * time.Second, IdleTimeout: 120 * time.Second, } srv.ListenAndServe()"
+      ],
+      "steps": [
+        "```go http.HandleFunc(\"/hello\", func(w http.ResponseWriter, r *http.Request) { fmt.Fprintln(w, \"hi\") }) log.Fatal(http.ListenAndServe(\":8080\", nil)) ``` Production: configure timeouts. ```go srv := &http.Server{ Addr: \":8080\", Handler: mux, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 30 * time.Second, WriteTimeout: 30 * time.Second, IdleTimeout: 120 * time.Second, } srv.ListenAndServe() ```"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: Production:, go."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: build a basic HTTP server"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-write-http-middleware",
+      "kind": "recipe",
+      "title": "go recipe: write HTTP middleware",
+      "statement": "```go\nfunc logging(next http.Handler) http.Handler {\n    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {\n        start := time.Now()\n        next.ServeHTTP(w, r)\n        log.Printf(\"%s %s %s\", r.Method, r.URL.Path, time.Since(start))\n    })\n}\n// Wire: srv.Handler = logging(authentication(mux))\n```\nStack multiple by wrapping. For richer routing/middleware: chi, gin, echo.",
+      "source_url": "https://pkg.go.dev/net/http",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "```go func logging(next http.Handler) http.Handler { return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { start := time.Now() next.ServeHTTP(w, r) log.Printf(\"%s %s %s\", r.Method, r.URL.Path, time.Since(start)) }) } // Wire: srv.Handler = logging(authentication(mux)) ``` Stack multiple by wrapping. For richer routing/middleware: chi, gin, echo"
+      ],
+      "constraints": [],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: write HTTP middleware"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-connect-to-a-database-with-database-sql",
+      "kind": "recipe",
+      "title": "go recipe: connect to a database with database/sql",
+      "statement": "```go\nimport _ \"github.com/lib/pq\"  // driver registers itself\ndb, err := sql.Open(\"postgres\", \"host=localhost user=u dbname=d sslmode=disable\")\ndb.SetMaxOpenConns(25)\ndb.SetMaxIdleConns(25)\ndb.SetConnMaxLifetime(5 * time.Minute)\nif err := db.PingContext(ctx); err != nil { return err }\n```\nDrivers: `lib/pq` (postgres), `mysql`, `sqlite3` (cgo), `modernc.org/sqlite` (pure-Go). ALWAYS configure connection pool size + lifetime.",
+      "source_url": "https://pkg.go.dev/database/sql",
+      "source_type": "official_docs",
+      "commands": [
+        "Drivers:"
+      ],
+      "steps": [
+        "```go import _ \"github.com/lib/pq\" // driver registers itself db, err := sql.Open(\"postgres\", \"host=localhost user=u dbname=d sslmode=disable\") db.SetMaxOpenConns",
+        "db.SetMaxIdleConns",
+        "db.SetConnMaxLifetime(5 * time.Minute) if err := db.PingContext(ctx); err != nil { return err } ``` Drivers: `lib/pq` (postgres), `mysql`, `sqlite3` (cgo), `modernc.org/sqlite` (pure-Go). ALWAYS configure connection pool size + lifetime"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: Drivers:."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: connect to a database with database/sql"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-run-a-sql-query-with-placeholders",
+      "kind": "recipe",
+      "title": "go recipe: run a SQL query (with placeholders)",
+      "statement": "Single row: ```go\nvar name string\nif err := db.QueryRowContext(ctx, \"SELECT name FROM users WHERE id=$1\", id).Scan(&name); errors.Is(err, sql.ErrNoRows) { return ErrNotFound } else if err != nil { return err }\n```. Multiple: ```go\nrows, err := db.QueryContext(ctx, \"SELECT id, name FROM users\")\ndefer rows.Close()\nfor rows.Next() { rows.Scan(&id, &name) }\nrows.Err()\n```. Insert with return: PostgreSQL `RETURNING id` then Scan.",
+      "source_url": "https://pkg.go.dev/database/sql",
+      "source_type": "official_docs",
+      "commands": [
+        "go var name string if err := db.QueryRowContext(ctx, \"SELECT name FROM users WHERE id=$1\", id).Scan(&name); errors.Is(err, sql.ErrNoRows) { return ErrNotFound } else if err != nil { return err }",
+        ". Multiple:",
+        "go rows, err := db.QueryContext(ctx, \"SELECT id, name FROM users\") defer rows.Close() for rows.Next() { rows.Scan(&id, &name) } rows.Err()",
+        ". Insert with return: PostgreSQL"
+      ],
+      "steps": [
+        "Single row: ```go var name string if err := db.QueryRowContext(ctx, \"SELECT name FROM users WHERE id=$1\", id).Scan(&name); errors.Is(err, sql.ErrNoRows) { return ErrNotFound } else if err != nil { return err } ```. Multiple: ```go rows, err := db.QueryContext(ctx, \"SELECT id, name FROM users\") defer rows.Close() for rows.Next() { rows.Scan(&id, &name) } rows.Err() ```. Insert with return: PostgreSQL `RETURNING id` then Scan"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ., go."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: run a SQL query (with placeholders)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-read-a-file-line-by-line",
+      "kind": "recipe",
+      "title": "go recipe: read a file line-by-line",
+      "statement": "```go\nf, _ := os.Open(path)\ndefer f.Close()\nscanner := bufio.NewScanner(f)\nfor scanner.Scan() {\n    line := scanner.Text()\n    process(line)\n}\nif err := scanner.Err(); err != nil { return err }\n```\nDefault line limit: 64 KiB. For longer: `scanner.Buffer(make([]byte, 1024*1024), 10*1024*1024)`. Whole file: `data, err := os.ReadFile(path)` (Go 1.16+).",
+      "source_url": "https://pkg.go.dev/bufio",
+      "source_type": "official_docs",
+      "commands": [
+        "go f, _ := os.Open(path) defer f.Close() scanner := bufio.NewScanner(f) for scanner.Scan() { line := scanner.Text() process(line) } if err := scanner.Err(); err != nil { return err }",
+        "Default line limit: 64 KiB. For longer:",
+        ". Whole file:"
+      ],
+      "steps": [
+        "```go f, _ := os.Open(path) defer f.Close() scanner := bufio.NewScanner(f) for scanner.Scan() { line := scanner.Text() process(line) } if err := scanner.Err(); err != nil { return err } ``` Default line limit: 64 KiB. For longer: `scanner.Buffer(make([]byte, 1024*1024), 10*1024*1024)`. Whole file: `data, err := os.ReadFile(path)` (Go 1.16+)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ., Default, go."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: read a file line-by-line"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-execute-an-external-command",
+      "kind": "recipe",
+      "title": "go recipe: execute an external command",
+      "statement": "```go\ncmd := exec.CommandContext(ctx, \"git\", \"log\", \"--oneline\")\nout, err := cmd.Output()  // stdout only; CombinedOutput() merges stderr\nif err != nil {\n    var ee *exec.ExitError\n    if errors.As(err, &ee) {\n        log.Printf(\"exit %d: %s\", ee.ExitCode(), ee.Stderr)\n    }\n    return err\n}\n```\nFor streaming: `cmd.Stdout = os.Stdout; cmd.Stderr = os.Stderr; cmd.Run()`. Pass env: `cmd.Env = append(os.Environ(), \"FOO=bar\")`.",
+      "source_url": "https://pkg.go.dev/os/exec",
+      "source_type": "official_docs",
+      "commands": [
+        "For streaming:",
+        ". Pass env:"
+      ],
+      "steps": [
+        "```go cmd := exec.CommandContext(ctx, \"git\", \"log\", \"--oneline\") out, err := cmd.Output() // stdout only; CombinedOutput() merges stderr if err != nil { var ee *exec.ExitError if errors.As(err, &ee) { log.Printf(\"exit %d: %s\", ee.ExitCode(), ee.Stderr) } return err } ``` For streaming: `cmd.Stdout = os.Stdout; cmd.Stderr = os.Stderr; cmd.Run()`. Pass env: `cmd.Env = append(os.Environ(), \"FOO=bar\")`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ., For."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: execute an external command"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-parse-command-line-flags",
+      "kind": "recipe",
+      "title": "go recipe: parse command-line flags",
+      "statement": "Stdlib `flag`. ```go\nvar (\n    port = flag.Int(\"port\", 8080, \"listen port\")\n    name = flag.String(\"name\", \"\", \"required name\")\n)\nflag.Parse()\nif *name == \"\" { flag.Usage(); os.Exit(2) }\nfor _, arg := range flag.Args() { /* positional */ }\n```. Subcommands / richer flags: cobra (de facto), pflag. Env-var-aware: kelseyhightower/envconfig.",
+      "source_url": "https://pkg.go.dev/flag",
+      "source_type": "official_docs",
+      "commands": [
+        "flag",
+        "go var ( port = flag.Int(\"port\", 8080, \"listen port\") name = flag.String(\"name\", \"\", \"required name\") ) flag.Parse() if *name == \"\" { flag.Usage(); os.Exit(2) } for _, arg := range flag.Args() { /* positional */ }"
+      ],
+      "steps": [
+        "Stdlib `flag`. ```go var ( port = flag.Int(\"port\", 8080, \"listen port\") name = flag.String(\"name\", \"\", \"required name\") ) flag.Parse() if *name == \"\" { flag.Usage(); os.Exit",
+        "} for _, arg := range flag.Args() { /* positional */ } ```. Subcommands / richer flags: cobra (de facto), pflag. Env-var-aware: kelseyhightower/envconfig"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: flag, go."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: parse command-line flags"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-structured-logging-with-slog",
+      "kind": "recipe",
+      "title": "go recipe: structured logging with slog",
+      "statement": "Go 1.21+ stdlib. ```go\nimport \"log/slog\"\nlogger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}))\nlogger.Info(\"request handled\", \"method\", r.Method, \"path\", r.URL.Path, \"ms\", elapsed)\nlogger.Error(\"db query\", \"err\", err)\n```. Set as global: `slog.SetDefault(logger)` then `slog.Info(...)` anywhere. Attach context: `logger.With(\"request_id\", id).Info(\"...\")`.",
+      "source_url": "https://pkg.go.dev/log/slog",
+      "source_type": "official_docs",
+      "commands": [
+        ". Set as global:",
+        "then",
+        "anywhere. Attach context:"
+      ],
+      "steps": [
+        "Go 1.21+ stdlib. ```go import \"log/slog\" logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo})) logger.Info(\"request handled\", \"method\", r.Method, \"path\", r.URL.Path, \"ms\", elapsed) logger.Error(\"db query\", \"err\", err) ```. Set as global: `slog.SetDefault(logger)` then `slog.Info(...)` anywhere. Attach context: `logger.With(\"request_id\", id).Info(\"...\")`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ., anywhere., then."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: structured logging with slog"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-error-wrapping-with-errors-is-errors-as",
+      "kind": "recipe",
+      "title": "go recipe: error wrapping with errors.Is / errors.As",
+      "statement": "Wrap: `return fmt.Errorf(\"reading config: %w\", err)`. Check sentinel: `if errors.Is(err, io.EOF) { ... }`. Extract type: ```go\nvar perr *os.PathError\nif errors.As(err, &perr) { log.Printf(\"path: %s\", perr.Path) }\n```. Custom sentinel: `var ErrNotFound = errors.New(\"not found\")` then `errors.Is(err, ErrNotFound)`.",
+      "source_url": "https://pkg.go.dev/errors",
+      "source_type": "official_docs",
+      "commands": [
+        "return fmt.Errorf(\"reading config: %w\", err)",
+        "if errors.Is(err, io.EOF) { ... }",
+        "go var perr *os.PathError if errors.As(err, &perr) { log.Printf(\"path: %s\", perr.Path) }",
+        ". Custom sentinel:",
+        "then"
+      ],
+      "steps": [
+        "Wrap: `return fmt.Errorf(\"reading config: %w\", err)`. Check sentinel: `if errors.Is(err, io.EOF) { ... }`. Extract type: ```go var perr *os.PathError if errors.As(err, &perr) { log.Printf(\"path: %s\", perr.Path) } ```. Custom sentinel: `var ErrNotFound = errors.New(\"not found\")` then `errors.Is(err, ErrNotFound)`"
+      ],
+      "constraints": [
+        "Wrap: `return fmt.Errorf(\"reading config: %w\", err)`. Check sentinel: `if errors.Is(err, io.EOF) { ... }`. Extract type: ```go var perr *os.PathError if errors.As(err, &perr) { log.Printf(\"path: %s\", perr.Path) } ```. Custom sentinel: `var ErrNotFound = errors.New(\"not found\")` then `errors.Is(err, ErrNotFound)`",
+        "Requires binaries or commands referenced in examples: ., go, if, return, then."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: error wrapping with errors.Is / errors.As"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-write-a-unit-test-with-table-driven-cases",
+      "kind": "recipe",
+      "title": "go recipe: write a unit test (with table-driven cases)",
+      "statement": "```go\nfunc TestAdd(t *testing.T) {\n    cases := []struct{\n        name string\n        a, b, want int\n    }{\n        {\"positive\", 1, 2, 3},\n        {\"zero\", 0, 0, 0},\n        {\"negative\", -1, 1, 0},\n    }\n    for _, c := range cases {\n        t.Run(c.name, func(t *testing.T) {\n            if got := Add(c.a, c.b); got != c.want {\n                t.Errorf(\"got %d, want %d\", got, c.want)\n            }\n        })\n    }\n}\n```",
+      "source_url": "https://pkg.go.dev/testing",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "```go func TestAdd(t *testing.T) { cases := []struct{ name string a, b, want int }{ {\"positive\", 1, 2, 3}, {\"zero\", 0, 0, 0}, {\"negative\", -1, 1, 0}, } for _, c := range cases { t.Run(c.name, func(t *testing.T) { if got := Add(c.a, c.b); got != c.want { t.Errorf(\"got %d, want %d\", got, c.want) } }) } } ```"
+      ],
+      "constraints": [],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: write a unit test (with table-driven cases)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-fuzz-testing",
+      "kind": "recipe",
+      "title": "go recipe: fuzz testing",
+      "statement": "Go 1.18+. ```go\nfunc FuzzParse(f *testing.F) {\n    f.Add(\"hello\")  // seed corpus\n    f.Fuzz(func(t *testing.T, s string) {\n        v, err := Parse(s)\n        if err == nil {\n            if Reformat(v) != s { t.Error(\"round-trip broken\") }\n        }\n    })\n}\n```. Run: `go test -fuzz=FuzzParse -fuzztime=30s`. Failing inputs saved to `testdata/fuzz/`.",
+      "source_url": "https://pkg.go.dev/testing",
+      "source_type": "official_docs",
+      "commands": [
+        "go func FuzzParse(f *testing.F) { f.Add(\"hello\") // seed corpus f.Fuzz(func(t *testing.T, s string) { v, err := Parse(s) if err == nil { if Reformat(v) != s { t.Error(\"round-trip broken\") } } }) }",
+        ". Run:",
+        ". Failing inputs saved to"
+      ],
+      "steps": [
+        "Go 1.18+. ```go func FuzzParse(f *testing.F) { f.Add(\"hello\") // seed corpus f.Fuzz(func(t *testing.T, s string) { v, err := Parse(s) if err == nil { if Reformat(v) != s { t.Error(\"round-trip broken\") } } }) } ```. Run: `go test -fuzz=FuzzParse -fuzztime=30s`. Failing inputs saved to `testdata/fuzz/`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ., go."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: fuzz testing"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-profile-with-pprof",
+      "kind": "recipe",
+      "title": "go recipe: profile with pprof",
+      "statement": "Add: `import _ \"net/http/pprof\"` and a `go func() { http.ListenAndServe(\":6060\", nil) }()` in main. CPU profile: `go tool pprof http://localhost:6060/debug/pprof/profile?seconds=30`. Heap: `go tool pprof http://localhost:6060/debug/pprof/heap`. Goroutines: `curl http://localhost:6060/debug/pprof/goroutine?debug=2`. Inside pprof: `top10`, `list FuncName`, `web` (opens SVG).",
+      "source_url": "https://pkg.go.dev/net/http/pprof",
+      "source_type": "official_docs",
+      "commands": [
+        "import _ \"net/http/pprof\"",
+        "go func() { http.ListenAndServe(\":6060\", nil) }()",
+        "go tool pprof http://localhost:6060/debug/pprof/profile?seconds=30",
+        "go tool pprof http://localhost:6060/debug/pprof/heap",
+        "curl http://localhost:6060/debug/pprof/goroutine?debug=2",
+        "top10",
+        "list FuncName",
+        "web"
+      ],
+      "steps": [
+        "Add: `import _ \"net/http/pprof\"` and a `go func() { http.ListenAndServe(\":6060\", nil) }()` in main. CPU profile: `go tool pprof http://localhost:6060/debug/pprof/profile?seconds=30`. Heap: `go tool pprof http://localhost:6060/debug/pprof/heap`. Goroutines: `curl http://localhost:6060/debug/pprof/goroutine?debug=2`. Inside pprof: `top10`, `list FuncName`, `web` (opens SVG)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: curl, go, import, list, top10, web."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: profile with pprof"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-graceful-http-server-shutdown",
+      "kind": "recipe",
+      "title": "go recipe: graceful HTTP server shutdown",
+      "statement": "```go\nsrv := &http.Server{Addr: \":8080\", Handler: mux}\ngo func() { srv.ListenAndServe() }()\n\nsigCh := make(chan os.Signal, 1)\nsignal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)\n<-sigCh\n\nctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)\ndefer cancel()\nif err := srv.Shutdown(ctx); err != nil {\n    log.Printf(\"forced shutdown: %v\", err)\n}\n```\nDrains in-flight requests, refuses new ones. Combine with `signal.NotifyContext` for context-driven shutdown.",
+      "source_url": "https://pkg.go.dev/net/http",
+      "source_type": "official_docs",
+      "commands": [
+        "Drains in-flight requests, refuses new ones. Combine with"
+      ],
+      "steps": [
+        "```go srv := &http.Server{Addr: \":8080\", Handler: mux} go func() { srv.ListenAndServe() }() sigCh := make(chan os.Signal, 1) signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM) <-sigCh ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second) defer cancel() if err := srv.Shutdown(ctx); err != nil { log.Printf(\"forced shutdown: %v\", err) } ``` Drains in-flight requests, refuses new ones. Combine with `signal.NotifyContext` for context-driven shutdown"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: Drains."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: graceful HTTP server shutdown"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-idiomatic-project-layout",
+      "kind": "recipe",
+      "title": "go recipe: idiomatic project layout",
+      "statement": "Common (not enforced): `cmd/<name>/main.go` for binaries; `internal/<pkg>` for code that shouldn't be importable by other modules; `pkg/<name>` for libraries you want exposed; `Makefile` or `Taskfile.yml` for build automation. Avoid: deep `pkg/` directories (no benefit over just a flat layout for small projects). Tests live alongside source: `foo.go` + `foo_test.go`. Example: https://github.com/golang-standards/project-layout (informal community guide, not official).",
+      "source_url": "https://go.dev/doc/modules/layout",
+      "source_type": "official_docs",
+      "commands": [
+        "Makefile",
+        "Taskfile.yml",
+        "pkg/",
+        "foo.go",
+        "foo_test.go"
+      ],
+      "steps": [
+        "Common (not enforced): `cmd/<name>/main.go` for binaries; `internal/<pkg>` for code that shouldn't be importable by other modules; `pkg/<name>` for libraries you want exposed; `Makefile` or `Taskfile.yml` for build automation. Avoid: deep `pkg/` directories (no benefit over just a flat layout for small projects). Tests live alongside source: `foo.go` + `foo_test.go`. Example: https://github.com/golang-standards/project-layout (informal community guide, not official)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: Makefile, Taskfile.yml, foo.go, foo_test.go, pkg/."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: idiomatic project layout"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-use-slices-maps-generic-helpers-go-1-21",
+      "kind": "recipe",
+      "title": "go recipe: use slices/maps generic helpers (Go 1.21+)",
+      "statement": "stdlib `slices` and `maps` packages. `slices.Sort(s)` (sorts in place, requires `cmp.Ordered`). `slices.Contains(s, v)`. `slices.IndexFunc(s, func(t T) bool { ... })`. `slices.SortFunc(s, cmp.Compare)`. `maps.Keys(m)`, `maps.Values(m)`. `maps.Clone(m)`. These replaced a lot of manual loops and `sort.Slice`/`sort.SliceStable`.",
+      "source_url": "https://pkg.go.dev/slices",
+      "source_type": "official_docs",
+      "commands": [
+        "slices",
+        "maps",
+        "cmp.Ordered",
+        "sort.Slice",
+        "sort.SliceStable"
+      ],
+      "steps": [
+        "stdlib `slices` and `maps` packages. `slices.Sort(s)` (sorts in place, requires `cmp.Ordered`). `slices.Contains(s, v)`. `slices.IndexFunc(s, func(t T) bool { ... })`. `slices.SortFunc(s, cmp.Compare)`. `maps.Keys(m)`, `maps.Values(m)`. `maps.Clone(m)`. These replaced a lot of manual loops and `sort.Slice`/`sort.SliceStable`"
+      ],
+      "constraints": [
+        "stdlib `slices` and `maps` packages. `slices.Sort(s)` (sorts in place, requires `cmp.Ordered`). `slices.Contains(s, v)`. `slices.IndexFunc(s, func(t T) bool { ... })`. `slices.SortFunc(s, cmp.Compare)`. `maps.Keys(m)`, `maps.Values(m)`. `maps.Clone(m)`. These replaced a lot of manual loops and `sort.Slice`/`sort.SliceStable`",
+        "Requires binaries or commands referenced in examples: cmp.Ordered, maps, slices, sort.Slice, sort.SliceStable."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: use slices/maps generic helpers (Go 1.21+)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "go-recipe-go-recipe-use-workspaces-for-multi-module-dev",
+      "kind": "recipe",
+      "title": "go recipe: use workspaces for multi-module dev",
+      "statement": "Go 1.18+. For multi-module monorepo OR cross-repo dev. `go work init ./moduleA ./moduleB` creates go.work. From any module inside: `go run` / `go test` uses local code for the other module. Add more later: `go work use ./moduleC`. DON'T commit go.work (gitignore it) \u2014 it's a local dev tool, not for distribution. Cleaner than `replace` directives for active multi-module work.",
+      "source_url": "https://go.dev/ref/mod",
+      "source_type": "official_docs",
+      "commands": [
+        "go work init ./moduleA ./moduleB",
+        "go run",
+        "go test",
+        "go work use ./moduleC",
+        "replace"
+      ],
+      "steps": [
+        "Go 1.18+. For multi-module monorepo OR cross-repo dev. `go work init ./moduleA ./moduleB` creates go.work. From any module inside: `go run` / `go test` uses local code for the other module. Add more later: `go work use ./moduleC`. DON'T commit go.work (gitignore it) \u2014 it's a local dev tool, not for distribution. Cleaner than `replace` directives for active multi-module work"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: go, replace."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "go-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_go_errors_recipes.py",
+        "legacy_tool_id": "go-recipes",
+        "legacy_title": "go recipe: use workspaces for multi-module dev"
+      },
+      "confidence": 0.92
+    }
+  ]
+}

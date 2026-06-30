@@ -1,0 +1,1844 @@
+{
+  "family": "psql",
+  "version": "v1",
+  "artifact_id": "psql-curated-source-v1",
+  "generated_from": {
+    "kind": "legacy_seed_script",
+    "path": "tools/scripts/seed_postgresql_errors_recipes.py"
+  },
+  "entries": [
+    {
+      "entry_id": "psql-error-psql-error-fatal-role-name-does-not-exist",
+      "kind": "error",
+      "title": "psql error: FATAL: role \"<name>\" does not exist",
+      "statement": "Connecting as a user that doesn't exist in PostgreSQL. Fix: (1) list roles: `psql -U postgres -c '\\du'`; (2) create the role: `createuser <name>` or `psql -c \"CREATE ROLE <name> LOGIN PASSWORD '...';\"`; (3) default OS-user fallback: on Linux/macOS, if no `-U` is given psql uses your OS username \u2014 create a matching role or pass `-U postgres`; (4) for a brand-new install: the `postgres` superuser is auto-created \u2014 switch to it: `sudo -u postgres psql`.",
+      "source_url": "https://www.postgresql.org/docs/current/app-createuser.html",
+      "source_type": "official_docs",
+      "commands": [
+        "psql -U postgres -c '\\du'",
+        "createuser <name>",
+        "psql -c \"CREATE ROLE <name> LOGIN PASSWORD '...';\"",
+        "-U",
+        "-U postgres",
+        "postgres",
+        "sudo -u postgres psql"
+      ],
+      "steps": [
+        "list roles: `psql -U postgres -c '\\du'`",
+        "create the role: `createuser <name>` or `psql -c \"CREATE ROLE <name> LOGIN PASSWORD '...';\"`",
+        "default OS-user fallback: on Linux/macOS, if no `-U` is given psql uses your OS username \u2014 create a matching role or pass `-U postgres`",
+        "for a brand-new install: the `postgres` superuser is auto-created \u2014 switch to it: `sudo -u postgres psql`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -U, createuser, postgres, psql, sudo."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": true,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-errors",
+        "legacy_title": "postgresql error: FATAL: role \"<name>\" does not exist"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "psql-error-psql-error-fatal-database-name-does-not-exist",
+      "kind": "error",
+      "title": "psql error: FATAL: database \"<name>\" does not exist",
+      "statement": "Trying to connect to a database that hasn't been created. Fix: (1) list databases: `psql -U postgres -l`; (2) create it: `createdb <name>` or `CREATE DATABASE <name>;` inside psql; (3) connect to a default DB first: `psql -U postgres -d postgres`; (4) connection URIs: `postgres://user@host/dbname` \u2014 `dbname` is required.",
+      "source_url": "https://www.postgresql.org/docs/current/app-createdb.html",
+      "source_type": "official_docs",
+      "commands": [
+        "psql -U postgres -l",
+        "createdb <name>",
+        "CREATE DATABASE <name>;",
+        "psql -U postgres -d postgres",
+        "dbname"
+      ],
+      "steps": [
+        "list databases: `psql -U postgres -l`",
+        "create it: `createdb <name>` or `CREATE DATABASE <name>;` inside psql",
+        "connect to a default DB first: `psql -U postgres -d postgres`",
+        "connection URIs: `postgres://user@host/dbname` \u2014 `dbname` is required"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: CREATE, createdb, dbname, psql."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-errors",
+        "legacy_title": "postgresql error: FATAL: database \"<name>\" does not exist"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "psql-error-psql-error-fatal-password-authentication-failed-for-user",
+      "kind": "error",
+      "title": "psql error: FATAL: password authentication failed for user",
+      "statement": "Wrong password (or wrong auth method configured for this user/host). Fix: (1) reset password as superuser: `ALTER USER <name> WITH PASSWORD '...';`; (2) check pg_hba.conf \u2014 the matching row might require `peer`, `ident`, `md5`, or `scram-sha-256`; (3) for scripting: use .pgpass (`~/.pgpass` with mode 0600, format `host:port:db:user:password`); (4) env var: `PGPASSWORD=...` (insecure on shared systems \u2014 prefer .pgpass); (5) for clients on the same machine: peer auth uses OS user (`sudo -u postgres psql`).",
+      "source_url": "https://www.postgresql.org/docs/current/auth-password.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ALTER USER <name> WITH PASSWORD '...';",
+        "peer",
+        "ident",
+        "md5",
+        "scram-sha-256",
+        "host:port:db:user:password",
+        "sudo -u postgres psql"
+      ],
+      "steps": [
+        "reset password as superuser: `ALTER USER <name> WITH PASSWORD '...';`",
+        "check pg_hba.conf \u2014 the matching row might require `peer`, `ident`, `md5`, or `scram-sha-256`",
+        "for scripting: use .pgpass (`~/.pgpass` with mode 0600, format `host:port:db:user:password`)",
+        "env var: `PGPASSWORD=...` (insecure on shared systems \u2014 prefer .pgpass)",
+        "for clients on the same machine: peer auth uses OS user (`sudo -u postgres psql`)"
+      ],
+      "constraints": [
+        "check pg_hba.conf \u2014 the matching row might require `peer`, `ident`, `md5`, or `scram-sha-256`",
+        "Requires binaries or commands referenced in examples: ALTER, host:port:db:user:password, ident, md5, peer, scram-sha-256, sudo."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": true,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-errors",
+        "legacy_title": "postgresql error: FATAL: password authentication failed for user"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "psql-error-psql-error-fatal-no-pg-hba-conf-entry-for-host",
+      "kind": "error",
+      "title": "psql error: FATAL: no pg_hba.conf entry for host",
+      "statement": "pg_hba.conf doesn't have a matching rule for your connection's host/user/database. Fix: (1) find pg_hba.conf: `psql -U postgres -t -c \"SHOW hba_file\"`; (2) add a line: `host    mydb    myuser    192.168.1.0/24    scram-sha-256`; (3) reload: `pg_ctl reload` (or `SELECT pg_reload_conf();`); (4) rule order matters \u2014 first match wins; (5) for Docker images: pg_hba.conf is usually in /var/lib/postgresql/data/pg_hba.conf inside the container.",
+      "source_url": "https://www.postgresql.org/docs/current/auth-pg-hba-conf.html",
+      "source_type": "official_docs",
+      "commands": [
+        "psql -U postgres -t -c \"SHOW hba_file\"",
+        "host mydb myuser 192.168.1.0/24 scram-sha-256",
+        "pg_ctl reload",
+        "SELECT pg_reload_conf();"
+      ],
+      "steps": [
+        "find pg_hba.conf: `psql -U postgres -t -c \"SHOW hba_file\"`",
+        "add a line: `host mydb myuser 192.168.1.0/24 scram-sha-256`",
+        "reload: `pg_ctl reload` (or `SELECT pg_reload_conf();`)",
+        "rule order matters \u2014 first match wins",
+        "for Docker images: pg_hba.conf is usually in /var/lib/postgresql/data/pg_hba.conf inside the container"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: SELECT, host, pg_ctl, psql."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-errors",
+        "legacy_title": "postgresql error: FATAL: no pg_hba.conf entry for host"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "psql-error-psql-error-error-permission-denied-for-table-relation",
+      "kind": "error",
+      "title": "psql error: ERROR: permission denied for table / relation",
+      "statement": "Role lacks the required privilege on the target object. Fix: (1) grant the privilege: `GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE <table> TO <role>;`; (2) for all current tables: `GRANT ... ON ALL TABLES IN SCHEMA public TO <role>;`; (3) for future tables (default privileges): `ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ... TO <role>;`; (4) check existing: `\\dp <table>` in psql shows ACL; (5) for table-owner concerns: `ALTER TABLE <table> OWNER TO <role>;`.",
+      "source_url": "https://www.postgresql.org/docs/current/app-psql.html",
+      "source_type": "official_docs",
+      "commands": [
+        "GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE <table> TO <role>;",
+        "GRANT ... ON ALL TABLES IN SCHEMA public TO <role>;",
+        "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ... TO <role>;",
+        "ALTER TABLE <table> OWNER TO <role>;"
+      ],
+      "steps": [
+        "grant the privilege: `GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE <table> TO <role>;`",
+        "for all current tables: `GRANT ... ON ALL TABLES IN SCHEMA public TO <role>;`",
+        "for future tables (default privileges): `ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ... TO <role>;`",
+        "check existing: `\\dp <table>` in psql shows ACL",
+        "for table-owner concerns: `ALTER TABLE <table> OWNER TO <role>;`"
+      ],
+      "constraints": [
+        "check existing: `\\dp <table>` in psql shows ACL",
+        "Requires binaries or commands referenced in examples: ALTER, GRANT."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-errors",
+        "legacy_title": "postgresql error: ERROR: permission denied for table / relation"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "psql-error-psql-error-error-relation-x-does-not-exist",
+      "kind": "error",
+      "title": "psql error: ERROR: relation \"<X>\" does not exist",
+      "statement": "Table/view/sequence not found in the current search_path. Fix: (1) check current search_path: `SHOW search_path;`; (2) qualify with schema: `SELECT * FROM myschema.mytable`; (3) add to search_path: `SET search_path TO myschema, public;` (session-only) or `ALTER DATABASE mydb SET search_path TO ...` (persistent); (4) check case: PostgreSQL lowercases unquoted identifiers \u2014 `\"MyTable\"` (with quotes) is different from `mytable`; (5) list tables: `\\dt *.<pattern>` in psql.",
+      "source_url": "https://www.postgresql.org/docs/current/app-psql.html",
+      "source_type": "official_docs",
+      "commands": [
+        "SHOW search_path;",
+        "SELECT * FROM myschema.mytable",
+        "SET search_path TO myschema, public;",
+        "ALTER DATABASE mydb SET search_path TO ...",
+        "mytable"
+      ],
+      "steps": [
+        "check current search_path: `SHOW search_path;`",
+        "qualify with schema: `SELECT * FROM myschema.mytable`",
+        "add to search_path: `SET search_path TO myschema, public;` (session-only) or `ALTER DATABASE mydb SET search_path TO ...` (persistent)",
+        "check case: PostgreSQL lowercases unquoted identifiers \u2014 `\"MyTable\"` (with quotes) is different from `mytable`",
+        "list tables: `\\dt *.<pattern>` in psql"
+      ],
+      "constraints": [
+        "check current search_path: `SHOW search_path;`",
+        "check case: PostgreSQL lowercases unquoted identifiers \u2014 `\"MyTable\"` (with quotes) is different from `mytable`",
+        "Requires binaries or commands referenced in examples: ALTER, SELECT, SET, SHOW, mytable."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-errors",
+        "legacy_title": "postgresql error: ERROR: relation \"<X>\" does not exist"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "psql-error-psql-error-error-duplicate-key-value-violates-unique-constraint",
+      "kind": "error",
+      "title": "psql error: ERROR: duplicate key value violates unique constraint",
+      "statement": "INSERT or UPDATE would create a duplicate where a UNIQUE constraint (often the primary key) forbids it. Fix: (1) UPSERT instead: `INSERT ... ON CONFLICT (col) DO UPDATE SET ...` (or `DO NOTHING`); (2) check existing: `SELECT * FROM tbl WHERE key = '...'`; (3) for sequences out of sync after data import: `SELECT setval('tbl_id_seq', (SELECT MAX(id) FROM tbl));`; (4) for soft-delete: include `deleted_at IS NULL` in the unique constraint via partial index.",
+      "source_url": "https://www.postgresql.org/docs/current/app-psql.html",
+      "source_type": "official_docs",
+      "commands": [
+        "INSERT ... ON CONFLICT (col) DO UPDATE SET ...",
+        "DO NOTHING",
+        "SELECT * FROM tbl WHERE key = '...'",
+        "SELECT setval('tbl_id_seq', (SELECT MAX(id) FROM tbl));",
+        "deleted_at IS NULL"
+      ],
+      "steps": [
+        "UPSERT instead: `INSERT ... ON CONFLICT (col) DO UPDATE SET ...` (or `DO NOTHING`)",
+        "check existing: `SELECT * FROM tbl WHERE key = '...'`",
+        "for sequences out of sync after data import: `SELECT setval('tbl_id_seq', (SELECT MAX(id) FROM tbl));`",
+        "for soft-delete: include `deleted_at IS NULL` in the unique constraint via partial index"
+      ],
+      "constraints": [
+        "check existing: `SELECT * FROM tbl WHERE key = '...'`",
+        "Requires binaries or commands referenced in examples: DO, INSERT, SELECT, deleted_at."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-errors",
+        "legacy_title": "postgresql error: ERROR: duplicate key value violates unique constraint"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "psql-error-psql-error-error-insert-update-on-table-violates-foreign-key-constraint",
+      "kind": "error",
+      "title": "psql error: ERROR: insert/update on table violates foreign key constraint",
+      "statement": "Referenced row doesn't exist (insert) or is being deleted (delete cascade). Fix: (1) ensure parent row exists first: `INSERT INTO parent (id, ...) ... ;` THEN `INSERT INTO child ... ;`; (2) for circular: defer with `DEFERRABLE INITIALLY DEFERRED` on the FK + `SET CONSTRAINTS ... DEFERRED` in transaction; (3) for cascading deletes: `ON DELETE CASCADE` in FK definition; (4) inspect the constraint: `\\d+ <table>` in psql.",
+      "source_url": "https://www.postgresql.org/docs/current/app-psql.html",
+      "source_type": "official_docs",
+      "commands": [
+        "INSERT INTO parent (id, ...) ... ;",
+        "INSERT INTO child ... ;",
+        "DEFERRABLE INITIALLY DEFERRED",
+        "SET CONSTRAINTS ... DEFERRED",
+        "ON DELETE CASCADE"
+      ],
+      "steps": [
+        "ensure parent row exists first: `INSERT INTO parent (id, ...) ... ;` THEN `INSERT INTO child ... ;`",
+        "for circular: defer with `DEFERRABLE INITIALLY DEFERRED` on the FK + `SET CONSTRAINTS ... DEFERRED` in transaction",
+        "for cascading deletes: `ON DELETE CASCADE` in FK definition",
+        "inspect the constraint: `\\d+ <table>` in psql"
+      ],
+      "constraints": [
+        "ensure parent row exists first: `INSERT INTO parent (id, ...) ... ;` THEN `INSERT INTO child ... ;`",
+        "Requires binaries or commands referenced in examples: DEFERRABLE, INSERT, ON, SET."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-errors",
+        "legacy_title": "postgresql error: ERROR: insert/update on table violates foreign key constraint"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "psql-error-psql-error-error-column-x-does-not-exist-hint-perhaps-you-meant",
+      "kind": "error",
+      "title": "psql error: ERROR: column \"<X>\" does not exist (HINT: Perhaps you meant ...)",
+      "statement": "Column name typo OR case-sensitivity issue. Fix: (1) PostgreSQL folds unquoted identifiers to lowercase: `\"FooBar\"` != `foobar`; (2) check actual columns: `\\d+ <table>` in psql; (3) the HINT often nails the typo \u2014 listen to it; (4) if column was created with double quotes: it's case-sensitive forever \u2014 quote it in every query.",
+      "source_url": "https://www.postgresql.org/docs/current/app-psql.html",
+      "source_type": "official_docs",
+      "commands": [
+        "foobar"
+      ],
+      "steps": [
+        "PostgreSQL folds unquoted identifiers to lowercase: `\"FooBar\"` != `foobar`",
+        "check actual columns: `\\d+ <table>` in psql",
+        "the HINT often nails the typo \u2014 listen to it",
+        "if column was created with double quotes: it's case-sensitive forever \u2014 quote it in every query"
+      ],
+      "constraints": [
+        "check actual columns: `\\d+ <table>` in psql",
+        "Requires binaries or commands referenced in examples: foobar."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-errors",
+        "legacy_title": "postgresql error: ERROR: column \"<X>\" does not exist (HINT: Perhaps you meant ...)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "psql-error-psql-error-error-syntax-error-at-or-near-x",
+      "kind": "error",
+      "title": "psql error: ERROR: syntax error at or near \"<X>\"",
+      "statement": "SQL parse error. PostgreSQL points at the location. Fix: (1) re-read the query \u2014 usually a missing comma, extra paren, or reserved word; (2) reserved words: `user`, `order`, `select` etc need double-quoting if used as identifiers; (3) for psql multi-line: ensure statement terminator `;` is present; (4) common: backslash commands inside `psql -c` don't work \u2014 those are psql-only, not SQL.",
+      "source_url": "https://www.postgresql.org/docs/current/app-psql.html",
+      "source_type": "official_docs",
+      "commands": [
+        "user",
+        "order",
+        "select",
+        "psql -c"
+      ],
+      "steps": [
+        "re-read the query \u2014 usually a missing comma, extra paren, or reserved word",
+        "reserved words: `user`, `order`, `select` etc need double-quoting if used as identifiers",
+        "for psql multi-line: ensure statement terminator `;` is present",
+        "common: backslash commands inside `psql -c` don't work \u2014 those are psql-only, not SQL"
+      ],
+      "constraints": [
+        "reserved words: `user`, `order`, `select` etc need double-quoting if used as identifiers",
+        "for psql multi-line: ensure statement terminator `;` is present",
+        "Requires binaries or commands referenced in examples: order, psql, select, user."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-errors",
+        "legacy_title": "postgresql error: ERROR: syntax error at or near \"<X>\""
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "psql-error-psql-error-error-invalid-input-syntax-for-type-x",
+      "kind": "error",
+      "title": "psql error: ERROR: invalid input syntax for type <X>",
+      "statement": "Value doesn't parse for the declared column type. Fix: (1) for date/time: use ISO 8601: `'2026-01-15'` not `'15/01/2026'`; (2) for boolean: `true`/`false` or `'t'`/`'f'` (no quotes for bool literal); (3) for UUID: must be 36-char canonical form; (4) for jsonb: must be valid JSON: `'{\"key\":\"value\"}'`; (5) cast explicitly: `'2026-01-15'::date`.",
+      "source_url": "https://www.postgresql.org/docs/current/app-psql.html",
+      "source_type": "official_docs",
+      "commands": [
+        "true",
+        "false"
+      ],
+      "steps": [
+        "for date/time: use ISO 8601: `'2026-01-15'` not `'15/01/2026'`",
+        "for boolean: `true`/`false` or `'t'`/`'f'` (no quotes for bool literal)",
+        "for UUID: must be 36-char canonical form",
+        "for jsonb: must be valid JSON: `'{\"key\":\"value\"}'`",
+        "cast explicitly: `'2026-01-15'::date`"
+      ],
+      "constraints": [
+        "for UUID: must be 36-char canonical form",
+        "for jsonb: must be valid JSON: `'{\"key\":\"value\"}'`",
+        "Requires binaries or commands referenced in examples: false, true."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-errors",
+        "legacy_title": "postgresql error: ERROR: invalid input syntax for type <X>"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "psql-error-psql-error-error-cannot-drop-the-currently-open-database",
+      "kind": "error",
+      "title": "psql error: ERROR: cannot drop the currently open database",
+      "statement": "DROP DATABASE refuses to drop the database you're connected to. Fix: (1) connect to a different DB first: `\\c postgres` or `psql -d postgres`; (2) then: `DROP DATABASE mydb;`; (3) for stuck connections: terminate first: `SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'mydb' AND pid <> pg_backend_pid();`; (4) force drop (PG 13+): `DROP DATABASE mydb WITH (FORCE);`.",
+      "source_url": "https://www.postgresql.org/docs/current/app-dropdb.html",
+      "source_type": "official_docs",
+      "commands": [
+        "psql -d postgres",
+        "DROP DATABASE mydb;",
+        "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'mydb' AND pid <> pg_backend_pid();",
+        "DROP DATABASE mydb WITH (FORCE);"
+      ],
+      "steps": [
+        "connect to a different DB first: `\\c postgres` or `psql -d postgres`",
+        "then: `DROP DATABASE mydb;`",
+        "for stuck connections: terminate first: `SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'mydb' AND pid <> pg_backend_pid();`",
+        "force drop (PG 13+): `DROP DATABASE mydb WITH (FORCE);`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: DROP, SELECT, psql."
+      ],
+      "effect": {
+        "kind": "destructive",
+        "destructive": true,
+        "reversible": false,
+        "mutates_remote_state": true,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "critical",
+        "reasons": [
+          "Dropping databases or tables can irreversibly destroy persisted data."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-errors",
+        "legacy_title": "postgresql error: ERROR: cannot drop the currently open database"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "psql-error-psql-error-error-ssl-connection-required-ssl-error-certificate-verify",
+      "kind": "error",
+      "title": "psql error: ERROR: SSL connection required / SSL error / certificate verify",
+      "statement": "Server requires SSL, OR client and server disagree on TLS verification. Fix: (1) for required SSL: ensure `sslmode=require` or higher in connection: `psql 'host=db sslmode=require user=u'`; (2) verify cert chain: `sslmode=verify-full` (most secure) + `sslrootcert=/path/to/ca.pem`; (3) for self-signed (dev): `sslmode=require` (no verification); (4) server config: `ssl = on` + `ssl_cert_file` + `ssl_key_file` in postgresql.conf; (5) test: `openssl s_client -connect host:5432 -starttls postgres`.",
+      "source_url": "https://www.postgresql.org/docs/current/runtime-config-connection.html",
+      "source_type": "official_docs",
+      "commands": [
+        "psql 'host=db sslmode=require user=u'",
+        "ssl = on",
+        "ssl_cert_file",
+        "ssl_key_file",
+        "openssl s_client -connect host:5432 -starttls postgres"
+      ],
+      "steps": [
+        "for required SSL: ensure `sslmode=require` or higher in connection: `psql 'host=db sslmode=require user=u'`",
+        "verify cert chain: `sslmode=verify-full` (most secure) + `sslrootcert=/path/to/ca.pem`",
+        "for self-signed (dev): `sslmode=require` (no verification)",
+        "server config: `ssl = on` + `ssl_cert_file` + `ssl_key_file` in postgresql.conf",
+        "test: `openssl s_client -connect host:5432 -starttls postgres`"
+      ],
+      "constraints": [
+        "for required SSL: ensure `sslmode=require` or higher in connection: `psql 'host=db sslmode=require user=u'`",
+        "verify cert chain: `sslmode=verify-full` (most secure) + `sslrootcert=/path/to/ca.pem`",
+        "Requires binaries or commands referenced in examples: openssl, psql, ssl, ssl_cert_file, ssl_key_file."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-errors",
+        "legacy_title": "postgresql error: ERROR: SSL connection required / SSL error / certificate verify"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "psql-error-psql-error-pg-restore-error-could-not-read-from-input-file",
+      "kind": "error",
+      "title": "psql error: pg_restore: error: could not read from input file",
+      "statement": "Restore can't read the dump file. Fix: (1) check file exists + readable: `ls -la dump.tar`; (2) for custom format (-Fc): use `pg_restore`; for plain SQL: use `psql -f`; (3) for directory format: `pg_restore -d mydb ./dump_dir/`; (4) compression: pg_restore handles `.dump` (custom) and `.tar`; for `.sql.gz`: `gunzip -c dump.sql.gz | psql -d mydb`; (5) for empty target DB: create first: `createdb mydb`.",
+      "source_url": "https://www.postgresql.org/docs/current/app-pg-restore.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ls -la dump.tar",
+        "pg_restore",
+        "psql -f",
+        "pg_restore -d mydb ./dump_dir/",
+        ".dump",
+        ".tar",
+        ".sql.gz",
+        "gunzip -c dump.sql.gz | psql -d mydb"
+      ],
+      "steps": [
+        "check file exists + readable: `ls -la dump.tar`",
+        "for custom format (-Fc): use `pg_restore`; for plain SQL: use `psql -f`",
+        "for directory format: `pg_restore -d mydb ./dump_dir/`",
+        "compression: pg_restore handles `.dump` (custom) and `.tar`; for `.sql.gz`: `gunzip -c dump.sql.gz | psql -d mydb`",
+        "for empty target DB: create first: `createdb mydb`"
+      ],
+      "constraints": [
+        "check file exists + readable: `ls -la dump.tar`",
+        "Requires binaries or commands referenced in examples: .dump, .sql.gz, .tar, gunzip, ls, pg_restore, psql."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-errors",
+        "legacy_title": "postgresql error: pg_restore: error: could not read from input file"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "psql-error-psql-error-error-tuple-concurrently-updated",
+      "kind": "error",
+      "title": "psql error: ERROR: tuple concurrently updated",
+      "statement": "Two transactions tried to modify the same row in incompatible ways (often during DDL + DML races). Fix: (1) retry: usually transient; (2) for serialization issues: use `SELECT ... FOR UPDATE` to lock rows explicitly; (3) for advisory locks across transactions: `SELECT pg_advisory_lock(N);`; (4) for CONCURRENT index builds + writes: the CONCURRENT index build pauses for active transactions \u2014 short retry helps.",
+      "source_url": "https://www.postgresql.org/docs/current/app-psql.html",
+      "source_type": "official_docs",
+      "commands": [
+        "SELECT ... FOR UPDATE",
+        "SELECT pg_advisory_lock(N);"
+      ],
+      "steps": [
+        "retry: usually transient",
+        "for serialization issues: use `SELECT ... FOR UPDATE` to lock rows explicitly",
+        "for advisory locks across transactions: `SELECT pg_advisory_lock(N);`",
+        "for CONCURRENT index builds + writes: the CONCURRENT index build pauses for active transactions \u2014 short retry helps"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: SELECT."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-errors",
+        "legacy_title": "postgresql error: ERROR: tuple concurrently updated"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "psql-error-psql-error-warning-there-is-no-transaction-in-progress",
+      "kind": "error",
+      "title": "psql error: WARNING: there is no transaction in progress",
+      "statement": "COMMIT or ROLLBACK issued without a matching BEGIN. Harmless but noisy. Fix: (1) drop stray COMMIT/ROLLBACK from script; (2) check autocommit settings: psql `\\set AUTOCOMMIT off` makes every statement implicit-transactional; (3) for migrations: ensure BEGIN/COMMIT bracket each step properly.",
+      "source_url": "https://www.postgresql.org/docs/current/app-psql.html",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "drop stray COMMIT/ROLLBACK from script",
+        "check autocommit settings: psql `\\set AUTOCOMMIT off` makes every statement implicit-transactional",
+        "for migrations: ensure BEGIN/COMMIT bracket each step properly"
+      ],
+      "constraints": [
+        "check autocommit settings: psql `\\set AUTOCOMMIT off` makes every statement implicit-transactional",
+        "for migrations: ensure BEGIN/COMMIT bracket each step properly"
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-errors",
+        "legacy_title": "postgresql error: WARNING: there is no transaction in progress"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "psql-error-psql-error-error-canceling-statement-due-to-user-request",
+      "kind": "error",
+      "title": "psql error: ERROR: canceling statement due to user request",
+      "statement": "Someone pressed Ctrl-C (psql) or called `pg_cancel_backend(pid)`. Not really an error \u2014 confirms the cancel worked. Fix: (1) ignore if intentional; (2) for unwanted cancels: check if a monitoring tool is sending cancels (pg_terminate_backend on slow queries); (3) `statement_timeout` produces a different message: 'canceling statement due to statement timeout'.",
+      "source_url": "https://www.postgresql.org/docs/current/app-psql.html",
+      "source_type": "official_docs",
+      "commands": [
+        "statement_timeout"
+      ],
+      "steps": [
+        "ignore if intentional",
+        "for unwanted cancels: check if a monitoring tool is sending cancels (pg_terminate_backend on slow queries)",
+        "`statement_timeout` produces a different message: 'canceling statement due to statement timeout'"
+      ],
+      "constraints": [
+        "for unwanted cancels: check if a monitoring tool is sending cancels (pg_terminate_backend on slow queries)",
+        "Requires binaries or commands referenced in examples: statement_timeout."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-errors",
+        "legacy_title": "postgresql error: ERROR: canceling statement due to user request"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "psql-error-psql-error-error-type-x-does-not-exist",
+      "kind": "error",
+      "title": "psql error: ERROR: type \"<X>\" does not exist",
+      "statement": "Custom type or extension not present in this database. Fix: (1) list installed extensions: `\\dx` in psql; (2) create extension: `CREATE EXTENSION IF NOT EXISTS uuid-ossp;` (or `pg_trgm`, `vector`, etc.); (3) for custom types: must be created with `CREATE TYPE ...`; (4) for extension types not loaded in current schema: try `CREATE EXTENSION ... WITH SCHEMA public;` then `SET search_path TO public, my_schema;`.",
+      "source_url": "https://www.postgresql.org/docs/current/app-psql.html",
+      "source_type": "official_docs",
+      "commands": [
+        "CREATE EXTENSION IF NOT EXISTS uuid-ossp;",
+        "pg_trgm",
+        "vector",
+        "CREATE TYPE ...",
+        "CREATE EXTENSION ... WITH SCHEMA public;",
+        "SET search_path TO public, my_schema;"
+      ],
+      "steps": [
+        "list installed extensions: `\\dx` in psql",
+        "create extension: `CREATE EXTENSION IF NOT EXISTS uuid-ossp;` (or `pg_trgm`, `vector`, etc.)",
+        "for custom types: must be created with `CREATE TYPE ...`",
+        "for extension types not loaded in current schema: try `CREATE EXTENSION ... WITH SCHEMA public;` then `SET search_path TO public, my_schema;`"
+      ],
+      "constraints": [
+        "for custom types: must be created with `CREATE TYPE ...`",
+        "Requires binaries or commands referenced in examples: CREATE, SET, pg_trgm, vector."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-errors",
+        "legacy_title": "postgresql error: ERROR: type \"<X>\" does not exist"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "psql-recipe-psql-recipe-connect-to-a-database-psql",
+      "kind": "recipe",
+      "title": "psql recipe: connect to a database (psql)",
+      "statement": "Local: `psql -d mydb` (uses OS user as default role). Specific user: `psql -U myuser -d mydb`. Remote: `psql -h db.example.com -p 5432 -U myuser -d mydb`. Connection URI: `psql 'postgres://user:pass@host:5432/dbname?sslmode=require'`. From service file: `psql 'service=prod'` (reads ~/.pg_service.conf). Once in psql: `\\?` for help, `\\q` to quit.",
+      "source_url": "https://www.postgresql.org/docs/current/app-psql.html",
+      "source_type": "official_docs",
+      "commands": [
+        "psql -d mydb",
+        "psql -U myuser -d mydb",
+        "psql -h db.example.com -p 5432 -U myuser -d mydb",
+        "psql 'postgres://user:pass@host:5432/dbname?sslmode=require'",
+        "psql 'service=prod'"
+      ],
+      "steps": [
+        "Local: `psql -d mydb` (uses OS user as default role). Specific user: `psql -U myuser -d mydb`. Remote: `psql -h db.example.com -p 5432 -U myuser -d mydb`. Connection URI: `psql 'postgres://user:pass@host:5432/dbname?sslmode=require'`. From service file: `psql 'service=prod'` (reads ~/.pg_service.conf). Once in psql: `\\?` for help, `\\q` to quit"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: psql."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-recipes",
+        "legacy_title": "postgresql recipe: connect to a database (psql)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "psql-recipe-psql-recipe-use-pgpass-for-credentials-no-pgpassword-in-env",
+      "kind": "recipe",
+      "title": "psql recipe: use .pgpass for credentials (no PGPASSWORD in env)",
+      "statement": "Create `~/.pgpass` with mode 0600: ```\\nhost:port:database:user:password\\n*:*:*:myuser:mypassword\\n```. Permissions critical: `chmod 600 ~/.pgpass` (psql refuses if too open). Wildcards: `*` matches anything. On Windows: `%APPDATA%\\postgresql\\pgpass.conf`. Now `psql -U myuser -h db.example.com` doesn't prompt.",
+      "source_url": "https://www.postgresql.org/docs/current/libpq-pgservice.html",
+      "source_type": "official_docs",
+      "commands": [
+        ". Permissions critical:",
+        "matches anything. On Windows:",
+        ". Now"
+      ],
+      "steps": [
+        "Create `~/.pgpass` with mode 0600: ```\\nhost:port:database:user:password\\n*:*:*:myuser:mypassword\\n```. Permissions critical: `chmod 600 ~/.pgpass` (psql refuses if too open). Wildcards: `*` matches anything. On Windows: `%APPDATA%\\postgresql\\pgpass.conf`. Now `psql -U myuser -h db.example.com` doesn't prompt"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ., matches."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": true,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-recipes",
+        "legacy_title": "postgresql recipe: use .pgpass for credentials (no PGPASSWORD in env)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "psql-recipe-psql-recipe-use-libpq-environment-variables",
+      "kind": "recipe",
+      "title": "psql recipe: use libpq environment variables",
+      "statement": "Set per-shell so every client picks them up. `export PGHOST=db.example.com` (or `PGHOSTADDR` for IP). `export PGPORT=5432`. `export PGUSER=myuser`. `export PGDATABASE=mydb`. `export PGSSLMODE=require`. After: `psql` (no args) connects to the env-configured target. Avoid `PGPASSWORD` (visible in `ps`) \u2014 use .pgpass.",
+      "source_url": "https://www.postgresql.org/docs/current/libpq-envars.html",
+      "source_type": "official_docs",
+      "commands": [
+        "export PGHOST=db.example.com",
+        "PGHOSTADDR",
+        "export PGPORT=5432",
+        "export PGUSER=myuser",
+        "export PGDATABASE=mydb",
+        "export PGSSLMODE=require",
+        "psql",
+        "PGPASSWORD"
+      ],
+      "steps": [
+        "Set per-shell so every client picks them up. `export PGHOST=db.example.com` (or `PGHOSTADDR` for IP). `export PGPORT=5432`. `export PGUSER=myuser`. `export PGDATABASE=mydb`. `export PGSSLMODE=require`. After: `psql` (no args) connects to the env-configured target. Avoid `PGPASSWORD` (visible in `ps`) \u2014 use .pgpass"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: PGHOSTADDR, PGPASSWORD, export, psql."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": true,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-recipes",
+        "legacy_title": "postgresql recipe: use libpq environment variables"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "psql-recipe-psql-recipe-create-a-database-user-with-appropriate-grants",
+      "kind": "recipe",
+      "title": "psql recipe: create a database + user with appropriate grants",
+      "statement": "```bash\\nsudo -u postgres psql -c \"CREATE USER appuser WITH PASSWORD 'secret';\"\\nsudo -u postgres psql -c \"CREATE DATABASE appdb OWNER appuser;\"\\nsudo -u postgres psql -d appdb -c \"GRANT ALL PRIVILEGES ON SCHEMA public TO appuser;\"\\n```. For least-privilege apps (separate read-only role): create the role, then `GRANT SELECT ON ALL TABLES IN SCHEMA public TO ...;` + `ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO ...;` for future tables.",
+      "source_url": "https://www.postgresql.org/docs/current/app-createuser.html",
+      "source_type": "official_docs",
+      "commands": [
+        ". For least-privilege apps (separate read-only role): create the role, then"
+      ],
+      "steps": [
+        "```bash\\nsudo -u postgres psql -c \"CREATE USER appuser WITH PASSWORD 'secret';\"\\nsudo -u postgres psql -c \"CREATE DATABASE appdb OWNER appuser;\"\\nsudo -u postgres psql -d appdb -c \"GRANT ALL PRIVILEGES ON SCHEMA public TO appuser;\"\\n```. For least-privilege apps (separate read-only role): create the role, then `GRANT SELECT ON ALL TABLES IN SCHEMA public TO ...;` + `ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO ...;` for future tables"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: .."
+      ],
+      "effect": {
+        "kind": "secret_exposure",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": true,
+        "risk_level": "high",
+        "reasons": [
+          "The action references secrets, tokens, or API keys."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-recipes",
+        "legacy_title": "postgresql recipe: create a database + user with appropriate grants"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "psql-recipe-psql-recipe-list-databases-tables-schemas-in-psql",
+      "kind": "recipe",
+      "title": "psql recipe: list databases / tables / schemas in psql",
+      "statement": "Databases: `\\l` (or `\\list`). Tables in current DB: `\\dt` (just tables). All in schema: `\\dt schema.*` or `\\dt *.*` (across schemas). Schemas: `\\dn`. Indexes: `\\di`. Sequences: `\\ds`. Views: `\\dv`. Functions: `\\df`. Roles/users: `\\du`. Extensions: `\\dx`.",
+      "source_url": "https://www.postgresql.org/docs/current/app-psql.html",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "Databases: `\\l` (or `\\list`). Tables in current DB: `\\dt` (just tables). All in schema: `\\dt schema.*` or `\\dt *.*` (across schemas). Schemas: `\\dn`. Indexes: `\\di`. Sequences: `\\ds`. Views: `\\dv`. Functions: `\\df`. Roles/users: `\\du`. Extensions: `\\dx`"
+      ],
+      "constraints": [],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-recipes",
+        "legacy_title": "postgresql recipe: list databases / tables / schemas in psql"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "psql-recipe-psql-recipe-describe-a-table-columns-indexes-constraints",
+      "kind": "recipe",
+      "title": "psql recipe: describe a table (columns + indexes + constraints)",
+      "statement": "Basic: `\\d <table>` (columns + types). Full: `\\d+ <table>` (also: storage, stats target, description, partitions). Just indexes on table: `\\di+ <table>*`. Just functions: `\\df mypkg.*`. For SQL-only (cross-app): query `information_schema.columns` or `pg_attribute`.",
+      "source_url": "https://www.postgresql.org/docs/current/app-psql.html",
+      "source_type": "official_docs",
+      "commands": [
+        "information_schema.columns",
+        "pg_attribute"
+      ],
+      "steps": [
+        "Basic: `\\d <table>` (columns + types). Full: `\\d+ <table>` (also: storage, stats target, description, partitions). Just indexes on table: `\\di+ <table>*`. Just functions: `\\df mypkg.*`. For SQL-only (cross-app): query `information_schema.columns` or `pg_attribute`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: information_schema.columns, pg_attribute."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-recipes",
+        "legacy_title": "postgresql recipe: describe a table (columns + indexes + constraints)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "psql-recipe-psql-recipe-run-a-query-from-a-file-single-command",
+      "kind": "recipe",
+      "title": "psql recipe: run a query from a file / single command",
+      "statement": "From file: `psql -d mydb -f script.sql`. Single command: `psql -d mydb -c \"SELECT count(*) FROM users;\"`. Multiple commands: `psql -d mydb -c \"BEGIN; UPDATE ...; COMMIT;\"`. From stdin: `cat script.sql | psql -d mydb`. With variables: `psql -d mydb -v name='alice' -c \"SELECT * FROM users WHERE name = :'name'\"`. Quiet mode (for scripts): `-q` (suppress notices).",
+      "source_url": "https://www.postgresql.org/docs/current/app-psql.html",
+      "source_type": "official_docs",
+      "commands": [
+        "psql -d mydb -f script.sql",
+        "psql -d mydb -c \"SELECT count(*) FROM users;\"",
+        "psql -d mydb -c \"BEGIN; UPDATE ...; COMMIT;\"",
+        "cat script.sql | psql -d mydb",
+        "psql -d mydb -v name='alice' -c \"SELECT * FROM users WHERE name = :'name'\"",
+        "-q"
+      ],
+      "steps": [
+        "From file: `psql -d mydb -f script.sql`. Single command: `psql -d mydb -c \"SELECT count(*) FROM users;\"`. Multiple commands: `psql -d mydb -c \"BEGIN; UPDATE ...; COMMIT;\"`. From stdin: `cat script.sql | psql -d mydb`. With variables: `psql -d mydb -v name='alice' -c \"SELECT * FROM users WHERE name = :'name'\"`. Quiet mode (for scripts): `-q` (suppress notices)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -q, cat, psql."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-recipes",
+        "legacy_title": "postgresql recipe: run a query from a file / single command"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "psql-recipe-psql-recipe-export-query-results-to-csv",
+      "kind": "recipe",
+      "title": "psql recipe: export query results to CSV",
+      "statement": "Inside psql: `\\copy (SELECT * FROM users WHERE active) TO 'users.csv' CSV HEADER`. Server-side (postgres user owns file): `COPY (SELECT * FROM users) TO '/tmp/users.csv' CSV HEADER;`. From bash: `psql -d mydb -c \"\\copy (SELECT * FROM users) TO 'users.csv' CSV HEADER\"`. Tab-separated: `WITH (FORMAT csv, DELIMITER E'\\t')`. No header: omit `HEADER`.",
+      "source_url": "https://www.postgresql.org/docs/current/app-psql.html",
+      "source_type": "official_docs",
+      "commands": [
+        "COPY (SELECT * FROM users) TO '/tmp/users.csv' CSV HEADER;",
+        "psql -d mydb -c \"\\copy (SELECT * FROM users) TO 'users.csv' CSV HEADER\"",
+        "WITH (FORMAT csv, DELIMITER E'\\t')",
+        "HEADER"
+      ],
+      "steps": [
+        "Inside psql: `\\copy (SELECT * FROM users WHERE active) TO 'users.csv' CSV HEADER`. Server-side (postgres user owns file): `COPY (SELECT * FROM users) TO '/tmp/users.csv' CSV HEADER;`. From bash: `psql -d mydb -c \"\\copy (SELECT * FROM users) TO 'users.csv' CSV HEADER\"`. Tab-separated: `WITH (FORMAT csv, DELIMITER E'\\t')`. No header: omit `HEADER`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: COPY, HEADER, WITH, psql."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-recipes",
+        "legacy_title": "postgresql recipe: export query results to CSV"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "psql-recipe-psql-recipe-import-data-from-csv",
+      "kind": "recipe",
+      "title": "psql recipe: import data from CSV",
+      "statement": "Inside psql: `\\copy users FROM 'users.csv' CSV HEADER`. Specific columns: `\\copy users (name, email) FROM 'users.csv' CSV HEADER`. Server-side (only if you have file-system access on the server): `COPY users FROM '/tmp/users.csv' CSV HEADER;`. Handle NULLs: `WITH (NULL 'NULL')` treats literal 'NULL' as NULL. For huge files: use COPY (orders of magnitude faster than INSERTs).",
+      "source_url": "https://www.postgresql.org/docs/current/app-psql.html",
+      "source_type": "official_docs",
+      "commands": [
+        "COPY users FROM '/tmp/users.csv' CSV HEADER;",
+        "WITH (NULL 'NULL')"
+      ],
+      "steps": [
+        "Inside psql: `\\copy users FROM 'users.csv' CSV HEADER`. Specific columns: `\\copy users (name, email) FROM 'users.csv' CSV HEADER`. Server-side (only if you have file-system access on the server): `COPY users FROM '/tmp/users.csv' CSV HEADER;`. Handle NULLs: `WITH (NULL 'NULL')` treats literal 'NULL' as NULL. For huge files: use COPY (orders of magnitude faster than INSERTs)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: COPY, WITH."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-recipes",
+        "legacy_title": "postgresql recipe: import data from CSV"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "psql-recipe-psql-recipe-dump-a-database-pg-dump",
+      "kind": "recipe",
+      "title": "psql recipe: dump a database (pg_dump)",
+      "statement": "Custom format (compressed, parallel-restorable, recommended): `pg_dump -d mydb -Fc -f mydb.dump`. Plain SQL (huge, but human-readable + can restore with psql): `pg_dump -d mydb > mydb.sql`. Directory format (parallel-dumpable): `pg_dump -d mydb -Fd -j 4 -f mydb_dir/`. Schema only: `--schema-only`. Data only: `--data-only`. Specific tables: `-t users -t orders`. Exclude: `-T audit_log`.",
+      "source_url": "https://www.postgresql.org/docs/current/app-pgdump.html",
+      "source_type": "official_docs",
+      "commands": [
+        "pg_dump -d mydb -Fc -f mydb.dump",
+        "pg_dump -d mydb > mydb.sql",
+        "pg_dump -d mydb -Fd -j 4 -f mydb_dir/",
+        "--schema-only",
+        "--data-only",
+        "-t users -t orders",
+        "-T audit_log"
+      ],
+      "steps": [
+        "Custom format (compressed, parallel-restorable, recommended): `pg_dump -d mydb -Fc -f mydb.dump`. Plain SQL (huge, but human-readable + can restore with psql): `pg_dump -d mydb > mydb.sql`. Directory format (parallel-dumpable): `pg_dump -d mydb -Fd -j 4 -f mydb_dir/`. Schema only: `--schema-only`. Data only: `--data-only`. Specific tables: `-t users -t orders`. Exclude: `-T audit_log`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: --data-only, --schema-only, -T, -t, pg_dump."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-recipes",
+        "legacy_title": "postgresql recipe: dump a database (pg_dump)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "psql-recipe-psql-recipe-restore-from-a-pg-dump-file",
+      "kind": "recipe",
+      "title": "psql recipe: restore from a pg_dump file",
+      "statement": "Custom format (.dump): `pg_restore -d mydb mydb.dump` (target DB must exist). Parallel: `pg_restore -d mydb -j 4 mydb.dump`. Plain SQL (.sql): `psql -d mydb -f mydb.sql`. List contents without restoring: `pg_restore -l mydb.dump > toc.list`. Selective restore: edit toc.list (comment lines with `;`), then `pg_restore -d mydb -L toc.list mydb.dump`. Drop + create target first: include `-c -C`.",
+      "source_url": "https://www.postgresql.org/docs/current/app-pg-restore.html",
+      "source_type": "official_docs",
+      "commands": [
+        "pg_restore -d mydb mydb.dump",
+        "pg_restore -d mydb -j 4 mydb.dump",
+        "psql -d mydb -f mydb.sql",
+        "pg_restore -l mydb.dump > toc.list",
+        "pg_restore -d mydb -L toc.list mydb.dump",
+        "-c -C"
+      ],
+      "steps": [
+        "Custom format (.dump): `pg_restore -d mydb mydb.dump` (target DB must exist). Parallel: `pg_restore -d mydb -j 4 mydb.dump`. Plain SQL (.sql): `psql -d mydb -f mydb.sql`. List contents without restoring: `pg_restore -l mydb.dump > toc.list`. Selective restore: edit toc.list (comment lines with `;`), then `pg_restore -d mydb -L toc.list mydb.dump`. Drop + create target first: include `-c -C`"
+      ],
+      "constraints": [
+        "Custom format (.dump): `pg_restore -d mydb mydb.dump` (target DB must exist). Parallel: `pg_restore -d mydb -j 4 mydb.dump`. Plain SQL (.sql): `psql -d mydb -f mydb.sql`. List contents without restoring: `pg_restore -l mydb.dump > toc.list`. Selective restore: edit toc.list (comment lines with `;`), then `pg_restore -d mydb -L toc.list mydb.dump`. Drop + create target first: include `-c -C`",
+        "Requires binaries or commands referenced in examples: -c, pg_restore, psql."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-recipes",
+        "legacy_title": "postgresql recipe: restore from a pg_dump file"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "psql-recipe-psql-recipe-dump-entire-cluster-pg-dumpall",
+      "kind": "recipe",
+      "title": "psql recipe: dump entire cluster (pg_dumpall)",
+      "statement": "`pg_dumpall > cluster.sql` \u2014 all databases + global objects (roles, tablespaces). Just globals: `pg_dumpall --globals-only > globals.sql`. Just roles (no DBs): `pg_dumpall --roles-only > roles.sql`. Restore: `psql -f cluster.sql -d postgres` (use a default DB as entry point). For per-DB dump + globals separately: typical pattern is `pg_dumpall --globals-only` + `pg_dump -Fc` per database.",
+      "source_url": "https://www.postgresql.org/docs/current/app-pg-dumpall.html",
+      "source_type": "official_docs",
+      "commands": [
+        "pg_dumpall > cluster.sql",
+        "pg_dumpall --globals-only > globals.sql",
+        "pg_dumpall --roles-only > roles.sql",
+        "psql -f cluster.sql -d postgres",
+        "pg_dumpall --globals-only",
+        "pg_dump -Fc"
+      ],
+      "steps": [
+        "`pg_dumpall > cluster.sql` \u2014 all databases + global objects (roles, tablespaces). Just globals: `pg_dumpall --globals-only > globals.sql`. Just roles (no DBs): `pg_dumpall --roles-only > roles.sql`. Restore: `psql -f cluster.sql -d postgres` (use a default DB as entry point). For per-DB dump + globals separately: typical pattern is `pg_dumpall --globals-only` + `pg_dump -Fc` per database"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: pg_dump, pg_dumpall, psql."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-recipes",
+        "legacy_title": "postgresql recipe: dump entire cluster (pg_dumpall)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "psql-recipe-psql-recipe-vacuum-analyze-a-database",
+      "kind": "recipe",
+      "title": "psql recipe: vacuum + analyze a database",
+      "statement": "Standard maintenance: `vacuumdb --analyze --all`. Per-database: `vacuumdb -d mydb --analyze`. Specific table: `psql -d mydb -c 'VACUUM (ANALYZE, VERBOSE) my_table;'`. Full (rebuilds \u2014 locks the table): `VACUUM FULL` \u2014 only for emergency space reclaim. After mass deletes: regular VACUUM marks space reusable; ANALYZE updates stats. Modern PG: autovacuum runs automatically \u2014 tune via `autovacuum_vacuum_scale_factor` etc.",
+      "source_url": "https://www.postgresql.org/docs/current/app-vacuumdb.html",
+      "source_type": "official_docs",
+      "commands": [
+        "vacuumdb --analyze --all",
+        "vacuumdb -d mydb --analyze",
+        "psql -d mydb -c 'VACUUM (ANALYZE, VERBOSE) my_table;'",
+        "VACUUM FULL",
+        "autovacuum_vacuum_scale_factor"
+      ],
+      "steps": [
+        "Standard maintenance: `vacuumdb --analyze --all`. Per-database: `vacuumdb -d mydb --analyze`. Specific table: `psql -d mydb -c 'VACUUM (ANALYZE, VERBOSE) my_table;'`. Full (rebuilds \u2014 locks the table): `VACUUM FULL` \u2014 only for emergency space reclaim. After mass deletes: regular VACUUM marks space reusable; ANALYZE updates stats. Modern PG: autovacuum runs automatically \u2014 tune via `autovacuum_vacuum_scale_factor` etc"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: VACUUM, autovacuum_vacuum_scale_factor, psql, vacuumdb."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-recipes",
+        "legacy_title": "postgresql recipe: vacuum + analyze a database"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "psql-recipe-psql-recipe-reindex-a-database-rebuild-indexes",
+      "kind": "recipe",
+      "title": "psql recipe: reindex a database (rebuild indexes)",
+      "statement": "All indexes in DB: `reindexdb -d mydb`. Specific table's indexes: `psql -d mydb -c 'REINDEX TABLE my_table;'`. Concurrently (no exclusive lock \u2014 recommended for prod, PG 12+): `REINDEX TABLE CONCURRENTLY my_table;`. All databases: `reindexdb --all`. Use case: bloat after heavy updates, corruption after crash, switching collation.",
+      "source_url": "https://www.postgresql.org/docs/current/app-reindexdb.html",
+      "source_type": "official_docs",
+      "commands": [
+        "reindexdb -d mydb",
+        "psql -d mydb -c 'REINDEX TABLE my_table;'",
+        "REINDEX TABLE CONCURRENTLY my_table;",
+        "reindexdb --all"
+      ],
+      "steps": [
+        "All indexes in DB: `reindexdb -d mydb`. Specific table's indexes: `psql -d mydb -c 'REINDEX TABLE my_table;'`. Concurrently (no exclusive lock \u2014 recommended for prod, PG 12+): `REINDEX TABLE CONCURRENTLY my_table;`. All databases: `reindexdb --all`. Use case: bloat after heavy updates, corruption after crash, switching collation"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: REINDEX, psql, reindexdb."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-recipes",
+        "legacy_title": "postgresql recipe: reindex a database (rebuild indexes)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "psql-recipe-psql-recipe-use-transactions-safely",
+      "kind": "recipe",
+      "title": "psql recipe: use transactions safely",
+      "statement": "Explicit: `BEGIN; UPDATE ...; SELECT ...; COMMIT;` or `ROLLBACK;`. Inside psql: `\\set ON_ERROR_ROLLBACK on` continues transaction on error (vs the default of aborting on first error). Savepoints: `SAVEPOINT s1; ... ROLLBACK TO s1; ... COMMIT;`. Isolation: `BEGIN ISOLATION LEVEL SERIALIZABLE;` (strictest) or `REPEATABLE READ`. Default isolation: READ COMMITTED.",
+      "source_url": "https://www.postgresql.org/docs/current/app-psql.html",
+      "source_type": "official_docs",
+      "commands": [
+        "SAVEPOINT s1; ... ROLLBACK TO s1; ... COMMIT;",
+        "BEGIN ISOLATION LEVEL SERIALIZABLE;",
+        "REPEATABLE READ"
+      ],
+      "steps": [
+        "Explicit: `BEGIN; UPDATE ...; SELECT ...; COMMIT;` or `ROLLBACK;`. Inside psql: `\\set ON_ERROR_ROLLBACK on` continues transaction on error (vs the default of aborting on first error). Savepoints: `SAVEPOINT s1; ... ROLLBACK TO s1; ... COMMIT;`. Isolation: `BEGIN ISOLATION LEVEL SERIALIZABLE;` (strictest) or `REPEATABLE READ`. Default isolation: READ COMMITTED"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: BEGIN, REPEATABLE, SAVEPOINT."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-recipes",
+        "legacy_title": "postgresql recipe: use transactions safely"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "psql-recipe-psql-recipe-show-kill-running-queries",
+      "kind": "recipe",
+      "title": "psql recipe: show + kill running queries",
+      "statement": "List: `SELECT pid, usename, datname, state, query_start, query FROM pg_stat_activity WHERE state = 'active';`. Long-running: `... AND now() - query_start > interval '1 minute';`. Cancel (graceful, keeps connection): `SELECT pg_cancel_backend(<pid>);`. Terminate (kills connection): `SELECT pg_terminate_backend(<pid>);`. Use pg_cancel first; only pg_terminate if cancel doesn't work.",
+      "source_url": "https://www.postgresql.org/docs/current/app-psql.html",
+      "source_type": "official_docs",
+      "commands": [
+        "SELECT pid, usename, datname, state, query_start, query FROM pg_stat_activity WHERE state = 'active';",
+        "... AND now() - query_start > interval '1 minute';",
+        "SELECT pg_cancel_backend(<pid>);",
+        "SELECT pg_terminate_backend(<pid>);"
+      ],
+      "steps": [
+        "List: `SELECT pid, usename, datname, state, query_start, query FROM pg_stat_activity WHERE state = 'active';`. Long-running: `... AND now() - query_start > interval '1 minute';`. Cancel (graceful, keeps connection): `SELECT pg_cancel_backend(<pid>);`. Terminate (kills connection): `SELECT pg_terminate_backend(<pid>);`. Use pg_cancel first; only pg_terminate if cancel doesn't work"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ..., SELECT."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-recipes",
+        "legacy_title": "postgresql recipe: show + kill running queries"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "psql-recipe-psql-recipe-query-timing-explain-analyze",
+      "kind": "recipe",
+      "title": "psql recipe: query timing + EXPLAIN ANALYZE",
+      "statement": "Time queries in psql: `\\timing` toggles on, then each query prints duration. Plan-only (no execution): `EXPLAIN SELECT ...;`. Plan + actual run: `EXPLAIN (ANALYZE, BUFFERS, VERBOSE) SELECT ...;`. Format: `EXPLAIN (ANALYZE, FORMAT JSON) ...` for tooling consumption. Read plan top-down: outer nodes consume inner. Better tools: https://explain.dalibo.com paste-and-explore.",
+      "source_url": "https://www.postgresql.org/docs/current/runtime-config-query.html",
+      "source_type": "official_docs",
+      "commands": [
+        "EXPLAIN SELECT ...;",
+        "EXPLAIN (ANALYZE, BUFFERS, VERBOSE) SELECT ...;",
+        "EXPLAIN (ANALYZE, FORMAT JSON) ..."
+      ],
+      "steps": [
+        "Time queries in psql: `\\timing` toggles on, then each query prints duration. Plan-only (no execution): `EXPLAIN SELECT ...;`. Plan + actual run: `EXPLAIN (ANALYZE, BUFFERS, VERBOSE) SELECT ...;`. Format: `EXPLAIN (ANALYZE, FORMAT JSON) ...` for tooling consumption. Read plan top-down: outer nodes consume inner. Better tools: https://explain.dalibo.com paste-and-explore"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: EXPLAIN."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-recipes",
+        "legacy_title": "postgresql recipe: query timing + EXPLAIN ANALYZE"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "psql-recipe-psql-recipe-use-watch-for-repeated-execution",
+      "kind": "recipe",
+      "title": "psql recipe: use \\watch for repeated execution",
+      "statement": "In psql: ```sql\\nSELECT count(*) FROM pg_stat_activity WHERE state = 'active';\\n\\watch 5\\n```. Refreshes every 5 seconds. Ctrl-C to stop. Use case: monitor active connections during a load test, watch a job complete.",
+      "source_url": "https://www.postgresql.org/docs/current/app-psql.html",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "In psql: ```sql\\nSELECT count(*) FROM pg_stat_activity WHERE state = 'active';\\n\\watch 5\\n```. Refreshes every 5 seconds. Ctrl-C to stop. Use case: monitor active connections during a load test, watch a job complete"
+      ],
+      "constraints": [],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-recipes",
+        "legacy_title": "postgresql recipe: use \\watch for repeated execution"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "psql-recipe-psql-recipe-use-set-for-psql-variables",
+      "kind": "recipe",
+      "title": "psql recipe: use \\set for psql variables",
+      "statement": "Set: `\\set username 'alice'`. Use in SQL: `SELECT * FROM users WHERE name = :'username';` (`:'name'` quotes as string; `:name` injects raw). Show all: `\\set` (no args). Unset: `\\unset username`. Built-ins: `\\set ECHO_HIDDEN on` (show SQL behind `\\d`), `\\set AUTOCOMMIT off`.",
+      "source_url": "https://www.postgresql.org/docs/current/app-psql.html",
+      "source_type": "official_docs",
+      "commands": [
+        "SELECT * FROM users WHERE name = :'username';",
+        ":name"
+      ],
+      "steps": [
+        "Set: `\\set username 'alice'`. Use in SQL: `SELECT * FROM users WHERE name = :'username';` (`:'name'` quotes as string; `:name` injects raw). Show all: `\\set` (no args). Unset: `\\unset username`. Built-ins: `\\set ECHO_HIDDEN on` (show SQL behind `\\d`), `\\set AUTOCOMMIT off`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: :name, SELECT."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-recipes",
+        "legacy_title": "postgresql recipe: use \\set for psql variables"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "psql-recipe-psql-recipe-use-pg-service-conf-for-connection-profiles",
+      "kind": "recipe",
+      "title": "psql recipe: use pg_service.conf for connection profiles",
+      "statement": "`~/.pg_service.conf`: ```ini\\n[prod]\\nhost=db.example.com\\nport=5432\\nuser=myuser\\ndbname=mydb\\nsslmode=require\\n\\n[dev]\\nhost=localhost\\nuser=myuser\\ndbname=mydb_dev\\n```. Then: `psql 'service=prod'` connects with all settings. Set as default: `PGSERVICE=prod` env var, then `psql` alone connects to prod. Combine with .pgpass for password.",
+      "source_url": "https://www.postgresql.org/docs/current/libpq-pgservice.html",
+      "source_type": "official_docs",
+      "commands": [
+        ". Then:",
+        "connects with all settings. Set as default:",
+        "env var, then"
+      ],
+      "steps": [
+        "`~/.pg_service.conf`: ```ini\\n[prod]\\nhost=db.example.com\\nport=5432\\nuser=myuser\\ndbname=mydb\\nsslmode=require\\n\\n[dev]\\nhost=localhost\\nuser=myuser\\ndbname=mydb_dev\\n```. Then: `psql 'service=prod'` connects with all settings. Set as default: `PGSERVICE=prod` env var, then `psql` alone connects to prod. Combine with .pgpass for password"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ., connects, env."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": true,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-recipes",
+        "legacy_title": "postgresql recipe: use pg_service.conf for connection profiles"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "psql-recipe-psql-recipe-create-use-a-schema",
+      "kind": "recipe",
+      "title": "psql recipe: create + use a schema",
+      "statement": "Create: `CREATE SCHEMA analytics;`. Set as default: `SET search_path TO analytics, public;` (session) or `ALTER DATABASE mydb SET search_path TO analytics, public;` (persistent). Create table in schema: `CREATE TABLE analytics.events (...);`. Cross-schema query: `SELECT * FROM analytics.events JOIN public.users USING (user_id);`. Drop with everything inside: `DROP SCHEMA analytics CASCADE;`.",
+      "source_url": "https://www.postgresql.org/docs/current/app-psql.html",
+      "source_type": "official_docs",
+      "commands": [
+        "CREATE SCHEMA analytics;",
+        "SET search_path TO analytics, public;",
+        "ALTER DATABASE mydb SET search_path TO analytics, public;",
+        "CREATE TABLE analytics.events (...);",
+        "SELECT * FROM analytics.events JOIN public.users USING (user_id);",
+        "DROP SCHEMA analytics CASCADE;"
+      ],
+      "steps": [
+        "Create: `CREATE SCHEMA analytics;`. Set as default: `SET search_path TO analytics, public;` (session) or `ALTER DATABASE mydb SET search_path TO analytics, public;` (persistent). Create table in schema: `CREATE TABLE analytics.events (...);`. Cross-schema query: `SELECT * FROM analytics.events JOIN public.users USING (user_id);`. Drop with everything inside: `DROP SCHEMA analytics CASCADE;`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ALTER, CREATE, DROP, SELECT, SET."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-recipes",
+        "legacy_title": "postgresql recipe: create + use a schema"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "psql-recipe-psql-recipe-create-an-index-concurrently-no-lock",
+      "kind": "recipe",
+      "title": "psql recipe: create an index concurrently (no lock)",
+      "statement": "Standard: `CREATE INDEX ON users (email);` \u2014 locks table briefly. Production-safe: `CREATE INDEX CONCURRENTLY ON users (email);` \u2014 no exclusive lock, takes longer. Caveats: CONCURRENTLY can't be inside a transaction; on failure leaves an INVALID index \u2014 drop + retry. Drop concurrently too: `DROP INDEX CONCURRENTLY users_email_idx;`. Always CONCURRENTLY on production tables.",
+      "source_url": "https://www.postgresql.org/docs/current/app-psql.html",
+      "source_type": "official_docs",
+      "commands": [
+        "CREATE INDEX ON users (email);",
+        "CREATE INDEX CONCURRENTLY ON users (email);",
+        "DROP INDEX CONCURRENTLY users_email_idx;"
+      ],
+      "steps": [
+        "Standard: `CREATE INDEX ON users (email);` \u2014 locks table briefly. Production-safe: `CREATE INDEX CONCURRENTLY ON users (email);` \u2014 no exclusive lock, takes longer. Caveats: CONCURRENTLY can't be inside a transaction; on failure leaves an INVALID index \u2014 drop + retry. Drop concurrently too: `DROP INDEX CONCURRENTLY users_email_idx;`. Always CONCURRENTLY on production tables"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: CREATE, DROP."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-recipes",
+        "legacy_title": "postgresql recipe: create an index concurrently (no lock)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "psql-recipe-psql-recipe-monitor-with-pg-stat-views",
+      "kind": "recipe",
+      "title": "psql recipe: monitor with pg_stat views",
+      "statement": "Active queries: `SELECT * FROM pg_stat_activity;`. Table I/O: `SELECT * FROM pg_stat_user_tables;`. Index usage: `SELECT * FROM pg_stat_user_indexes WHERE idx_scan = 0;` (unused indexes). Locks: `SELECT * FROM pg_locks JOIN pg_stat_activity USING (pid);`. Cache hit ratio: `SELECT sum(blks_hit)::float / sum(blks_hit + blks_read) FROM pg_stat_database;`. Replication lag: `SELECT * FROM pg_stat_replication;`.",
+      "source_url": "https://www.postgresql.org/docs/current/app-psql.html",
+      "source_type": "official_docs",
+      "commands": [
+        "SELECT * FROM pg_stat_activity;",
+        "SELECT * FROM pg_stat_user_tables;",
+        "SELECT * FROM pg_stat_user_indexes WHERE idx_scan = 0;",
+        "SELECT * FROM pg_locks JOIN pg_stat_activity USING (pid);",
+        "SELECT sum(blks_hit)::float / sum(blks_hit + blks_read) FROM pg_stat_database;",
+        "SELECT * FROM pg_stat_replication;"
+      ],
+      "steps": [
+        "Active queries: `SELECT * FROM pg_stat_activity;`. Table I/O: `SELECT * FROM pg_stat_user_tables;`. Index usage: `SELECT * FROM pg_stat_user_indexes WHERE idx_scan = 0;` (unused indexes). Locks: `SELECT * FROM pg_locks JOIN pg_stat_activity USING (pid);`. Cache hit ratio: `SELECT sum(blks_hit)::float / sum(blks_hit + blks_read) FROM pg_stat_database;`. Replication lag: `SELECT * FROM pg_stat_replication;`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: SELECT."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-recipes",
+        "legacy_title": "postgresql recipe: monitor with pg_stat views"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "psql-recipe-psql-recipe-write-upserts-insert-on-conflict",
+      "kind": "recipe",
+      "title": "psql recipe: write upserts (INSERT ... ON CONFLICT)",
+      "statement": "Skip duplicate: `INSERT INTO users (id, email) VALUES (1, 'a@x') ON CONFLICT (id) DO NOTHING;`. Update on conflict: `INSERT INTO users (id, email, updated_at) VALUES (1, 'a@x', NOW()) ON CONFLICT (id) DO UPDATE SET email = EXCLUDED.email, updated_at = EXCLUDED.updated_at;`. `EXCLUDED` references the row that would have been inserted. Multiple targets: `ON CONFLICT (col1, col2)`. Conditional update: `... DO UPDATE SET email = EXCLUDED.email WHERE users.updated_at < EXCLUDED.updated_at;`.",
+      "source_url": "https://www.postgresql.org/docs/current/app-psql.html",
+      "source_type": "official_docs",
+      "commands": [
+        "INSERT INTO users (id, email) VALUES (1, 'a@x') ON CONFLICT (id) DO NOTHING;",
+        "INSERT INTO users (id, email, updated_at) VALUES (1, 'a@x', NOW()) ON CONFLICT (id) DO UPDATE SET email = EXCLUDED.email, updated_at = EXCLUDED.updated_at;",
+        "EXCLUDED",
+        "ON CONFLICT (col1, col2)",
+        "... DO UPDATE SET email = EXCLUDED.email WHERE users.updated_at < EXCLUDED.updated_at;"
+      ],
+      "steps": [
+        "Skip duplicate: `INSERT INTO users (id, email) VALUES (1, 'a@x') ON CONFLICT (id) DO NOTHING;`. Update on conflict: `INSERT INTO users (id, email, updated_at) VALUES (1, 'a@x', NOW()) ON CONFLICT (id) DO UPDATE SET email = EXCLUDED.email, updated_at = EXCLUDED.updated_at;`. `EXCLUDED` references the row that would have been inserted. Multiple targets: `ON CONFLICT (col1, col2)`. Conditional update: `... DO UPDATE SET email = EXCLUDED.email WHERE users.updated_at < EXCLUDED.updated_at;`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ..., EXCLUDED, INSERT, ON."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-recipes",
+        "legacy_title": "postgresql recipe: write upserts (INSERT ... ON CONFLICT)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "psql-recipe-psql-recipe-install-use-an-extension",
+      "kind": "recipe",
+      "title": "psql recipe: install + use an extension",
+      "statement": "List available: `SELECT * FROM pg_available_extensions;`. Install: `CREATE EXTENSION IF NOT EXISTS pg_trgm;`. Common: `uuid-ossp` (UUID generation), `pg_trgm` (fuzzy text search), `hstore` (key-value), `postgis` (geospatial), `pgvector` (vectors), `pgcrypto` (hashing). Update: `ALTER EXTENSION pg_trgm UPDATE;`. Drop: `DROP EXTENSION pg_trgm;` (refuses if other things depend on it).",
+      "source_url": "https://www.postgresql.org/docs/current/app-psql.html",
+      "source_type": "official_docs",
+      "commands": [
+        "SELECT * FROM pg_available_extensions;",
+        "CREATE EXTENSION IF NOT EXISTS pg_trgm;",
+        "uuid-ossp",
+        "pg_trgm",
+        "hstore",
+        "postgis",
+        "pgvector",
+        "pgcrypto"
+      ],
+      "steps": [
+        "List available: `SELECT * FROM pg_available_extensions;`. Install: `CREATE EXTENSION IF NOT EXISTS pg_trgm;`. Common: `uuid-ossp` (UUID generation), `pg_trgm` (fuzzy text search), `hstore` (key-value), `postgis` (geospatial), `pgvector` (vectors), `pgcrypto` (hashing). Update: `ALTER EXTENSION pg_trgm UPDATE;`. Drop: `DROP EXTENSION pg_trgm;` (refuses if other things depend on it)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: CREATE, SELECT, hstore, pg_trgm, pgcrypto, pgvector, postgis, uuid-ossp."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-recipes",
+        "legacy_title": "postgresql recipe: install + use an extension"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "psql-recipe-psql-recipe-configure-connection-pooling-with-pgbouncer",
+      "kind": "recipe",
+      "title": "psql recipe: configure connection pooling with PgBouncer",
+      "statement": "Not PostgreSQL itself \u2014 but the standard solution. Install pgbouncer + config /etc/pgbouncer/pgbouncer.ini: ```\\n[databases]\\nmydb = host=localhost port=5432 dbname=mydb\\n\\n[pgbouncer]\\nlisten_port = 6432\\npool_mode = transaction\\nmax_client_conn = 1000\\ndefault_pool_size = 25\\n```. Connect via pgbouncer: `psql -h pgbouncer-host -p 6432 -d mydb`. Modes: `session` (per-client), `transaction` (per-transaction, most common), `statement` (most aggressive).",
+      "source_url": "https://www.postgresql.org/docs/current/runtime-config-connection.html",
+      "source_type": "official_docs",
+      "commands": [
+        ". Connect via pgbouncer:",
+        ". Modes:"
+      ],
+      "steps": [
+        "Not PostgreSQL itself \u2014 but the standard solution. Install pgbouncer + config /etc/pgbouncer/pgbouncer.ini: ```\\n[databases]\\nmydb = host=localhost port=5432 dbname=mydb\\n\\n[pgbouncer]\\nlisten_port = 6432\\npool_mode = transaction\\nmax_client_conn = 1000\\ndefault_pool_size = 25\\n```. Connect via pgbouncer: `psql -h pgbouncer-host -p 6432 -d mydb`. Modes: `session` (per-client), `transaction` (per-transaction, most common), `statement` (most aggressive)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: .."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "psql-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_postgresql_errors_recipes.py",
+        "legacy_tool_id": "postgresql-recipes",
+        "legacy_title": "postgresql recipe: configure connection pooling with PgBouncer"
+      },
+      "confidence": 0.92
+    }
+  ]
+}
