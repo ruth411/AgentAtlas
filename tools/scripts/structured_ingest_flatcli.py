@@ -27,7 +27,6 @@ from pathlib import Path
 import re
 import subprocess
 import sys
-from typing import Callable
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "backend"))
@@ -120,6 +119,18 @@ def _parse_optspec(spec: str) -> list[tuple[str, str | None]]:
         if toggle:
             out.append((f"-{toggle.group(1)}", None))
             out.append((f"-no{toggle.group(1)}", None))
+            continue
+        # Git-style "--[no-]name" toggles are likewise a real pair of long
+        # options. When the positive form accepts an optional value (e.g.
+        # "--[no-]gpg-sign[=<key-id>]"), keep that metavar on the positive
+        # spelling and emit a bare negated flag.
+        long_toggle = re.match(
+            r"^--\[no-\]([A-Za-z0-9][A-Za-z0-9._-]*)(?:\[(?:=(.+))\])?$",
+            part,
+        )
+        if long_toggle:
+            out.append((f"--{long_toggle.group(1)}", long_toggle.group(2)))
+            out.append((f"--no-{long_toggle.group(1)}", None))
             continue
         m = _OPT_TOKEN.match(part)
         if m:
@@ -347,6 +358,14 @@ _REGISTRY: dict[str, FlatTool] = {
         effect=("filesystem", False, True, False, False, False,
                 "`magick` (ImageMagick) reads and writes local image files; no "
                 "network or remote side effects by default."),
+    ),
+    "vim": FlatTool(
+        program="vim",
+        help_argv=("vim", "--help"),
+        source_url="https://vimhelp.org/starting.txt.html",
+        effect=("filesystem", False, True, False, False, False,
+                "`vim` reads and writes local files and may create swap/session "
+                "artifacts; it performs no network or remote side effects by default."),
     ),
 }
 

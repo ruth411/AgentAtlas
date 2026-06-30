@@ -1,0 +1,2466 @@
+{
+  "family": "curl",
+  "version": "v1",
+  "artifact_id": "curl-curated-source-v1",
+  "generated_from": {
+    "kind": "legacy_seed_script",
+    "path": "tools/scripts/seed_curl_errors_recipes.py"
+  },
+  "entries": [
+    {
+      "entry_id": "curl-error-curl-error-6-could-not-resolve-host",
+      "kind": "error",
+      "title": "curl error 6: Could not resolve host",
+      "statement": "DNS resolution failed for the URL's hostname. Causes: typo in URL, DNS server unreachable, hostname doesn't exist. Fix: (1) `nslookup <host>` or `dig <host>` to verify DNS independently; (2) check /etc/resolv.conf for valid nameservers; (3) if your DNS is fine but the host is wrong, curl can use a different host with the same IP: `curl --resolve example.com:443:1.2.3.4 https://example.com`; (4) test with explicit IP: `curl https://1.2.3.4 -H \"Host: example.com\" -k` (the -k skips cert verification since the cert won't match an IP).",
+      "source_url": "https://curl.se/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "nslookup <host>",
+        "dig <host>",
+        "curl --resolve example.com:443:1.2.3.4 https://example.com",
+        "curl https://1.2.3.4 -H \"Host: example.com\" -k"
+      ],
+      "steps": [
+        "`nslookup <host>` or `dig <host>` to verify DNS independently",
+        "check /etc/resolv.conf for valid nameservers",
+        "if your DNS is fine but the host is wrong, curl can use a different host with the same IP: `curl --resolve example.com:443:1.2.3.4 https://example.com`",
+        "test with explicit IP: `curl https://1.2.3.4 -H \"Host: example.com\" -k` (the -k skips cert verification since the cert won't match an IP)"
+      ],
+      "constraints": [
+        "`nslookup <host>` or `dig <host>` to verify DNS independently",
+        "check /etc/resolv.conf for valid nameservers",
+        "Requires binaries or commands referenced in examples: curl, dig, nslookup."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-errors",
+        "legacy_title": "curl error 6: Could not resolve host"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "curl-error-curl-error-7-failed-to-connect-to-host",
+      "kind": "error",
+      "title": "curl error 7: Failed to connect to host",
+      "statement": "TCP connection couldn't be established. The host resolved but the port is unreachable. Fix: (1) `nc -zv <host> <port>` to test the port independently; (2) check firewall rules (local and remote); (3) verify the port matches the protocol (80 for HTTP, 443 for HTTPS, 21 for FTP); (4) for proxied environments, set `--proxy http://proxy:8080` or env vars HTTPS_PROXY/HTTP_PROXY; (5) `curl -v` shows the connection attempt details \u2014 IP, port, retry behavior.",
+      "source_url": "https://curl.se/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "nc -zv <host> <port>",
+        "--proxy http://proxy:8080",
+        "curl -v"
+      ],
+      "steps": [
+        "`nc -zv <host> <port>` to test the port independently",
+        "check firewall rules (local and remote)",
+        "verify the port matches the protocol (80 for HTTP, 443 for HTTPS, 21 for FTP)",
+        "for proxied environments, set `--proxy http://proxy:8080` or env vars HTTPS_PROXY/HTTP_PROXY",
+        "`curl -v` shows the connection attempt details \u2014 IP, port, retry behavior"
+      ],
+      "constraints": [
+        "check firewall rules (local and remote)",
+        "verify the port matches the protocol (80 for HTTP, 443 for HTTPS, 21 for FTP)",
+        "Requires binaries or commands referenced in examples: --proxy, curl, nc."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-errors",
+        "legacy_title": "curl error 7: Failed to connect to host"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "curl-error-curl-error-28-operation-timed-out",
+      "kind": "error",
+      "title": "curl error 28: Operation timed out",
+      "statement": "curl waited longer than the configured timeout. Default is no timeout for full operation; --connect-timeout is the connect-phase timeout. Fix: (1) increase `--max-time <seconds>` for total operation timeout; (2) `--connect-timeout <seconds>` for just the TCP handshake; (3) check if the server is slow (`curl -w \"%{time_total}\\n\" -o /dev/null -s <url>`); (4) for unreliable networks: `--retry 3 --retry-delay 5 --retry-max-time 60`; (5) for keepalives during slow transfers: `--speed-limit 1 --speed-time 30` aborts only if speed drops below 1 byte/s for 30s.",
+      "source_url": "https://curl.se/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "--max-time <seconds>",
+        "--connect-timeout <seconds>",
+        "curl -w \"%{time_total}\\n\" -o /dev/null -s <url>",
+        "--retry 3 --retry-delay 5 --retry-max-time 60",
+        "--speed-limit 1 --speed-time 30"
+      ],
+      "steps": [
+        "increase `--max-time <seconds>` for total operation timeout",
+        "`--connect-timeout <seconds>` for just the TCP handshake",
+        "check if the server is slow (`curl -w \"%{time_total}\\n\" -o /dev/null -s <url>`)",
+        "for unreliable networks: `--retry 3 --retry-delay 5 --retry-max-time 60`",
+        "for keepalives during slow transfers: `--speed-limit 1 --speed-time 30` aborts only if speed drops below 1 byte/s for 30s"
+      ],
+      "constraints": [
+        "check if the server is slow (`curl -w \"%{time_total}\\n\" -o /dev/null -s <url>`)",
+        "Requires binaries or commands referenced in examples: --connect-timeout, --max-time, --retry, --speed-limit, curl."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-errors",
+        "legacy_title": "curl error 28: Operation timed out"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "curl-error-curl-error-35-ssl-connect-error",
+      "kind": "error",
+      "title": "curl error 35: SSL connect error",
+      "statement": "TLS/SSL handshake failed. Common causes: protocol mismatch, cipher mismatch, server doesn't support TLS 1.2+, MITM proxy intercepting. Fix: (1) try with `--insecure` (`-k`) to see if cert validation is the issue (DON'T leave this in production); (2) `--tlsv1.2` or `--tls-max 1.2` to negotiate a specific TLS version; (3) `-v` shows the handshake \u2014 look for 'cipher' and 'protocol'; (4) for self-signed certs: `--cacert /path/to/ca.pem` to add a trusted CA; (5) for client certs (mTLS): `--cert client.pem --key client.key`.",
+      "source_url": "https://curl.se/docs/docs/sslcerts.html",
+      "source_type": "official_docs",
+      "commands": [
+        "--insecure",
+        "-k",
+        "--tlsv1.2",
+        "--tls-max 1.2",
+        "-v",
+        "--cacert /path/to/ca.pem",
+        "--cert client.pem --key client.key"
+      ],
+      "steps": [
+        "try with `--insecure` (`-k`) to see if cert validation is the issue (DON'T leave this in production)",
+        "`--tlsv1.2` or `--tls-max 1.2` to negotiate a specific TLS version",
+        "`-v` shows the handshake \u2014 look for 'cipher' and 'protocol'",
+        "for self-signed certs: `--cacert /path/to/ca.pem` to add a trusted CA",
+        "for client certs (mTLS): `--cert client.pem --key client.key`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: --cacert, --cert, --insecure, --tls-max, --tlsv1.2, -k, -v."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-errors",
+        "legacy_title": "curl error 35: SSL connect error"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "curl-error-curl-error-22-http-response-code-said-error-fail",
+      "kind": "error",
+      "title": "curl error 22: HTTP response code said error (--fail)",
+      "statement": "You used `-f`/`--fail` which makes curl exit non-zero on HTTP 4xx/5xx responses. Fix: (1) check what HTTP status the server returned \u2014 without `-f`, curl prints the body normally; (2) `-w \"%{http_code}\\n\"` writes the HTTP code; (3) `--fail-with-body` (newer curl) returns the response body even on error (useful for APIs that embed error details); (4) `-i` includes response headers; debug what the server is actually telling you.",
+      "source_url": "https://curl.se/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-f",
+        "--fail",
+        "-w \"%{http_code}\\n\"",
+        "--fail-with-body",
+        "-i"
+      ],
+      "steps": [
+        "check what HTTP status the server returned \u2014 without `-f`, curl prints the body normally",
+        "`-w \"%{http_code}\\n\"` writes the HTTP code",
+        "`--fail-with-body` (newer curl) returns the response body even on error (useful for APIs that embed error details)",
+        "`-i` includes response headers; debug what the server is actually telling you"
+      ],
+      "constraints": [
+        "check what HTTP status the server returned \u2014 without `-f`, curl prints the body normally",
+        "Requires binaries or commands referenced in examples: --fail, --fail-with-body, -f, -i, -w."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-errors",
+        "legacy_title": "curl error 22: HTTP response code said error (--fail)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "curl-error-curl-error-60-ssl-certificate-problem-self-signed-or-unknown-ca",
+      "kind": "error",
+      "title": "curl error 60: SSL certificate problem (self-signed or unknown CA)",
+      "statement": "The server's TLS certificate isn't trusted by your CA bundle. Fix for self-signed: (1) get the cert: `openssl s_client -connect host:443 -showcerts < /dev/null`; (2) save the CA cert as ca.pem; (3) `curl --cacert ca.pem https://host`; (4) for client-side pinning: `--pinnedpubkey sha256//<base64-of-cert-pubkey>`; (5) NEVER use `-k`/`--insecure` in production scripts \u2014 defeats the entire point of TLS.",
+      "source_url": "https://curl.se/docs/docs/sslcerts.html",
+      "source_type": "official_docs",
+      "commands": [
+        "openssl s_client -connect host:443 -showcerts < /dev/null",
+        "curl --cacert ca.pem https://host",
+        "--pinnedpubkey sha256//<base64-of-cert-pubkey>",
+        "-k",
+        "--insecure"
+      ],
+      "steps": [
+        "The server's TLS certificate isn't trusted by your CA bundle. Fix for self-signed:",
+        "get the cert: `openssl s_client -connect host:443 -showcerts < /dev/null`",
+        "save the CA cert as ca.pem",
+        "`curl --cacert ca.pem https://host`",
+        "for client-side pinning: `--pinnedpubkey sha256//<base64-of-cert-pubkey>`",
+        "NEVER use `-k`/`--insecure` in production scripts \u2014 defeats the entire point of TLS"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: --insecure, --pinnedpubkey, -k, curl, openssl."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-errors",
+        "legacy_title": "curl error 60: SSL certificate problem (self-signed or unknown CA)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "curl-error-curl-error-47-maximum-default-50-redirects-followed",
+      "kind": "error",
+      "title": "curl error 47: Maximum (default 50) redirects followed",
+      "statement": "Too many HTTP redirects, often a redirect loop. Fix: (1) inspect the chain: `curl -L -v -o /dev/null <url> 2>&1 | grep -i location`; (2) raise the limit: `--max-redirs 100`; (3) confirm the URL is correct \u2014 the loop is usually a misconfigured server sending HTTP\u2192HTTPS\u2192HTTP infinitely; (4) curl doesn't follow redirects by default \u2014 without `-L`, you'd see the 301/302 + Location header but not the loop.",
+      "source_url": "https://curl.se/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "curl -L -v -o /dev/null <url> 2>&1 | grep -i location",
+        "--max-redirs 100",
+        "-L"
+      ],
+      "steps": [
+        "inspect the chain: `curl -L -v -o /dev/null <url> 2>&1 | grep -i location`",
+        "raise the limit: `--max-redirs 100`",
+        "confirm the URL is correct \u2014 the loop is usually a misconfigured server sending HTTP\u2192HTTPS\u2192HTTP infinitely",
+        "curl doesn't follow redirects by default \u2014 without `-L`, you'd see the 301/302 + Location header but not the loop"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: --max-redirs, -L, curl."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-errors",
+        "legacy_title": "curl error 47: Maximum (default 50) redirects followed"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "curl-error-curl-error-56-failure-when-receiving-data-from-the-peer",
+      "kind": "error",
+      "title": "curl error 56: Failure when receiving data from the peer",
+      "statement": "Connection reset mid-transfer. Network instability, server crash, timeout on the server side, or proxy intervention. Fix: (1) retry: `--retry 3`; (2) reduce request size if uploading; (3) check server logs for the same time window \u2014 connection resets usually have a server-side cause; (4) for diagnostic: `curl -v --trace-ascii dump.txt <url>` writes a full transcript to dump.txt; (5) test from a different network to rule out local firewall / proxy.",
+      "source_url": "https://curl.se/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "--retry 3",
+        "curl -v --trace-ascii dump.txt <url>"
+      ],
+      "steps": [
+        "retry: `--retry 3`",
+        "reduce request size if uploading",
+        "check server logs for the same time window \u2014 connection resets usually have a server-side cause",
+        "for diagnostic: `curl -v --trace-ascii dump.txt <url>` writes a full transcript to dump.txt",
+        "test from a different network to rule out local firewall / proxy"
+      ],
+      "constraints": [
+        "check server logs for the same time window \u2014 connection resets usually have a server-side cause",
+        "Requires binaries or commands referenced in examples: --retry, curl."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-errors",
+        "legacy_title": "curl error 56: Failure when receiving data from the peer"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "curl-error-curl-error-18-transferred-a-partial-file",
+      "kind": "error",
+      "title": "curl error 18: Transferred a partial file",
+      "statement": "Download didn't complete \u2014 file was cut off. Often paired with error 56. Fix: (1) resume with `--continue-at - <url> -o file` (`-` lets curl figure out where to resume); (2) for HTTP, server must support Range requests (most modern servers do); (3) `--retry 3 --retry-delay 5` for transient failures; (4) verify final size matches Content-Length: `curl -I <url>` returns headers including expected size.",
+      "source_url": "https://curl.se/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "--continue-at - <url> -o file",
+        "--retry 3 --retry-delay 5",
+        "curl -I <url>"
+      ],
+      "steps": [
+        "resume with `--continue-at - <url> -o file` (`-` lets curl figure out where to resume)",
+        "for HTTP, server must support Range requests (most modern servers do)",
+        "`--retry 3 --retry-delay 5` for transient failures",
+        "verify final size matches Content-Length: `curl -I <url>` returns headers including expected size"
+      ],
+      "constraints": [
+        "for HTTP, server must support Range requests (most modern servers do)",
+        "verify final size matches Content-Length: `curl -I <url>` returns headers including expected size",
+        "Requires binaries or commands referenced in examples: --continue-at, --retry, curl."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-errors",
+        "legacy_title": "curl error 18: Transferred a partial file"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "curl-error-curl-error-92-http-2-stream-not-closed-cleanly",
+      "kind": "error",
+      "title": "curl error 92: HTTP/2 stream not closed cleanly",
+      "statement": "HTTP/2 connection ended unexpectedly. Server-side issue or middlebox interference. Fix: (1) force HTTP/1.1: `curl --http1.1 <url>` \u2014 works around server-side HTTP/2 bugs; (2) `-v` to see protocol negotiation; (3) check if server explicitly closes streams under load (server logs may show CONNECTION RESET BY PEER).",
+      "source_url": "https://curl.se/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "curl --http1.1 <url>",
+        "-v"
+      ],
+      "steps": [
+        "force HTTP/1.1: `curl --http1.1 <url>` \u2014 works around server-side HTTP/2 bugs",
+        "`-v` to see protocol negotiation",
+        "check if server explicitly closes streams under load (server logs may show CONNECTION RESET BY PEER)"
+      ],
+      "constraints": [
+        "check if server explicitly closes streams under load (server logs may show CONNECTION RESET BY PEER)",
+        "Requires binaries or commands referenced in examples: -v, curl."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-errors",
+        "legacy_title": "curl error 92: HTTP/2 stream not closed cleanly"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "curl-error-curl-error-77-problem-with-the-ssl-ca-cert",
+      "kind": "error",
+      "title": "curl error 77: Problem with the SSL CA cert",
+      "statement": "CA bundle missing or unreadable. Common on minimal Docker images. Fix: (1) install ca-certificates: `apt install ca-certificates` (Debian) or `apk add ca-certificates` (Alpine); (2) verify path: `curl -v <url>` shows the CA bundle it's trying to use; (3) explicit override: `--cacert /etc/ssl/certs/ca-certificates.crt`; (4) for corporate environments with custom CAs: add your CA cert to the system bundle (Debian: drop in /usr/local/share/ca-certificates/ + `update-ca-certificates`).",
+      "source_url": "https://curl.se/docs/docs/sslcerts.html",
+      "source_type": "official_docs",
+      "commands": [
+        "apt install ca-certificates",
+        "apk add ca-certificates",
+        "curl -v <url>",
+        "--cacert /etc/ssl/certs/ca-certificates.crt",
+        "update-ca-certificates"
+      ],
+      "steps": [
+        "install ca-certificates: `apt install ca-certificates` (Debian) or `apk add ca-certificates` (Alpine)",
+        "verify path: `curl -v <url>` shows the CA bundle it's trying to use",
+        "explicit override: `--cacert /etc/ssl/certs/ca-certificates.crt`",
+        "for corporate environments with custom CAs: add your CA cert to the system bundle (Debian: drop in /usr/local/share/ca-certificates/ + `update-ca-certificates`)"
+      ],
+      "constraints": [
+        "verify path: `curl -v <url>` shows the CA bundle it's trying to use",
+        "Requires binaries or commands referenced in examples: --cacert, apk, apt, curl, update-ca-certificates."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-errors",
+        "legacy_title": "curl error 77: Problem with the SSL CA cert"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "curl-error-curl-error-26-read-error-from-local-file",
+      "kind": "error",
+      "title": "curl error 26: Read error (from local file)",
+      "statement": "curl couldn't read the file you're trying to upload. Fix: (1) verify path exists + readable: `ls -la <file>`; (2) for stdin uploads: `curl -T - <url> < file.txt` or `cat file.txt | curl -T - <url>`; (3) check permissions \u2014 curl uses the calling user's UID/GID; (4) for symlinks pointing to non-existent files, curl errors here too.",
+      "source_url": "https://curl.se/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ls -la <file>",
+        "curl -T - <url> < file.txt",
+        "cat file.txt | curl -T - <url>"
+      ],
+      "steps": [
+        "verify path exists + readable: `ls -la <file>`",
+        "for stdin uploads: `curl -T - <url> < file.txt` or `cat file.txt | curl -T - <url>`",
+        "check permissions \u2014 curl uses the calling user's UID/GID",
+        "for symlinks pointing to non-existent files, curl errors here too"
+      ],
+      "constraints": [
+        "verify path exists + readable: `ls -la <file>`",
+        "check permissions \u2014 curl uses the calling user's UID/GID",
+        "Requires binaries or commands referenced in examples: cat, curl, ls."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-errors",
+        "legacy_title": "curl error 26: Read error (from local file)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "curl-error-curl-error-23-failed-writing-body-write-error",
+      "kind": "error",
+      "title": "curl error 23: Failed writing body (write error)",
+      "statement": "curl couldn't write the response body to disk or stdout. Disk full, permissions, or piped consumer closed early. Fix: (1) check disk: `df -h .`; (2) verify write permissions to the output directory; (3) if piping (e.g., `curl ... | head`), the consumer closing the pipe early causes this \u2014 curl tries to write more than the consumer reads; use `curl ... | head` (acceptable to lose data), or `curl -o - ... | head` and explicitly handle SIGPIPE in scripts.",
+      "source_url": "https://curl.se/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "df -h .",
+        "curl ... | head",
+        "curl -o - ... | head"
+      ],
+      "steps": [
+        "check disk: `df -h .`",
+        "verify write permissions to the output directory",
+        "if piping (e.g., `curl ... | head`), the consumer closing the pipe early causes this \u2014 curl tries to write more than the consumer reads; use `curl ... | head` (acceptable to lose data), or `curl -o - ... | head` and explicitly handle SIGPIPE in scripts"
+      ],
+      "constraints": [
+        "check disk: `df -h .`",
+        "verify write permissions to the output directory",
+        "Requires binaries or commands referenced in examples: curl, df."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-errors",
+        "legacy_title": "curl error 23: Failed writing body (write error)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "curl-error-curl-error-5-couldn-t-resolve-proxy",
+      "kind": "error",
+      "title": "curl error 5: Couldn't resolve proxy",
+      "statement": "Proxy hostname DNS failed. Fix: (1) verify proxy URL \u2014 typo in HTTP_PROXY/HTTPS_PROXY env vars is common; (2) `nslookup <proxy-host>`; (3) for proxy with auth in URL: `--proxy http://user:pass@proxy:8080` (better: `--proxy-user user:pass`); (4) for split proxy (different upstream proxies for http vs https): set both HTTP_PROXY and HTTPS_PROXY env vars.",
+      "source_url": "https://curl.se/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "nslookup <proxy-host>",
+        "--proxy http://user:pass@proxy:8080",
+        "--proxy-user user:pass"
+      ],
+      "steps": [
+        "verify proxy URL \u2014 typo in HTTP_PROXY/HTTPS_PROXY env vars is common",
+        "`nslookup <proxy-host>`",
+        "for proxy with auth in URL: `--proxy http://user:pass@proxy:8080` (better: `--proxy-user user:pass`)",
+        "for split proxy (different upstream proxies for http vs https): set both HTTP_PROXY and HTTPS_PROXY env vars"
+      ],
+      "constraints": [
+        "verify proxy URL \u2014 typo in HTTP_PROXY/HTTPS_PROXY env vars is common",
+        "Requires binaries or commands referenced in examples: --proxy, --proxy-user, nslookup."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-errors",
+        "legacy_title": "curl error 5: Couldn't resolve proxy"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "curl-error-curl-error-67-login-denied-authentication-failed",
+      "kind": "error",
+      "title": "curl error 67: Login denied (authentication failed)",
+      "statement": "Server rejected your credentials. Could be password, expired token, missing scope. Fix: (1) for HTTP Basic: `-u user:pass`; (2) for bearer tokens: `-H \"Authorization: Bearer <token>\"`; (3) `-v` shows the WWW-Authenticate challenge and your Authorization header; (4) for OAuth2 flows, verify the token isn't expired \u2014 check `iat` and `exp` in the JWT payload; (5) for FTP: `--user user:pass` or embed in URL: `ftp://user:pass@host/path`.",
+      "source_url": "https://curl.se/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-u user:pass",
+        "-H \"Authorization: Bearer <token>\"",
+        "-v",
+        "iat",
+        "exp",
+        "--user user:pass"
+      ],
+      "steps": [
+        "for HTTP Basic: `-u user:pass`",
+        "for bearer tokens: `-H \"Authorization: Bearer <token>\"`",
+        "`-v` shows the WWW-Authenticate challenge and your Authorization header",
+        "for OAuth2 flows, verify the token isn't expired \u2014 check `iat` and `exp` in the JWT payload",
+        "for FTP: `--user user:pass` or embed in URL: `ftp://user:pass@host/path`"
+      ],
+      "constraints": [
+        "for OAuth2 flows, verify the token isn't expired \u2014 check `iat` and `exp` in the JWT payload",
+        "Requires binaries or commands referenced in examples: --user, -H, -u, -v, exp, iat."
+      ],
+      "effect": {
+        "kind": "secret_exposure",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": true,
+        "risk_level": "high",
+        "reasons": [
+          "The action references secrets, tokens, or API keys."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-errors",
+        "legacy_title": "curl error 67: Login denied (authentication failed)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "curl-error-curl-error-1-unsupported-protocol",
+      "kind": "error",
+      "title": "curl error 1: Unsupported protocol",
+      "statement": "URL scheme isn't supported by your curl build. Fix: (1) `curl -V` shows compiled-in protocols (look at 'Protocols:' line); (2) common missing on minimal builds: LDAPS, RTMP, GOPHER, SCP, SFTP; (3) reinstall a fuller curl: `apt install curl` (Debian provides most), or `brew install curl --with-openssl --with-libssh2`; (4) check the URL \u2014 typo in scheme (`htps://` instead of `https://`).",
+      "source_url": "https://curl.se/docs/docs/protdocs.html",
+      "source_type": "official_docs",
+      "commands": [
+        "curl -V",
+        "apt install curl",
+        "brew install curl --with-openssl --with-libssh2",
+        "htps://",
+        "https://"
+      ],
+      "steps": [
+        "`curl -V` shows compiled-in protocols (look at 'Protocols:' line)",
+        "common missing on minimal builds: LDAPS, RTMP, GOPHER, SCP, SFTP",
+        "reinstall a fuller curl: `apt install curl` (Debian provides most), or `brew install curl --with-openssl --with-libssh2`",
+        "check the URL \u2014 typo in scheme (`htps://` instead of `https://`)"
+      ],
+      "constraints": [
+        "check the URL \u2014 typo in scheme (`htps://` instead of `https://`)",
+        "Requires binaries or commands referenced in examples: apt, brew, curl, htps://, https://."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-errors",
+        "legacy_title": "curl error 1: Unsupported protocol"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "curl-error-curl-error-51-ssl-public-key-does-not-match-pinned-key",
+      "kind": "error",
+      "title": "curl error 51: SSL public key does not match pinned key",
+      "statement": "You used `--pinnedpubkey` and the server's cert pubkey doesn't match. Either pin is wrong or you're under MITM. Fix: (1) get current pubkey: `openssl s_client -connect host:443 < /dev/null 2>/dev/null | openssl x509 -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | base64`; (2) update your pin if the server rotated keys legitimately; (3) if pin was right and server changed unexpectedly, investigate \u2014 it could be MITM.",
+      "source_url": "https://curl.se/docs/docs/sslcerts.html",
+      "source_type": "official_docs",
+      "commands": [
+        "--pinnedpubkey",
+        "openssl s_client -connect host:443 < /dev/null 2>/dev/null | openssl x509 -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | base64"
+      ],
+      "steps": [
+        "get current pubkey: `openssl s_client -connect host:443 < /dev/null 2>/dev/null | openssl x509 -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | base64`",
+        "update your pin if the server rotated keys legitimately",
+        "if pin was right and server changed unexpectedly, investigate \u2014 it could be MITM"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: --pinnedpubkey, openssl."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-errors",
+        "legacy_title": "curl error 51: SSL public key does not match pinned key"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "curl-error-curl-error-52-empty-reply-from-server",
+      "kind": "error",
+      "title": "curl error 52: Empty reply from server",
+      "statement": "Server accepted the connection but closed it without sending anything. Often a server-side crash, misconfigured proxy, or load balancer dropping the connection. Fix: (1) retry with delay: `--retry 3 --retry-delay 2`; (2) test from different client to rule out request-specific issues; (3) check server logs for the timestamp; (4) for slow servers, allow more time: `--max-time 60`.",
+      "source_url": "https://curl.se/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "--retry 3 --retry-delay 2",
+        "--max-time 60"
+      ],
+      "steps": [
+        "retry with delay: `--retry 3 --retry-delay 2`",
+        "test from different client to rule out request-specific issues",
+        "check server logs for the timestamp",
+        "for slow servers, allow more time: `--max-time 60`"
+      ],
+      "constraints": [
+        "check server logs for the timestamp",
+        "Requires binaries or commands referenced in examples: --max-time, --retry."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-errors",
+        "legacy_title": "curl error 52: Empty reply from server"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "curl-error-curl-warning-tlsv1-tlsv1-1-connection-refused",
+      "kind": "error",
+      "title": "curl warning: TLSv1 / TLSv1.1 connection refused",
+      "statement": "Server requires TLS 1.2 or 1.3; your curl is offering older. Fix: (1) usually you don't need to do anything \u2014 modern curl negotiates the best version; (2) if you explicitly set `--tlsv1.0`, remove it; (3) for forcing newer: `--tlsv1.2` or `--tls-max 1.3`.",
+      "source_url": "https://curl.se/docs/docs/sslcerts.html",
+      "source_type": "official_docs",
+      "commands": [
+        "--tlsv1.0",
+        "--tlsv1.2",
+        "--tls-max 1.3"
+      ],
+      "steps": [
+        "usually you don't need to do anything \u2014 modern curl negotiates the best version",
+        "if you explicitly set `--tlsv1.0`, remove it",
+        "for forcing newer: `--tlsv1.2` or `--tls-max 1.3`"
+      ],
+      "constraints": [
+        "usually you don't need to do anything \u2014 modern curl negotiates the best version",
+        "Requires binaries or commands referenced in examples: --tls-max, --tlsv1.0, --tlsv1.2."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-errors",
+        "legacy_title": "curl warning: TLSv1 / TLSv1.1 connection refused"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "curl-error-curl-error-33-http-server-doesn-t-support-the-requested-range",
+      "kind": "error",
+      "title": "curl error 33: HTTP server doesn't support the requested range",
+      "statement": "You used `--range` (`-r`) but the server doesn't support partial content. Fix: (1) check with HEAD: `curl -I <url>` \u2014 look for `Accept-Ranges: bytes` (or missing); (2) drop the range \u2014 many servers support full GET only; (3) some servers support range for binary files but not text/dynamic responses.",
+      "source_url": "https://curl.se/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "--range",
+        "-r",
+        "curl -I <url>",
+        "Accept-Ranges: bytes"
+      ],
+      "steps": [
+        "check with HEAD: `curl -I <url>` \u2014 look for `Accept-Ranges: bytes` (or missing)",
+        "drop the range \u2014 many servers support full GET only",
+        "some servers support range for binary files but not text/dynamic responses"
+      ],
+      "constraints": [
+        "check with HEAD: `curl -I <url>` \u2014 look for `Accept-Ranges: bytes` (or missing)",
+        "Requires binaries or commands referenced in examples: --range, -r, Accept-Ranges:, curl."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-errors",
+        "legacy_title": "curl error 33: HTTP server doesn't support the requested range"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "curl-error-curl-error-could-not-resolve-host-with-resolve-flag",
+      "kind": "error",
+      "title": "curl error: Could not resolve host with --resolve flag",
+      "statement": "You tried `--resolve host:port:ip` but the syntax was wrong. Fix: (1) format is exactly `host:port:ip` \u2014 three colon-separated parts: `--resolve example.com:443:1.2.3.4`; (2) you can repeat: `--resolve a.com:443:1.2.3.4 --resolve b.com:443:5.6.7.8`; (3) for IPv6: `--resolve example.com:443:[2001:db8::1]`; (4) for HSTS/HTTPS, must include the actual port the URL targets.",
+      "source_url": "https://curl.se/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "--resolve host:port:ip",
+        "host:port:ip",
+        "--resolve example.com:443:1.2.3.4",
+        "--resolve a.com:443:1.2.3.4 --resolve b.com:443:5.6.7.8",
+        "--resolve example.com:443:[2001:db8::1]"
+      ],
+      "steps": [
+        "format is exactly `host:port:ip` \u2014 three colon-separated parts: `--resolve example.com:443:1.2.3.4`",
+        "you can repeat: `--resolve a.com:443:1.2.3.4 --resolve b.com:443:5.6.7.8`",
+        "for IPv6: `--resolve example.com:443:[2001:db8::1]`",
+        "for HSTS/HTTPS, must include the actual port the URL targets"
+      ],
+      "constraints": [
+        "for HSTS/HTTPS, must include the actual port the URL targets",
+        "Requires binaries or commands referenced in examples: --resolve, host:port:ip."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-errors",
+        "legacy_title": "curl error: Could not resolve host with --resolve flag"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "curl-error-curl-error-bad-command-line-option",
+      "kind": "error",
+      "title": "curl error: bad command line option",
+      "statement": "curl rejected one of your flags. Different versions support different flags. Fix: (1) check the version: `curl -V`; (2) check the option syntax in the manpage; (3) older flag names: `--data-urlencode` vs `--data-encode`; (4) some flags are protocol-specific (e.g., `--ftp-port` only works with FTP URLs).",
+      "source_url": "https://curl.se/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "curl -V",
+        "--data-urlencode",
+        "--data-encode",
+        "--ftp-port"
+      ],
+      "steps": [
+        "check the version: `curl -V`",
+        "check the option syntax in the manpage",
+        "older flag names: `--data-urlencode` vs `--data-encode`",
+        "some flags are protocol-specific (e.g., `--ftp-port` only works with FTP URLs)"
+      ],
+      "constraints": [
+        "check the version: `curl -V`",
+        "check the option syntax in the manpage",
+        "Requires binaries or commands referenced in examples: --data-encode, --data-urlencode, --ftp-port, curl."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-errors",
+        "legacy_title": "curl error: bad command line option"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "curl-error-curl-warning-binary-output-can-mess-up-your-terminal",
+      "kind": "error",
+      "title": "curl: warning: Binary output can mess up your terminal",
+      "statement": "curl detected the response body is binary and the output is a terminal. By default it stops to protect you. Fix: (1) `-o file` redirects to a file instead \u2014 preferred for binaries; (2) `--output -` forces stdout (useful in pipes); (3) `-O` saves to the URL's filename; (4) `-s --no-progress-bar` to silence the warning if you genuinely want binary on stdout (still risky).",
+      "source_url": "https://curl.se/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-o file",
+        "--output -",
+        "-O",
+        "-s --no-progress-bar"
+      ],
+      "steps": [
+        "`-o file` redirects to a file instead \u2014 preferred for binaries",
+        "`--output -` forces stdout (useful in pipes)",
+        "`-O` saves to the URL's filename",
+        "`-s --no-progress-bar` to silence the warning if you genuinely want binary on stdout (still risky)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: --output, -O, -o, -s."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-errors",
+        "legacy_title": "curl: warning: Binary output can mess up your terminal"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "curl-error-curl-error-cookie-domain-mismatch",
+      "kind": "error",
+      "title": "curl error: cookie domain mismatch",
+      "statement": "Server set a cookie for a domain that doesn't match the request. Curl warns; cookie is dropped. Fix: usually a server bug \u2014 the server should match its own cookie Domain attribute to its hostname. Workaround: write cookies manually with `-b \"name=value\"` (you're explicit about what's sent) instead of relying on automatic jar tracking; or use `-c jar.txt` to capture and `-b jar.txt` to replay \u2014 the jar is more permissive than strict RFC compliance.",
+      "source_url": "https://curl.se/docs/docs/cookies.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-b \"name=value\"",
+        "-c jar.txt",
+        "-b jar.txt"
+      ],
+      "steps": [
+        "usually a server bug \u2014 the server should match its own cookie Domain attribute to its hostname. Workaround: write cookies manually with `-b \"name=value\"` (you're explicit about what's sent) instead of relying on automatic jar tracking; or use `-c jar.txt` to capture and `-b jar.txt` to replay \u2014 the jar is more permissive than strict RFC compliance"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -b, -c."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-errors",
+        "legacy_title": "curl error: cookie domain mismatch"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "curl-error-curl-error-http-1-1-100-continue-but-server-expected-request-body",
+      "kind": "error",
+      "title": "curl error: HTTP/1.1 100 Continue but server expected request body",
+      "statement": "You used `Expect: 100-continue` (or curl set it automatically for big POST/PUT) but the server is misbehaving. Fix: (1) explicitly disable the Expect header: `-H \"Expect:\"` (empty value = removed); (2) some old/weird servers (some IIS configs, F5 LB) don't speak Expect \u2014 common on legacy enterprise APIs; (3) `--expect100-timeout <seconds>` to wait less time for the server's 100 response.",
+      "source_url": "https://curl.se/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "Expect: 100-continue",
+        "-H \"Expect:\"",
+        "--expect100-timeout <seconds>"
+      ],
+      "steps": [
+        "explicitly disable the Expect header: `-H \"Expect:\"` (empty value = removed)",
+        "some old/weird servers (some IIS configs, F5 LB) don't speak Expect \u2014 common on legacy enterprise APIs",
+        "`--expect100-timeout <seconds>` to wait less time for the server's 100 response"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: --expect100-timeout, -H, Expect:."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-errors",
+        "legacy_title": "curl error: HTTP/1.1 100 Continue but server expected request body"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "curl-error-curl-error-data-urlencode-failed-to-encode",
+      "kind": "error",
+      "title": "curl error: --data-urlencode failed to encode",
+      "statement": "URL-encoding failed, often because the input had encoding issues. Fix: (1) ensure input is valid UTF-8; (2) for special form fields: `--data-urlencode \"key=value with spaces\"`; (3) for fields from a file: `--data-urlencode \"key@filename\"`; (4) for prefilled key + value-only encoding: `--data-urlencode \"=needs-encoding\"`.",
+      "source_url": "https://curl.se/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "--data-urlencode \"key=value with spaces\"",
+        "--data-urlencode \"key@filename\"",
+        "--data-urlencode \"=needs-encoding\""
+      ],
+      "steps": [
+        "ensure input is valid UTF-8",
+        "for special form fields: `--data-urlencode \"key=value with spaces\"`",
+        "for fields from a file: `--data-urlencode \"key@filename\"`",
+        "for prefilled key + value-only encoding: `--data-urlencode \"=needs-encoding\"`"
+      ],
+      "constraints": [
+        "ensure input is valid UTF-8",
+        "for prefilled key + value-only encoding: `--data-urlencode \"=needs-encoding\"`",
+        "Requires binaries or commands referenced in examples: --data-urlencode."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-errors",
+        "legacy_title": "curl error: --data-urlencode failed to encode"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "curl-error-curl-error-write-out-w-format-malformed",
+      "kind": "error",
+      "title": "curl error: write-out (-w) format malformed",
+      "statement": "Your --write-out format string has bad syntax. Fix: (1) variables go in `%{varname}`: `-w \"%{http_code} %{time_total}\\n\"`; (2) escape literal % with `%%`; (3) full list of variables in the manpage's WRITE-OUT section; (4) for JSON output: `-w \"%{json}\\n\"` (curl 7.70+) dumps everything as JSON \u2014 much easier than building format strings.",
+      "source_url": "https://curl.se/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-w \"%{http_code} %{time_total}\\n\"",
+        "-w \"%{json}\\n\""
+      ],
+      "steps": [
+        "variables go in `%{varname}`: `-w \"%{http_code} %{time_total}\\n\"`",
+        "escape literal % with `%%`",
+        "full list of variables in the manpage's WRITE-OUT section",
+        "for JSON output: `-w \"%{json}\\n\"` (curl 7.70+) dumps everything as JSON \u2014 much easier than building format strings"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -w."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-errors",
+        "legacy_title": "curl error: write-out (-w) format malformed"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "curl-error-curl-error-could-not-open-the-output-file-o",
+      "kind": "error",
+      "title": "curl error: Could not open the output file (-o)",
+      "statement": "Directory doesn't exist or you lack permission. Fix: (1) `--create-dirs` to auto-create parent directories: `curl -o output/sub/dir/file.txt --create-dirs <url>`; (2) verify the parent directory exists and is writable; (3) for downloads using URL's filename: `-O --output-dir ./downloads`.",
+      "source_url": "https://curl.se/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "--create-dirs",
+        "curl -o output/sub/dir/file.txt --create-dirs <url>",
+        "-O --output-dir ./downloads"
+      ],
+      "steps": [
+        "`--create-dirs` to auto-create parent directories: `curl -o output/sub/dir/file.txt --create-dirs <url>`",
+        "verify the parent directory exists and is writable",
+        "for downloads using URL's filename: `-O --output-dir ./downloads`"
+      ],
+      "constraints": [
+        "verify the parent directory exists and is writable",
+        "Requires binaries or commands referenced in examples: --create-dirs, -O, curl."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-errors",
+        "legacy_title": "curl error: Could not open the output file (-o)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "curl-recipe-curl-recipe-send-a-post-request-with-json-body",
+      "kind": "recipe",
+      "title": "curl recipe: send a POST request with JSON body",
+      "statement": "Standard REST API call. Pattern: `curl -X POST https://api.example.com/users -H \"Content-Type: application/json\" -d '{\"name\":\"Alice\",\"email\":\"alice@example.com\"}'`. From a file: `curl -X POST <url> -H \"Content-Type: application/json\" -d @data.json`. With pretty-printed response: `curl ... | jq .`. With auth: add `-H \"Authorization: Bearer <token>\"` or `-u user:pass` for basic. `-d` automatically sets POST + Content-Type to application/x-www-form-urlencoded unless overridden \u2014 explicit -H is safer.",
+      "source_url": "https://curl.se/docs/docs/httpscripting.html",
+      "source_type": "official_docs",
+      "commands": [
+        "curl -X POST https://api.example.com/users -H \"Content-Type: application/json\" -d '{\"name\":\"Alice\",\"email\":\"alice@example.com\"}'",
+        "curl -X POST <url> -H \"Content-Type: application/json\" -d @data.json",
+        "curl ... | jq .",
+        "-H \"Authorization: Bearer <token>\"",
+        "-u user:pass",
+        "-d"
+      ],
+      "steps": [
+        "Standard REST API call. Pattern: `curl -X POST https://api.example.com/users -H \"Content-Type: application/json\" -d '{\"name\":\"Alice\",\"email\":\"alice@example.com\"}'`. From a file: `curl -X POST <url> -H \"Content-Type: application/json\" -d @data.json`. With pretty-printed response: `curl ... | jq .`. With auth: add `-H \"Authorization: Bearer <token>\"` or `-u user:pass` for basic. `-d` automatically sets POST + Content-Type to application/x-www-form-urlencoded unless overridden \u2014 explicit -H is safer"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -H, -d, -u, curl."
+      ],
+      "effect": {
+        "kind": "secret_exposure",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": true,
+        "risk_level": "high",
+        "reasons": [
+          "The action references secrets, tokens, or API keys."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-recipes",
+        "legacy_title": "curl recipe: send a POST request with JSON body"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "curl-recipe-curl-recipe-upload-a-file-with-multipart-form-data",
+      "kind": "recipe",
+      "title": "curl recipe: upload a file with multipart/form-data",
+      "statement": "Mimic a browser form upload. Pattern: `curl -X POST https://example.com/upload -F \"file=@/path/to/file.png\" -F \"description=My upload\"`. The `-F` builds multipart/form-data. Mix file uploads with normal fields. Multiple files: `-F \"files[]=@file1.png\" -F \"files[]=@file2.png\"`. Specify the part's Content-Type: `-F \"file=@photo.jpg;type=image/jpeg\"`. Custom filename: `-F \"file=@photo.jpg;filename=user-pic.jpg\"`.",
+      "source_url": "https://curl.se/docs/docs/httpscripting.html",
+      "source_type": "official_docs",
+      "commands": [
+        "curl -X POST https://example.com/upload -F \"file=@/path/to/file.png\" -F \"description=My upload\"",
+        "-F",
+        "-F \"files[]=@file1.png\" -F \"files[]=@file2.png\"",
+        "-F \"file=@photo.jpg;type=image/jpeg\"",
+        "-F \"file=@photo.jpg;filename=user-pic.jpg\""
+      ],
+      "steps": [
+        "Mimic a browser form upload. Pattern: `curl -X POST https://example.com/upload -F \"file=@/path/to/file.png\" -F \"description=My upload\"`. The `-F` builds multipart/form-data. Mix file uploads with normal fields. Multiple files: `-F \"files[]=@file1.png\" -F \"files[]=@file2.png\"`. Specify the part's Content-Type: `-F \"file=@photo.jpg;type=image/jpeg\"`. Custom filename: `-F \"file=@photo.jpg;filename=user-pic.jpg\"`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -F, curl."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-recipes",
+        "legacy_title": "curl recipe: upload a file with multipart/form-data"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "curl-recipe-curl-recipe-download-a-file-with-progress",
+      "kind": "recipe",
+      "title": "curl recipe: download a file with progress",
+      "statement": "Save a remote file. Pattern: `curl -o local-file.tar.gz https://example.com/big.tar.gz`. Use the URL's filename: `curl -O https://example.com/big.tar.gz` (creates big.tar.gz locally). With progress bar: by default curl shows a progress meter; suppress with `-s`; force progress bar (no meter) with `-#`. Resume interrupted: `curl -C - -O <url>` (the `-` lets curl figure out the offset). Verify checksum after: `sha256sum local-file.tar.gz` and compare to upstream's published hash.",
+      "source_url": "https://curl.se/docs/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "curl -o local-file.tar.gz https://example.com/big.tar.gz",
+        "curl -O https://example.com/big.tar.gz",
+        "-s",
+        "curl -C - -O <url>",
+        "sha256sum local-file.tar.gz"
+      ],
+      "steps": [
+        "Save a remote file. Pattern: `curl -o local-file.tar.gz https://example.com/big.tar.gz`. Use the URL's filename: `curl -O https://example.com/big.tar.gz` (creates big.tar.gz locally). With progress bar: by default curl shows a progress meter; suppress with `-s`; force progress bar (no meter) with `-#`. Resume interrupted: `curl -C - -O <url>` (the `-` lets curl figure out the offset). Verify checksum after: `sha256sum local-file.tar.gz` and compare to upstream's published hash"
+      ],
+      "constraints": [
+        "Save a remote file. Pattern: `curl -o local-file.tar.gz https://example.com/big.tar.gz`. Use the URL's filename: `curl -O https://example.com/big.tar.gz` (creates big.tar.gz locally). With progress bar: by default curl shows a progress meter; suppress with `-s`; force progress bar (no meter) with `-#`. Resume interrupted: `curl -C - -O <url>` (the `-` lets curl figure out the offset). Verify checksum after: `sha256sum local-file.tar.gz` and compare to upstream's published hash",
+        "Requires binaries or commands referenced in examples: -s, curl, sha256sum."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-recipes",
+        "legacy_title": "curl recipe: download a file with progress"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "curl-recipe-curl-recipe-follow-redirects-and-show-the-final-url",
+      "kind": "recipe",
+      "title": "curl recipe: follow redirects and show the final URL",
+      "statement": "By default curl doesn't follow. Pattern: `curl -L <url>` follows 3xx redirects. Show final URL after redirects: `curl -L -o /dev/null -s -w \"%{url_effective}\\n\" <url>`. Limit redirect depth: `--max-redirs 5`. See all hops: `curl -L -v <url> 2>&1 | grep -E '> (GET|Host)|< Location'` (greps the verbose trace).",
+      "source_url": "https://curl.se/docs/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "curl -L <url>",
+        "curl -L -o /dev/null -s -w \"%{url_effective}\\n\" <url>",
+        "--max-redirs 5",
+        "curl -L -v <url> 2>&1 | grep -E '> (GET|Host)|< Location'"
+      ],
+      "steps": [
+        "By default curl doesn't follow. Pattern: `curl -L <url>` follows 3xx redirects. Show final URL after redirects: `curl -L -o /dev/null -s -w \"%{url_effective}\\n\" <url>`. Limit redirect depth: `--max-redirs 5`. See all hops: `curl -L -v <url> 2>&1 | grep -E '> (GET|Host)|< Location'` (greps the verbose trace)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: --max-redirs, curl."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-recipes",
+        "legacy_title": "curl recipe: follow redirects and show the final URL"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "curl-recipe-curl-recipe-send-custom-headers",
+      "kind": "recipe",
+      "title": "curl recipe: send custom headers",
+      "statement": "Use `-H \"Header: Value\"` repeatedly. Examples: `curl -H \"Accept: application/json\" -H \"X-API-Key: abc123\" -H \"User-Agent: MyBot/1.0\" <url>`. Remove a default header curl sends automatically: `-H \"Accept:\"` (empty value removes it). Replace User-Agent shortcut: `-A \"Mozilla/5.0...\"`. Replace Referer: `-e \"https://google.com\"`. For long headers in scripts, build them in shell vars or use `-K configfile` to keep the curl command readable.",
+      "source_url": "https://curl.se/docs/docs/httpscripting.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-H \"Header: Value\"",
+        "curl -H \"Accept: application/json\" -H \"X-API-Key: abc123\" -H \"User-Agent: MyBot/1.0\" <url>",
+        "-H \"Accept:\"",
+        "-A \"Mozilla/5.0...\"",
+        "-e \"https://google.com\"",
+        "-K configfile"
+      ],
+      "steps": [
+        "Use `-H \"Header: Value\"` repeatedly. Examples: `curl -H \"Accept: application/json\" -H \"X-API-Key: abc123\" -H \"User-Agent: MyBot/1.0\" <url>`. Remove a default header curl sends automatically: `-H \"Accept:\"` (empty value removes it). Replace User-Agent shortcut: `-A \"Mozilla/5.0...\"`. Replace Referer: `-e \"https://google.com\"`. For long headers in scripts, build them in shell vars or use `-K configfile` to keep the curl command readable"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -A, -H, -K, -e, curl."
+      ],
+      "effect": {
+        "kind": "secret_exposure",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": true,
+        "risk_level": "high",
+        "reasons": [
+          "The action references secrets, tokens, or API keys."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-recipes",
+        "legacy_title": "curl recipe: send custom headers"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "curl-recipe-curl-recipe-handle-cookies-session-persistence",
+      "kind": "recipe",
+      "title": "curl recipe: handle cookies (session persistence)",
+      "statement": "Capture cookies during login + replay them. Pattern: (1) Login + save cookies: `curl -c cookies.txt -d \"user=alice&pass=secret\" https://example.com/login`; (2) Subsequent requests with the same session: `curl -b cookies.txt https://example.com/api/me`; (3) For a complete flow: `curl -L -c cookies.txt -b cookies.txt <url>` (read AND write the same jar \u2014 preserves cookies set during redirects). Direct cookie strings (no jar): `curl -b \"sessionid=abc; csrf=xyz\" <url>`.",
+      "source_url": "https://curl.se/docs/docs/cookies.html",
+      "source_type": "official_docs",
+      "commands": [
+        "curl -c cookies.txt -d \"user=alice&pass=secret\" https://example.com/login",
+        "curl -b cookies.txt https://example.com/api/me",
+        "curl -L -c cookies.txt -b cookies.txt <url>",
+        "curl -b \"sessionid=abc; csrf=xyz\" <url>"
+      ],
+      "steps": [
+        "Capture cookies during login + replay them. Pattern:",
+        "Login + save cookies: `curl -c cookies.txt -d \"user=alice&pass=secret\" https://example.com/login`",
+        "Subsequent requests with the same session: `curl -b cookies.txt https://example.com/api/me`",
+        "For a complete flow: `curl -L -c cookies.txt -b cookies.txt <url>` (read AND write the same jar \u2014 preserves cookies set during redirects). Direct cookie strings (no jar): `curl -b \"sessionid=abc; csrf=xyz\" <url>`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: curl."
+      ],
+      "effect": {
+        "kind": "secret_exposure",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": true,
+        "risk_level": "high",
+        "reasons": [
+          "The action references secrets, tokens, or API keys."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-recipes",
+        "legacy_title": "curl recipe: handle cookies (session persistence)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "curl-recipe-curl-recipe-http-basic-authentication",
+      "kind": "recipe",
+      "title": "curl recipe: HTTP basic authentication",
+      "statement": "Send Authorization: Basic header. Inline: `curl -u alice:secret https://api.example.com/me`. Prompt for password (no shell history): `curl -u alice https://api.example.com/me` (curl prompts). From .netrc: `curl --netrc <url>` reads ~/.netrc for credentials. Embed in URL: `curl https://alice:secret@api.example.com/me` (works but exposes password in process listings).",
+      "source_url": "https://curl.se/docs/docs/httpscripting.html",
+      "source_type": "official_docs",
+      "commands": [
+        "curl -u alice:secret https://api.example.com/me",
+        "curl -u alice https://api.example.com/me",
+        "curl --netrc <url>",
+        "curl https://alice:secret@api.example.com/me"
+      ],
+      "steps": [
+        "Send Authorization: Basic header. Inline: `curl -u alice:secret https://api.example.com/me`. Prompt for password (no shell history): `curl -u alice https://api.example.com/me` (curl prompts). From .netrc: `curl --netrc <url>` reads ~/.netrc for credentials. Embed in URL: `curl https://alice:secret@api.example.com/me` (works but exposes password in process listings)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: curl."
+      ],
+      "effect": {
+        "kind": "secret_exposure",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": true,
+        "risk_level": "high",
+        "reasons": [
+          "The action references secrets, tokens, or API keys."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-recipes",
+        "legacy_title": "curl recipe: HTTP basic authentication"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "curl-recipe-curl-recipe-oauth-2-0-bearer-token",
+      "kind": "recipe",
+      "title": "curl recipe: OAuth 2.0 bearer token",
+      "statement": "Standard pattern for modern APIs. `curl -H \"Authorization: Bearer eyJhbGc...token...here\" https://api.example.com/v1/users`. Get the token first via curl too \u2014 typical OAuth client_credentials grant: `TOKEN=$(curl -s -X POST https://auth.example.com/token -d \"grant_type=client_credentials&client_id=$ID&client_secret=$SECRET\" | jq -r .access_token)`. Then use: `curl -H \"Authorization: Bearer $TOKEN\" <api-url>`. Refresh expired tokens with `grant_type=refresh_token&refresh_token=<rt>`.",
+      "source_url": "https://curl.se/docs/docs/httpscripting.html",
+      "source_type": "official_docs",
+      "commands": [
+        "curl -H \"Authorization: Bearer eyJhbGc...token...here\" https://api.example.com/v1/users",
+        "curl -H \"Authorization: Bearer $TOKEN\" <api-url>"
+      ],
+      "steps": [
+        "Standard pattern for modern APIs. `curl -H \"Authorization: Bearer eyJhbGc...token...here\" https://api.example.com/v1/users`. Get the token first via curl too \u2014 typical OAuth client_credentials grant: `TOKEN=$(curl -s -X POST https://auth.example.com/token -d \"grant_type=client_credentials&client_id=$ID&client_secret=$SECRET\" | jq -r .access_token)`. Then use: `curl -H \"Authorization: Bearer $TOKEN\" <api-url>`. Refresh expired tokens with `grant_type=refresh_token&refresh_token=<rt>`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: curl."
+      ],
+      "effect": {
+        "kind": "secret_exposure",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": true,
+        "risk_level": "high",
+        "reasons": [
+          "The action references secrets, tokens, or API keys."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-recipes",
+        "legacy_title": "curl recipe: OAuth 2.0 bearer token"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "curl-recipe-curl-recipe-test-only-with-head-request",
+      "kind": "recipe",
+      "title": "curl recipe: test only with HEAD request",
+      "statement": "Get just response headers (no body). `curl -I <url>` sends HEAD. Useful for: checking if a URL exists, inspecting Content-Length, getting Last-Modified for caching, checking Content-Type. For GET that just shows headers without saving body: `curl -i -o /dev/null <url>`. Some servers reject HEAD \u2014 fall back to GET with output discarded: `curl -X GET -o /dev/null -D - <url>` (`-D -` dumps headers to stdout).",
+      "source_url": "https://curl.se/docs/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "curl -I <url>",
+        "curl -i -o /dev/null <url>",
+        "curl -X GET -o /dev/null -D - <url>",
+        "-D -"
+      ],
+      "steps": [
+        "Get just response headers (no body). `curl -I <url>` sends HEAD. Useful for: checking if a URL exists, inspecting Content-Length, getting Last-Modified for caching, checking Content-Type. For GET that just shows headers without saving body: `curl -i -o /dev/null <url>`. Some servers reject HEAD \u2014 fall back to GET with output discarded: `curl -X GET -o /dev/null -D - <url>` (`-D -` dumps headers to stdout)"
+      ],
+      "constraints": [
+        "Get just response headers (no body). `curl -I <url>` sends HEAD. Useful for: checking if a URL exists, inspecting Content-Length, getting Last-Modified for caching, checking Content-Type. For GET that just shows headers without saving body: `curl -i -o /dev/null <url>`. Some servers reject HEAD \u2014 fall back to GET with output discarded: `curl -X GET -o /dev/null -D - <url>` (`-D -` dumps headers to stdout)",
+        "Requires binaries or commands referenced in examples: -D, curl."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-recipes",
+        "legacy_title": "curl recipe: test only with HEAD request"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "curl-recipe-curl-recipe-send-a-put-or-delete",
+      "kind": "recipe",
+      "title": "curl recipe: send a PUT or DELETE",
+      "statement": "Just use `-X <METHOD>`. Examples: PUT with JSON: `curl -X PUT -H \"Content-Type: application/json\" -d '{\"name\":\"bob\"}' https://api.example.com/users/123`. DELETE: `curl -X DELETE https://api.example.com/users/123 -H \"Authorization: Bearer $TOKEN\"`. PATCH (partial update): `curl -X PATCH -H \"Content-Type: application/merge-patch+json\" -d '{\"email\":\"new@email\"}' <url>`. Note: omitting `-X` and using `-d` defaults to POST; explicit `-X PUT` is needed for body-bearing PUT.",
+      "source_url": "https://curl.se/docs/docs/httpscripting.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-X <METHOD>",
+        "curl -X PUT -H \"Content-Type: application/json\" -d '{\"name\":\"bob\"}' https://api.example.com/users/123",
+        "curl -X DELETE https://api.example.com/users/123 -H \"Authorization: Bearer $TOKEN\"",
+        "curl -X PATCH -H \"Content-Type: application/merge-patch+json\" -d '{\"email\":\"new@email\"}' <url>",
+        "-X",
+        "-d",
+        "-X PUT"
+      ],
+      "steps": [
+        "Just use `-X <METHOD>`. Examples: PUT with JSON: `curl -X PUT -H \"Content-Type: application/json\" -d '{\"name\":\"bob\"}' https://api.example.com/users/123`. DELETE: `curl -X DELETE https://api.example.com/users/123 -H \"Authorization: Bearer $TOKEN\"`. PATCH (partial update): `curl -X PATCH -H \"Content-Type: application/merge-patch+json\" -d '{\"email\":\"new@email\"}' <url>`. Note: omitting `-X` and using `-d` defaults to POST; explicit `-X PUT` is needed for body-bearing PUT"
+      ],
+      "constraints": [
+        "Just use `-X <METHOD>`. Examples: PUT with JSON: `curl -X PUT -H \"Content-Type: application/json\" -d '{\"name\":\"bob\"}' https://api.example.com/users/123`. DELETE: `curl -X DELETE https://api.example.com/users/123 -H \"Authorization: Bearer $TOKEN\"`. PATCH (partial update): `curl -X PATCH -H \"Content-Type: application/merge-patch+json\" -d '{\"email\":\"new@email\"}' <url>`. Note: omitting `-X` and using `-d` defaults to POST; explicit `-X PUT` is needed for body-bearing PUT",
+        "Requires binaries or commands referenced in examples: -X, -d, curl."
+      ],
+      "effect": {
+        "kind": "secret_exposure",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": true,
+        "risk_level": "high",
+        "reasons": [
+          "The action references secrets, tokens, or API keys."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-recipes",
+        "legacy_title": "curl recipe: send a PUT or DELETE"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "curl-recipe-curl-recipe-debug-a-failing-request",
+      "kind": "recipe",
+      "title": "curl recipe: debug a failing request",
+      "statement": "Verbose flag chain for triage. `-v` (verbose): shows request + response headers, TLS handshake details. `--trace dump.txt` writes full request and response binary. `--trace-ascii dump.txt` is more readable. Pretty timing breakdown: `curl -w \"DNS: %{time_namelookup} TCP: %{time_connect} TLS: %{time_appconnect} TTFB: %{time_starttransfer} Total: %{time_total}\\n\" -o /dev/null -s <url>`. Failure isolation: try `-k` to skip cert check, `--http1.1` to skip HTTP/2 \u2014 narrows down the layer.",
+      "source_url": "https://curl.se/docs/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-v",
+        "--trace dump.txt",
+        "--trace-ascii dump.txt",
+        "curl -w \"DNS: %{time_namelookup} TCP: %{time_connect} TLS: %{time_appconnect} TTFB: %{time_starttransfer} Total: %{time_total}\\n\" -o /dev/null -s <url>",
+        "-k",
+        "--http1.1"
+      ],
+      "steps": [
+        "Verbose flag chain for triage. `-v` (verbose): shows request + response headers, TLS handshake details. `--trace dump.txt` writes full request and response binary. `--trace-ascii dump.txt` is more readable. Pretty timing breakdown: `curl -w \"DNS: %{time_namelookup} TCP: %{time_connect} TLS: %{time_appconnect} TTFB: %{time_starttransfer} Total: %{time_total}\\n\" -o /dev/null -s <url>`. Failure isolation: try `-k` to skip cert check, `--http1.1` to skip HTTP/2 \u2014 narrows down the layer"
+      ],
+      "constraints": [
+        "Verbose flag chain for triage. `-v` (verbose): shows request + response headers, TLS handshake details. `--trace dump.txt` writes full request and response binary. `--trace-ascii dump.txt` is more readable. Pretty timing breakdown: `curl -w \"DNS: %{time_namelookup} TCP: %{time_connect} TLS: %{time_appconnect} TTFB: %{time_starttransfer} Total: %{time_total}\\n\" -o /dev/null -s <url>`. Failure isolation: try `-k` to skip cert check, `--http1.1` to skip HTTP/2 \u2014 narrows down the layer",
+        "Requires binaries or commands referenced in examples: --http1.1, --trace, --trace-ascii, -k, -v, curl."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-recipes",
+        "legacy_title": "curl recipe: debug a failing request"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "curl-recipe-curl-recipe-pretty-print-response-as-json",
+      "kind": "recipe",
+      "title": "curl recipe: pretty-print response as JSON",
+      "statement": "Pipe through jq. `curl -s https://api.example.com/users | jq .` formats JSON output indented. Extract specific fields: `curl -s <url> | jq '.users[].email'`. Show just HTTP status + body: `curl -s -w \"\\n\\nHTTP: %{http_code}\\n\" <url>`. Combined check + parse: `curl -fsSL <url> | jq .` (the `-f` fails on HTTP 4xx/5xx, `-s` silent, `-S` show errors).",
+      "source_url": "https://curl.se/docs/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "curl -s https://api.example.com/users | jq .",
+        "curl -s <url> | jq '.users[].email'",
+        "curl -s -w \"\\n\\nHTTP: %{http_code}\\n\" <url>",
+        "curl -fsSL <url> | jq .",
+        "-f",
+        "-s",
+        "-S"
+      ],
+      "steps": [
+        "Pipe through jq. `curl -s https://api.example.com/users | jq .` formats JSON output indented. Extract specific fields: `curl -s <url> | jq '.users[].email'`. Show just HTTP status + body: `curl -s -w \"\\n\\nHTTP: %{http_code}\\n\" <url>`. Combined check + parse: `curl -fsSL <url> | jq .` (the `-f` fails on HTTP 4xx/5xx, `-s` silent, `-S` show errors)"
+      ],
+      "constraints": [
+        "Pipe through jq. `curl -s https://api.example.com/users | jq .` formats JSON output indented. Extract specific fields: `curl -s <url> | jq '.users[].email'`. Show just HTTP status + body: `curl -s -w \"\\n\\nHTTP: %{http_code}\\n\" <url>`. Combined check + parse: `curl -fsSL <url> | jq .` (the `-f` fails on HTTP 4xx/5xx, `-s` silent, `-S` show errors)",
+        "Requires binaries or commands referenced in examples: -S, -f, -s, curl."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-recipes",
+        "legacy_title": "curl recipe: pretty-print response as JSON"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "curl-recipe-curl-recipe-send-raw-binary-body-data-binary",
+      "kind": "recipe",
+      "title": "curl recipe: send raw binary body (--data-binary)",
+      "statement": "`-d` munges newlines (strips them). `--data-binary` sends bytes as-is. Use for: uploading raw files where exact byte stream matters, sending pre-formatted JSON files. `curl -X POST --data-binary @file.bin -H \"Content-Type: application/octet-stream\" <url>`. Difference: `-d @file.txt` strips newlines from file content; `--data-binary @file.txt` preserves them. For JSON, always use `--data-binary` or escape newlines yourself.",
+      "source_url": "https://curl.se/docs/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-d",
+        "--data-binary",
+        "curl -X POST --data-binary @file.bin -H \"Content-Type: application/octet-stream\" <url>",
+        "-d @file.txt",
+        "--data-binary @file.txt"
+      ],
+      "steps": [
+        "`-d` munges newlines (strips them). `--data-binary` sends bytes as-is. Use for: uploading raw files where exact byte stream matters, sending pre-formatted JSON files. `curl -X POST --data-binary @file.bin -H \"Content-Type: application/octet-stream\" <url>`. Difference: `-d @file.txt` strips newlines from file content; `--data-binary @file.txt` preserves them. For JSON, always use `--data-binary` or escape newlines yourself"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: --data-binary, -d, curl."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-recipes",
+        "legacy_title": "curl recipe: send raw binary body (--data-binary)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "curl-recipe-curl-recipe-timing-measurements-observability",
+      "kind": "recipe",
+      "title": "curl recipe: timing measurements + observability",
+      "statement": "`curl -w` exposes detailed timing. Standard breakdown: `curl -w \"@curl-format.txt\" -o /dev/null -s <url>` where curl-format.txt contains: `     time_namelookup:  %{time_namelookup}\\n        time_connect:  %{time_connect}\\n     time_appconnect:  %{time_appconnect}\\n    time_pretransfer:  %{time_pretransfer}\\n       time_redirect:  %{time_redirect}\\n  time_starttransfer:  %{time_starttransfer}\\n                     ----------\\n          time_total:  %{time_total}\\n`. Sum: NAMELOOKUP < CONNECT < APPCONNECT (TLS) < PRETRANSFER < STARTTRANSFER (TTFB) < TOTAL.",
+      "source_url": "https://curl.se/docs/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "curl -w",
+        "curl -w \"@curl-format.txt\" -o /dev/null -s <url>"
+      ],
+      "steps": [
+        "`curl -w` exposes detailed timing. Standard breakdown: `curl -w \"@curl-format.txt\" -o /dev/null -s <url>` where curl-format.txt contains: ` time_namelookup: %{time_namelookup}\\n time_connect: %{time_connect}\\n time_appconnect: %{time_appconnect}\\n time_pretransfer: %{time_pretransfer}\\n time_redirect: %{time_redirect}\\n time_starttransfer: %{time_starttransfer}\\n ----------\\n time_total: %{time_total}\\n`. Sum: NAMELOOKUP < CONNECT < APPCONNECT (TLS) < PRETRANSFER < STARTTRANSFER (TTFB) < TOTAL"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: curl."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-recipes",
+        "legacy_title": "curl recipe: timing measurements + observability"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "curl-recipe-curl-recipe-retry-with-backoff",
+      "kind": "recipe",
+      "title": "curl recipe: retry with backoff",
+      "statement": "Built-in retry: `--retry 5` retries up to 5 times. Pair with `--retry-delay <sec>` (linear delay) or `--retry-max-time <sec>` (total budget). Modern curl supports exponential backoff via `--retry-all-errors` (retry on any error, not just transient ones \u2014 be careful with side-effect-having methods). Full pattern for a script: `curl -fsS --retry 5 --retry-delay 5 --retry-max-time 60 --connect-timeout 10 -o file <url>`. For 5xx-only retry: combine with `-f` so 4xx exits immediately while 5xx retries.",
+      "source_url": "https://curl.se/docs/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "--retry 5",
+        "--retry-delay <sec>",
+        "--retry-max-time <sec>",
+        "--retry-all-errors",
+        "curl -fsS --retry 5 --retry-delay 5 --retry-max-time 60 --connect-timeout 10 -o file <url>",
+        "-f"
+      ],
+      "steps": [
+        "Built-in retry: `--retry 5` retries up to 5 times. Pair with `--retry-delay <sec>` (linear delay) or `--retry-max-time <sec>` (total budget). Modern curl supports exponential backoff via `--retry-all-errors` (retry on any error, not just transient ones \u2014 be careful with side-effect-having methods). Full pattern for a script: `curl -fsS --retry 5 --retry-delay 5 --retry-max-time 60 --connect-timeout 10 -o file <url>`. For 5xx-only retry: combine with `-f` so 4xx exits immediately while 5xx retries"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: --retry, --retry-all-errors, --retry-delay, --retry-max-time, -f, curl."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-recipes",
+        "legacy_title": "curl recipe: retry with backoff"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "curl-recipe-curl-recipe-parallel-requests-one-curl-invocation",
+      "kind": "recipe",
+      "title": "curl recipe: parallel requests (one curl invocation)",
+      "statement": "Run multiple URLs in parallel from one curl. `curl -Z https://a.com https://b.com https://c.com -o a.html -o b.html -o c.html`. The `-Z` (`--parallel`) launches them concurrently. Default 50 parallel, override with `--parallel-max <N>`. Or per-URL config with `--next` (`-:`): `curl -d \"x=1\" https://a.com -: -d \"x=2\" https://b.com -: -d \"x=3\" https://c.com`. Useful for: warming caches, batch API calls, multi-mirror downloads.",
+      "source_url": "https://curl.se/docs/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "curl -Z https://a.com https://b.com https://c.com -o a.html -o b.html -o c.html",
+        "-Z",
+        "--parallel",
+        "--parallel-max <N>",
+        "--next",
+        "curl -d \"x=1\" https://a.com -: -d \"x=2\" https://b.com -: -d \"x=3\" https://c.com"
+      ],
+      "steps": [
+        "Run multiple URLs in parallel from one curl. `curl -Z https://a.com https://b.com https://c.com -o a.html -o b.html -o c.html`. The `-Z` (`--parallel`) launches them concurrently. Default 50 parallel, override with `--parallel-max <N>`. Or per-URL config with `--next` (`-:`): `curl -d \"x=1\" https://a.com -: -d \"x=2\" https://b.com -: -d \"x=3\" https://c.com`. Useful for: warming caches, batch API calls, multi-mirror downloads"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: --next, --parallel, --parallel-max, -Z, curl."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-recipes",
+        "legacy_title": "curl recipe: parallel requests (one curl invocation)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "curl-recipe-curl-recipe-read-urls-from-a-file",
+      "kind": "recipe",
+      "title": "curl recipe: read URLs from a file",
+      "statement": "`-K <config-file>` reads command-line options from a file. Example config file `requests.conf`: `url = \"https://a.com\"\\nurl = \"https://b.com\"\\nurl = \"https://c.com\"`. Then: `curl -K requests.conf`. Alternative for plain-URL lists: shell loop: `cat urls.txt | xargs -n1 curl -O`. For batch downloads with consistent options: use config file (cleaner than super-long command lines).",
+      "source_url": "https://curl.se/docs/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-K <config-file>",
+        "requests.conf",
+        "url = \"https://a.com\"\\nurl = \"https://b.com\"\\nurl = \"https://c.com\"",
+        "curl -K requests.conf",
+        "cat urls.txt | xargs -n1 curl -O"
+      ],
+      "steps": [
+        "`-K <config-file>` reads command-line options from a file. Example config file `requests.conf`: `url = \"https://a.com\"\\nurl = \"https://b.com\"\\nurl = \"https://c.com\"`. Then: `curl -K requests.conf`. Alternative for plain-URL lists: shell loop: `cat urls.txt | xargs -n1 curl -O`. For batch downloads with consistent options: use config file (cleaner than super-long command lines)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -K, cat, curl, requests.conf, url."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-recipes",
+        "legacy_title": "curl recipe: read URLs from a file"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "curl-recipe-curl-recipe-download-file-with-auth-resume",
+      "kind": "recipe",
+      "title": "curl recipe: download file with auth + resume",
+      "statement": "Combine -u with resume. `curl -u user:pass -C - -O https://example.com/big.tar.gz`. With auth from .netrc (better than plaintext on CLI): `curl --netrc -C - -O <url>`. For mid-download interruption recovery in scripts: wrap in a retry loop that checks file size + uses `-C -`.",
+      "source_url": "https://curl.se/docs/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "curl -u user:pass -C - -O https://example.com/big.tar.gz",
+        "curl --netrc -C - -O <url>",
+        "-C -"
+      ],
+      "steps": [
+        "Combine -u with resume. `curl -u user:pass -C - -O https://example.com/big.tar.gz`. With auth from .netrc (better than plaintext on CLI): `curl --netrc -C - -O <url>`. For mid-download interruption recovery in scripts: wrap in a retry loop that checks file size + uses `-C -`"
+      ],
+      "constraints": [
+        "Combine -u with resume. `curl -u user:pass -C - -O https://example.com/big.tar.gz`. With auth from .netrc (better than plaintext on CLI): `curl --netrc -C - -O <url>`. For mid-download interruption recovery in scripts: wrap in a retry loop that checks file size + uses `-C -`",
+        "Requires binaries or commands referenced in examples: -C, curl."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-recipes",
+        "legacy_title": "curl recipe: download file with auth + resume"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "curl-recipe-curl-recipe-test-api-rate-limits",
+      "kind": "recipe",
+      "title": "curl recipe: test API rate limits",
+      "statement": "Loop curl, show throughput + response codes. Pattern: `for i in $(seq 1 100); do curl -s -o /dev/null -w \"%{http_code}\\t%{time_total}\\n\" https://api.example.com/endpoint; done`. Watch for 429 (too many requests) \u2014 the response usually has a Retry-After header. Capture rate-limit headers: `curl -i <url> | grep -i 'x-ratelimit'` (GitHub, AWS, etc. expose remaining quota).",
+      "source_url": "https://curl.se/docs/docs/httpscripting.html",
+      "source_type": "official_docs",
+      "commands": [
+        "for i in $(seq 1 100); do curl -s -o /dev/null -w \"%{http_code}\\t%{time_total}\\n\" https://api.example.com/endpoint; done",
+        "curl -i <url> | grep -i 'x-ratelimit'"
+      ],
+      "steps": [
+        "Loop curl, show throughput + response codes. Pattern: `for i in $(seq 1 100); do curl -s -o /dev/null -w \"%{http_code}\\t%{time_total}\\n\" https://api.example.com/endpoint; done`. Watch for 429 (too many requests) \u2014 the response usually has a Retry-After header. Capture rate-limit headers: `curl -i <url> | grep -i 'x-ratelimit'` (GitHub, AWS, etc. expose remaining quota)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: curl, for."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-recipes",
+        "legacy_title": "curl recipe: test API rate limits"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "curl-recipe-curl-recipe-use-a-proxy",
+      "kind": "recipe",
+      "title": "curl recipe: use a proxy",
+      "statement": "Routes curl through an intermediate. `curl --proxy http://proxy.corp:8080 https://api.example.com`. Proxy with auth: `curl --proxy http://user:pass@proxy:8080 <url>` or `--proxy-user user:pass`. SOCKS5 proxy: `--proxy socks5://localhost:1080 <url>` (useful for SSH tunnels: `ssh -D 1080 user@bastion`). Environment-based: `https_proxy=http://proxy:8080 curl <url>` \u2014 many UNIX tools respect $http_proxy/$https_proxy.",
+      "source_url": "https://curl.se/docs/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "curl --proxy http://proxy.corp:8080 https://api.example.com",
+        "curl --proxy http://user:pass@proxy:8080 <url>",
+        "--proxy-user user:pass",
+        "--proxy socks5://localhost:1080 <url>",
+        "ssh -D 1080 user@bastion"
+      ],
+      "steps": [
+        "Routes curl through an intermediate. `curl --proxy http://proxy.corp:8080 https://api.example.com`. Proxy with auth: `curl --proxy http://user:pass@proxy:8080 <url>` or `--proxy-user user:pass`. SOCKS5 proxy: `--proxy socks5://localhost:1080 <url>` (useful for SSH tunnels: `ssh -D 1080 user@bastion`). Environment-based: `https_proxy=http://proxy:8080 curl <url>` \u2014 many UNIX tools respect $http_proxy/$https_proxy"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: --proxy, --proxy-user, curl, ssh."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-recipes",
+        "legacy_title": "curl recipe: use a proxy"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "curl-recipe-curl-recipe-send-mtls-client-cert-request",
+      "kind": "recipe",
+      "title": "curl recipe: send mTLS (client cert) request",
+      "statement": "Mutual TLS: server verifies client. Pattern: `curl --cert client.pem --key client-key.pem https://mtls.example.com/secure`. Combined PEM (cert + key in same file): `--cert combined.pem`. PKCS#12 (.p12 from a CA): `--cert cert.p12 --cert-type P12`. Password-protected key: `--cert client.pem --key client-key.pem:passphrase` or `--key client-key.pem` (curl prompts).",
+      "source_url": "https://curl.se/docs/docs/sslcerts.html",
+      "source_type": "official_docs",
+      "commands": [
+        "curl --cert client.pem --key client-key.pem https://mtls.example.com/secure",
+        "--cert combined.pem",
+        "--cert cert.p12 --cert-type P12",
+        "--cert client.pem --key client-key.pem:passphrase",
+        "--key client-key.pem"
+      ],
+      "steps": [
+        "Mutual TLS: server verifies client. Pattern: `curl --cert client.pem --key client-key.pem https://mtls.example.com/secure`. Combined PEM (cert + key in same file): `--cert combined.pem`. PKCS#12 (.p12 from a CA): `--cert cert.p12 --cert-type P12`. Password-protected key: `--cert client.pem --key client-key.pem:passphrase` or `--key client-key.pem` (curl prompts)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: --cert, --key, curl."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": true,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-recipes",
+        "legacy_title": "curl recipe: send mTLS (client cert) request"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "curl-recipe-curl-recipe-scp-sftp-upload-via-curl",
+      "kind": "recipe",
+      "title": "curl recipe: SCP/SFTP upload via curl",
+      "statement": "Yes, curl handles SSH-based transfer too. SCP: `curl -T local.txt scp://user@host/path/`. SFTP: `curl -u user: -T local.txt sftp://host/path/file.txt` (the `:` after user prompts for password). With SSH key: `--key ~/.ssh/id_rsa`. Note: requires curl built with libssh2 \u2014 check with `curl -V` for 'libssh2' in the output line.",
+      "source_url": "https://curl.se/docs/docs/protdocs.html",
+      "source_type": "official_docs",
+      "commands": [
+        "curl -T local.txt scp://user@host/path/",
+        "curl -u user: -T local.txt sftp://host/path/file.txt",
+        "--key ~/.ssh/id_rsa",
+        "curl -V"
+      ],
+      "steps": [
+        "Yes, curl handles SSH-based transfer too. SCP: `curl -T local.txt scp://user@host/path/`. SFTP: `curl -u user: -T local.txt sftp://host/path/file.txt` (the `:` after user prompts for password). With SSH key: `--key ~/.ssh/id_rsa`. Note: requires curl built with libssh2 \u2014 check with `curl -V` for 'libssh2' in the output line"
+      ],
+      "constraints": [
+        "Yes, curl handles SSH-based transfer too. SCP: `curl -T local.txt scp://user@host/path/`. SFTP: `curl -u user: -T local.txt sftp://host/path/file.txt` (the `:` after user prompts for password). With SSH key: `--key ~/.ssh/id_rsa`. Note: requires curl built with libssh2 \u2014 check with `curl -V` for 'libssh2' in the output line",
+        "Requires binaries or commands referenced in examples: --key, curl."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": true,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-recipes",
+        "legacy_title": "curl recipe: SCP/SFTP upload via curl"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "curl-recipe-curl-recipe-ftp-upload-download",
+      "kind": "recipe",
+      "title": "curl recipe: FTP upload + download",
+      "statement": "Upload: `curl -T file.txt -u user:pass ftp://ftp.example.com/dir/`. Download: `curl -u user:pass -O ftp://ftp.example.com/dir/file.txt`. List directory: `curl -u user:pass ftp://ftp.example.com/dir/`. FTPS (FTP over TLS): use `ftps://` URL or `--ssl-reqd ftp://`. For passive mode (firewall-friendly): default for curl, force with `--ftp-pasv`. Active mode (rarely needed): `--ftp-port -` (curl picks the port).",
+      "source_url": "https://curl.se/docs/docs/protdocs.html",
+      "source_type": "official_docs",
+      "commands": [
+        "curl -T file.txt -u user:pass ftp://ftp.example.com/dir/",
+        "curl -u user:pass -O ftp://ftp.example.com/dir/file.txt",
+        "curl -u user:pass ftp://ftp.example.com/dir/",
+        "ftps://",
+        "--ssl-reqd ftp://",
+        "--ftp-pasv",
+        "--ftp-port -"
+      ],
+      "steps": [
+        "Upload: `curl -T file.txt -u user:pass ftp://ftp.example.com/dir/`. Download: `curl -u user:pass -O ftp://ftp.example.com/dir/file.txt`. List directory: `curl -u user:pass ftp://ftp.example.com/dir/`. FTPS (FTP over TLS): use `ftps://` URL or `--ssl-reqd ftp://`. For passive mode (firewall-friendly): default for curl, force with `--ftp-pasv`. Active mode (rarely needed): `--ftp-port -` (curl picks the port)"
+      ],
+      "constraints": [
+        "Upload: `curl -T file.txt -u user:pass ftp://ftp.example.com/dir/`. Download: `curl -u user:pass -O ftp://ftp.example.com/dir/file.txt`. List directory: `curl -u user:pass ftp://ftp.example.com/dir/`. FTPS (FTP over TLS): use `ftps://` URL or `--ssl-reqd ftp://`. For passive mode (firewall-friendly): default for curl, force with `--ftp-pasv`. Active mode (rarely needed): `--ftp-port -` (curl picks the port)",
+        "Requires binaries or commands referenced in examples: --ftp-pasv, --ftp-port, --ssl-reqd, curl, ftps://."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-recipes",
+        "legacy_title": "curl recipe: FTP upload + download"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "curl-recipe-curl-recipe-smtp-send-email",
+      "kind": "recipe",
+      "title": "curl recipe: SMTP send email",
+      "statement": "curl can send email too. Pattern: `curl --url 'smtps://smtp.gmail.com:465' --user 'sender@gmail.com:app-password' --mail-from 'sender@gmail.com' --mail-rcpt 'recipient@example.com' --upload-file message.txt`. message.txt format: `From: sender@gmail.com\\nTo: recipient@example.com\\nSubject: Hello\\n\\nMessage body here`. Use case: scripted notifications without installing sendmail or msmtp. Gmail requires app passwords (not your account password) if 2FA enabled.",
+      "source_url": "https://curl.se/docs/docs/protdocs.html",
+      "source_type": "official_docs",
+      "commands": [
+        "curl --url 'smtps://smtp.gmail.com:465' --user 'sender@gmail.com:app-password' --mail-from 'sender@gmail.com' --mail-rcpt 'recipient@example.com' --upload-file message.txt",
+        "From: sender@gmail.com\\nTo: recipient@example.com\\nSubject: Hello\\n\\nMessage body here"
+      ],
+      "steps": [
+        "curl can send email too. Pattern: `curl --url 'smtps://smtp.gmail.com:465' --user 'sender@gmail.com:app-password' --mail-from 'sender@gmail.com' --mail-rcpt 'recipient@example.com' --upload-file message.txt`. message.txt format: `From: sender@gmail.com\\nTo: recipient@example.com\\nSubject: Hello\\n\\nMessage body here`. Use case: scripted notifications without installing sendmail or msmtp. Gmail requires app passwords (not your account password) if 2FA enabled"
+      ],
+      "constraints": [
+        "curl can send email too. Pattern: `curl --url 'smtps://smtp.gmail.com:465' --user 'sender@gmail.com:app-password' --mail-from 'sender@gmail.com' --mail-rcpt 'recipient@example.com' --upload-file message.txt`. message.txt format: `From: sender@gmail.com\\nTo: recipient@example.com\\nSubject: Hello\\n\\nMessage body here`. Use case: scripted notifications without installing sendmail or msmtp. Gmail requires app passwords (not your account password) if 2FA enabled",
+        "Requires binaries or commands referenced in examples: From:, curl."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": true,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-recipes",
+        "legacy_title": "curl recipe: SMTP send email"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "curl-recipe-curl-recipe-send-graphql-query",
+      "kind": "recipe",
+      "title": "curl recipe: send GraphQL query",
+      "statement": "GraphQL is HTTP POST with a JSON body. Pattern: `curl -X POST https://api.example.com/graphql -H \"Content-Type: application/json\" -H \"Authorization: Bearer $TOKEN\" -d '{\"query\": \"{ users { id name } }\"}'`. Multi-line queries: store in a file and use `-d @query.json` where query.json is `{\"query\": \"...\", \"variables\": {...}}`. Pipe through jq for readable output.",
+      "source_url": "https://curl.se/docs/docs/httpscripting.html",
+      "source_type": "official_docs",
+      "commands": [
+        "curl -X POST https://api.example.com/graphql -H \"Content-Type: application/json\" -H \"Authorization: Bearer $TOKEN\" -d '{\"query\": \"{ users { id name } }\"}'",
+        "-d @query.json"
+      ],
+      "steps": [
+        "GraphQL is HTTP POST with a JSON body. Pattern: `curl -X POST https://api.example.com/graphql -H \"Content-Type: application/json\" -H \"Authorization: Bearer $TOKEN\" -d '{\"query\": \"{ users { id name } }\"}'`. Multi-line queries: store in a file and use `-d @query.json` where query.json is `{\"query\": \"...\", \"variables\": {...}}`. Pipe through jq for readable output"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -d, curl."
+      ],
+      "effect": {
+        "kind": "secret_exposure",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": true,
+        "risk_level": "high",
+        "reasons": [
+          "The action references secrets, tokens, or API keys."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-recipes",
+        "legacy_title": "curl recipe: send GraphQL query"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "curl-recipe-curl-recipe-hit-a-localhost-service-in-development",
+      "kind": "recipe",
+      "title": "curl recipe: hit a localhost service in development",
+      "statement": "Common: `curl http://localhost:8080/api/health`. For IPv6 localhost: `curl http://[::1]:8080/`. Force IPv4: `curl --ipv4 http://localhost:8080`. With JWT for development: `curl -H \"Authorization: Bearer $(cat ~/.dev-token)\" http://localhost:8080/...`. For HTTPS localhost with self-signed cert: `curl -k https://localhost:8443/` (the `-k` skips cert validation; safe for dev only).",
+      "source_url": "https://curl.se/docs/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "curl http://localhost:8080/api/health",
+        "curl http://[::1]:8080/",
+        "curl --ipv4 http://localhost:8080",
+        "curl -H \"Authorization: Bearer $(cat ~/.dev-token)\" http://localhost:8080/...",
+        "curl -k https://localhost:8443/",
+        "-k"
+      ],
+      "steps": [
+        "Common: `curl http://localhost:8080/api/health`. For IPv6 localhost: `curl http://[::1]:8080/`. Force IPv4: `curl --ipv4 http://localhost:8080`. With JWT for development: `curl -H \"Authorization: Bearer $(cat ~/.dev-token)\" http://localhost:8080/...`. For HTTPS localhost with self-signed cert: `curl -k https://localhost:8443/` (the `-k` skips cert validation; safe for dev only)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -k, curl."
+      ],
+      "effect": {
+        "kind": "secret_exposure",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": true,
+        "risk_level": "high",
+        "reasons": [
+          "The action references secrets, tokens, or API keys."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-recipes",
+        "legacy_title": "curl recipe: hit a localhost service in development"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "curl-recipe-curl-recipe-cleanup-and-security-audit",
+      "kind": "recipe",
+      "title": "curl recipe: cleanup and security audit",
+      "statement": "Use `curl -V` to audit: shows compiled-in features (TLS library, supported protocols, IDN, HTTP/3 support). Check curl version: `curl --version` and compare to latest at curl.se \u2014 outdated curl has CVEs. For automated systems, pin curl version OR validate via package signing. Always use `-fsS` flags in scripts: `-f` fails on HTTP errors, `-s` silent, `-S` shows errors (only when -s is set) \u2014 this combination prevents silent failures.",
+      "source_url": "https://curl.se/docs/docs/security.html",
+      "source_type": "official_docs",
+      "commands": [
+        "curl -V",
+        "curl --version",
+        "-fsS",
+        "-f",
+        "-s",
+        "-S"
+      ],
+      "steps": [
+        "Use `curl -V` to audit: shows compiled-in features (TLS library, supported protocols, IDN, HTTP/3 support). Check curl version: `curl --version` and compare to latest at curl.se \u2014 outdated curl has CVEs. For automated systems, pin curl version OR validate via package signing. Always use `-fsS` flags in scripts: `-f` fails on HTTP errors, `-s` silent, `-S` shows errors (only when -s is set) \u2014 this combination prevents silent failures"
+      ],
+      "constraints": [
+        "Use `curl -V` to audit: shows compiled-in features (TLS library, supported protocols, IDN, HTTP/3 support). Check curl version: `curl --version` and compare to latest at curl.se \u2014 outdated curl has CVEs. For automated systems, pin curl version OR validate via package signing. Always use `-fsS` flags in scripts: `-f` fails on HTTP errors, `-s` silent, `-S` shows errors (only when -s is set) \u2014 this combination prevents silent failures",
+        "Requires binaries or commands referenced in examples: -S, -f, -fsS, -s, curl."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-recipes",
+        "legacy_title": "curl recipe: cleanup and security audit"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "curl-recipe-curl-recipe-replace-wget-with-curl",
+      "kind": "recipe",
+      "title": "curl recipe: replace wget with curl",
+      "statement": "Most wget workflows translate to curl. Save URL to filename: wget URL \u2192 `curl -O URL`. Specific output name: wget -O file URL \u2192 `curl -o file URL`. Recursive download: curl doesn't do this natively \u2014 wget wins. Resume: wget -c \u2192 `curl -C -`. Following redirects: wget does by default; curl needs `-L`. Quiet: wget -q \u2192 `curl -s`.",
+      "source_url": "https://curl.se/docs/docs/comparison-table.html",
+      "source_type": "official_docs",
+      "commands": [
+        "curl -O URL",
+        "curl -o file URL",
+        "curl -C -",
+        "-L",
+        "curl -s"
+      ],
+      "steps": [
+        "Most wget workflows translate to curl. Save URL to filename: wget URL \u2192 `curl -O URL`. Specific output name: wget -O file URL \u2192 `curl -o file URL`. Recursive download: curl doesn't do this natively \u2014 wget wins. Resume: wget -c \u2192 `curl -C -`. Following redirects: wget does by default; curl needs `-L`. Quiet: wget -q \u2192 `curl -s`"
+      ],
+      "constraints": [
+        "Most wget workflows translate to curl. Save URL to filename: wget URL \u2192 `curl -O URL`. Specific output name: wget -O file URL \u2192 `curl -o file URL`. Recursive download: curl doesn't do this natively \u2014 wget wins. Resume: wget -c \u2192 `curl -C -`. Following redirects: wget does by default; curl needs `-L`. Quiet: wget -q \u2192 `curl -s`",
+        "Requires binaries or commands referenced in examples: -L, curl."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-recipes",
+        "legacy_title": "curl recipe: replace wget with curl"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "curl-recipe-curl-recipe-write-out-variables-response-observability",
+      "kind": "recipe",
+      "title": "curl recipe: write-out variables (response observability)",
+      "statement": "`-w \"format\"` exposes ~40 variables. Useful ones: `%{http_code}` \u2014 response status; `%{size_download}` \u2014 body bytes; `%{speed_download}` \u2014 bytes/sec; `%{url_effective}` \u2014 final URL after redirects; `%{ssl_verify_result}` \u2014 cert verification (0=OK); `%{json}` \u2014 entire response metadata as JSON (curl 7.70+); `%{header_json}` \u2014 response headers as JSON. Example monitoring: `curl -w \"%{http_code}\\t%{time_total}\\t%{size_download}\\n\" -o /dev/null -s <url>`.",
+      "source_url": "https://curl.se/docs/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-w \"format\"",
+        "curl -w \"%{http_code}\\t%{time_total}\\t%{size_download}\\n\" -o /dev/null -s <url>"
+      ],
+      "steps": [
+        "`-w \"format\"` exposes ~40 variables. Useful ones: `%{http_code}` \u2014 response status; `%{size_download}` \u2014 body bytes; `%{speed_download}` \u2014 bytes/sec; `%{url_effective}` \u2014 final URL after redirects; `%{ssl_verify_result}` \u2014 cert verification (0=OK); `%{json}` \u2014 entire response metadata as JSON (curl 7.70+); `%{header_json}` \u2014 response headers as JSON. Example monitoring: `curl -w \"%{http_code}\\t%{time_total}\\t%{size_download}\\n\" -o /dev/null -s <url>`"
+      ],
+      "constraints": [
+        "`-w \"format\"` exposes ~40 variables. Useful ones: `%{http_code}` \u2014 response status; `%{size_download}` \u2014 body bytes; `%{speed_download}` \u2014 bytes/sec; `%{url_effective}` \u2014 final URL after redirects; `%{ssl_verify_result}` \u2014 cert verification (0=OK); `%{json}` \u2014 entire response metadata as JSON (curl 7.70+); `%{header_json}` \u2014 response headers as JSON. Example monitoring: `curl -w \"%{http_code}\\t%{time_total}\\t%{size_download}\\n\" -o /dev/null -s <url>`",
+        "Requires binaries or commands referenced in examples: -w, curl."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-recipes",
+        "legacy_title": "curl recipe: write-out variables (response observability)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "curl-recipe-curl-recipe-download-multiple-files-in-parallel-from-a-list",
+      "kind": "recipe",
+      "title": "curl recipe: download multiple files in parallel from a list",
+      "statement": "Use `-Z` with a URL pattern or file. Pattern variants: (1) URL globbing: `curl -Z -O \"https://example.com/file[1-10].zip\"` downloads 1.zip through 10.zip in parallel; (2) Multiple URLs from script: `curl -Z $(cat urls.txt)`; (3) Limit concurrency: `--parallel-max 5`. Combined with `--remote-name-all -O` ensures every URL gets its own output file.",
+      "source_url": "https://curl.se/docs/docs/manpage.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-Z",
+        "curl -Z -O \"https://example.com/file[1-10].zip\"",
+        "curl -Z $(cat urls.txt)",
+        "--parallel-max 5",
+        "--remote-name-all -O"
+      ],
+      "steps": [
+        "Use `-Z` with a URL pattern or file. Pattern variants:",
+        "URL globbing: `curl -Z -O \"https://example.com/file[1-10].zip\"` downloads 1.zip through 10.zip in parallel",
+        "Multiple URLs from script: `curl -Z $(cat urls.txt)`",
+        "Limit concurrency: `--parallel-max 5`. Combined with `--remote-name-all -O` ensures every URL gets its own output file"
+      ],
+      "constraints": [
+        "Limit concurrency: `--parallel-max 5`. Combined with `--remote-name-all -O` ensures every URL gets its own output file",
+        "Requires binaries or commands referenced in examples: --parallel-max, --remote-name-all, -Z, curl."
+      ],
+      "effect": {
+        "kind": "network",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "curl-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_curl_errors_recipes.py",
+        "legacy_tool_id": "curl-recipes",
+        "legacy_title": "curl recipe: download multiple files in parallel from a list"
+      },
+      "confidence": 0.92
+    }
+  ]
+}

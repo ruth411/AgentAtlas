@@ -132,6 +132,94 @@ def _vercel_effect(cmd: str) -> tuple[str, bool, bool, bool, bool, bool, str]:
             f"`{c}` changes remote Vercel/project state.")
 
 
+# ------------------------------------------------------------------ git ------
+def _git_subcommands() -> list[str]:
+    out = _run(["git", "--help", "-a"])
+    cmds: list[str] = []
+    for line in out.splitlines():
+        m = re.match(r"^\s{3,}([a-z0-9][a-z0-9-]*)\s{2,}\S", line)
+        if m:
+            cmds.append(m.group(1))
+    return sorted(set(cmds))
+
+
+_GIT_DESTRUCTIVE = {"clean", "filter-branch", "prune", "prune-packed", "reset", "rm"}
+_GIT_REMOTE_MUT = {"push", "send-email"}
+_GIT_REMOTE_READ = {"clone", "fetch", "ls-remote", "pull", "request-pull"}
+_GIT_READ_ONLY = {
+    "annotate", "blame", "bugreport", "cat-file", "count-objects", "describe",
+    "diagnose", "diff", "diff-files", "diff-index", "diff-tree", "difftool",
+    "for-each-ref", "fsck", "grep", "help", "log", "ls-files", "ls-remote",
+    "ls-tree", "merge-base", "merge-tree", "name-rev", "range-diff", "rev-list",
+    "rev-parse", "show", "show-branch", "status", "symbolic-ref",
+    "verify-commit", "verify-tag", "version", "whatchanged",
+}
+
+
+def _git_effect(cmd: str) -> tuple[str, bool, bool, bool, bool, bool, str]:
+    c = f"git {cmd}"
+    if cmd in _GIT_DESTRUCTIVE:
+        return ("destructive", True, True, False, False, False,
+                f"`{c}` removes tracked/untracked data or rewrites repository history.")
+    if cmd in _GIT_REMOTE_MUT:
+        return ("mutation", False, True, True, False, True,
+                f"`{c}` sends repository data to remote systems and may use credentials.")
+    if cmd in _GIT_REMOTE_READ:
+        return ("network", False, True, False, False, True,
+                f"`{c}` contacts remote repositories and may use credentials.")
+    if cmd in _GIT_READ_ONLY:
+        return ("filesystem", False, True, False, False, False,
+                f"`{c}` inspects repository state without changing tracked content.")
+    return ("filesystem", False, True, False, False, False,
+            f"`{c}` changes local repository state, index, refs, or working tree files.")
+
+
+# ------------------------------------------------------------------- go ------
+def _go_subcommands() -> list[str]:
+    out = _run(["go", "help"])
+    cmds: list[str] = []
+    in_cmds = False
+    for line in out.splitlines():
+        stripped = line.strip()
+        if stripped == "The commands are:":
+            in_cmds = True
+            continue
+        if not in_cmds:
+            continue
+        if not line.startswith("\t"):
+            if stripped:
+                break
+            continue
+        m = re.match(r"^\t([a-z][a-z0-9-]*)\s{2,}\S", line)
+        if m:
+            cmds.append(m.group(1))
+    return sorted(set(cmds))
+
+
+_GO_DESTRUCTIVE = {"clean"}
+_GO_REMOTE_MUT = {"get"}
+_GO_REMOTE_READ = {"doc", "env", "list", "version"}
+_GO_BUILD_LOCAL = {"build", "fix", "fmt", "generate", "install", "mod", "run", "test", "tool", "vet", "work"}
+
+
+def _go_effect(cmd: str) -> tuple[str, bool, bool, bool, bool, bool, str]:
+    c = f"go {cmd}"
+    if cmd in _GO_DESTRUCTIVE:
+        return ("destructive", True, True, False, False, False,
+                f"`{c}` removes cached or built artifacts from the local filesystem.")
+    if cmd in _GO_REMOTE_MUT:
+        return ("mutation", False, True, False, False, False,
+                f"`{c}` may download modules and update local module state.")
+    if cmd in _GO_REMOTE_READ:
+        return ("network", False, True, False, False, False,
+                f"`{c}` may read module or environment metadata, including over the network.")
+    if cmd in _GO_BUILD_LOCAL:
+        return ("filesystem", False, True, False, False, False,
+                f"`{c}` builds, tests, formats, or inspects local Go code and artifacts.")
+    return ("filesystem", False, True, False, False, False,
+            f"`{c}` operates on local Go source, build, or workspace state.")
+
+
 # ---------------------------------------------------------------- cargo -------
 def _cargo_subcommands() -> list[str]:
     out = _run(["cargo", "--list"])
@@ -269,6 +357,20 @@ _TOOLS = {
         "help_argv": lambda cmd: ["vercel", cmd, "--help"],
         "effect": _vercel_effect,
         "source_url": lambda cmd: f"https://vercel.com/docs/cli/{cmd}",
+    },
+    "git": {
+        "family": "git",
+        "list": _git_subcommands,
+        "help_argv": lambda cmd: ["git", cmd, "-h"],
+        "effect": _git_effect,
+        "source_url": lambda cmd: f"https://git-scm.com/docs/git-{cmd}",
+    },
+    "go": {
+        "family": "go",
+        "list": _go_subcommands,
+        "help_argv": lambda cmd: ["go", "help", cmd],
+        "effect": _go_effect,
+        "source_url": lambda cmd: f"https://pkg.go.dev/cmd/go#{cmd}",
     },
     "cargo": {
         "family": "cargo", "list": _cargo_subcommands,

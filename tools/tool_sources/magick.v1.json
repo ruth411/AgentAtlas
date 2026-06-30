@@ -1,0 +1,2817 @@
+{
+  "family": "magick",
+  "version": "v1",
+  "artifact_id": "magick-curated-source-v1",
+  "generated_from": {
+    "kind": "legacy_seed_script",
+    "path": "tools/scripts/seed_imagemagick_errors_recipes.py"
+  },
+  "entries": [
+    {
+      "entry_id": "magick-error-magick-error-unable-to-open-image-file-no-such-file-or-directory",
+      "kind": "error",
+      "title": "magick error: unable to open image '<file>': No such file or directory",
+      "statement": "Input file missing or wrong path. Fix: (1) check spelling: `ls <file>`; (2) absolute path is safest: `/full/path/to/img.png`; (3) for piped input: `cat img.png | magick - out.jpg` (use `-` for stdin); (4) for batch: `magick *.png out.jpg` requires shell glob to actually match files; (5) permissions: `ls -l` \u2014 magick can't read unreadable files.",
+      "source_url": "https://imagemagick.org/script/command-line-tools.php",
+      "source_type": "official_docs",
+      "commands": [
+        "ls <file>",
+        "/full/path/to/img.png",
+        "cat img.png | magick - out.jpg",
+        "magick *.png out.jpg",
+        "ls -l"
+      ],
+      "steps": [
+        "check spelling: `ls <file>`",
+        "absolute path is safest: `/full/path/to/img.png`",
+        "for piped input: `cat img.png | magick - out.jpg` (use `-` for stdin)",
+        "for batch: `magick *.png out.jpg` requires shell glob to actually match files",
+        "permissions: `ls -l` \u2014 magick can't read unreadable files"
+      ],
+      "constraints": [
+        "check spelling: `ls <file>`",
+        "for batch: `magick *.png out.jpg` requires shell glob to actually match files",
+        "Requires binaries or commands referenced in examples: /full/path/to/img.png, cat, ls, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-errors",
+        "legacy_title": "imagemagick error: unable to open image '<file>': No such file or directory"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "magick-error-magick-error-no-decode-delegate-for-this-image-format",
+      "kind": "error",
+      "title": "magick error: no decode delegate for this image format",
+      "statement": "ImageMagick built without support for that format (libpng, libjpeg, libwebp, libheif, libraw etc missing at build). Fix: (1) check delegates: `magick -list format` (or `magick -version` shows linked libraries); (2) install missing: macOS `brew install imagemagick --with-webp --with-heif`; Linux apt `imagemagick libmagickwand-dev libwebp-dev libheif-dev`; (3) for HEIC (iPhone): needs libheif + ghostscript-fonts; (4) reinstall after deps: `brew reinstall imagemagick`.",
+      "source_url": "https://imagemagick.org/script/formats.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick -list format",
+        "magick -version",
+        "brew install imagemagick --with-webp --with-heif",
+        "imagemagick libmagickwand-dev libwebp-dev libheif-dev",
+        "brew reinstall imagemagick"
+      ],
+      "steps": [
+        "check delegates: `magick -list format` (or `magick -version` shows linked libraries)",
+        "install missing: macOS `brew install imagemagick --with-webp --with-heif`; Linux apt `imagemagick libmagickwand-dev libwebp-dev libheif-dev`",
+        "for HEIC (iPhone): needs libheif + ghostscript-fonts",
+        "reinstall after deps: `brew reinstall imagemagick`"
+      ],
+      "constraints": [
+        "check delegates: `magick -list format` (or `magick -version` shows linked libraries)",
+        "for HEIC (iPhone): needs libheif + ghostscript-fonts",
+        "Requires binaries or commands referenced in examples: brew, imagemagick, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-errors",
+        "legacy_title": "imagemagick error: no decode delegate for this image format"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "magick-error-magick-error-cache-resources-exhausted-memory-allocation-failed",
+      "kind": "error",
+      "title": "magick error: cache resources exhausted / memory allocation failed",
+      "statement": "Resource limit hit (memory, map, disk, or area). Default limits are conservative. Fix: (1) check current: `magick -list resource`; (2) raise via env: `MAGICK_MEMORY_LIMIT=2GiB MAGICK_MAP_LIMIT=4GiB magick big.tif out.png`; (3) edit policy.xml: `<policy domain=\"resource\" name=\"memory\" value=\"4GiB\"/>`; (4) for huge images: stream-process via `-limit thread 1 -define stream:buffer-size=256m`; (5) for OCR/PDF: usually need bigger disk limit (`MAGICK_DISK_LIMIT`).",
+      "source_url": "https://imagemagick.org/script/resources.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick -list resource",
+        "-limit thread 1 -define stream:buffer-size=256m",
+        "MAGICK_DISK_LIMIT"
+      ],
+      "steps": [
+        "check current: `magick -list resource`",
+        "raise via env: `MAGICK_MEMORY_LIMIT=2GiB MAGICK_MAP_LIMIT=4GiB magick big.tif out.png`",
+        "edit policy.xml: `<policy domain=\"resource\" name=\"memory\" value=\"4GiB\"/>`",
+        "for huge images: stream-process via `-limit thread 1 -define stream:buffer-size=256m`",
+        "for OCR/PDF: usually need bigger disk limit (`MAGICK_DISK_LIMIT`)"
+      ],
+      "constraints": [
+        "check current: `magick -list resource`",
+        "for OCR/PDF: usually need bigger disk limit (`MAGICK_DISK_LIMIT`)",
+        "Requires binaries or commands referenced in examples: -limit, MAGICK_DISK_LIMIT, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-errors",
+        "legacy_title": "imagemagick error: cache resources exhausted / memory allocation failed"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "magick-error-magick-error-not-authorized-pdf-ps-eps-policyerror",
+      "kind": "error",
+      "title": "magick error: not authorized 'PDF' / 'PS' / 'EPS' (PolicyError)",
+      "statement": "Famous post-CVE-2016 default policy.xml blocks PDF/PS/EPS reads. Fix: (1) find policy.xml: `magick -list policy | head` or `find / -name policy.xml 2>/dev/null`; (2) if you trust input, comment out: `<!-- <policy domain=\"coder\" rights=\"none\" pattern=\"PDF\" /> -->`; (3) safer: allow only specific operations: `rights=\"read|write\"`; (4) for one-off: env override `MAGICK_CONFIGURE_PATH=/path/to/custom-policy/`; (5) NEVER disable on a server that accepts untrusted user uploads \u2014 policy exists for security reasons.",
+      "source_url": "https://imagemagick.org/script/security-policy.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick -list policy | head",
+        "find / -name policy.xml 2>/dev/null"
+      ],
+      "steps": [
+        "find policy.xml: `magick -list policy | head` or `find / -name policy.xml 2>/dev/null`",
+        "if you trust input, comment out: `<!-- <policy domain=\"coder\" rights=\"none\" pattern=\"PDF\" /> -->`",
+        "safer: allow only specific operations: `rights=\"read|write\"`",
+        "for one-off: env override `MAGICK_CONFIGURE_PATH=/path/to/custom-policy/`",
+        "NEVER disable on a server that accepts untrusted user uploads \u2014 policy exists for security reasons"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: find, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-errors",
+        "legacy_title": "imagemagick error: not authorized 'PDF' / 'PS' / 'EPS' (PolicyError)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "magick-error-magick-error-delegate-failed-ghostscript-pdf2png",
+      "kind": "error",
+      "title": "magick error: delegate failed (Ghostscript / pdf2png)",
+      "statement": "ImageMagick uses external tools (Ghostscript for PDF, libheif via heif-convert) and the delegate isn't installed/findable. Fix: (1) for PDF/PS: `brew install ghostscript` (macOS) or `apt install ghostscript` (Linux); (2) check delegates: `magick -list delegate | grep pdf`; (3) for SVG: install `librsvg` or `inkscape`; (4) for HEIC: `brew install libheif`; (5) verify gs is on PATH: `which gs`.",
+      "source_url": "https://imagemagick.org/script/formats.php",
+      "source_type": "official_docs",
+      "commands": [
+        "brew install ghostscript",
+        "apt install ghostscript",
+        "magick -list delegate | grep pdf",
+        "librsvg",
+        "inkscape",
+        "brew install libheif",
+        "which gs"
+      ],
+      "steps": [
+        "for PDF/PS: `brew install ghostscript` (macOS) or `apt install ghostscript` (Linux)",
+        "check delegates: `magick -list delegate | grep pdf`",
+        "for SVG: install `librsvg` or `inkscape`",
+        "for HEIC: `brew install libheif`",
+        "verify gs is on PATH: `which gs`"
+      ],
+      "constraints": [
+        "check delegates: `magick -list delegate | grep pdf`",
+        "verify gs is on PATH: `which gs`",
+        "Requires binaries or commands referenced in examples: apt, brew, inkscape, librsvg, magick, which."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-errors",
+        "legacy_title": "imagemagick error: delegate failed (Ghostscript / pdf2png)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "magick-error-magick-warning-the-convert-command-is-deprecated-in-imv7",
+      "kind": "error",
+      "title": "magick warning: The convert command is deprecated in IMv7",
+      "statement": "Informational (not an error). IM 7 unified all tools into `magick`. `convert` still works but is legacy. Fix: (1) replace `convert` with `magick`: `magick in.png out.jpg`; (2) for identify: `magick identify` (or just `identify` if you alias); (3) for compatibility on systems with both: `magick -compatibility` shows IM6/IM7 difference; (4) for old scripts: `convert` \u2192 `magick` is a 1:1 swap in 99% of cases.",
+      "source_url": "https://imagemagick.org/script/magick.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick",
+        "convert",
+        "magick in.png out.jpg",
+        "magick identify",
+        "identify",
+        "magick -compatibility"
+      ],
+      "steps": [
+        "replace `convert` with `magick`: `magick in.png out.jpg`",
+        "for identify: `magick identify` (or just `identify` if you alias)",
+        "for compatibility on systems with both: `magick -compatibility` shows IM6/IM7 difference",
+        "for old scripts: `convert` \u2192 `magick` is a 1:1 swap in 99% of cases"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: convert, identify, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-errors",
+        "legacy_title": "imagemagick warning: The convert command is deprecated in IMv7"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "magick-error-magick-error-missing-an-image-filename",
+      "kind": "error",
+      "title": "magick error: missing an image filename",
+      "statement": "Forgot input or output file. magick needs at least input + output paths. Fix: (1) basic: `magick input.png output.jpg`; (2) for processing pipelines: input first, output last: `magick input.png -resize 50% output.png`; (3) for stdin: `magick - output.jpg < input.png`; (4) for in-place modification: use `mogrify` (NOT `magick`).",
+      "source_url": "https://imagemagick.org/script/command-line-processing.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick input.png output.jpg",
+        "magick input.png -resize 50% output.png",
+        "magick - output.jpg < input.png",
+        "mogrify",
+        "magick"
+      ],
+      "steps": [
+        "basic: `magick input.png output.jpg`",
+        "for processing pipelines: input first, output last: `magick input.png -resize 50% output.png`",
+        "for stdin: `magick - output.jpg < input.png`",
+        "for in-place modification: use `mogrify` (NOT `magick`)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: magick, mogrify."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-errors",
+        "legacy_title": "imagemagick error: missing an image filename"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "magick-error-magick-error-unrecognized-option-x-unknown-option",
+      "kind": "error",
+      "title": "magick error: unrecognized option '-X' / unknown option",
+      "statement": "Option typo, or version mismatch (IM7 added/renamed some options). Fix: (1) list all options: `magick -list option`; (2) check syntax: `magick -help`; (3) common confusion: `-resize` (not `--resize`); (4) option ordering MATTERS in IM \u2014 `-density 300 input.pdf` works but `input.pdf -density 300` doesn't (density must precede the input it affects).",
+      "source_url": "https://imagemagick.org/script/command-line-options.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick -list option",
+        "magick -help",
+        "-resize",
+        "--resize",
+        "-density 300 input.pdf",
+        "input.pdf -density 300"
+      ],
+      "steps": [
+        "list all options: `magick -list option`",
+        "check syntax: `magick -help`",
+        "common confusion: `-resize` (not `--resize`)",
+        "option ordering MATTERS in IM \u2014 `-density 300 input.pdf` works but `input.pdf -density 300` doesn't (density must precede the input it affects)"
+      ],
+      "constraints": [
+        "check syntax: `magick -help`",
+        "option ordering MATTERS in IM \u2014 `-density 300 input.pdf` works but `input.pdf -density 300` doesn't (density must precede the input it affects)",
+        "Requires binaries or commands referenced in examples: --resize, -density, -resize, input.pdf, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-errors",
+        "legacy_title": "imagemagick error: unrecognized option '-X' / unknown option"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "magick-error-magick-error-improper-image-header-unknown-image-format",
+      "kind": "error",
+      "title": "magick error: improper image header / unknown image format",
+      "statement": "File is corrupt, truncated, or not actually the format claimed by extension. Fix: (1) check actual type: `file input.jpg` or `magick identify input.jpg`; (2) for download issues: re-fetch source; (3) repair partial JPEG: `jpegtran -copy none input.jpg > out.jpg` (external tool); (4) for unknown extension: force format: `magick TIFF:input.dat out.png` (prefix `FORMAT:`).",
+      "source_url": "https://imagemagick.org/script/formats.php",
+      "source_type": "official_docs",
+      "commands": [
+        "file input.jpg",
+        "magick identify input.jpg",
+        "jpegtran -copy none input.jpg > out.jpg",
+        "magick TIFF:input.dat out.png",
+        "FORMAT:"
+      ],
+      "steps": [
+        "check actual type: `file input.jpg` or `magick identify input.jpg`",
+        "for download issues: re-fetch source",
+        "repair partial JPEG: `jpegtran -copy none input.jpg > out.jpg` (external tool)",
+        "for unknown extension: force format: `magick TIFF:input.dat out.png` (prefix `FORMAT:`)"
+      ],
+      "constraints": [
+        "check actual type: `file input.jpg` or `magick identify input.jpg`",
+        "Requires binaries or commands referenced in examples: FORMAT:, file, jpegtran, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-errors",
+        "legacy_title": "imagemagick error: improper image header / unknown image format"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "magick-error-magick-error-jpeg-datastream-contains-no-image-premature-end-of-jpeg-fil",
+      "kind": "error",
+      "title": "magick error: JPEG datastream contains no image / premature end of JPEG file",
+      "statement": "JPEG is corrupt \u2014 truncated mid-data or has no actual image data. Fix: (1) check file size: `ls -l file.jpg` \u2014 under ~1KB is suspicious; (2) re-download or re-export from source; (3) repair tools: `jpeginfo -c file.jpg` (third-party); (4) sometimes recoverable: `magick -define jpeg:ignore-warnings=true input.jpg out.png`.",
+      "source_url": "https://imagemagick.org/script/formats.php",
+      "source_type": "official_docs",
+      "commands": [
+        "ls -l file.jpg",
+        "jpeginfo -c file.jpg",
+        "magick -define jpeg:ignore-warnings=true input.jpg out.png"
+      ],
+      "steps": [
+        "check file size: `ls -l file.jpg` \u2014 under ~1KB is suspicious",
+        "re-download or re-export from source",
+        "repair tools: `jpeginfo -c file.jpg` (third-party)",
+        "sometimes recoverable: `magick -define jpeg:ignore-warnings=true input.jpg out.png`"
+      ],
+      "constraints": [
+        "check file size: `ls -l file.jpg` \u2014 under ~1KB is suspicious",
+        "Requires binaries or commands referenced in examples: jpeginfo, ls, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-errors",
+        "legacy_title": "imagemagick error: JPEG datastream contains no image / premature end of JPEG file"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "magick-error-magick-error-width-or-height-exceeds-limit",
+      "kind": "error",
+      "title": "magick error: width or height exceeds limit",
+      "statement": "Image is bigger than policy.xml's `width`/`height` limit (default 16KP \u00d7 16KP). Fix: (1) check: `magick -list resource`; (2) bump policy.xml: `<policy domain=\"resource\" name=\"width\" value=\"64KP\"/>` and `name=\"height\"`; (3) env: `MAGICK_AREA_LIMIT=8GP MAGICK_WIDTH_LIMIT=64KP magick big.tif out.png`; (4) untrusted input: leave low for security \u2014 DoS protection.",
+      "source_url": "https://imagemagick.org/script/security-policy.php",
+      "source_type": "official_docs",
+      "commands": [
+        "width",
+        "height",
+        "magick -list resource"
+      ],
+      "steps": [
+        "check: `magick -list resource`",
+        "bump policy.xml: `<policy domain=\"resource\" name=\"width\" value=\"64KP\"/>` and `name=\"height\"`",
+        "env: `MAGICK_AREA_LIMIT=8GP MAGICK_WIDTH_LIMIT=64KP magick big.tif out.png`",
+        "untrusted input: leave low for security \u2014 DoS protection"
+      ],
+      "constraints": [
+        "check: `magick -list resource`",
+        "Requires binaries or commands referenced in examples: height, magick, width."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-errors",
+        "legacy_title": "imagemagick error: width or height exceeds limit"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "magick-error-magick-error-tiff-invalid-tiff-directory-ifd",
+      "kind": "error",
+      "title": "magick error: TIFF Invalid TIFF directory / IFD",
+      "statement": "TIFF metadata is corrupted or uses a feature your libtiff doesn't support. Fix: (1) try forcing strip: `magick input.tif -strip out.tif`; (2) repair with tiffinfo / tiffcp (external tools): `tiffcp -c none input.tif fixed.tif`; (3) for proprietary TIFF variants (BigTIFF, geo-TIFF): need libtiff 4+ with extensions; (4) try converting to intermediate format: `magick input.tif intermediate.png && magick intermediate.png final.tif`.",
+      "source_url": "https://imagemagick.org/script/formats.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick input.tif -strip out.tif",
+        "tiffcp -c none input.tif fixed.tif",
+        "magick input.tif intermediate.png && magick intermediate.png final.tif"
+      ],
+      "steps": [
+        "try forcing strip: `magick input.tif -strip out.tif`",
+        "repair with tiffinfo / tiffcp (external tools): `tiffcp -c none input.tif fixed.tif`",
+        "for proprietary TIFF variants (BigTIFF, geo-TIFF): need libtiff 4+ with extensions",
+        "try converting to intermediate format: `magick input.tif intermediate.png && magick intermediate.png final.tif`"
+      ],
+      "constraints": [
+        "for proprietary TIFF variants (BigTIFF, geo-TIFF): need libtiff 4+ with extensions",
+        "Requires binaries or commands referenced in examples: magick, tiffcp."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-errors",
+        "legacy_title": "imagemagick error: TIFF Invalid TIFF directory / IFD"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "magick-error-magick-error-unable-to-extend-pixel-cache",
+      "kind": "error",
+      "title": "magick error: unable to extend pixel cache",
+      "statement": "Disk-based pixel cache ran out of space (large images get spilled to disk). Fix: (1) check `MAGICK_TMPDIR` (defaults to /tmp): `echo $MAGICK_TMPDIR`; (2) point to a bigger filesystem: `MAGICK_TMPDIR=/var/big-disk magick big.tif out.png`; (3) raise disk limit in policy.xml: `<policy domain=\"resource\" name=\"disk\" value=\"50GiB\"/>`; (4) clean up: `rm /tmp/magick-*` (leftover from prior crashes).",
+      "source_url": "https://imagemagick.org/script/resources.php",
+      "source_type": "official_docs",
+      "commands": [
+        "MAGICK_TMPDIR",
+        "echo $MAGICK_TMPDIR",
+        "rm /tmp/magick-*"
+      ],
+      "steps": [
+        "check `MAGICK_TMPDIR` (defaults to /tmp): `echo $MAGICK_TMPDIR`",
+        "point to a bigger filesystem: `MAGICK_TMPDIR=/var/big-disk magick big.tif out.png`",
+        "raise disk limit in policy.xml: `<policy domain=\"resource\" name=\"disk\" value=\"50GiB\"/>`",
+        "clean up: `rm /tmp/magick-*` (leftover from prior crashes)"
+      ],
+      "constraints": [
+        "check `MAGICK_TMPDIR` (defaults to /tmp): `echo $MAGICK_TMPDIR`",
+        "Requires binaries or commands referenced in examples: MAGICK_TMPDIR, echo, rm."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-errors",
+        "legacy_title": "imagemagick error: unable to extend pixel cache"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "magick-error-magick-error-no-images-defined",
+      "kind": "error",
+      "title": "magick error: no images defined",
+      "statement": "No input image was successfully read before an output operation. Usually means input failed silently. Fix: (1) check that the input load worked: `magick identify input.png` first; (2) for piped: ensure stdin had data: `cat input.png | magick - out.jpg`; (3) common cause: shell glob matched zero files: `magick *.png out.jpg` with no PNGs; (4) ordering: input file must come before output operations.",
+      "source_url": "https://imagemagick.org/script/command-line-processing.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick identify input.png",
+        "cat input.png | magick - out.jpg",
+        "magick *.png out.jpg"
+      ],
+      "steps": [
+        "check that the input load worked: `magick identify input.png` first",
+        "for piped: ensure stdin had data: `cat input.png | magick - out.jpg`",
+        "common cause: shell glob matched zero files: `magick *.png out.jpg` with no PNGs",
+        "ordering: input file must come before output operations"
+      ],
+      "constraints": [
+        "check that the input load worked: `magick identify input.png` first",
+        "for piped: ensure stdin had data: `cat input.png | magick - out.jpg`",
+        "ordering: input file must come before output operations",
+        "Requires binaries or commands referenced in examples: cat, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-errors",
+        "legacy_title": "imagemagick error: no images defined"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "magick-error-magick-error-unable-to-set-font-font-not-found",
+      "kind": "error",
+      "title": "magick error: unable to set font / font not found",
+      "statement": "Font specified in `-font` doesn't exist. Fix: (1) list available: `magick -list font` (or `convert -list font`); (2) use direct path: `-font /path/to/font.ttf`; (3) common system paths: macOS `/System/Library/Fonts/`, Linux `/usr/share/fonts/`; (4) install Ghostscript fonts for default labels: `brew install ghostscript-fonts` / `apt install gsfonts`; (5) for Linux+Docker: explicitly mount fonts or install in image.",
+      "source_url": "https://imagemagick.org/script/command-line-options.php",
+      "source_type": "official_docs",
+      "commands": [
+        "-font",
+        "magick -list font",
+        "convert -list font",
+        "-font /path/to/font.ttf",
+        "/System/Library/Fonts/",
+        "/usr/share/fonts/",
+        "brew install ghostscript-fonts",
+        "apt install gsfonts"
+      ],
+      "steps": [
+        "list available: `magick -list font` (or `convert -list font`)",
+        "use direct path: `-font /path/to/font.ttf`",
+        "common system paths: macOS `/System/Library/Fonts/`, Linux `/usr/share/fonts/`",
+        "install Ghostscript fonts for default labels: `brew install ghostscript-fonts` / `apt install gsfonts`",
+        "for Linux+Docker: explicitly mount fonts or install in image"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -font, /System/Library/Fonts/, /usr/share/fonts/, apt, brew, convert, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-errors",
+        "legacy_title": "imagemagick error: unable to set font / font not found"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "magick-error-magick-error-missingdelegateerror-png-jpeg-webp-not-supported",
+      "kind": "error",
+      "title": "magick error: MissingDelegateError / 'png' / 'jpeg' / 'webp' not supported",
+      "statement": "Specific format library wasn't linked at build time. Fix: (1) check: `magick -list format | grep -i jpeg` shows whether JPG read/write is supported; (2) macOS rebuild: `brew reinstall imagemagick`; (3) Linux apt: `apt install libwebp-dev libheif-dev libjpeg-dev libpng-dev` then rebuild source; (4) for Docker: use `dpokidov/imagemagick` (full-featured); (5) verify: `magick -version` should list `webp` etc in 'Delegates' line.",
+      "source_url": "https://imagemagick.org/script/formats.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick -list format | grep -i jpeg",
+        "brew reinstall imagemagick",
+        "apt install libwebp-dev libheif-dev libjpeg-dev libpng-dev",
+        "dpokidov/imagemagick",
+        "magick -version",
+        "webp"
+      ],
+      "steps": [
+        "check: `magick -list format | grep -i jpeg` shows whether JPG read/write is supported",
+        "macOS rebuild: `brew reinstall imagemagick`",
+        "Linux apt: `apt install libwebp-dev libheif-dev libjpeg-dev libpng-dev` then rebuild source",
+        "for Docker: use `dpokidov/imagemagick` (full-featured)",
+        "verify: `magick -version` should list `webp` etc in 'Delegates' line"
+      ],
+      "constraints": [
+        "check: `magick -list format | grep -i jpeg` shows whether JPG read/write is supported",
+        "verify: `magick -version` should list `webp` etc in 'Delegates' line",
+        "Requires binaries or commands referenced in examples: apt, brew, dpokidov/imagemagick, magick, webp."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-errors",
+        "legacy_title": "imagemagick error: MissingDelegateError / 'png' / 'jpeg' / 'webp' not supported"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "magick-error-magick-error-geometry-does-not-contain-image",
+      "kind": "error",
+      "title": "magick error: geometry does not contain image",
+      "statement": "Crop/extract geometry would produce zero-size output (negative offset, too-large offset, etc). Fix: (1) syntax: `-crop WxH+X+Y` (X,Y are offsets from top-left); (2) check image dimensions: `identify input.png`; (3) for relative: `-crop 50%x100%+0+0` (half-width strip); (4) for tiles: `-crop 256x256` (no +X+Y produces N tiles).",
+      "source_url": "https://imagemagick.org/script/command-line-options.php",
+      "source_type": "official_docs",
+      "commands": [
+        "-crop WxH+X+Y",
+        "identify input.png",
+        "-crop 50%x100%+0+0",
+        "-crop 256x256"
+      ],
+      "steps": [
+        "syntax: `-crop WxH+X+Y` (X,Y are offsets from top-left)",
+        "check image dimensions: `identify input.png`",
+        "for relative: `-crop 50%x100%+0+0` (half-width strip)",
+        "for tiles: `-crop 256x256` (no +X+Y produces N tiles)"
+      ],
+      "constraints": [
+        "check image dimensions: `identify input.png`",
+        "Requires binaries or commands referenced in examples: -crop, identify."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-errors",
+        "legacy_title": "imagemagick error: geometry does not contain image"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "magick-error-magick-error-colorspace-error-unable-to-convert-to-cmyk",
+      "kind": "error",
+      "title": "magick error: colorspace error / unable to convert to CMYK",
+      "statement": "Conversion between colorspaces without ICC profile, or profile-less RGB\u2192CMYK request. Fix: (1) explicit profile: `magick rgb.png -profile /path/to/CMYK.icc -colorspace CMYK out.tif`; (2) for screen\u2192print: get the printer's ICC profile or use FOGRA39/SWOP defaults; (3) basic naive (good enough for proofs): `magick rgb.png -colorspace CMYK out.tif`; (4) check current colorspace: `identify -format '%[colorspace]' input.png`.",
+      "source_url": "https://imagemagick.org/script/color-management.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick rgb.png -profile /path/to/CMYK.icc -colorspace CMYK out.tif",
+        "magick rgb.png -colorspace CMYK out.tif",
+        "identify -format '%[colorspace]' input.png"
+      ],
+      "steps": [
+        "explicit profile: `magick rgb.png -profile /path/to/CMYK.icc -colorspace CMYK out.tif`",
+        "for screen\u2192print: get the printer's ICC profile or use FOGRA39/SWOP defaults",
+        "basic naive (good enough for proofs): `magick rgb.png -colorspace CMYK out.tif`",
+        "check current colorspace: `identify -format '%[colorspace]' input.png`"
+      ],
+      "constraints": [
+        "check current colorspace: `identify -format '%[colorspace]' input.png`",
+        "Requires binaries or commands referenced in examples: identify, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-errors",
+        "legacy_title": "imagemagick error: colorspace error / unable to convert to CMYK"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "magick-error-magick-error-negative-or-zero-image-size",
+      "kind": "error",
+      "title": "magick error: negative or zero image size",
+      "statement": "Operation produced 0-pixel result (crop way out of bounds, resize to 0%, etc.). Fix: (1) re-check `-crop` / `-resize` geometry; (2) for `-resize 0` (typo): use percent: `-resize 50%`; (3) for crop: must overlap with actual image; (4) for tiled montage: ensure each cell is non-zero.",
+      "source_url": "https://imagemagick.org/script/command-line-options.php",
+      "source_type": "official_docs",
+      "commands": [
+        "-crop",
+        "-resize",
+        "-resize 0",
+        "-resize 50%"
+      ],
+      "steps": [
+        "re-check `-crop` / `-resize` geometry",
+        "for `-resize 0` (typo): use percent: `-resize 50%`",
+        "for crop: must overlap with actual image",
+        "for tiled montage: ensure each cell is non-zero"
+      ],
+      "constraints": [
+        "re-check `-crop` / `-resize` geometry",
+        "for crop: must overlap with actual image",
+        "for tiled montage: ensure each cell is non-zero",
+        "Requires binaries or commands referenced in examples: -crop, -resize."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-errors",
+        "legacy_title": "imagemagick error: negative or zero image size"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "magick-error-magick-error-image-sequence-is-required",
+      "kind": "error",
+      "title": "magick error: image sequence is required",
+      "statement": "Operation needs multiple input images (montage, animate, fx multi-frame). Fix: (1) pass multiple: `magick a.png b.png c.png -append column.png`; (2) for animated GIF: `magick frame*.png -delay 10 -loop 0 out.gif`; (3) for montage: `magick montage 'frame*.png' -tile 4x4 grid.png`; (4) for `compare`: needs exactly 2: `magick compare a.png b.png diff.png`.",
+      "source_url": "https://imagemagick.org/script/command-line-processing.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick a.png b.png c.png -append column.png",
+        "magick frame*.png -delay 10 -loop 0 out.gif",
+        "magick montage 'frame*.png' -tile 4x4 grid.png",
+        "compare",
+        "magick compare a.png b.png diff.png"
+      ],
+      "steps": [
+        "pass multiple: `magick a.png b.png c.png -append column.png`",
+        "for animated GIF: `magick frame*.png -delay 10 -loop 0 out.gif`",
+        "for montage: `magick montage 'frame*.png' -tile 4x4 grid.png`",
+        "for `compare`: needs exactly 2: `magick compare a.png b.png diff.png`"
+      ],
+      "constraints": [
+        "for `compare`: needs exactly 2: `magick compare a.png b.png diff.png`",
+        "Requires binaries or commands referenced in examples: compare, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-errors",
+        "legacy_title": "imagemagick error: image sequence is required"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "magick-error-magick-error-unable-to-read-configure-file",
+      "kind": "error",
+      "title": "magick error: unable to read configure file",
+      "statement": "ImageMagick can't find magick.xml / policy.xml / delegates.xml. Fix: (1) `magick -list configure` shows where it looks; (2) reinstall: `brew reinstall imagemagick` or `apt reinstall imagemagick`; (3) point to custom: `MAGICK_CONFIGURE_PATH=/path/to/configs/`; (4) Docker: ensure /etc/ImageMagick-7/ is present in image; (5) check perms: configure dir must be readable by magick user.",
+      "source_url": "https://imagemagick.org/script/architecture.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick -list configure",
+        "brew reinstall imagemagick",
+        "apt reinstall imagemagick"
+      ],
+      "steps": [
+        "`magick -list configure` shows where it looks",
+        "reinstall: `brew reinstall imagemagick` or `apt reinstall imagemagick`",
+        "point to custom: `MAGICK_CONFIGURE_PATH=/path/to/configs/`",
+        "Docker: ensure /etc/ImageMagick-7/ is present in image",
+        "check perms: configure dir must be readable by magick user"
+      ],
+      "constraints": [
+        "Docker: ensure /etc/ImageMagick-7/ is present in image",
+        "check perms: configure dir must be readable by magick user",
+        "Requires binaries or commands referenced in examples: apt, brew, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-errors",
+        "legacy_title": "imagemagick error: unable to read configure file"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "magick-error-magick-warning-density-units-must-come-before-input",
+      "kind": "error",
+      "title": "magick warning: -density / -units must come BEFORE input",
+      "statement": "Some options affect how input is INTERPRETED \u2014 they must precede the input filename. Fix: (1) correct: `magick -density 300 input.pdf -resize 50% output.png`; (2) wrong: `magick input.pdf -density 300 out.png` (density applied AFTER load \u2014 too late for PDF rasterization); (3) general rule: 'global' options like -density, -depth, -units come first; transformation options come after input.",
+      "source_url": "https://imagemagick.org/script/command-line-processing.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick -density 300 input.pdf -resize 50% output.png",
+        "magick input.pdf -density 300 out.png"
+      ],
+      "steps": [
+        "correct: `magick -density 300 input.pdf -resize 50% output.png`",
+        "wrong: `magick input.pdf -density 300 out.png` (density applied AFTER load \u2014 too late for PDF rasterization)",
+        "general rule: 'global' options like -density, -depth, -units come first; transformation options come after input"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-errors",
+        "legacy_title": "imagemagick warning: -density / -units must come BEFORE input"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "magick-error-magick-error-webp-coder-error-no-webp-encoder",
+      "kind": "error",
+      "title": "magick error: WebP coder error / no webp encoder",
+      "statement": "libwebp not linked. Fix: (1) check: `magick -list format | grep -i webp`; (2) install: macOS `brew install webp && brew reinstall imagemagick`; Linux `apt install libwebp-dev` + rebuild; (3) for quick alternative: use `cwebp` external tool for WebP encoding, then move on with magick for the rest; (4) Docker: `dpokidov/imagemagick` includes webp.",
+      "source_url": "https://imagemagick.org/script/formats.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick -list format | grep -i webp",
+        "brew install webp && brew reinstall imagemagick",
+        "apt install libwebp-dev",
+        "cwebp",
+        "dpokidov/imagemagick"
+      ],
+      "steps": [
+        "check: `magick -list format | grep -i webp`",
+        "install: macOS `brew install webp && brew reinstall imagemagick`; Linux `apt install libwebp-dev` + rebuild",
+        "for quick alternative: use `cwebp` external tool for WebP encoding, then move on with magick for the rest",
+        "Docker: `dpokidov/imagemagick` includes webp"
+      ],
+      "constraints": [
+        "check: `magick -list format | grep -i webp`",
+        "Requires binaries or commands referenced in examples: apt, brew, cwebp, dpokidov/imagemagick, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-errors",
+        "legacy_title": "imagemagick error: WebP coder error / no webp encoder"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "magick-error-magick-error-heic-heif-input-failed",
+      "kind": "error",
+      "title": "magick error: HEIC / HEIF input failed",
+      "statement": "Apple HEIC needs libheif at build time. Fix: (1) check: `magick -list format | grep -i heic`; (2) macOS: `brew install libheif && brew reinstall imagemagick`; (3) Linux: `apt install libheif-dev` + rebuild from source; (4) Docker (recommended): `dpokidov/imagemagick:7-bookworm` ships heif; (5) fallback: convert HEIC to JPG with `sips -s format jpeg in.heic --out tmp.jpg` (macOS only) then process tmp.jpg.",
+      "source_url": "https://imagemagick.org/script/formats.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick -list format | grep -i heic",
+        "brew install libheif && brew reinstall imagemagick",
+        "apt install libheif-dev",
+        "dpokidov/imagemagick:7-bookworm",
+        "sips -s format jpeg in.heic --out tmp.jpg"
+      ],
+      "steps": [
+        "check: `magick -list format | grep -i heic`",
+        "macOS: `brew install libheif && brew reinstall imagemagick`",
+        "Linux: `apt install libheif-dev` + rebuild from source",
+        "Docker (recommended): `dpokidov/imagemagick:7-bookworm` ships heif",
+        "fallback: convert HEIC to JPG with `sips -s format jpeg in.heic --out tmp.jpg` (macOS only) then process tmp.jpg"
+      ],
+      "constraints": [
+        "check: `magick -list format | grep -i heic`",
+        "Requires binaries or commands referenced in examples: apt, brew, dpokidov/imagemagick:7-bookworm, magick, sips."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-errors",
+        "legacy_title": "imagemagick error: HEIC / HEIF input failed"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "magick-error-magick-error-unable-to-open-file-tmp-magick-xxxxx",
+      "kind": "error",
+      "title": "magick error: unable to open file '/tmp/magick-XXXXX'",
+      "statement": "Temp directory unwritable or full. Fix: (1) check: `df /tmp` \u2014 should have space; `ls -ld /tmp` \u2014 should be `drwxrwxrwt`; (2) use different temp: `MAGICK_TMPDIR=/var/big-tmp magick big.tif out.png`; (3) clean orphans: `rm /tmp/magick-*` (from prior crashes); (4) Docker: ensure /tmp is writeable + has space.",
+      "source_url": "https://imagemagick.org/script/resources.php",
+      "source_type": "official_docs",
+      "commands": [
+        "df /tmp",
+        "ls -ld /tmp",
+        "drwxrwxrwt",
+        "rm /tmp/magick-*"
+      ],
+      "steps": [
+        "check: `df /tmp` \u2014 should have space; `ls -ld /tmp` \u2014 should be `drwxrwxrwt`",
+        "use different temp: `MAGICK_TMPDIR=/var/big-tmp magick big.tif out.png`",
+        "clean orphans: `rm /tmp/magick-*` (from prior crashes)",
+        "Docker: ensure /tmp is writeable + has space"
+      ],
+      "constraints": [
+        "check: `df /tmp` \u2014 should have space; `ls -ld /tmp` \u2014 should be `drwxrwxrwt`",
+        "Docker: ensure /tmp is writeable + has space",
+        "Requires binaries or commands referenced in examples: df, drwxrwxrwt, ls, rm."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-errors",
+        "legacy_title": "imagemagick error: unable to open file '/tmp/magick-XXXXX'"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "magick-error-magick-error-insufficient-image-data-on-read",
+      "kind": "error",
+      "title": "magick error: insufficient image data on read",
+      "statement": "Input stream cut off before all pixel data arrived (often piped input from a process that died). Fix: (1) for HTTP-fed input: ensure full download before pipe: `curl -fsSL url | magick - out.jpg` (the `-f` fails on 4xx so pipe doesn't get partial); (2) for compressed input: ensure decompression completes \u2014 pipe order matters: `cat raw.gz | gunzip - | magick - out.jpg`; (3) check the file actually has data: `wc -c input.png`.",
+      "source_url": "https://imagemagick.org/script/formats.php",
+      "source_type": "official_docs",
+      "commands": [
+        "curl -fsSL url | magick - out.jpg",
+        "-f",
+        "cat raw.gz | gunzip - | magick - out.jpg",
+        "wc -c input.png"
+      ],
+      "steps": [
+        "for HTTP-fed input: ensure full download before pipe: `curl -fsSL url | magick - out.jpg` (the `-f` fails on 4xx so pipe doesn't get partial)",
+        "for compressed input: ensure decompression completes \u2014 pipe order matters: `cat raw.gz | gunzip - | magick - out.jpg`",
+        "check the file actually has data: `wc -c input.png`"
+      ],
+      "constraints": [
+        "for HTTP-fed input: ensure full download before pipe: `curl -fsSL url | magick - out.jpg` (the `-f` fails on 4xx so pipe doesn't get partial)",
+        "for compressed input: ensure decompression completes \u2014 pipe order matters: `cat raw.gz | gunzip - | magick - out.jpg`",
+        "check the file actually has data: `wc -c input.png`",
+        "Requires binaries or commands referenced in examples: -f, cat, curl, wc."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-errors",
+        "legacy_title": "imagemagick error: insufficient image data on read"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "magick-error-magick-error-cannot-allocate-pixel-cache-outofmemory",
+      "kind": "error",
+      "title": "magick error: cannot allocate pixel cache / OutOfMemory",
+      "statement": "Operation exceeded available RAM (and possibly disk fallback too). Fix: (1) check resource limits: `magick -list resource`; (2) reduce: use `-thumbnail` instead of `-resize` (cheaper, streams in chunks); (3) for very large input: pre-shrink: `magick big.tif -define jpeg:size=2000x2000 small.jpg`; (4) raise limits: env `MAGICK_MEMORY_LIMIT=8GiB MAGICK_MAP_LIMIT=16GiB` or policy.xml.",
+      "source_url": "https://imagemagick.org/script/resources.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick -list resource",
+        "-thumbnail",
+        "-resize",
+        "magick big.tif -define jpeg:size=2000x2000 small.jpg"
+      ],
+      "steps": [
+        "check resource limits: `magick -list resource`",
+        "reduce: use `-thumbnail` instead of `-resize` (cheaper, streams in chunks)",
+        "for very large input: pre-shrink: `magick big.tif -define jpeg:size=2000x2000 small.jpg`",
+        "raise limits: env `MAGICK_MEMORY_LIMIT=8GiB MAGICK_MAP_LIMIT=16GiB` or policy.xml"
+      ],
+      "constraints": [
+        "check resource limits: `magick -list resource`",
+        "Requires binaries or commands referenced in examples: -resize, -thumbnail, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-errors",
+        "legacy_title": "imagemagick error: cannot allocate pixel cache / OutOfMemory"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "magick-error-magick-error-imagemagick-is-not-installed-command-not-found",
+      "kind": "error",
+      "title": "magick error: ImageMagick is not installed / command not found",
+      "statement": "Not installed or not on PATH. Fix: (1) verify: `magick --version` or `convert --version`; (2) install macOS: `brew install imagemagick`; (3) Linux: `apt install imagemagick` or `dnf install ImageMagick`; (4) IM7 binary is `magick`; IM6 was `convert`/`identify`/`mogrify` (separate). Some distros still install IM6 by default; (5) for Docker: `dpokidov/imagemagick` is a popular IM7 image.",
+      "source_url": "https://imagemagick.org/script/binary-releases.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick --version",
+        "convert --version",
+        "brew install imagemagick",
+        "apt install imagemagick",
+        "dnf install ImageMagick",
+        "magick",
+        "convert",
+        "identify"
+      ],
+      "steps": [
+        "verify: `magick --version` or `convert --version`",
+        "install macOS: `brew install imagemagick`",
+        "Linux: `apt install imagemagick` or `dnf install ImageMagick`",
+        "IM7 binary is `magick`; IM6 was `convert`/`identify`/`mogrify` (separate). Some distros still install IM6 by default",
+        "for Docker: `dpokidov/imagemagick` is a popular IM7 image"
+      ],
+      "constraints": [
+        "verify: `magick --version` or `convert --version`",
+        "Requires binaries or commands referenced in examples: apt, brew, convert, dnf, identify, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-errors",
+        "legacy_title": "imagemagick error: ImageMagick is not installed / command not found"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "magick-error-magick-error-auto-orient-not-respected-exif-orientation-ignored",
+      "kind": "error",
+      "title": "magick error: -auto-orient not respected / EXIF orientation ignored",
+      "statement": "ImageMagick reads EXIF orientation but only rotates pixels if you explicitly ask. Fix: (1) add `-auto-orient`: `magick input.jpg -auto-orient out.jpg`; (2) then strip: `-auto-orient -strip` (removes EXIF after rotation); (3) for batch: `mogrify -auto-orient *.jpg`; (4) verify: `identify -format '%[orientation]' out.jpg` should say 'Undefined' or 'TopLeft' after auto-orient.",
+      "source_url": "https://imagemagick.org/script/command-line-options.php",
+      "source_type": "official_docs",
+      "commands": [
+        "-auto-orient",
+        "magick input.jpg -auto-orient out.jpg",
+        "-auto-orient -strip",
+        "mogrify -auto-orient *.jpg",
+        "identify -format '%[orientation]' out.jpg"
+      ],
+      "steps": [
+        "add `-auto-orient`: `magick input.jpg -auto-orient out.jpg`",
+        "then strip: `-auto-orient -strip` (removes EXIF after rotation)",
+        "for batch: `mogrify -auto-orient *.jpg`",
+        "verify: `identify -format '%[orientation]' out.jpg` should say 'Undefined' or 'TopLeft' after auto-orient"
+      ],
+      "constraints": [
+        "verify: `identify -format '%[orientation]' out.jpg` should say 'Undefined' or 'TopLeft' after auto-orient",
+        "Requires binaries or commands referenced in examples: -auto-orient, identify, magick, mogrify."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-errors",
+        "legacy_title": "imagemagick error: -auto-orient not respected / EXIF orientation ignored"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "magick-error-magick-error-animation-timing-wrong-frames-out-of-order",
+      "kind": "error",
+      "title": "magick error: animation timing wrong / frames out of order",
+      "statement": "Animated GIF/WebP frame order or delays don't match expectation. Fix: (1) explicit ordering: pass files in sequence: `magick frame_01.png frame_02.png ... -loop 0 out.gif` (NOT a wildcard that might re-sort); (2) consistent delays: `-delay 10` before all frames (= 100ms); (3) per-frame: `-delay 50 frame_01.png -delay 10 frame_02.png ...`; (4) loop forever: `-loop 0`; once: `-loop 1`; (5) dispose method: `-dispose previous` between frames to avoid ghosting.",
+      "source_url": "https://imagemagick.org/script/command-line-options.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick frame_01.png frame_02.png ... -loop 0 out.gif",
+        "-delay 10",
+        "-delay 50 frame_01.png -delay 10 frame_02.png ...",
+        "-loop 0",
+        "-loop 1",
+        "-dispose previous"
+      ],
+      "steps": [
+        "explicit ordering: pass files in sequence: `magick frame_01.png frame_02.png ... -loop 0 out.gif` (NOT a wildcard that might re-sort)",
+        "consistent delays: `-delay 10` before all frames (= 100ms)",
+        "per-frame: `-delay 50 frame_01.png -delay 10 frame_02.png ...`",
+        "loop forever: `-loop 0`; once: `-loop 1`",
+        "dispose method: `-dispose previous` between frames to avoid ghosting"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -delay, -dispose, -loop, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-errors",
+        "legacy_title": "imagemagick error: animation timing wrong / frames out of order"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-resize-while-maintaining-aspect-ratio",
+      "kind": "recipe",
+      "title": "magick recipe: resize while maintaining aspect ratio",
+      "statement": "`magick input.jpg -resize 800x600 output.jpg` resizes to FIT in 800x600 (smaller dim wins). Width-only: `-resize 800x` (height auto). Height-only: `-resize x600`. Percent: `-resize 50%`. Don't upscale: `-resize 800x600\\>` (the `\\>` means 'only if larger'). Ignore aspect (force exact): `-resize 800x600!` (the `!` distorts).",
+      "source_url": "https://imagemagick.org/script/command-line-options.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick input.jpg -resize 800x600 output.jpg",
+        "-resize 800x",
+        "-resize x600",
+        "-resize 50%",
+        "-resize 800x600\\>",
+        "-resize 800x600!"
+      ],
+      "steps": [
+        "`magick input.jpg -resize 800x600 output.jpg` resizes to FIT in 800x600 (smaller dim wins). Width-only: `-resize 800x` (height auto). Height-only: `-resize x600`. Percent: `-resize 50%`. Don't upscale: `-resize 800x600\\>` (the `\\>` means 'only if larger'). Ignore aspect (force exact): `-resize 800x600!` (the `!` distorts)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -resize, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: resize while maintaining aspect ratio"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-convert-image-format-png-jpg-webp",
+      "kind": "recipe",
+      "title": "magick recipe: convert image format (PNG \u2194 JPG \u2194 WebP)",
+      "statement": "`magick input.png output.jpg` \u2014 extension determines format. Set JPG quality: `-quality 85` (default 92; 75 is common 'web' compromise). WebP: `magick input.jpg output.webp -quality 80`. Preserve alpha (PNG \u2192 WebP): WebP supports alpha; JPG doesn't (will flatten to white). Force format: `magick input.dat JPEG:output.jpg`.",
+      "source_url": "https://imagemagick.org/script/formats.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick input.png output.jpg",
+        "-quality 85",
+        "magick input.jpg output.webp -quality 80",
+        "magick input.dat JPEG:output.jpg"
+      ],
+      "steps": [
+        "`magick input.png output.jpg` \u2014 extension determines format. Set JPG quality: `-quality 85` (default 92; 75 is common 'web' compromise). WebP: `magick input.jpg output.webp -quality 80`. Preserve alpha (PNG \u2192 WebP): WebP supports alpha; JPG doesn't (will flatten to white). Force format: `magick input.dat JPEG:output.jpg`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -quality, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: convert image format (PNG \u2194 JPG \u2194 WebP)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-crop-to-specific-region",
+      "kind": "recipe",
+      "title": "magick recipe: crop to specific region",
+      "statement": "`magick input.png -crop WxH+X+Y output.png` where X,Y is the top-left of the crop. Center crop to square: `magick input.png -gravity center -crop 1000x1000+0+0 +repage output.png` (the `+repage` resets the offset metadata). Crop to aspect ratio: `-crop 16:9+0+0` (modern syntax; or compute dimensions). Tile crop (each chunk becomes a separate output): `-crop 256x256 tile_%d.png`.",
+      "source_url": "https://imagemagick.org/script/command-line-options.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick input.png -crop WxH+X+Y output.png",
+        "magick input.png -gravity center -crop 1000x1000+0+0 +repage output.png",
+        "-crop 16:9+0+0",
+        "-crop 256x256 tile_%d.png"
+      ],
+      "steps": [
+        "`magick input.png -crop WxH+X+Y output.png` where X,Y is the top-left of the crop. Center crop to square: `magick input.png -gravity center -crop 1000x1000+0+0 +repage output.png` (the `+repage` resets the offset metadata). Crop to aspect ratio: `-crop 16:9+0+0` (modern syntax; or compute dimensions). Tile crop (each chunk becomes a separate output): `-crop 256x256 tile_%d.png`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -crop, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: crop to specific region"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-rotate-by-n-degrees",
+      "kind": "recipe",
+      "title": "magick recipe: rotate by N degrees",
+      "statement": "`magick input.png -rotate 90 output.png` (90 = clockwise; -90 = counter). Fill background for non-90\u00b0 rotations: `-background white -rotate 30 -alpha remove output.png`. Keep transparent BG: omit `-alpha remove`. Auto-rotate by EXIF: `-auto-orient` (handles iPhone portrait/landscape).",
+      "source_url": "https://imagemagick.org/script/command-line-options.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick input.png -rotate 90 output.png",
+        "-background white -rotate 30 -alpha remove output.png",
+        "-alpha remove",
+        "-auto-orient"
+      ],
+      "steps": [
+        "`magick input.png -rotate 90 output.png` (90 = clockwise; -90 = counter). Fill background for non-90\u00b0 rotations: `-background white -rotate 30 -alpha remove output.png`. Keep transparent BG: omit `-alpha remove`. Auto-rotate by EXIF: `-auto-orient` (handles iPhone portrait/landscape)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -alpha, -auto-orient, -background, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: rotate by N degrees"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-strip-metadata-exif-iptc-color-profile",
+      "kind": "recipe",
+      "title": "magick recipe: strip metadata (EXIF, IPTC, color profile)",
+      "statement": "Remove all: `magick input.jpg -strip output.jpg`. Smaller file + privacy: also kills GPS coords, camera info, thumbnail. Keep ICC profile (color management): `-profile /path/to/sRGB.icc -strip` then re-apply. For batch: `mogrify -strip *.jpg`. Check before/after: `identify -verbose input.jpg | grep -E 'Exif|GPS'`.",
+      "source_url": "https://imagemagick.org/script/command-line-options.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick input.jpg -strip output.jpg",
+        "-profile /path/to/sRGB.icc -strip",
+        "mogrify -strip *.jpg",
+        "identify -verbose input.jpg | grep -E 'Exif|GPS'"
+      ],
+      "steps": [
+        "Remove all: `magick input.jpg -strip output.jpg`. Smaller file + privacy: also kills GPS coords, camera info, thumbnail. Keep ICC profile (color management): `-profile /path/to/sRGB.icc -strip` then re-apply. For batch: `mogrify -strip *.jpg`. Check before/after: `identify -verbose input.jpg | grep -E 'Exif|GPS'`"
+      ],
+      "constraints": [
+        "Remove all: `magick input.jpg -strip output.jpg`. Smaller file + privacy: also kills GPS coords, camera info, thumbnail. Keep ICC profile (color management): `-profile /path/to/sRGB.icc -strip` then re-apply. For batch: `mogrify -strip *.jpg`. Check before/after: `identify -verbose input.jpg | grep -E 'Exif|GPS'`",
+        "Requires binaries or commands referenced in examples: -profile, identify, magick, mogrify."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: strip metadata (EXIF, IPTC, color profile)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-reduce-jpg-file-size-with-quality",
+      "kind": "recipe",
+      "title": "magick recipe: reduce JPG file size with quality",
+      "statement": "`magick input.jpg -quality 75 -strip output.jpg` typically halves file size with minimal visible loss. More aggressive: `-quality 60`. Progressive (better for web): `-interlace Plane`. Better encoder: `-sampling-factor 4:2:0` (chroma subsampling = standard web). Combined: `magick input.jpg -strip -interlace Plane -sampling-factor 4:2:0 -quality 80 output.jpg`.",
+      "source_url": "https://imagemagick.org/script/command-line-options.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick input.jpg -quality 75 -strip output.jpg",
+        "-quality 60",
+        "-interlace Plane",
+        "-sampling-factor 4:2:0",
+        "magick input.jpg -strip -interlace Plane -sampling-factor 4:2:0 -quality 80 output.jpg"
+      ],
+      "steps": [
+        "`magick input.jpg -quality 75 -strip output.jpg` typically halves file size with minimal visible loss. More aggressive: `-quality 60`. Progressive (better for web): `-interlace Plane`. Better encoder: `-sampling-factor 4:2:0` (chroma subsampling = standard web). Combined: `magick input.jpg -strip -interlace Plane -sampling-factor 4:2:0 -quality 80 output.jpg`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -interlace, -quality, -sampling-factor, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: reduce JPG file size with quality"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-generate-thumbnails-in-batch",
+      "kind": "recipe",
+      "title": "magick recipe: generate thumbnails in batch",
+      "statement": "Single dir: `for f in *.jpg; do magick \"$f\" -thumbnail 300x300\\> -quality 85 \"thumbs/$f\"; done`. Native batch: `mogrify -path thumbs/ -thumbnail 300x300\\> -quality 85 *.jpg`. Faster (parallel): `find . -name '*.jpg' | xargs -P 4 -I {} magick {} -thumbnail 300x300\\> thumbs/{}`. `-thumbnail` is faster than `-resize` for downscales (uses pre-blur + nearest-neighbor).",
+      "source_url": "https://imagemagick.org/script/command-line-options.php",
+      "source_type": "official_docs",
+      "commands": [
+        "for f in *.jpg; do magick \"$f\" -thumbnail 300x300\\> -quality 85 \"thumbs/$f\"; done",
+        "mogrify -path thumbs/ -thumbnail 300x300\\> -quality 85 *.jpg",
+        "find . -name '*.jpg' | xargs -P 4 -I {} magick {} -thumbnail 300x300\\> thumbs/{}",
+        "-thumbnail",
+        "-resize"
+      ],
+      "steps": [
+        "Single dir: `for f in *.jpg; do magick \"$f\" -thumbnail 300x300\\> -quality 85 \"thumbs/$f\"; done`. Native batch: `mogrify -path thumbs/ -thumbnail 300x300\\> -quality 85 *.jpg`. Faster (parallel): `find . -name '*.jpg' | xargs -P 4 -I {} magick {} -thumbnail 300x300\\> thumbs/{}`. `-thumbnail` is faster than `-resize` for downscales (uses pre-blur + nearest-neighbor)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -resize, -thumbnail, find, for, mogrify."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: generate thumbnails in batch"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-composite-watermark-logo-overlay",
+      "kind": "recipe",
+      "title": "magick recipe: composite watermark / logo overlay",
+      "statement": "Bottom-right with margin: `magick input.png logo.png -gravity southeast -geometry +20+20 -composite output.png`. Top-left: `-gravity northwest`. Center: `-gravity center -geometry +0+0`. Semi-transparent: pre-process logo: `magick logo.png -alpha set -channel A -evaluate set 50% +channel logo-50.png`. Tile across whole image: `-composite -tile`.",
+      "source_url": "https://imagemagick.org/script/composite.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick input.png logo.png -gravity southeast -geometry +20+20 -composite output.png",
+        "-gravity northwest",
+        "-gravity center -geometry +0+0",
+        "magick logo.png -alpha set -channel A -evaluate set 50% +channel logo-50.png",
+        "-composite -tile"
+      ],
+      "steps": [
+        "Bottom-right with margin: `magick input.png logo.png -gravity southeast -geometry +20+20 -composite output.png`. Top-left: `-gravity northwest`. Center: `-gravity center -geometry +0+0`. Semi-transparent: pre-process logo: `magick logo.png -alpha set -channel A -evaluate set 50% +channel logo-50.png`. Tile across whole image: `-composite -tile`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -composite, -gravity, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: composite watermark / logo overlay"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-add-text-overlay-label-caption",
+      "kind": "recipe",
+      "title": "magick recipe: add text overlay (label / caption)",
+      "statement": "Simple text: `magick input.png -gravity south -pointsize 36 -fill white -annotate +0+20 'My Caption' output.png`. Multi-line: use `caption:` or `label:`: `magick -size 800x -background transparent -fill white -font /System/Library/Fonts/Helvetica.ttc -pointsize 40 caption:'Multi\\nline\\ntext' caption.png` then composite. Specific font: `-font /path/to/font.ttf`. List available: `magick -list font`.",
+      "source_url": "https://imagemagick.org/script/command-line-options.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick input.png -gravity south -pointsize 36 -fill white -annotate +0+20 'My Caption' output.png",
+        "caption:",
+        "label:",
+        "magick -size 800x -background transparent -fill white -font /System/Library/Fonts/Helvetica.ttc -pointsize 40 caption:'Multi\\nline\\ntext' caption.png",
+        "-font /path/to/font.ttf",
+        "magick -list font"
+      ],
+      "steps": [
+        "Simple text: `magick input.png -gravity south -pointsize 36 -fill white -annotate +0+20 'My Caption' output.png`. Multi-line: use `caption:` or `label:`: `magick -size 800x -background transparent -fill white -font /System/Library/Fonts/Helvetica.ttc -pointsize 40 caption:'Multi\\nline\\ntext' caption.png` then composite. Specific font: `-font /path/to/font.ttf`. List available: `magick -list font`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -font, caption:, label:, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: add text overlay (label / caption)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-create-animated-gif-from-frames",
+      "kind": "recipe",
+      "title": "magick recipe: create animated GIF from frames",
+      "statement": "`magick frame_*.png -delay 10 -loop 0 animation.gif` (delay in centiseconds; 10 = 100ms = 10 fps). Per-frame delay: `magick -delay 50 frame_1.png -delay 10 frame_2.png ... animation.gif`. Optimize size: `-layers Optimize animation.gif`. Reduce palette: `-colors 64`. Reverse: `-reverse`.",
+      "source_url": "https://imagemagick.org/script/command-line-options.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick frame_*.png -delay 10 -loop 0 animation.gif",
+        "magick -delay 50 frame_1.png -delay 10 frame_2.png ... animation.gif",
+        "-layers Optimize animation.gif",
+        "-colors 64",
+        "-reverse"
+      ],
+      "steps": [
+        "`magick frame_*.png -delay 10 -loop 0 animation.gif` (delay in centiseconds; 10 = 100ms = 10 fps). Per-frame delay: `magick -delay 50 frame_1.png -delay 10 frame_2.png ... animation.gif`. Optimize size: `-layers Optimize animation.gif`. Reduce palette: `-colors 64`. Reverse: `-reverse`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -colors, -layers, -reverse, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: create animated GIF from frames"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-extract-frames-from-animated-gif",
+      "kind": "recipe",
+      "title": "magick recipe: extract frames from animated GIF",
+      "statement": "`magick animation.gif frame_%03d.png` produces frame_000.png, frame_001.png, etc. First frame only: `magick 'animation.gif[0]' first.png`. Specific range: `magick 'animation.gif[0-5]' frame_%d.png`. With composited differences (full frames): `magick animation.gif -coalesce frame_%03d.png` (handles GIF disposal correctly).",
+      "source_url": "https://imagemagick.org/script/command-line-processing.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick animation.gif frame_%03d.png",
+        "magick 'animation.gif[0]' first.png",
+        "magick 'animation.gif[0-5]' frame_%d.png",
+        "magick animation.gif -coalesce frame_%03d.png"
+      ],
+      "steps": [
+        "`magick animation.gif frame_%03d.png` produces frame_000.png, frame_001.png, etc. First frame only: `magick 'animation.gif[0]' first.png`. Specific range: `magick 'animation.gif[0-5]' frame_%d.png`. With composited differences (full frames): `magick animation.gif -coalesce frame_%03d.png` (handles GIF disposal correctly)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: extract frames from animated GIF"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-convert-pdf-to-png-with-high-dpi",
+      "kind": "recipe",
+      "title": "magick recipe: convert PDF to PNG (with high DPI)",
+      "statement": "`magick -density 300 input.pdf output.png`. `-density` MUST come before input for PDF rasterization. Multi-page \u2192 individual images: `magick -density 300 input.pdf page_%03d.png`. Specific page: `magick -density 300 'input.pdf[2]' page_3.png` (zero-indexed). Better quality (slower): `-density 600`. May require Ghostscript: install with `brew install ghostscript` or `apt install ghostscript`.",
+      "source_url": "https://imagemagick.org/script/formats.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick -density 300 input.pdf output.png",
+        "-density",
+        "magick -density 300 input.pdf page_%03d.png",
+        "magick -density 300 'input.pdf[2]' page_3.png",
+        "-density 600",
+        "brew install ghostscript",
+        "apt install ghostscript"
+      ],
+      "steps": [
+        "`magick -density 300 input.pdf output.png`. `-density` MUST come before input for PDF rasterization. Multi-page \u2192 individual images: `magick -density 300 input.pdf page_%03d.png`. Specific page: `magick -density 300 'input.pdf[2]' page_3.png` (zero-indexed). Better quality (slower): `-density 600`. May require Ghostscript: install with `brew install ghostscript` or `apt install ghostscript`"
+      ],
+      "constraints": [
+        "`magick -density 300 input.pdf output.png`. `-density` MUST come before input for PDF rasterization. Multi-page \u2192 individual images: `magick -density 300 input.pdf page_%03d.png`. Specific page: `magick -density 300 'input.pdf[2]' page_3.png` (zero-indexed). Better quality (slower): `-density 600`. May require Ghostscript: install with `brew install ghostscript` or `apt install ghostscript`",
+        "Requires binaries or commands referenced in examples: -density, apt, brew, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: convert PDF to PNG (with high DPI)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-pdf-to-single-multi-page-tiff-or-stacked-png",
+      "kind": "recipe",
+      "title": "magick recipe: PDF to single multi-page TIFF or stacked PNG",
+      "statement": "`magick -density 300 input.pdf -alpha remove -compress lzw multipage.tif` (TIFF supports multi-page). Stacked PNG (montage of pages): `magick -density 200 input.pdf -resize 50% -append all-pages.png`. Side-by-side: `+append` (instead of `-append`). For thumbnails of every page: `magick -density 100 input.pdf -resize 200x -tile 4x -montage all.png`.",
+      "source_url": "https://imagemagick.org/script/formats.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick -density 300 input.pdf -alpha remove -compress lzw multipage.tif",
+        "magick -density 200 input.pdf -resize 50% -append all-pages.png",
+        "-append",
+        "magick -density 100 input.pdf -resize 200x -tile 4x -montage all.png"
+      ],
+      "steps": [
+        "`magick -density 300 input.pdf -alpha remove -compress lzw multipage.tif` (TIFF supports multi-page). Stacked PNG (montage of pages): `magick -density 200 input.pdf -resize 50% -append all-pages.png`. Side-by-side: `+append` (instead of `-append`). For thumbnails of every page: `magick -density 100 input.pdf -resize 200x -tile 4x -montage all.png`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -append, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: PDF to single multi-page TIFF or stacked PNG"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-sharpen-or-blur-an-image",
+      "kind": "recipe",
+      "title": "magick recipe: sharpen or blur an image",
+      "statement": "Sharpen: `magick input.png -sharpen 0x1 output.png` (sigma=1.0 \u2014 subtle). Unsharp mask (more control): `-unsharp 0x1+1+0.05` (radius x sigma + amount + threshold). Blur: `-blur 0x3` (Gaussian, sigma=3). Motion blur: `-motion-blur 0x10+45` (direction = 45\u00b0). Radial: `-radial-blur 45`. Mild noise reduction: `-despeckle`.",
+      "source_url": "https://imagemagick.org/script/command-line-options.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick input.png -sharpen 0x1 output.png",
+        "-unsharp 0x1+1+0.05",
+        "-blur 0x3",
+        "-motion-blur 0x10+45",
+        "-radial-blur 45",
+        "-despeckle"
+      ],
+      "steps": [
+        "Sharpen: `magick input.png -sharpen 0x1 output.png` (sigma=1.0 \u2014 subtle). Unsharp mask (more control): `-unsharp 0x1+1+0.05` (radius x sigma + amount + threshold). Blur: `-blur 0x3` (Gaussian, sigma=3). Motion blur: `-motion-blur 0x10+45` (direction = 45\u00b0). Radial: `-radial-blur 45`. Mild noise reduction: `-despeckle`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -blur, -despeckle, -motion-blur, -radial-blur, -unsharp, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: sharpen or blur an image"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-adjust-brightness-contrast-saturation",
+      "kind": "recipe",
+      "title": "magick recipe: adjust brightness, contrast, saturation",
+      "statement": "Brightness/Contrast (separate): `magick input.png -brightness-contrast 10x20 output.png` (+10% brightness, +20% contrast). Modulate (brightness \u00d7 saturation \u00d7 hue %): `-modulate 110,150,100` (110% brightness, 150% saturation, hue unchanged). Auto-level: `-auto-level` (stretches dynamic range). Specific channel: `-channel R -level 0%,80%` (red channel only). Gamma: `-gamma 1.5` (>1 brighter, <1 darker).",
+      "source_url": "https://imagemagick.org/script/command-line-options.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick input.png -brightness-contrast 10x20 output.png",
+        "-modulate 110,150,100",
+        "-auto-level",
+        "-channel R -level 0%,80%",
+        "-gamma 1.5"
+      ],
+      "steps": [
+        "Brightness/Contrast (separate): `magick input.png -brightness-contrast 10x20 output.png` (+10% brightness, +20% contrast). Modulate (brightness \u00d7 saturation \u00d7 hue %): `-modulate 110,150,100` (110% brightness, 150% saturation, hue unchanged). Auto-level: `-auto-level` (stretches dynamic range). Specific channel: `-channel R -level 0%,80%` (red channel only). Gamma: `-gamma 1.5` (>1 brighter, <1 darker)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -auto-level, -channel, -gamma, -modulate, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: adjust brightness, contrast, saturation"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-convert-to-grayscale",
+      "kind": "recipe",
+      "title": "magick recipe: convert to grayscale",
+      "statement": "Simple: `magick input.png -colorspace Gray output.png`. Preserve original colorspace metadata but desaturate: `-modulate 100,0,100` (sets saturation to 0). Weighted (perceptual): `-grayscale Rec709Luma`. Average channels (faster, less accurate): `-grayscale Average`. Single channel: `-channel R -separate` (just red channel as grayscale).",
+      "source_url": "https://imagemagick.org/script/command-line-options.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick input.png -colorspace Gray output.png",
+        "-modulate 100,0,100",
+        "-grayscale Rec709Luma",
+        "-grayscale Average",
+        "-channel R -separate"
+      ],
+      "steps": [
+        "Simple: `magick input.png -colorspace Gray output.png`. Preserve original colorspace metadata but desaturate: `-modulate 100,0,100` (sets saturation to 0). Weighted (perceptual): `-grayscale Rec709Luma`. Average channels (faster, less accurate): `-grayscale Average`. Single channel: `-channel R -separate` (just red channel as grayscale)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -channel, -grayscale, -modulate, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: convert to grayscale"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-apply-sepia-or-vintage-tone",
+      "kind": "recipe",
+      "title": "magick recipe: apply sepia or vintage tone",
+      "statement": "Sepia: `magick input.png -sepia-tone 80% output.png` (intensity 0-100). Old photo (combined): `magick input.png -modulate 90,10,100 -sepia-tone 50% -fill '#704214' -tint 30 -border 20x20 -bordercolor '#3a2412' output.png`. Black + white + grain: `-colorspace Gray +noise Gaussian -attenuate 0.1`.",
+      "source_url": "https://imagemagick.org/script/command-line-options.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick input.png -sepia-tone 80% output.png",
+        "magick input.png -modulate 90,10,100 -sepia-tone 50% -fill '#704214' -tint 30 -border 20x20 -bordercolor '#3a2412' output.png",
+        "-colorspace Gray +noise Gaussian -attenuate 0.1"
+      ],
+      "steps": [
+        "Sepia: `magick input.png -sepia-tone 80% output.png` (intensity 0-100). Old photo (combined): `magick input.png -modulate 90,10,100 -sepia-tone 50% -fill '#704214' -tint 30 -border 20x20 -bordercolor '#3a2412' output.png`. Black + white + grain: `-colorspace Gray +noise Gaussian -attenuate 0.1`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -colorspace, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: apply sepia or vintage tone"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-pad-extend-image-to-specific-dimensions",
+      "kind": "recipe",
+      "title": "magick recipe: pad / extend image to specific dimensions",
+      "statement": "Add transparent padding: `magick input.png -gravity center -background none -extent 1200x1200 output.png`. White background: `-background white`. Specific color: `-background '#cccccc'`. Off-center: change `-gravity` (north, south, east, west, center, etc). For exact dimensions WITH resize fit: `-resize 1200x1200 -gravity center -extent 1200x1200` (resizes to fit, then pads).",
+      "source_url": "https://imagemagick.org/script/command-line-options.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick input.png -gravity center -background none -extent 1200x1200 output.png",
+        "-background white",
+        "-background '#cccccc'",
+        "-gravity",
+        "-resize 1200x1200 -gravity center -extent 1200x1200"
+      ],
+      "steps": [
+        "Add transparent padding: `magick input.png -gravity center -background none -extent 1200x1200 output.png`. White background: `-background white`. Specific color: `-background '#cccccc'`. Off-center: change `-gravity` (north, south, east, west, center, etc). For exact dimensions WITH resize fit: `-resize 1200x1200 -gravity center -extent 1200x1200` (resizes to fit, then pads)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -background, -gravity, -resize, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: pad / extend image to specific dimensions"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-compare-two-images-perceptual-difference",
+      "kind": "recipe",
+      "title": "magick recipe: compare two images (perceptual difference)",
+      "statement": "Numeric distance: `magick compare -metric AE a.png b.png difference.png` prints differing pixel count + writes red highlight image. Other metrics: `RMSE` (root mean square error), `PSNR` (peak signal-to-noise), `SSIM` (structural). Just the number: `magick compare -metric AE a.png b.png null: 2>&1`. Side-by-side viewer: `magick a.png b.png +append comparison.png`.",
+      "source_url": "https://imagemagick.org/script/compare.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick compare -metric AE a.png b.png difference.png",
+        "RMSE",
+        "PSNR",
+        "SSIM",
+        "magick compare -metric AE a.png b.png null: 2>&1",
+        "magick a.png b.png +append comparison.png"
+      ],
+      "steps": [
+        "Numeric distance: `magick compare -metric AE a.png b.png difference.png` prints differing pixel count + writes red highlight image. Other metrics: `RMSE` (root mean square error), `PSNR` (peak signal-to-noise), `SSIM` (structural). Just the number: `magick compare -metric AE a.png b.png null: 2>&1`. Side-by-side viewer: `magick a.png b.png +append comparison.png`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: PSNR, RMSE, SSIM, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: compare two images (perceptual difference)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-identify-image-info-dimensions-format-color-depth",
+      "kind": "recipe",
+      "title": "magick recipe: identify image info (dimensions, format, color depth)",
+      "statement": "`magick identify input.png` (or `identify input.png`). Verbose: `identify -verbose input.png | less` (full EXIF + properties). Specific format: `identify -format 'width=%w height=%h format=%m colorspace=%[colorspace] depth=%[depth]\\n' input.png`. All images in dir: `identify *.png`. JSON: `magick identify -format '%[json]' input.png`.",
+      "source_url": "https://imagemagick.org/script/identify.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick identify input.png",
+        "identify input.png",
+        "identify -verbose input.png | less",
+        "identify -format 'width=%w height=%h format=%m colorspace=%[colorspace] depth=%[depth]\\n' input.png",
+        "identify *.png",
+        "magick identify -format '%[json]' input.png"
+      ],
+      "steps": [
+        "`magick identify input.png` (or `identify input.png`). Verbose: `identify -verbose input.png | less` (full EXIF + properties). Specific format: `identify -format 'width=%w height=%h format=%m colorspace=%[colorspace] depth=%[depth]\\n' input.png`. All images in dir: `identify *.png`. JSON: `magick identify -format '%[json]' input.png`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: identify, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: identify image info (dimensions, format, color depth)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-bulk-process-a-directory-resize-convert-all",
+      "kind": "recipe",
+      "title": "magick recipe: bulk-process a directory (resize/convert all)",
+      "statement": "`mogrify -resize 1200\\> -quality 85 -format jpg *.png` (in-place, but `-format jpg` writes new .jpg files). To different dir: `mogrify -path resized/ -resize 1200\\> *.jpg`. Recursive: `find . -name '*.jpg' -exec magick {} -resize 1200\\> {} \\;` (overwrites originals). Parallel: `find . -name '*.jpg' | xargs -P 4 -I {} magick {} -resize 1200\\> resized/{}`.",
+      "source_url": "https://imagemagick.org/script/mogrify.php",
+      "source_type": "official_docs",
+      "commands": [
+        "mogrify -resize 1200\\> -quality 85 -format jpg *.png",
+        "-format jpg",
+        "mogrify -path resized/ -resize 1200\\> *.jpg",
+        "find . -name '*.jpg' -exec magick {} -resize 1200\\> {} \\;",
+        "find . -name '*.jpg' | xargs -P 4 -I {} magick {} -resize 1200\\> resized/{}"
+      ],
+      "steps": [
+        "`mogrify -resize 1200\\> -quality 85 -format jpg *.png` (in-place, but `-format jpg` writes new .jpg files). To different dir: `mogrify -path resized/ -resize 1200\\> *.jpg`. Recursive: `find . -name '*.jpg' -exec magick {} -resize 1200\\> {} \\;` (overwrites originals). Parallel: `find . -name '*.jpg' | xargs -P 4 -I {} magick {} -resize 1200\\> resized/{}`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -format, find, mogrify."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: bulk-process a directory (resize/convert all)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-generate-a-favicon-multi-resolution-ico",
+      "kind": "recipe",
+      "title": "magick recipe: generate a favicon (multi-resolution ICO)",
+      "statement": "`magick input.png -define icon:auto-resize=64,48,32,16 favicon.ico`. Produces ICO with all common sizes embedded. Modern web favicon (PNG): single 32x32 or 192x192 PNG often sufficient. For Apple touch icon: `magick input.png -resize 180x180 apple-touch-icon.png`.",
+      "source_url": "https://imagemagick.org/script/formats.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick input.png -define icon:auto-resize=64,48,32,16 favicon.ico",
+        "magick input.png -resize 180x180 apple-touch-icon.png"
+      ],
+      "steps": [
+        "`magick input.png -define icon:auto-resize=64,48,32,16 favicon.ico`. Produces ICO with all common sizes embedded. Modern web favicon (PNG): single 32x32 or 192x192 PNG often sufficient. For Apple touch icon: `magick input.png -resize 180x180 apple-touch-icon.png`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: generate a favicon (multi-resolution ICO)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-create-a-flat-color-canvas",
+      "kind": "recipe",
+      "title": "magick recipe: create a flat-color canvas",
+      "statement": "`magick -size 1200x800 xc:'#3a5f8f' canvas.png`. `xc:` = X canvas. Color names also work: `xc:red`, `xc:'rgb(255,128,64)'`. Transparent: `xc:transparent` or `xc:none`. Gradient: `magick -size 800x600 gradient:blue-red gradient.png`. Radial: `-size 800x600 radial-gradient:white-black radial.png`.",
+      "source_url": "https://imagemagick.org/script/command-line-options.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick -size 1200x800 xc:'#3a5f8f' canvas.png",
+        "xc:",
+        "xc:red",
+        "xc:transparent",
+        "xc:none",
+        "magick -size 800x600 gradient:blue-red gradient.png",
+        "-size 800x600 radial-gradient:white-black radial.png"
+      ],
+      "steps": [
+        "`magick -size 1200x800 xc:'#3a5f8f' canvas.png`. `xc:` = X canvas. Color names also work: `xc:red`, `xc:'rgb(255,128,64)'`. Transparent: `xc:transparent` or `xc:none`. Gradient: `magick -size 800x600 gradient:blue-red gradient.png`. Radial: `-size 800x600 radial-gradient:white-black radial.png`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -size, magick, xc:, xc:none, xc:red, xc:transparent."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: create a flat-color canvas"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-add-a-border-frame-around-image",
+      "kind": "recipe",
+      "title": "magick recipe: add a border / frame around image",
+      "statement": "Solid color: `magick input.png -bordercolor '#333' -border 10 output.png` (10px on all sides). Asymmetric: `-border 20x10` (20 horizontal, 10 vertical). Beveled (3D look): `-frame 20x20+5+5`. Rounded corners: `magick input.png \\( +clone -alpha extract -draw 'fill black polygon 0,0 0,20 20,0 fill white circle 20,20 20,0' \\( +clone -flip \\) -compose Multiply -composite \\( +clone -flop \\) -compose Multiply -composite \\) -alpha off -compose CopyOpacity -composite output.png` (complex but works).",
+      "source_url": "https://imagemagick.org/script/command-line-options.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick input.png -bordercolor '#333' -border 10 output.png",
+        "-border 20x10",
+        "-frame 20x20+5+5"
+      ],
+      "steps": [
+        "Solid color: `magick input.png -bordercolor '#333' -border 10 output.png` (10px on all sides). Asymmetric: `-border 20x10` (20 horizontal, 10 vertical). Beveled (3D look): `-frame 20x20+5+5`. Rounded corners: `magick input.png \\( +clone -alpha extract -draw 'fill black polygon 0,0 0,20 20,0 fill white circle 20,20 20,0' \\( +clone -flip \\) -compose Multiply -composite \\( +clone -flop \\) -compose Multiply -composite \\) -alpha off -compose CopyOpacity -composite output.png` (complex but works)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -border, -frame, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: add a border / frame around image"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-join-images-side-by-side-or-vertically",
+      "kind": "recipe",
+      "title": "magick recipe: join images side-by-side or vertically",
+      "statement": "Horizontal (side-by-side): `magick a.png b.png c.png +append row.png`. Vertical (stacked): `magick a.png b.png c.png -append column.png`. Match heights first (for varying inputs): `magick a.png b.png -resize x500 -append col.png`. Grid (montage): `magick montage a.png b.png c.png d.png -tile 2x2 -geometry 400x400+5+5 grid.png`.",
+      "source_url": "https://imagemagick.org/script/montage.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick a.png b.png c.png +append row.png",
+        "magick a.png b.png c.png -append column.png",
+        "magick a.png b.png -resize x500 -append col.png",
+        "magick montage a.png b.png c.png d.png -tile 2x2 -geometry 400x400+5+5 grid.png"
+      ],
+      "steps": [
+        "Horizontal (side-by-side): `magick a.png b.png c.png +append row.png`. Vertical (stacked): `magick a.png b.png c.png -append column.png`. Match heights first (for varying inputs): `magick a.png b.png -resize x500 -append col.png`. Grid (montage): `magick montage a.png b.png c.png d.png -tile 2x2 -geometry 400x400+5+5 grid.png`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: join images side-by-side or vertically"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-generate-noise-patterns",
+      "kind": "recipe",
+      "title": "magick recipe: generate noise / patterns",
+      "statement": "Gaussian noise: `magick -size 800x600 xc:gray +noise Gaussian noise.png`. Random colors: `-size 800x600 plasma: plasma.png` (smooth gradient noise). Checkerboard: `-size 800x600 pattern:checkerboard checker.png`. Striped: `pattern:horizontal2`. List all patterns: `magick -list pattern`.",
+      "source_url": "https://imagemagick.org/script/command-line-options.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick -size 800x600 xc:gray +noise Gaussian noise.png",
+        "-size 800x600 plasma: plasma.png",
+        "-size 800x600 pattern:checkerboard checker.png",
+        "pattern:horizontal2",
+        "magick -list pattern"
+      ],
+      "steps": [
+        "Gaussian noise: `magick -size 800x600 xc:gray +noise Gaussian noise.png`. Random colors: `-size 800x600 plasma: plasma.png` (smooth gradient noise). Checkerboard: `-size 800x600 pattern:checkerboard checker.png`. Striped: `pattern:horizontal2`. List all patterns: `magick -list pattern`"
+      ],
+      "constraints": [
+        "Gaussian noise: `magick -size 800x600 xc:gray +noise Gaussian noise.png`. Random colors: `-size 800x600 plasma: plasma.png` (smooth gradient noise). Checkerboard: `-size 800x600 pattern:checkerboard checker.png`. Striped: `pattern:horizontal2`. List all patterns: `magick -list pattern`",
+        "Requires binaries or commands referenced in examples: -size, magick, pattern:horizontal2."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: generate noise / patterns"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-convert-heic-iphone-to-jpg",
+      "kind": "recipe",
+      "title": "magick recipe: convert HEIC (iPhone) to JPG",
+      "statement": "Direct: `magick input.heic output.jpg -quality 85`. Requires libheif at build (most homebrew/apt installs include it). Batch (works for whole iPhone photo dump): `mogrify -format jpg -quality 85 *.HEIC`. Preserve EXIF (rotation, date): `magick input.heic -auto-orient output.jpg`. macOS fallback: `sips -s format jpeg input.heic --out output.jpg` (built into macOS).",
+      "source_url": "https://imagemagick.org/script/formats.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick input.heic output.jpg -quality 85",
+        "mogrify -format jpg -quality 85 *.HEIC",
+        "magick input.heic -auto-orient output.jpg",
+        "sips -s format jpeg input.heic --out output.jpg"
+      ],
+      "steps": [
+        "Direct: `magick input.heic output.jpg -quality 85`. Requires libheif at build (most homebrew/apt installs include it). Batch (works for whole iPhone photo dump): `mogrify -format jpg -quality 85 *.HEIC`. Preserve EXIF (rotation, date): `magick input.heic -auto-orient output.jpg`. macOS fallback: `sips -s format jpeg input.heic --out output.jpg` (built into macOS)"
+      ],
+      "constraints": [
+        "Direct: `magick input.heic output.jpg -quality 85`. Requires libheif at build (most homebrew/apt installs include it). Batch (works for whole iPhone photo dump): `mogrify -format jpg -quality 85 *.HEIC`. Preserve EXIF (rotation, date): `magick input.heic -auto-orient output.jpg`. macOS fallback: `sips -s format jpeg input.heic --out output.jpg` (built into macOS)",
+        "Requires binaries or commands referenced in examples: magick, mogrify, sips."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: convert HEIC (iPhone) to JPG"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-optimize-png-reduce-palette-strip",
+      "kind": "recipe",
+      "title": "magick recipe: optimize PNG (reduce palette / strip)",
+      "statement": "Strip + interlace: `magick input.png -strip -interlace none output.png`. Reduce palette to 256: `-colors 256 -dither Riemersma` (gives indexed PNG, smaller). Drop alpha channel: `-alpha off -background white -flatten`. True optimization: pipe through external `pngquant`: `pngquant --quality=65-80 input.png` (lossy palette compression, often 50-70% smaller).",
+      "source_url": "https://imagemagick.org/script/command-line-options.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick input.png -strip -interlace none output.png",
+        "-colors 256 -dither Riemersma",
+        "-alpha off -background white -flatten",
+        "pngquant",
+        "pngquant --quality=65-80 input.png"
+      ],
+      "steps": [
+        "Strip + interlace: `magick input.png -strip -interlace none output.png`. Reduce palette to 256: `-colors 256 -dither Riemersma` (gives indexed PNG, smaller). Drop alpha channel: `-alpha off -background white -flatten`. True optimization: pipe through external `pngquant`: `pngquant --quality=65-80 input.png` (lossy palette compression, often 50-70% smaller)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -alpha, -colors, magick, pngquant."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: optimize PNG (reduce palette / strip)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-generate-open-graph-social-preview-image",
+      "kind": "recipe",
+      "title": "magick recipe: generate Open Graph / social preview image",
+      "statement": "1200x630 with title text: ```\\nmagick -size 1200x630 -background '#1a1a2e' xc:'#1a1a2e' \\\\\\n  -font /System/Library/Fonts/Helvetica.ttc -pointsize 72 -fill white \\\\\\n  -gravity center -annotate +0-30 'My Article Title' \\\\\\n  -pointsize 32 -fill '#aaa' -annotate +0+50 'Subtitle here' \\\\\\n  og-image.png\\n```. With logo: composite a small logo: `-gravity southwest -geometry +30+30 logo.png -composite`.",
+      "source_url": "https://imagemagick.org/script/command-line-options.php",
+      "source_type": "official_docs",
+      "commands": [
+        ". With logo: composite a small logo:"
+      ],
+      "steps": [
+        "1200x630 with title text: ```\\nmagick -size 1200x630 -background '#1a1a2e' xc:'#1a1a2e' \\\\\\n -font /System/Library/Fonts/Helvetica.ttc -pointsize 72 -fill white \\\\\\n -gravity center -annotate +0-30 'My Article Title' \\\\\\n -pointsize 32 -fill '#aaa' -annotate +0+50 'Subtitle here' \\\\\\n og-image.png\\n```. With logo: composite a small logo: `-gravity southwest -geometry +30+30 logo.png -composite`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: .."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: generate Open Graph / social preview image"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-apply-icc-profile-color-management",
+      "kind": "recipe",
+      "title": "magick recipe: apply ICC profile (color management)",
+      "statement": "Embed a profile: `magick input.png -profile /path/to/AdobeRGB.icc output.png`. Convert between profiles: `magick input.png -profile sRGB.icc -profile CMYK.icc output.tif` (first applies the SOURCE profile, second the destination). Strip profile: `+profile '*'` (or just `-strip`). Check existing: `identify -verbose input.png | grep -i profile`.",
+      "source_url": "https://imagemagick.org/script/color-management.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick input.png -profile /path/to/AdobeRGB.icc output.png",
+        "magick input.png -profile sRGB.icc -profile CMYK.icc output.tif",
+        "-strip",
+        "identify -verbose input.png | grep -i profile"
+      ],
+      "steps": [
+        "Embed a profile: `magick input.png -profile /path/to/AdobeRGB.icc output.png`. Convert between profiles: `magick input.png -profile sRGB.icc -profile CMYK.icc output.tif` (first applies the SOURCE profile, second the destination). Strip profile: `+profile '*'` (or just `-strip`). Check existing: `identify -verbose input.png | grep -i profile`"
+      ],
+      "constraints": [
+        "Embed a profile: `magick input.png -profile /path/to/AdobeRGB.icc output.png`. Convert between profiles: `magick input.png -profile sRGB.icc -profile CMYK.icc output.tif` (first applies the SOURCE profile, second the destination). Strip profile: `+profile '*'` (or just `-strip`). Check existing: `identify -verbose input.png | grep -i profile`",
+        "Requires binaries or commands referenced in examples: -strip, identify, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: apply ICC profile (color management)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-edge-detection-sharpening-filters",
+      "kind": "recipe",
+      "title": "magick recipe: edge detection / sharpening filters",
+      "statement": "Edge: `magick input.png -edge 1 edges.png`. Stronger: `-edge 3`. Sobel-style: `-morphology Convolve Sobel output.png`. Laplacian: `-morphology Convolve Laplacian:0`. For sketch effect: `magick input.png -edge 1 -negate -modulate 100,0,100 sketch.png`.",
+      "source_url": "https://imagemagick.org/script/morphology.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick input.png -edge 1 edges.png",
+        "-edge 3",
+        "-morphology Convolve Sobel output.png",
+        "-morphology Convolve Laplacian:0",
+        "magick input.png -edge 1 -negate -modulate 100,0,100 sketch.png"
+      ],
+      "steps": [
+        "Edge: `magick input.png -edge 1 edges.png`. Stronger: `-edge 3`. Sobel-style: `-morphology Convolve Sobel output.png`. Laplacian: `-morphology Convolve Laplacian:0`. For sketch effect: `magick input.png -edge 1 -negate -modulate 100,0,100 sketch.png`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -edge, -morphology, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: edge detection / sharpening filters"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-tint-colorize-image",
+      "kind": "recipe",
+      "title": "magick recipe: tint / colorize image",
+      "statement": "Tint (preserves luminance): `magick input.png -fill '#3a7fc4' -tint 50 output.png`. Hard colorize (overrides): `-fill '#3a7fc4' -colorize 100`. Channel-specific: `-channel R -evaluate Multiply 1.2 +channel` (boost red 20%). Replace specific color: `-fuzz 10% -fill blue -opaque red` (replace all red-ish pixels with blue).",
+      "source_url": "https://imagemagick.org/script/command-line-options.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick input.png -fill '#3a7fc4' -tint 50 output.png",
+        "-fill '#3a7fc4' -colorize 100",
+        "-channel R -evaluate Multiply 1.2 +channel",
+        "-fuzz 10% -fill blue -opaque red"
+      ],
+      "steps": [
+        "Tint (preserves luminance): `magick input.png -fill '#3a7fc4' -tint 50 output.png`. Hard colorize (overrides): `-fill '#3a7fc4' -colorize 100`. Channel-specific: `-channel R -evaluate Multiply 1.2 +channel` (boost red 20%). Replace specific color: `-fuzz 10% -fill blue -opaque red` (replace all red-ish pixels with blue)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -channel, -fill, -fuzz, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: tint / colorize image"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-stream-very-large-images-avoid-oom",
+      "kind": "recipe",
+      "title": "magick recipe: stream very large images (avoid OOM)",
+      "statement": "For multi-gigapixel TIFFs that don't fit in RAM. `magick stream -map rgb -storage-type char big.tif - | other-tool` streams raw pixels. Or in pipeline: `magick big.tif -define stream:buffer-size=256m -resize 50% small.tif`. Raise disk limit for cache spill: `MAGICK_MAP_LIMIT=32GiB`. Use `-thumbnail` instead of `-resize` for downscale (loads pre-decimated subimage if format supports it \u2014 TIFF/JPEG).",
+      "source_url": "https://imagemagick.org/script/architecture.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick stream -map rgb -storage-type char big.tif - | other-tool",
+        "magick big.tif -define stream:buffer-size=256m -resize 50% small.tif",
+        "-thumbnail",
+        "-resize"
+      ],
+      "steps": [
+        "For multi-gigapixel TIFFs that don't fit in RAM. `magick stream -map rgb -storage-type char big.tif - | other-tool` streams raw pixels. Or in pipeline: `magick big.tif -define stream:buffer-size=256m -resize 50% small.tif`. Raise disk limit for cache spill: `MAGICK_MAP_LIMIT=32GiB`. Use `-thumbnail` instead of `-resize` for downscale (loads pre-decimated subimage if format supports it \u2014 TIFF/JPEG)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -resize, -thumbnail, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: stream very large images (avoid OOM)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-write-multiple-sizes-at-once-responsive-images",
+      "kind": "recipe",
+      "title": "magick recipe: write multiple sizes at once (responsive images)",
+      "statement": "One command produces multiple outputs: ```\\nmagick input.jpg \\\\\\n  \\\\( +clone -resize 320x \\\\) -write small.jpg +delete \\\\\\n  \\\\( +clone -resize 800x \\\\) -write medium.jpg +delete \\\\\\n  \\\\( +clone -resize 1920x \\\\) -write large.jpg +delete \\\\\\n  null:\\n```. Or just call magick N times \u2014 simpler if not in a hot loop. For srcset HTML: combine with web framework's image helpers.",
+      "source_url": "https://imagemagick.org/script/command-line-processing.php",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "One command produces multiple outputs: ```\\nmagick input.jpg \\\\\\n \\\\( +clone -resize 320x \\\\) -write small.jpg +delete \\\\\\n \\\\( +clone -resize 800x \\\\) -write medium.jpg +delete \\\\\\n \\\\( +clone -resize 1920x \\\\) -write large.jpg +delete \\\\\\n null:\\n```. Or just call magick N times \u2014 simpler if not in a hot loop. For srcset HTML: combine with web framework's image helpers"
+      ],
+      "constraints": [],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: write multiple sizes at once (responsive images)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-blur-background-while-keeping-subject-vignette",
+      "kind": "recipe",
+      "title": "magick recipe: blur background while keeping subject (vignette)",
+      "statement": "Vignette (darken edges): `magick input.png -background black -vignette 0x100 vignette.png`. Bigger sigma = wider fade. For 'background blur' (subject in focus): masks the subject + blurs everything else \u2014 complex; usually easier to use a portrait-mode app. Simple radial darkening: `-fill black -draw 'fill-opacity 0.5 circle 200,200 200,400'`.",
+      "source_url": "https://imagemagick.org/script/command-line-options.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick input.png -background black -vignette 0x100 vignette.png",
+        "-fill black -draw 'fill-opacity 0.5 circle 200,200 200,400'"
+      ],
+      "steps": [
+        "Vignette (darken edges): `magick input.png -background black -vignette 0x100 vignette.png`. Bigger sigma = wider fade. For 'background blur' (subject in focus): masks the subject + blurs everything else \u2014 complex; usually easier to use a portrait-mode app. Simple radial darkening: `-fill black -draw 'fill-opacity 0.5 circle 200,200 200,400'`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -fill, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: blur background while keeping subject (vignette)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "magick-recipe-magick-recipe-protect-against-malicious-uploads-production-safe-magick",
+      "kind": "recipe",
+      "title": "magick recipe: protect against malicious uploads (production-safe magick)",
+      "statement": "Apply size + resource limits: `magick -limit width 8000 -limit height 8000 -limit area 256MB -limit memory 256MiB -limit map 512MiB -limit disk 1GiB -limit time 30 untrusted.png out.jpg`. Or set in policy.xml: `<policy domain=\"resource\" name=\"width\" value=\"8000\"/>`. Disable risky coders: keep policy.xml denying PDF/PS/EPS/MSL/MVG for untrusted input. Run in container with no network + read-only FS + minimal user. Validate before processing: `identify input` and check format/dimensions before deeper ops.",
+      "source_url": "https://imagemagick.org/script/security-policy.php",
+      "source_type": "official_docs",
+      "commands": [
+        "magick -limit width 8000 -limit height 8000 -limit area 256MB -limit memory 256MiB -limit map 512MiB -limit disk 1GiB -limit time 30 untrusted.png out.jpg",
+        "identify input"
+      ],
+      "steps": [
+        "Apply size + resource limits: `magick -limit width 8000 -limit height 8000 -limit area 256MB -limit memory 256MiB -limit map 512MiB -limit disk 1GiB -limit time 30 untrusted.png out.jpg`. Or set in policy.xml: `<policy domain=\"resource\" name=\"width\" value=\"8000\"/>`. Disable risky coders: keep policy.xml denying PDF/PS/EPS/MSL/MVG for untrusted input. Run in container with no network + read-only FS + minimal user. Validate before processing: `identify input` and check format/dimensions before deeper ops"
+      ],
+      "constraints": [
+        "Apply size + resource limits: `magick -limit width 8000 -limit height 8000 -limit area 256MB -limit memory 256MiB -limit map 512MiB -limit disk 1GiB -limit time 30 untrusted.png out.jpg`. Or set in policy.xml: `<policy domain=\"resource\" name=\"width\" value=\"8000\"/>`. Disable risky coders: keep policy.xml denying PDF/PS/EPS/MSL/MVG for untrusted input. Run in container with no network + read-only FS + minimal user. Validate before processing: `identify input` and check format/dimensions before deeper ops",
+        "Requires binaries or commands referenced in examples: identify, magick."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "magick-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_imagemagick_errors_recipes.py",
+        "legacy_tool_id": "imagemagick-recipes",
+        "legacy_title": "imagemagick recipe: protect against malicious uploads (production-safe magick)"
+      },
+      "confidence": 0.92
+    }
+  ]
+}

@@ -1,0 +1,2738 @@
+{
+  "family": "rustc",
+  "version": "v1",
+  "artifact_id": "rustc-curated-source-v1",
+  "generated_from": {
+    "kind": "legacy_seed_script",
+    "path": "tools/scripts/seed_rust_errors_recipes.py"
+  },
+  "entries": [
+    {
+      "entry_id": "rustc-error-rustc-error-e0382-use-of-moved-value-borrow-of-moved-value",
+      "kind": "error",
+      "title": "rustc error: E0382 \u2014 use of moved value / borrow of moved value",
+      "statement": "You used a value after it was moved (consumed). Rust's ownership rules: assigning or passing a non-`Copy` value moves it. Fix: (1) clone if you need both: `let b = a.clone(); use(a); use(b);` (cost: deep copy); (2) borrow instead of move: pass `&a` (read) or `&mut a` (write) \u2014 borrowing doesn't consume; (3) make the type `Copy` (only for small primitives + structs of Copy fields): `#[derive(Copy, Clone)] struct Point { ... }`; (4) restructure: if you only need one of the two uses, drop the other.",
+      "source_url": "https://doc.rust-lang.org/book/ch04-00-understanding-ownership.html",
+      "source_type": "official_docs",
+      "commands": [
+        "Copy",
+        "let b = a.clone(); use(a); use(b);"
+      ],
+      "steps": [
+        "clone if you need both: `let b = a.clone(); use(a); use(b);` (cost: deep copy)",
+        "borrow instead of move: pass `&a` (read) or `&mut a` (write) \u2014 borrowing doesn't consume",
+        "make the type `Copy` (only for small primitives + structs of Copy fields): `#[derive(Copy, Clone)] struct Point { ... }`",
+        "restructure: if you only need one of the two uses, drop the other"
+      ],
+      "constraints": [
+        "clone if you need both: `let b = a.clone(); use(a); use(b);` (cost: deep copy)",
+        "restructure: if you only need one of the two uses, drop the other",
+        "Requires binaries or commands referenced in examples: Copy, let."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-errors",
+        "legacy_title": "rust error: E0382 \u2014 use of moved value / borrow of moved value"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "rustc-error-rustc-error-e0502-cannot-borrow-as-mutable-because-also-borrowed-as-immu",
+      "kind": "error",
+      "title": "rustc error: E0502 \u2014 cannot borrow as mutable because also borrowed as immutable",
+      "statement": "Active immutable borrow exists while you try to take a mutable borrow. Rust's borrow checker prevents data races at compile time. Fix: (1) shorten the immutable borrow's scope: `{ let r = &v; use(r); } // r dropped here. let m = &mut v;`; (2) collect indices first, mutate after: `let bad_idx: Vec<usize> = v.iter().enumerate().filter(...).map(|(i,_)|i).collect(); for i in bad_idx { v[i] = ...; }`; (3) use interior mutability: `RefCell<T>` (single-threaded) or `Mutex<T>` (threads) \u2014 moves the check to runtime; (4) for splitting: `v.split_at_mut(i)` returns two non-overlapping mutable slices.",
+      "source_url": "https://doc.rust-lang.org/book/ch04-00-understanding-ownership.html",
+      "source_type": "official_docs",
+      "commands": [
+        "let bad_idx: Vec<usize> = v.iter().enumerate().filter(...).map(|(i,_)|i).collect(); for i in bad_idx { v[i] = ...; }"
+      ],
+      "steps": [
+        "shorten the immutable borrow's scope: `{ let r = &v; use(r); } // r dropped here. let m = &mut v;`",
+        "collect indices first, mutate after: `let bad_idx: Vec<usize> = v.iter().enumerate().filter(...).map(|(i,_)|i).collect(); for i in bad_idx { v[i] = ...; }`",
+        "use interior mutability: `RefCell<T>` (single-threaded) or `Mutex<T>` (threads) \u2014 moves the check to runtime",
+        "for splitting: `v.split_at_mut(i)` returns two non-overlapping mutable slices"
+      ],
+      "constraints": [
+        "use interior mutability: `RefCell<T>` (single-threaded) or `Mutex<T>` (threads) \u2014 moves the check to runtime",
+        "Requires binaries or commands referenced in examples: let."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-errors",
+        "legacy_title": "rust error: E0502 \u2014 cannot borrow as mutable because also borrowed as immutable"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "rustc-error-rustc-error-e0507-cannot-move-out-of-a-reference",
+      "kind": "error",
+      "title": "rustc error: E0507 \u2014 cannot move out of a reference",
+      "statement": "Tried to take ownership of something behind a borrow (e.g. `*v` to consume a `&Vec<T>`). References don't grant ownership. Fix: (1) clone: `(*v).clone()` (cost: deep copy); (2) borrow instead: do you really need to consume, or can you work with `&T`?; (3) `std::mem::replace(target, default)` swaps in a default and returns the old value (when you have `&mut`); (4) for `Option`: `Option::take()` swaps in `None` and returns the old `Some`.",
+      "source_url": "https://doc.rust-lang.org/book/ch04-00-understanding-ownership.html",
+      "source_type": "official_docs",
+      "commands": [
+        "Option",
+        "None",
+        "Some"
+      ],
+      "steps": [
+        "clone: `(*v).clone()` (cost: deep copy)",
+        "borrow instead: do you really need to consume, or can you work with `&T`?",
+        "`std::mem::replace(target, default)` swaps in a default and returns the old value (when you have `&mut`)",
+        "for `Option`: `Option::take()` swaps in `None` and returns the old `Some`"
+      ],
+      "constraints": [
+        "borrow instead: do you really need to consume, or can you work with `&T`?",
+        "Requires binaries or commands referenced in examples: None, Option, Some."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-errors",
+        "legacy_title": "rust error: E0507 \u2014 cannot move out of a reference"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "rustc-error-rustc-error-e0506-cannot-assign-to-x-because-it-is-borrowed",
+      "kind": "error",
+      "title": "rustc error: E0506 \u2014 cannot assign to X because it is borrowed",
+      "statement": "You held a reference to a variable then tried to reassign or mutate the variable through a different path. Fix: (1) drop the reference before reassigning: end its scope with `{}` blocks or just let it lexically go out of scope; (2) `drop(r);` explicitly destroys a binding; (3) re-design the data flow: store the new value somewhere else, swap at the end; (4) for collections: use indexing instead of iterators when you need to mutate during iteration.",
+      "source_url": "https://doc.rust-lang.org/book/ch04-00-understanding-ownership.html",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "drop the reference before reassigning: end its scope with `{}` blocks or just let it lexically go out of scope",
+        "`drop(r);` explicitly destroys a binding",
+        "re-design the data flow: store the new value somewhere else, swap at the end",
+        "for collections: use indexing instead of iterators when you need to mutate during iteration"
+      ],
+      "constraints": [
+        "for collections: use indexing instead of iterators when you need to mutate during iteration"
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-errors",
+        "legacy_title": "rust error: E0506 \u2014 cannot assign to X because it is borrowed"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "rustc-error-rustc-error-e0277-trait-bound-x-y-is-not-satisfied",
+      "kind": "error",
+      "title": "rustc error: E0277 \u2014 trait bound `X: Y` is not satisfied",
+      "statement": "You used a generic function or type but provided a concrete type that doesn't implement the required trait. Fix: (1) implement the trait: `impl Y for X { ... }`; (2) derive if possible: `#[derive(Debug, Clone, PartialEq, Eq, Hash)]`; (3) for foreign types you don't own: wrap in a newtype struct and implement on the newtype; (4) check the trait's docs for which other traits to derive (Hash requires Eq, Eq requires PartialEq).",
+      "source_url": "https://doc.rust-lang.org/book/ch10-02-traits.html",
+      "source_type": "official_docs",
+      "commands": [
+        "impl Y for X { ... }"
+      ],
+      "steps": [
+        "implement the trait: `impl Y for X { ... }`",
+        "derive if possible: `#[derive(Debug, Clone, PartialEq, Eq, Hash)]`",
+        "for foreign types you don't own: wrap in a newtype struct and implement on the newtype",
+        "check the trait's docs for which other traits to derive (Hash requires Eq, Eq requires PartialEq)"
+      ],
+      "constraints": [
+        "check the trait's docs for which other traits to derive (Hash requires Eq, Eq requires PartialEq)",
+        "Requires binaries or commands referenced in examples: impl."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-errors",
+        "legacy_title": "rust error: E0277 \u2014 trait bound `X: Y` is not satisfied"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "rustc-error-rustc-error-e0308-mismatched-types",
+      "kind": "error",
+      "title": "rustc error: E0308 \u2014 mismatched types",
+      "statement": "Expression's type doesn't match what's expected. Fix: (1) read the error \u2014 Rust prints expected vs found; (2) common: `Result<T, E>` where `T` expected \u2014 use `?` to propagate or `.unwrap()` (panics on Err) or `.expect(\"msg\")`; (3) for numeric: `as` cast: `let x: u32 = y as u32;` (truncates); (4) for `&str` vs `String`: `.to_string()` or `String::from(s)` to convert &str to String; `&my_string` for the reverse; (5) for `Vec<T>` vs `&[T]`: `&vec[..]` or just `&vec` (auto-deref).",
+      "source_url": "https://doc.rust-lang.org/book/ch03-02-data-types.html",
+      "source_type": "official_docs",
+      "commands": [
+        "T",
+        "as",
+        "let x: u32 = y as u32;",
+        "String"
+      ],
+      "steps": [
+        "read the error \u2014 Rust prints expected vs found",
+        "common: `Result<T, E>` where `T` expected \u2014 use `?` to propagate or `.unwrap()` (panics on Err) or `.expect(\"msg\")`",
+        "for numeric: `as` cast: `let x: u32 = y as u32;` (truncates)",
+        "for `&str` vs `String`: `.to_string()` or `String::from(s)` to convert &str to String; `&my_string` for the reverse",
+        "for `Vec<T>` vs `&[T]`: `&vec[..]` or just `&vec` (auto-deref)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: String, T, as, let."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-errors",
+        "legacy_title": "rust error: E0308 \u2014 mismatched types"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "rustc-error-rustc-error-e0425-cannot-find-value-x-in-this-scope",
+      "kind": "error",
+      "title": "rustc error: E0425 \u2014 cannot find value `X` in this scope",
+      "statement": "Variable or function name not visible. Fix: (1) typo check; (2) missing `use`: import the path: `use std::collections::HashMap;`; (3) wrong scope: variable defined in inner block but used outside; (4) function defined in another module: `mod::function()` or import; (5) hint: rustc usually suggests the right path: `did you mean `std::cmp::min`?`.",
+      "source_url": "https://doc.rust-lang.org/book/ch07-00-managing-growing-projects-with-packages-crates-and-modules.html",
+      "source_type": "official_docs",
+      "commands": [
+        "use",
+        "use std::collections::HashMap;",
+        "did you mean"
+      ],
+      "steps": [
+        "typo check",
+        "missing `use`: import the path: `use std::collections::HashMap;`",
+        "wrong scope: variable defined in inner block but used outside",
+        "function defined in another module: `mod::function()` or import",
+        "hint: rustc usually suggests the right path: `did you mean `std::cmp::min`?`"
+      ],
+      "constraints": [
+        "typo check",
+        "Requires binaries or commands referenced in examples: did, use."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-errors",
+        "legacy_title": "rust error: E0425 \u2014 cannot find value `X` in this scope"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "rustc-error-rustc-error-e0432-unresolved-import",
+      "kind": "error",
+      "title": "rustc error: E0432 \u2014 unresolved import",
+      "statement": "Can't find what you're importing. Fix: (1) verify the crate is in Cargo.toml dependencies; (2) `cargo build` once to fetch + verify dep tree; (3) check the path: `use crate::module::Item;` (absolute) vs `use super::Item;` (parent) vs `use self::Item;` (current); (4) for external crates: `use crate_name::Item;` (no `crate::` prefix); (5) for feature-gated items: enable the feature in Cargo.toml \u2014 `crate = { version = \"...\", features = [\"async\"] }`.",
+      "source_url": "https://doc.rust-lang.org/book/ch07-04-bringing-paths-into-scope-with-the-use-keyword.html",
+      "source_type": "official_docs",
+      "commands": [
+        "cargo build",
+        "use crate::module::Item;",
+        "use super::Item;",
+        "use self::Item;",
+        "use crate_name::Item;",
+        "crate::",
+        "crate = { version = \"...\", features = [\"async\"] }"
+      ],
+      "steps": [
+        "verify the crate is in Cargo.toml dependencies",
+        "`cargo build` once to fetch + verify dep tree",
+        "check the path: `use crate::module::Item;` (absolute) vs `use super::Item;` (parent) vs `use self::Item;` (current)",
+        "for external crates: `use crate_name::Item;` (no `crate::` prefix)",
+        "for feature-gated items: enable the feature in Cargo.toml \u2014 `crate = { version = \"...\", features = [\"async\"] }`"
+      ],
+      "constraints": [
+        "verify the crate is in Cargo.toml dependencies",
+        "`cargo build` once to fetch + verify dep tree",
+        "check the path: `use crate::module::Item;` (absolute) vs `use super::Item;` (parent) vs `use self::Item;` (current)",
+        "Requires binaries or commands referenced in examples: cargo, crate, crate::, use."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-errors",
+        "legacy_title": "rust error: E0432 \u2014 unresolved import"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "rustc-error-rustc-error-e0061-function-takes-n-arguments-but-m-were-supplied",
+      "kind": "error",
+      "title": "rustc error: E0061 \u2014 function takes N arguments but M were supplied",
+      "statement": "Wrong number of args. Fix: (1) check function signature \u2014 IDE / `cargo doc --open`; (2) check for `self` consumption: methods on `&self`, `&mut self`, `self`; (3) for trait methods: arg count depends on the trait's signature; (4) for variadics (like `println!`): those are macros, not functions \u2014 different rules.",
+      "source_url": "https://doc.rust-lang.org/book/ch03-03-how-functions-work.html",
+      "source_type": "official_docs",
+      "commands": [
+        "cargo doc --open",
+        "self"
+      ],
+      "steps": [
+        "check function signature \u2014 IDE / `cargo doc --open`",
+        "check for `self` consumption: methods on `&self`, `&mut self`, `self`",
+        "for trait methods: arg count depends on the trait's signature",
+        "for variadics (like `println!`): those are macros, not functions \u2014 different rules"
+      ],
+      "constraints": [
+        "check function signature \u2014 IDE / `cargo doc --open`",
+        "check for `self` consumption: methods on `&self`, `&mut self`, `self`",
+        "Requires binaries or commands referenced in examples: cargo, self."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-errors",
+        "legacy_title": "rust error: E0061 \u2014 function takes N arguments but M were supplied"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "rustc-error-rustc-error-e0515-cannot-return-value-referencing-local-variable",
+      "kind": "error",
+      "title": "rustc error: E0515 \u2014 cannot return value referencing local variable",
+      "statement": "Returning a reference to data that goes out of scope when the function returns. Dangling reference. Fix: (1) return the owned value: drop the `&` from the return type; (2) take a reference parameter and return a reference with matching lifetime: `fn longest<'a>(x: &'a str, y: &'a str) -> &'a str`; (3) for lazy iteration: return an iterator that borrows from input + uses lifetime annotations; (4) use `String::from(...)` to allocate + return.",
+      "source_url": "https://doc.rust-lang.org/book/ch10-03-lifetime-syntax.html",
+      "source_type": "official_docs",
+      "commands": [
+        "fn longest<'a>(x: &'a str, y: &'a str) -> &'a str"
+      ],
+      "steps": [
+        "return the owned value: drop the `&` from the return type",
+        "take a reference parameter and return a reference with matching lifetime: `fn longest<'a>(x: &'a str, y: &'a str) -> &'a str`",
+        "for lazy iteration: return an iterator that borrows from input + uses lifetime annotations",
+        "use `String::from(...)` to allocate + return"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: fn."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-errors",
+        "legacy_title": "rust error: E0515 \u2014 cannot return value referencing local variable"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "rustc-error-rustc-error-lifetime-mismatch-does-not-live-long-enough",
+      "kind": "error",
+      "title": "rustc error: lifetime mismatch / does not live long enough",
+      "statement": "Compiler can't prove a reference is valid for the required lifetime. Fix: (1) read the error \u2014 it shows where the borrow started + when the borrowed thing dropped; (2) add lifetime annotations to functions: `fn f<'a>(x: &'a Foo) -> &'a Bar`; (3) extend the borrowed value's scope (move declaration earlier); (4) for self-referential structs: use `ouroboros` or `Pin` (rare and advanced); (5) for cases where you genuinely need it: clone instead of borrow.",
+      "source_url": "https://doc.rust-lang.org/book/ch10-03-lifetime-syntax.html",
+      "source_type": "official_docs",
+      "commands": [
+        "fn f<'a>(x: &'a Foo) -> &'a Bar",
+        "ouroboros",
+        "Pin"
+      ],
+      "steps": [
+        "read the error \u2014 it shows where the borrow started + when the borrowed thing dropped",
+        "add lifetime annotations to functions: `fn f<'a>(x: &'a Foo) -> &'a Bar`",
+        "extend the borrowed value's scope (move declaration earlier)",
+        "for self-referential structs: use `ouroboros` or `Pin` (rare and advanced)",
+        "for cases where you genuinely need it: clone instead of borrow"
+      ],
+      "constraints": [
+        "for cases where you genuinely need it: clone instead of borrow",
+        "Requires binaries or commands referenced in examples: Pin, fn, ouroboros."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-errors",
+        "legacy_title": "rust error: lifetime mismatch / does not live long enough"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "rustc-error-rustc-error-e0282-type-annotations-needed",
+      "kind": "error",
+      "title": "rustc error: E0282 \u2014 type annotations needed",
+      "statement": "Compiler can't infer the type of a binding (often `collect()` without target type, or generic function with ambiguous return). Fix: (1) annotate the binding: `let v: Vec<i32> = (0..10).collect();`; (2) turbofish: `let v = (0..10).collect::<Vec<i32>>();`; (3) annotate the function return type if generic; (4) common with `.parse()`: `let n: u32 = \"42\".parse().unwrap();` or `\"42\".parse::<u32>().unwrap();`.",
+      "source_url": "https://doc.rust-lang.org/reference/types.html",
+      "source_type": "official_docs",
+      "commands": [
+        "let v: Vec<i32> = (0..10).collect();",
+        "let v = (0..10).collect::<Vec<i32>>();",
+        "let n: u32 = \"42\".parse().unwrap();"
+      ],
+      "steps": [
+        "annotate the binding: `let v: Vec<i32> = (0..10).collect();`",
+        "turbofish: `let v = (0..10).collect::<Vec<i32>>();`",
+        "annotate the function return type if generic",
+        "common with `.parse()`: `let n: u32 = \"42\".parse().unwrap();` or `\"42\".parse::<u32>().unwrap();`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: let."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-errors",
+        "legacy_title": "rust error: E0282 \u2014 type annotations needed"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "rustc-error-rustc-error-e0599-no-method-named-x-found-for-type-y",
+      "kind": "error",
+      "title": "rustc error: E0599 \u2014 no method named `X` found for type `Y`",
+      "statement": "Method doesn't exist on the type (or trait isn't imported). Fix: (1) typo check; (2) check docs: `cargo doc --open` or rust-lang.org/std; (3) trait method: import the trait: `use std::io::Write;` to use `.write_all()` on a `File`; (4) for iterators: `use std::iter::*;` brings adapter methods into scope; (5) check generic constraints \u2014 `Vec<T>::sort()` needs `T: Ord`.",
+      "source_url": "https://doc.rust-lang.org/book/ch10-02-traits.html",
+      "source_type": "official_docs",
+      "commands": [
+        "cargo doc --open",
+        "use std::io::Write;",
+        "File",
+        "use std::iter::*;",
+        "T: Ord"
+      ],
+      "steps": [
+        "typo check",
+        "check docs: `cargo doc --open` or rust-lang.org/std",
+        "trait method: import the trait: `use std::io::Write;` to use `.write_all()` on a `File`",
+        "for iterators: `use std::iter::*;` brings adapter methods into scope",
+        "check generic constraints \u2014 `Vec<T>::sort()` needs `T: Ord`"
+      ],
+      "constraints": [
+        "typo check",
+        "check docs: `cargo doc --open` or rust-lang.org/std",
+        "check generic constraints \u2014 `Vec<T>::sort()` needs `T: Ord`",
+        "Requires binaries or commands referenced in examples: File, T:, cargo, use."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-errors",
+        "legacy_title": "rust error: E0599 \u2014 no method named `X` found for type `Y`"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "rustc-error-rustc-panic-thread-main-panicked-at-index-out-of-bounds",
+      "kind": "error",
+      "title": "rustc panic: thread 'main' panicked at 'index out of bounds'",
+      "statement": "Indexed a slice/Vec past its end. Fix: (1) check bounds before: `if i < v.len() { v[i] } else { default }`; (2) use `.get(i)` which returns `Option<&T>`: `v.get(i).copied().unwrap_or(0)`; (3) for iteration: prefer `for x in &v` over indexed loops; (4) for slice ranges: `v.get(start..end)` returns `Option<&[T]>`; (5) RUST_BACKTRACE=1 cargo run for full trace.",
+      "source_url": "https://doc.rust-lang.org/std/vec/struct.Vec.html",
+      "source_type": "official_docs",
+      "commands": [
+        "if i < v.len() { v[i] } else { default }",
+        "for x in &v"
+      ],
+      "steps": [
+        "check bounds before: `if i < v.len() { v[i] } else { default }`",
+        "use `.get(i)` which returns `Option<&T>`: `v.get(i).copied().unwrap_or",
+        "`",
+        "for iteration: prefer `for x in &v` over indexed loops",
+        "for slice ranges: `v.get(start..end)` returns `Option<&[T]>`",
+        "RUST_BACKTRACE=1 cargo run for full trace"
+      ],
+      "constraints": [
+        "check bounds before: `if i < v.len() { v[i] } else { default }`",
+        "Requires binaries or commands referenced in examples: for, if."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-errors",
+        "legacy_title": "rust panic: thread 'main' panicked at 'index out of bounds'"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "rustc-error-rustc-panic-called-option-unwrap-on-a-none-value",
+      "kind": "error",
+      "title": "rustc panic: called `Option::unwrap()` on a `None` value",
+      "statement": "`.unwrap()` on `None`. The classic Rust panic. Fix: (1) handle the None case: `match opt { Some(x) => ..., None => default }`; (2) provide a default: `opt.unwrap_or(default)` or `opt.unwrap_or_else(|| compute_default())`; (3) use `?` to propagate (if in a function returning `Option<U>`): `let x = opt?;`; (4) for `expect()` with message: `opt.expect(\"value was loaded from config\")` \u2014 still panics but explains why; (5) for development debugging: panic shows file:line \u2014 fix the source.",
+      "source_url": "https://doc.rust-lang.org/std/option/enum.Option.html",
+      "source_type": "official_docs",
+      "commands": [
+        "None",
+        "match opt { Some(x) => ..., None => default }",
+        "let x = opt?;"
+      ],
+      "steps": [
+        "handle the None case: `match opt { Some(x) => ..., None => default }`",
+        "provide a default: `opt.unwrap_or(default)` or `opt.unwrap_or_else(|| compute_default())`",
+        "use `?` to propagate (if in a function returning `Option<U>`): `let x = opt?;`",
+        "for `expect()` with message: `opt.expect(\"value was loaded from config\")` \u2014 still panics but explains why",
+        "for development debugging: panic shows file:line \u2014 fix the source"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: None, let, match."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-errors",
+        "legacy_title": "rust panic: called `Option::unwrap()` on a `None` value"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "rustc-error-rustc-panic-called-result-unwrap-on-an-err-value",
+      "kind": "error",
+      "title": "rustc panic: called `Result::unwrap()` on an `Err` value",
+      "statement": "Same as above but for `Result`. Fix: (1) propagate with `?` in functions returning `Result`: `let x = some_result?;`; (2) match: `match r { Ok(x) => ..., Err(e) => handle_error(e) }`; (3) `r.unwrap_or(default)` for simple recovery; (4) `r.map_err(|e| MyError::from(e))?` to convert error types; (5) prefer `expect()` over `unwrap()` for production \u2014 the message is logged in the panic.",
+      "source_url": "https://doc.rust-lang.org/std/result/enum.Result.html",
+      "source_type": "official_docs",
+      "commands": [
+        "Result",
+        "let x = some_result?;",
+        "match r { Ok(x) => ..., Err(e) => handle_error(e) }"
+      ],
+      "steps": [
+        "propagate with `?` in functions returning `Result`: `let x = some_result?;`",
+        "match: `match r { Ok(x) => ..., Err(e) => handle_error(e) }`",
+        "`r.unwrap_or(default)` for simple recovery",
+        "`r.map_err(|e| MyError::from(e))?` to convert error types",
+        "prefer `expect()` over `unwrap()` for production \u2014 the message is logged in the panic"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: Result, let, match."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-errors",
+        "legacy_title": "rust panic: called `Result::unwrap()` on an `Err` value"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "rustc-error-rustc-panic-attempt-to-subtract-with-overflow",
+      "kind": "error",
+      "title": "rustc panic: attempt to subtract with overflow",
+      "statement": "Unsigned arithmetic underflowed (e.g. `0u32 - 1`). In debug builds Rust panics; in release builds it wraps. Fix: (1) use signed types if negatives are expected: `i32` instead of `u32`; (2) `checked_sub`: `let n = a.checked_sub(b).unwrap_or(0);` returns `Option<T>`; (3) `saturating_sub`: clamps to 0/min: `a.saturating_sub(b)`; (4) `wrapping_sub`: explicit wrap; (5) for the difference of size + offset: validate first: `if a >= b { a - b } else { 0 }`.",
+      "source_url": "https://doc.rust-lang.org/reference/expressions/operator-expr.html",
+      "source_type": "official_docs",
+      "commands": [
+        "0u32 - 1",
+        "i32",
+        "u32",
+        "checked_sub",
+        "let n = a.checked_sub(b).unwrap_or(0);",
+        "saturating_sub",
+        "wrapping_sub",
+        "if a >= b { a - b } else { 0 }"
+      ],
+      "steps": [
+        "use signed types if negatives are expected: `i32` instead of `u32`",
+        "`checked_sub`: `let n = a.checked_sub(b).unwrap_or",
+        "` returns `Option<T>`",
+        "`saturating_sub`: clamps to 0/min: `a.saturating_sub(b)`",
+        "`wrapping_sub`: explicit wrap",
+        "for the difference of size + offset: validate first: `if a >= b { a - b } else { 0 }`"
+      ],
+      "constraints": [
+        "`checked_sub`: `let n = a.checked_sub(b).unwrap_or",
+        "Requires binaries or commands referenced in examples: 0u32, checked_sub, i32, if, let, saturating_sub, u32, wrapping_sub."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-errors",
+        "legacy_title": "rust panic: attempt to subtract with overflow"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "rustc-error-rustc-panic-attempt-to-divide-by-zero",
+      "kind": "error",
+      "title": "rustc panic: attempt to divide by zero",
+      "statement": "Integer division by zero panics (in any build). Float division produces inf/NaN. Fix: (1) check denominator: `if b != 0 { a / b } else { 0 }`; (2) `checked_div`: `a.checked_div(b).unwrap_or(0);`; (3) for float: works fine, produces `inf`/`-inf`/`NaN` \u2014 handle `is_nan()` / `is_infinite()` downstream.",
+      "source_url": "https://doc.rust-lang.org/reference/expressions/operator-expr.html",
+      "source_type": "official_docs",
+      "commands": [
+        "if b != 0 { a / b } else { 0 }",
+        "checked_div",
+        "inf",
+        "-inf",
+        "NaN"
+      ],
+      "steps": [
+        "check denominator: `if b != 0 { a / b } else { 0 }`",
+        "`checked_div`: `a.checked_div(b).unwrap_or",
+        "`",
+        "for float: works fine, produces `inf`/`-inf`/`NaN` \u2014 handle `is_nan()` / `is_infinite()` downstream"
+      ],
+      "constraints": [
+        "check denominator: `if b != 0 { a / b } else { 0 }`",
+        "`checked_div`: `a.checked_div(b).unwrap_or",
+        "Requires binaries or commands referenced in examples: -inf, NaN, checked_div, if, inf."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-errors",
+        "legacy_title": "rust panic: attempt to divide by zero"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "rustc-error-rustc-error-closure-does-not-implement-fn-fnmut-fnonce",
+      "kind": "error",
+      "title": "rustc error: closure does not implement Fn / FnMut / FnOnce",
+      "statement": "Closure captures by move/mut/ref doesn't match the expected trait. Hierarchy: `Fn: FnMut: FnOnce`. `Fn` is most restrictive (read-only env), `FnOnce` consumes the env. Fix: (1) for closures called multiple times: must be `Fn` (or `FnMut`); avoid moving captured variables into the closure body; (2) `move ||` keyword to move captures (use for `'static` closures going to threads); (3) for callbacks: `Box<dyn Fn()>` (heap) or `impl Fn()` (compile-time monomorphized) in signatures; (4) clone before capturing if you need both: `let s2 = s.clone(); move || println!(\"{}\", s2);`.",
+      "source_url": "https://doc.rust-lang.org/book/ch13-01-closures.html",
+      "source_type": "official_docs",
+      "commands": [
+        "Fn: FnMut: FnOnce",
+        "Fn",
+        "FnOnce",
+        "FnMut",
+        "move ||",
+        "impl Fn()",
+        "let s2 = s.clone(); move || println!(\"{}\", s2);"
+      ],
+      "steps": [
+        "for closures called multiple times: must be `Fn` (or `FnMut`); avoid moving captured variables into the closure body",
+        "`move ||` keyword to move captures (use for `'static` closures going to threads)",
+        "for callbacks: `Box<dyn Fn()>` (heap) or `impl Fn()` (compile-time monomorphized) in signatures",
+        "clone before capturing if you need both: `let s2 = s.clone(); move || println!(\"{}\", s2);`"
+      ],
+      "constraints": [
+        "for closures called multiple times: must be `Fn` (or `FnMut`); avoid moving captured variables into the closure body",
+        "clone before capturing if you need both: `let s2 = s.clone(); move || println!(\"{}\", s2);`",
+        "Requires binaries or commands referenced in examples: Fn, Fn:, FnMut, FnOnce, impl, let, move."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-errors",
+        "legacy_title": "rust error: closure does not implement Fn / FnMut / FnOnce"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "rustc-error-rustc-error-t-cannot-be-sent-between-threads-safely-send-not-implemented",
+      "kind": "error",
+      "title": "rustc error: `<T>` cannot be sent between threads safely (Send not implemented)",
+      "statement": "`Rc<T>` (single-threaded) was passed to a thread \u2014 need `Arc<T>`. Fix: (1) replace `Rc<T>` with `Arc<T>` for cross-thread sharing; (2) `RefCell<T>` (interior mutability) is not Send \u2014 use `Mutex<T>` or `RwLock<T>`; (3) raw pointers and some non-Sync types: wrap with `Mutex` or pass as `Arc<Mutex<T>>`; (4) for closures: `move ||` captures by ownership \u2014 captured types must be Send + 'static for `thread::spawn`.",
+      "source_url": "https://doc.rust-lang.org/std/sync/struct.Arc.html",
+      "source_type": "official_docs",
+      "commands": [
+        "Mutex",
+        "move ||",
+        "thread::spawn"
+      ],
+      "steps": [
+        "replace `Rc<T>` with `Arc<T>` for cross-thread sharing",
+        "`RefCell<T>` (interior mutability) is not Send \u2014 use `Mutex<T>` or `RwLock<T>`",
+        "raw pointers and some non-Sync types: wrap with `Mutex` or pass as `Arc<Mutex<T>>`",
+        "for closures: `move ||` captures by ownership \u2014 captured types must be Send + 'static for `thread::spawn`"
+      ],
+      "constraints": [
+        "for closures: `move ||` captures by ownership \u2014 captured types must be Send + 'static for `thread::spawn`",
+        "Requires binaries or commands referenced in examples: Mutex, move, thread::spawn."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-errors",
+        "legacy_title": "rust error: `<T>` cannot be sent between threads safely (Send not implemented)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "rustc-error-rustc-error-borrowed-value-does-not-live-long-enough-e0597",
+      "kind": "error",
+      "title": "rustc error: borrowed value does not live long enough (E0597)",
+      "statement": "Reference outlives the value it points to. Fix: (1) move the value declaration earlier so it lives at least as long as its reference; (2) for returning references from functions: see E0515 fix; (3) for struct holding a reference: add a lifetime: `struct Holder<'a> { r: &'a T }`; (4) common with temporaries: `let owned = expr; let r = &owned;` instead of `let r = &expr;` for some `expr`.",
+      "source_url": "https://doc.rust-lang.org/book/ch10-03-lifetime-syntax.html",
+      "source_type": "official_docs",
+      "commands": [
+        "struct Holder<'a> { r: &'a T }",
+        "let owned = expr; let r = &owned;",
+        "let r = &expr;",
+        "expr"
+      ],
+      "steps": [
+        "move the value declaration earlier so it lives at least as long as its reference",
+        "for returning references from functions: see E0515 fix",
+        "for struct holding a reference: add a lifetime: `struct Holder<'a> { r: &'a T }`",
+        "common with temporaries: `let owned = expr; let r = &owned;` instead of `let r = &expr;` for some `expr`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: expr, let, struct."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-errors",
+        "legacy_title": "rust error: borrowed value does not live long enough (E0597)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "rustc-error-rustc-linker-error-ld-returned-1-exit-status-undefined-symbol",
+      "kind": "error",
+      "title": "rustc linker error: ld returned 1 exit status / undefined symbol",
+      "statement": "Linker can't find a symbol. Fix: (1) for missing C lib: install dev headers \u2014 Linux `apt install libpq-dev`, macOS `brew install postgresql`; (2) check Cargo.toml for `[build-dependencies]` and `build.rs` if you have native deps; (3) for cross-compile: install target's stdlib: `rustup target add x86_64-unknown-linux-musl`; (4) Apple Silicon mismatch: check `cargo --version` arch matches your target; (5) for `+nightly` features: link errors can mean the dep needs nightly.",
+      "source_url": "https://doc.rust-lang.org/book/ch01-01-installation.html",
+      "source_type": "official_docs",
+      "commands": [
+        "apt install libpq-dev",
+        "brew install postgresql",
+        "build.rs",
+        "rustup target add x86_64-unknown-linux-musl",
+        "cargo --version"
+      ],
+      "steps": [
+        "for missing C lib: install dev headers \u2014 Linux `apt install libpq-dev`, macOS `brew install postgresql`",
+        "check Cargo.toml for `[build-dependencies]` and `build.rs` if you have native deps",
+        "for cross-compile: install target's stdlib: `rustup target add x86_64-unknown-linux-musl`",
+        "Apple Silicon mismatch: check `cargo --version` arch matches your target",
+        "for `+nightly` features: link errors can mean the dep needs nightly"
+      ],
+      "constraints": [
+        "check Cargo.toml for `[build-dependencies]` and `build.rs` if you have native deps",
+        "Apple Silicon mismatch: check `cargo --version` arch matches your target",
+        "for `+nightly` features: link errors can mean the dep needs nightly",
+        "Requires binaries or commands referenced in examples: apt, brew, build.rs, cargo, rustup."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-errors",
+        "legacy_title": "rust linker error: ld returned 1 exit status / undefined symbol"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "rustc-error-rustc-panic-thread-main-has-overflowed-its-stack",
+      "kind": "error",
+      "title": "rustc panic: thread 'main' has overflowed its stack",
+      "statement": "Stack overflow \u2014 usually deep recursion or huge stack-allocated data. Fix: (1) convert recursion to iteration; (2) box large stack values: `Box<[u8; 1_000_000]>` instead of `[u8; 1_000_000]`; (3) raise stack size for the main thread: `std::thread::Builder::new().stack_size(8 * 1024 * 1024).spawn(...)`; (4) for parsers: use a state machine or pratt parser instead of recursive descent on deep trees.",
+      "source_url": "https://doc.rust-lang.org/book/ch16-00-concurrency.html",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "convert recursion to iteration",
+        "box large stack values: `Box<[u8; 1_000_000]>` instead of `[u8; 1_000_000]`",
+        "raise stack size for the main thread: `std::thread::Builder::new().stack_size(8 * 1024 * 1024).spawn(...)`",
+        "for parsers: use a state machine or pratt parser instead of recursive descent on deep trees"
+      ],
+      "constraints": [],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-errors",
+        "legacy_title": "rust panic: thread 'main' has overflowed its stack"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "rustc-error-rustc-error-aborting-due-to-n-previous-errors",
+      "kind": "error",
+      "title": "rustc error: aborting due to N previous errors",
+      "statement": "Compilation gave up after N errors. Read top-down \u2014 the first error is usually the root cause; subsequent errors are often cascading. Fix: (1) fix the first error first, then recompile; (2) for huge errors: `cargo build 2>&1 | head -50`; (3) for incremental learning: tackle one file at a time; (4) `cargo check` is faster (skips codegen) \u2014 use during iteration.",
+      "source_url": "https://doc.rust-lang.org/book/ch01-03-hello-cargo.html",
+      "source_type": "official_docs",
+      "commands": [
+        "cargo build 2>&1 | head -50",
+        "cargo check"
+      ],
+      "steps": [
+        "fix the first error first, then recompile",
+        "for huge errors: `cargo build 2>&1 | head -50`",
+        "for incremental learning: tackle one file at a time",
+        "`cargo check` is faster (skips codegen) \u2014 use during iteration"
+      ],
+      "constraints": [
+        "`cargo check` is faster (skips codegen) \u2014 use during iteration",
+        "Requires binaries or commands referenced in examples: cargo."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-errors",
+        "legacy_title": "rust error: aborting due to N previous errors"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "rustc-error-rustc-warning-unused-import-dead-code",
+      "kind": "error",
+      "title": "rustc warning: unused import / dead_code",
+      "statement": "Items defined or imported but not used. Default lint level is `warn`. Fix: (1) remove the unused import / item; (2) intentional but unused (e.g. testing-only): prefix with `_` or `#[allow(dead_code)]`; (3) silence whole module: `#![allow(dead_code, unused_imports)]` at module top (not recommended long-term); (4) `cargo fix` auto-removes unused imports.",
+      "source_url": "https://doc.rust-lang.org/reference/attributes/diagnostics.html",
+      "source_type": "official_docs",
+      "commands": [
+        "warn",
+        "cargo fix"
+      ],
+      "steps": [
+        "remove the unused import / item",
+        "intentional but unused (e.g. testing-only): prefix with `_` or `#[allow(dead_code)]`",
+        "silence whole module: `#![allow(dead_code, unused_imports)]` at module top (not recommended long-term)",
+        "`cargo fix` auto-removes unused imports"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: cargo, warn."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-errors",
+        "legacy_title": "rust warning: unused import / dead_code"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "rustc-error-rustc-error-cannot-move-out-of-borrowed-content-e0507-variant",
+      "kind": "error",
+      "title": "rustc error: cannot move out of borrowed content (E0507 variant)",
+      "statement": "Trying to consume something through a reference. Same root as E0507 but specific to pattern matching. Fix: (1) match by reference: `match &my_thing { Some(x) => ... }` so `x` is a reference, not moved; (2) clone in arm: `Some(x) => x.clone()`; (3) for `Vec`: index access returns reference; `into_iter()` consumes the Vec.",
+      "source_url": "https://doc.rust-lang.org/book/ch06-02-match.html",
+      "source_type": "official_docs",
+      "commands": [
+        "match &my_thing { Some(x) => ... }",
+        "x",
+        "Vec"
+      ],
+      "steps": [
+        "match by reference: `match &my_thing { Some(x) => ... }` so `x` is a reference, not moved",
+        "clone in arm: `Some(x) => x.clone()`",
+        "for `Vec`: index access returns reference; `into_iter()` consumes the Vec"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: Vec, match, x."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-errors",
+        "legacy_title": "rust error: cannot move out of borrowed content (E0507 variant)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "rustc-error-rustc-error-cannot-infer-an-appropriate-lifetime-e0623",
+      "kind": "error",
+      "title": "rustc error: cannot infer an appropriate lifetime (E0623)",
+      "statement": "Multiple lifetimes involved and compiler can't pick one. Fix: (1) annotate explicitly: `fn f<'a, 'b>(x: &'a T, y: &'b U) -> &'a R`; (2) for HRTB (higher-ranked trait bounds): `for<'a> Fn(&'a T) -> &'a U`; (3) often: shorter lifetimes are okay \u2014 replace `'static` with explicit `'a`; (4) tool: `cargo expand` shows what lifetimes the compiler is inferring.",
+      "source_url": "https://doc.rust-lang.org/book/ch10-03-lifetime-syntax.html",
+      "source_type": "official_docs",
+      "commands": [
+        "fn f<'a, 'b>(x: &'a T, y: &'b U) -> &'a R",
+        "cargo expand"
+      ],
+      "steps": [
+        "annotate explicitly: `fn f<'a, 'b>(x: &'a T, y: &'b U) -> &'a R`",
+        "for HRTB (higher-ranked trait bounds): `for<'a> Fn(&'a T) -> &'a U`",
+        "often: shorter lifetimes are okay \u2014 replace `'static` with explicit `'a`",
+        "tool: `cargo expand` shows what lifetimes the compiler is inferring"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: cargo, fn."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-errors",
+        "legacy_title": "rust error: cannot infer an appropriate lifetime (E0623)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "rustc-error-rustc-error-async-function-cannot-capture-non-send-future",
+      "kind": "error",
+      "title": "rustc error: async function cannot capture / non-Send future",
+      "statement": "Async function's future captures something not-`Send`, but caller needs `Send` for `tokio::spawn`. Fix: (1) ensure all captured types are `Send`: use `Arc` not `Rc`, `Mutex` not `RefCell`; (2) for local-only async: `tokio::task::spawn_local` doesn't require Send (single-thread runtime); (3) avoid holding `MutexGuard` across `await` points (the guard is not Send) \u2014 drop before await; (4) `Box::pin(async move { ... })` for trait objects that aren't auto-Send.",
+      "source_url": "https://doc.rust-lang.org/book/ch20-00-async.html",
+      "source_type": "official_docs",
+      "commands": [
+        "Send",
+        "tokio::spawn",
+        "Arc",
+        "Rc",
+        "Mutex",
+        "RefCell",
+        "tokio::task::spawn_local",
+        "MutexGuard"
+      ],
+      "steps": [
+        "ensure all captured types are `Send`: use `Arc` not `Rc`, `Mutex` not `RefCell`",
+        "for local-only async: `tokio::task::spawn_local` doesn't require Send (single-thread runtime)",
+        "avoid holding `MutexGuard` across `await` points (the guard is not Send) \u2014 drop before await",
+        "`Box::pin(async move { ... })` for trait objects that aren't auto-Send"
+      ],
+      "constraints": [
+        "ensure all captured types are `Send`: use `Arc` not `Rc`, `Mutex` not `RefCell`",
+        "Requires binaries or commands referenced in examples: Arc, Mutex, MutexGuard, Rc, RefCell, Send, tokio::spawn, tokio::task::spawn_local."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-errors",
+        "legacy_title": "rust error: async function cannot capture / non-Send future"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "rustc-error-rustc-error-integer-overflow-in-debug-build-panic-vs-release-wraps",
+      "kind": "error",
+      "title": "rustc error: integer overflow in debug build (panic) vs release (wraps)",
+      "statement": "Default `+`/`-`/`*` on integers: debug panics on overflow, release silently wraps. Common surprise. Fix: (1) for explicit wrap: `wrapping_add` / `wrapping_sub` (intent-revealing); (2) for saturation: `saturating_add` clamps at max; (3) for checked: `checked_add` returns `Option<T>`; (4) for never-overflow asserts: enable overflow-checks in release too: `Cargo.toml` `[profile.release] overflow-checks = true` (slower); (5) for very wide arithmetic: `u128` or the `num` crate.",
+      "source_url": "https://doc.rust-lang.org/reference/expressions/operator-expr.html",
+      "source_type": "official_docs",
+      "commands": [
+        "wrapping_add",
+        "wrapping_sub",
+        "saturating_add",
+        "checked_add",
+        "Cargo.toml",
+        "u128",
+        "num"
+      ],
+      "steps": [
+        "for explicit wrap: `wrapping_add` / `wrapping_sub` (intent-revealing)",
+        "for saturation: `saturating_add` clamps at max",
+        "for checked: `checked_add` returns `Option<T>`",
+        "for never-overflow asserts: enable overflow-checks in release too: `Cargo.toml` `[profile.release] overflow-checks = true` (slower)",
+        "for very wide arithmetic: `u128` or the `num` crate"
+      ],
+      "constraints": [
+        "for checked: `checked_add` returns `Option<T>`",
+        "for never-overflow asserts: enable overflow-checks in release too: `Cargo.toml` `[profile.release] overflow-checks = true` (slower)",
+        "Requires binaries or commands referenced in examples: Cargo.toml, checked_add, num, saturating_add, u128, wrapping_add, wrapping_sub."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-errors",
+        "legacy_title": "rust error: integer overflow in debug build (panic) vs release (wraps)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "rustc-error-rustc-error-cannot-find-macro-x-in-this-scope",
+      "kind": "error",
+      "title": "rustc error: cannot find macro `X` in this scope",
+      "statement": "Macro not imported (or crate not in dependencies). Fix: (1) for stdlib macros (println!, vec!, format!): already in prelude \u2014 typo check; (2) for crate macros (lazy_static, anyhow): `use crate_name::macro_name;` (2018+ edition); (3) old style: `#[macro_use] extern crate crate_name;` at crate root; (4) for `derive` macros: `use serde::Serialize;` (the trait + macro share a name).",
+      "source_url": "https://doc.rust-lang.org/book/ch19-06-macros.html",
+      "source_type": "official_docs",
+      "commands": [
+        "use crate_name::macro_name;",
+        "derive",
+        "use serde::Serialize;"
+      ],
+      "steps": [
+        "for stdlib macros (println!, vec!, format!): already in prelude \u2014 typo check",
+        "for crate macros (lazy_static, anyhow): `use crate_name::macro_name;` (2018+ edition)",
+        "old style: `#[macro_use] extern crate crate_name;` at crate root",
+        "for `derive` macros: `use serde::Serialize;` (the trait + macro share a name)"
+      ],
+      "constraints": [
+        "for stdlib macros (println!, vec!, format!): already in prelude \u2014 typo check",
+        "Requires binaries or commands referenced in examples: derive, use."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-errors",
+        "legacy_title": "rust error: cannot find macro `X` in this scope"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-install-verify-rustup",
+      "kind": "recipe",
+      "title": "rustc recipe: install + verify rustup",
+      "statement": "`curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`. Adds `~/.cargo/bin` to PATH \u2014 restart shell or `source $HOME/.cargo/env`. Verify: `rustc --version` + `cargo --version`. Pin per-project: create `rust-toolchain.toml`: ```toml\\n[toolchain]\\nchannel = \"1.78.0\"\\ncomponents = [\"rustfmt\", \"clippy\"]\\n```. Update: `rustup update`. Switch channel: `rustup default nightly`.",
+      "source_url": "https://rust-lang.github.io/rustup/",
+      "source_type": "official_docs",
+      "commands": [
+        "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh",
+        "source $HOME/.cargo/env",
+        "rustc --version",
+        "cargo --version",
+        "rust-toolchain.toml",
+        ". Update:",
+        ". Switch channel:"
+      ],
+      "steps": [
+        "`curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`. Adds `~/.cargo/bin` to PATH \u2014 restart shell or `source $HOME/.cargo/env`. Verify: `rustc --version` + `cargo --version`. Pin per-project: create `rust-toolchain.toml`: ```toml\\n[toolchain]\\nchannel = \"1.78.0\"\\ncomponents = [\"rustfmt\", \"clippy\"]\\n```. Update: `rustup update`. Switch channel: `rustup default nightly`"
+      ],
+      "constraints": [
+        "`curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`. Adds `~/.cargo/bin` to PATH \u2014 restart shell or `source $HOME/.cargo/env`. Verify: `rustc --version` + `cargo --version`. Pin per-project: create `rust-toolchain.toml`: ```toml\\n[toolchain]\\nchannel = \"1.78.0\"\\ncomponents = [\"rustfmt\", \"clippy\"]\\n```. Update: `rustup update`. Switch channel: `rustup default nightly`",
+        "Requires binaries or commands referenced in examples: ., cargo, curl, rust-toolchain.toml, rustc, source."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: install + verify rustup"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-option-t-pattern-handling",
+      "kind": "recipe",
+      "title": "rustc recipe: Option<T> pattern handling",
+      "statement": "```rust\\n// Default value\\nlet n = maybe_n.unwrap_or(0);\\nlet n = maybe_n.unwrap_or_else(|| expensive_default());\\n\\n// Transform inside\\nlet doubled = maybe_n.map(|n| n * 2);\\nlet stringified = maybe_n.map(|n| n.to_string());\\n\\n// Propagate (in function returning Option<U>)\\nlet n = maybe_n?;\\n\\n// Pattern match\\nmatch maybe_n {\\n    Some(n) if n > 0 => positive(n),\\n    Some(n) => zero_or_negative(n),\\n    None => default(),\\n}\\n```",
+      "source_url": "https://doc.rust-lang.org/std/option/enum.Option.html",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "```rust\\n// Default value\\nlet n = maybe_n.unwrap_or",
+        "\\nlet n = maybe_n.unwrap_or_else(|| expensive_default());\\n\\n// Transform inside\\nlet doubled = maybe_n.map(|n| n * 2);\\nlet stringified = maybe_n.map(|n| n.to_string());\\n\\n// Propagate (in function returning Option<U>)\\nlet n = maybe_n?;\\n\\n// Pattern match\\nmatch maybe_n {\\n Some(n) if n > 0 => positive(n),\\n Some(n) => zero_or_negative(n),\\n None => default(),\\n}\\n```"
+      ],
+      "constraints": [],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: Option<T> pattern handling"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-result-t-e-with-operator",
+      "kind": "recipe",
+      "title": "rustc recipe: Result<T, E> with ? operator",
+      "statement": "```rust\\nuse std::fs;\\nfn read_config() -> Result<Config, Box<dyn std::error::Error>> {\\n    let raw = fs::read_to_string(\"config.toml\")?;  // io::Error \u2192 boxed\\n    let cfg: Config = toml::from_str(&raw)?;       // toml::de::Error \u2192 boxed\\n    Ok(cfg)\\n}\\n```. `?` early-returns on Err. Works in any function returning `Result<_, E>` where the inner error can `From`-convert into `E`. For ergonomic errors: `anyhow::Result<T>` (apps) or `thiserror` (libraries).",
+      "source_url": "https://doc.rust-lang.org/book/ch09-02-recoverable-errors-with-result.html",
+      "source_type": "official_docs",
+      "commands": [
+        "early-returns on Err. Works in any function returning",
+        "where the inner error can",
+        "-convert into",
+        ". For ergonomic errors:"
+      ],
+      "steps": [
+        "```rust\\nuse std::fs;\\nfn read_config() -> Result<Config, Box<dyn std::error::Error>> {\\n let raw = fs::read_to_string(\"config.toml\")?; // io::Error \u2192 boxed\\n let cfg: Config = toml::from_str(&raw)?; // toml::de::Error \u2192 boxed\\n Ok(cfg)\\n}\\n```. `?` early-returns on Err. Works in any function returning `Result<_, E>` where the inner error can `From`-convert into `E`. For ergonomic errors: `anyhow::Result<T>` (apps) or `thiserror` (libraries)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -convert, ., early-returns, where."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: Result<T, E> with ? operator"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-read-write-a-file",
+      "kind": "recipe",
+      "title": "rustc recipe: read + write a file",
+      "statement": "Read: `let contents = std::fs::read_to_string(\"file.txt\")?;` (whole file as String). Read bytes: `let bytes = std::fs::read(\"file.bin\")?;`. Write: `std::fs::write(\"out.txt\", \"hello\")?;` (overwrites). Append: ```rust\\nuse std::io::Write;\\nlet mut f = std::fs::OpenOptions::new().append(true).open(\"out.txt\")?;\\nwriteln!(f, \"line\")?;\\n```. For streaming line-by-line: `BufReader::new(f).lines()`.",
+      "source_url": "https://doc.rust-lang.org/std/fs/index.html",
+      "source_type": "official_docs",
+      "commands": [
+        "let contents = std::fs::read_to_string(\"file.txt\")?;",
+        "let bytes = std::fs::read(\"file.bin\")?;",
+        ". For streaming line-by-line:"
+      ],
+      "steps": [
+        "Read: `let contents = std::fs::read_to_string(\"file.txt\")?;` (whole file as String). Read bytes: `let bytes = std::fs::read(\"file.bin\")?;`. Write: `std::fs::write(\"out.txt\", \"hello\")?;` (overwrites). Append: ```rust\\nuse std::io::Write;\\nlet mut f = std::fs::OpenOptions::new().append(true).open(\"out.txt\")?;\\nwriteln!(f, \"line\")?;\\n```. For streaming line-by-line: `BufReader::new(f).lines()`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ., let."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: read + write a file"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-parse-command-line-arguments",
+      "kind": "recipe",
+      "title": "rustc recipe: parse command-line arguments",
+      "statement": "Stdlib quick: `let args: Vec<String> = std::env::args().collect();`. For real CLIs: use `clap` (de facto). ```rust\\nuse clap::Parser;\\n#[derive(Parser)]\\nstruct Args {\\n    #[arg(short, long)]\\n    name: String,\\n    #[arg(short, long, default_value_t = 1)]\\n    count: u32,\\n}\\nfn main() {\\n    let args = Args::parse();\\n    for _ in 0..args.count {\\n        println!(\"Hello {}\", args.name);\\n    }\\n}\\n```",
+      "source_url": "https://doc.rust-lang.org/std/env/fn.args.html",
+      "source_type": "official_docs",
+      "commands": [
+        "let args: Vec<String> = std::env::args().collect();",
+        "clap"
+      ],
+      "steps": [
+        "Stdlib quick: `let args: Vec<String> = std::env::args().collect();`. For real CLIs: use `clap` (de facto). ```rust\\nuse clap::Parser;\\n#[derive(Parser)]\\nstruct Args {\\n #[arg(short, long)]\\n name: String,\\n #[arg(short, long, default_value_t = 1)]\\n count: u32,\\n}\\nfn main() {\\n let args = Args::parse();\\n for _ in 0..args.count {\\n println!(\"Hello {}\", args.name);\\n }\\n}\\n```"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: clap, let."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: parse command-line arguments"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-iterate-collect-to-vec-hashmap",
+      "kind": "recipe",
+      "title": "rustc recipe: iterate + collect to Vec / HashMap",
+      "statement": "```rust\\n// Vec\\nlet doubled: Vec<i32> = (1..=5).map(|n| n * 2).collect();\\nlet evens: Vec<i32> = (1..=10).filter(|n| n % 2 == 0).collect();\\n\\n// HashMap\\nuse std::collections::HashMap;\\nlet map: HashMap<&str, i32> = vec![(\"a\", 1), (\"b\", 2)].into_iter().collect();\\n\\n// Sum / product / count\\nlet sum: i32 = (1..=100).sum();\\nlet count = (1..100).filter(|n| n % 7 == 0).count();\\n```",
+      "source_url": "https://doc.rust-lang.org/std/iter/trait.Iterator.html",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "```rust\\n// Vec\\nlet doubled: Vec<i32> = (1..=5).map(|n| n * 2).collect();\\nlet evens: Vec<i32> = (1..=10).filter(|n| n % 2 == 0).collect();\\n\\n// HashMap\\nuse std::collections::HashMap;\\nlet map: HashMap<&str, i32> = vec![(\"a\", 1), (\"b\", 2)].into_iter().collect();\\n\\n// Sum / product / count\\nlet sum: i32 = (1..=100).sum();\\nlet count = (1..100).filter(|n| n % 7 == 0).count();\\n```"
+      ],
+      "constraints": [],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: iterate + collect to Vec / HashMap"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-define-struct-impl-methods",
+      "kind": "recipe",
+      "title": "rustc recipe: define struct + impl methods",
+      "statement": "```rust\\n#[derive(Debug, Clone, PartialEq)]\\nstruct User {\\n    name: String,\\n    age: u32,\\n}\\n\\nimpl User {\\n    fn new(name: impl Into<String>, age: u32) -> Self {\\n        Self { name: name.into(), age }\\n    }\\n    fn greet(&self) -> String {\\n        format!(\"Hello, {}!\", self.name)\\n    }\\n    fn birthday(&mut self) {\\n        self.age += 1;\\n    }\\n}\\n\\nlet mut u = User::new(\"Alice\", 30);\\nu.birthday();\\n```",
+      "source_url": "https://doc.rust-lang.org/book/ch05-00-structs.html",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "```rust\\n#[derive(Debug, Clone, PartialEq)]\\nstruct User {\\n name: String,\\n age: u32,\\n}\\n\\nimpl User {\\n fn new(name: impl Into<String>, age: u32) -> Self {\\n Self { name: name.into(), age }\\n }\\n fn greet(&self) -> String {\\n format!(\"Hello, {}!\", self.name)\\n }\\n fn birthday(&mut self) {\\n self.age += 1;\\n }\\n}\\n\\nlet mut u = User::new(\"Alice\", 30);\\nu.birthday();\\n```"
+      ],
+      "constraints": [],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: define struct + impl methods"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-implement-a-trait",
+      "kind": "recipe",
+      "title": "rustc recipe: implement a trait",
+      "statement": "```rust\\ntrait Greet {\\n    fn hello(&self) -> String;\\n    fn shout(&self) -> String {\\n        self.hello().to_uppercase()  // default method\\n    }\\n}\\n\\nimpl Greet for User {\\n    fn hello(&self) -> String {\\n        format!(\"Hi, I'm {}\", self.name)\\n    }\\n}\\n\\nfn welcome(g: &impl Greet) {\\n    println!(\"{}\", g.hello());\\n}\\n```. Use `dyn Greet` for trait objects (heap-allocated, dynamic dispatch).",
+      "source_url": "https://doc.rust-lang.org/book/ch10-02-traits.html",
+      "source_type": "official_docs",
+      "commands": [
+        ". Use"
+      ],
+      "steps": [
+        "```rust\\ntrait Greet {\\n fn hello(&self) -> String;\\n fn shout(&self) -> String {\\n self.hello().to_uppercase() // default method\\n }\\n}\\n\\nimpl Greet for User {\\n fn hello(&self) -> String {\\n format!(\"Hi, I'm {}\", self.name)\\n }\\n}\\n\\nfn welcome(g: &impl Greet) {\\n println!(\"{}\", g.hello());\\n}\\n```. Use `dyn Greet` for trait objects (heap-allocated, dynamic dispatch)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: .."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: implement a trait"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-generic-function-with-trait-bounds",
+      "kind": "recipe",
+      "title": "rustc recipe: generic function with trait bounds",
+      "statement": "```rust\\nuse std::fmt::Display;\\n\\nfn print_all<T: Display>(items: &[T]) {\\n    for item in items {\\n        println!(\"{}\", item);\\n    }\\n}\\n\\n// `impl Trait` syntax (preferred for single bound)\\nfn print_all_v2(items: &[impl Display]) { ... }\\n\\n// Multiple bounds\\nfn process<T: Display + Clone>(x: T) -> T { x.clone() }\\n\\n// Where clauses (cleaner for complex bounds)\\nfn complex<T, U>(x: T, y: U)\\nwhere T: Display + Clone, U: IntoIterator { ... }\\n```",
+      "source_url": "https://doc.rust-lang.org/book/ch10-00-generics.html",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "```rust\\nuse std::fmt::Display;\\n\\nfn print_all<T: Display>(items: &[T]) {\\n for item in items {\\n println!(\"{}\", item);\\n }\\n}\\n\\n// `impl Trait` syntax (preferred for single bound)\\nfn print_all_v2(items: &[impl Display]) { ... }\\n\\n// Multiple bounds\\nfn process<T: Display + Clone>(x: T) -> T { x.clone() }\\n\\n// Where clauses (cleaner for complex bounds)\\nfn complex<T, U>(x: T, y: U)\\nwhere T: Display + Clone, U: IntoIterator { ... }\\n```"
+      ],
+      "constraints": [],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: generic function with trait bounds"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-derive-standard-traits",
+      "kind": "recipe",
+      "title": "rustc recipe: derive standard traits",
+      "statement": "```rust\\n#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]\\nstruct Config {\\n    name: String,\\n    count: u32,\\n}\\n```. `Debug`: enables `{:?}` formatting. `Clone`: `.clone()` method. `PartialEq` / `Eq`: equality. `Hash`: HashMap/HashSet key. `Default`: `Config::default()`. For ordered: also `PartialOrd, Ord`. `Copy` for tiny POD types (all fields Copy): `#[derive(Copy, Clone)]`.",
+      "source_url": "https://doc.rust-lang.org/reference/attributes/derive.html",
+      "source_type": "official_docs",
+      "commands": [
+        ": enables",
+        "formatting.",
+        "method.",
+        ": equality.",
+        ": HashMap/HashSet key.",
+        ". For ordered: also",
+        "for tiny POD types (all fields Copy):"
+      ],
+      "steps": [
+        "```rust\\n#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]\\nstruct Config {\\n name: String,\\n count: u32,\\n}\\n```. `Debug`: enables `{:?}` formatting. `Clone`: `.clone()` method. `PartialEq` / `Eq`: equality. `Hash`: HashMap/HashSet key. `Default`: `Config::default()`. For ordered: also `PartialOrd, Ord`. `Copy` for tiny POD types (all fields Copy): `#[derive(Copy, Clone)]`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ., :, for, formatting., method.."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: derive standard traits"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-box-for-heap-allocation-recursive-types",
+      "kind": "recipe",
+      "title": "rustc recipe: Box for heap allocation / recursive types",
+      "statement": "```rust\\n// Recursive type \u2014 needs indirection\\nenum List {\\n    Cons(i32, Box<List>),\\n    Nil,\\n}\\nlet list = List::Cons(1, Box::new(List::Cons(2, Box::new(List::Nil))));\\n\\n// Trait object\\nlet shapes: Vec<Box<dyn Shape>> = vec![Box::new(Circle{...}), Box::new(Square{...})];\\n\\n// Force heap allocation for huge value\\nlet big_array: Box<[u8; 1_000_000]> = Box::new([0; 1_000_000]);\\n```",
+      "source_url": "https://doc.rust-lang.org/std/boxed/struct.Box.html",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "```rust\\n// Recursive type \u2014 needs indirection\\nenum List {\\n Cons(i32, Box<List>),\\n Nil,\\n}\\nlet list = List::Cons(1, Box::new(List::Cons(2, Box::new(List::Nil))));\\n\\n// Trait object\\nlet shapes: Vec<Box<dyn Shape>> = vec![Box::new(Circle{...}), Box::new(Square{...})];\\n\\n// Force heap allocation for huge value\\nlet big_array: Box<[u8; 1_000_000]> = Box::new([0; 1_000_000]);\\n```"
+      ],
+      "constraints": [
+        "```rust\\n// Recursive type \u2014 needs indirection\\nenum List {\\n Cons(i32, Box<List>),\\n Nil,\\n}\\nlet list = List::Cons(1, Box::new(List::Cons(2, Box::new(List::Nil))));\\n\\n// Trait object\\nlet shapes: Vec<Box<dyn Shape>> = vec![Box::new(Circle{...}), Box::new(Square{...})];\\n\\n// Force heap allocation for huge value\\nlet big_array: Box<[u8; 1_000_000]> = Box::new([0; 1_000_000]);\\n```"
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: Box for heap allocation / recursive types"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-rc-for-shared-ownership-single-threaded",
+      "kind": "recipe",
+      "title": "rustc recipe: Rc for shared ownership (single-threaded)",
+      "statement": "```rust\\nuse std::rc::Rc;\\nlet a = Rc::new(vec![1, 2, 3]);\\nlet b = Rc::clone(&a);  // increments refcount (cheap)\\n// Both a and b own the Vec; dropped when last clone goes out of scope\\nprintln!(\"refs: {}\", Rc::strong_count(&a));  // 2\\n```. For mutation through Rc: combine with `RefCell`: `Rc<RefCell<T>>`. For multi-threaded: use `Arc` instead.",
+      "source_url": "https://doc.rust-lang.org/std/rc/struct.Rc.html",
+      "source_type": "official_docs",
+      "commands": [
+        ". For mutation through Rc: combine with",
+        ". For multi-threaded: use"
+      ],
+      "steps": [
+        "```rust\\nuse std::rc::Rc;\\nlet a = Rc::new(vec![1, 2, 3]);\\nlet b = Rc::clone(&a); // increments refcount (cheap)\\n// Both a and b own the Vec; dropped when last clone goes out of scope\\nprintln!(\"refs: {}\", Rc::strong_count(&a)); // 2\\n```. For mutation through Rc: combine with `RefCell`: `Rc<RefCell<T>>`. For multi-threaded: use `Arc` instead"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: .."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: Rc for shared ownership (single-threaded)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-arc-mutex-for-shared-mutable-state-across-threads",
+      "kind": "recipe",
+      "title": "rustc recipe: Arc + Mutex for shared mutable state across threads",
+      "statement": "```rust\\nuse std::sync::{Arc, Mutex};\\nuse std::thread;\\n\\nlet counter = Arc::new(Mutex::new(0));\\nlet mut handles = vec![];\\nfor _ in 0..10 {\\n    let c = Arc::clone(&counter);\\n    handles.push(thread::spawn(move || {\\n        let mut n = c.lock().unwrap();\\n        *n += 1;\\n    }));\\n}\\nfor h in handles { h.join().unwrap(); }\\nprintln!(\"Final: {}\", *counter.lock().unwrap());  // 10\\n```",
+      "source_url": "https://doc.rust-lang.org/std/sync/struct.Mutex.html",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "```rust\\nuse std::sync::{Arc, Mutex};\\nuse std::thread;\\n\\nlet counter = Arc::new(Mutex::new",
+        ");\\nlet mut handles = vec![];\\nfor _ in 0..10 {\\n let c = Arc::clone(&counter);\\n handles.push(thread::spawn(move || {\\n let mut n = c.lock().unwrap();\\n *n += 1;\\n }));\\n}\\nfor h in handles { h.join().unwrap(); }\\nprintln!(\"Final: {}\", *counter.lock().unwrap()); // 10\\n```"
+      ],
+      "constraints": [],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: Arc + Mutex for shared mutable state across threads"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-refcell-for-interior-mutability",
+      "kind": "recipe",
+      "title": "rustc recipe: RefCell for interior mutability",
+      "statement": "When you have a `&T` (immutable reference) but need to mutate `T`. Borrow check moves to runtime. ```rust\\nuse std::cell::RefCell;\\nlet x = RefCell::new(5);\\n*x.borrow_mut() += 1;\\nprintln!(\"{}\", *x.borrow());  // 6\\n```. Caveat: panics on overlapping borrows (use `try_borrow` to handle gracefully). Not Sync (single-threaded only) \u2014 use `Mutex` for threads.",
+      "source_url": "https://doc.rust-lang.org/std/cell/struct.RefCell.html",
+      "source_type": "official_docs",
+      "commands": [
+        "T",
+        ". Caveat: panics on overlapping borrows (use",
+        "to handle gracefully). Not Sync (single-threaded only) \u2014 use"
+      ],
+      "steps": [
+        "When you have a `&T` (immutable reference) but need to mutate `T`. Borrow check moves to runtime. ```rust\\nuse std::cell::RefCell;\\nlet x = RefCell::new",
+        "\\n*x.borrow_mut() += 1;\\nprintln!(\"{}\", *x.borrow()); // 6\\n```. Caveat: panics on overlapping borrows (use `try_borrow` to handle gracefully). Not Sync (single-threaded only) \u2014 use `Mutex` for threads"
+      ],
+      "constraints": [
+        "When you have a `&T` (immutable reference) but need to mutate `T`. Borrow check moves to runtime. ```rust\\nuse std::cell::RefCell;\\nlet x = RefCell::new",
+        "Requires binaries or commands referenced in examples: ., T, to."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: RefCell for interior mutability"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-spawn-threads-return-values",
+      "kind": "recipe",
+      "title": "rustc recipe: spawn threads + return values",
+      "statement": "```rust\\nuse std::thread;\\n\\nlet handle = thread::spawn(|| {\\n    // do work\\n    expensive_compute()\\n});\\nlet result = handle.join().unwrap();  // wait + retrieve\\n\\n// With captures (use move)\\nlet data = vec![1, 2, 3];\\nlet h = thread::spawn(move || {\\n    data.iter().sum::<i32>()\\n});\\nprintln!(\"sum: {}\", h.join().unwrap());\\n```. For thread pools: use `rayon` (data-parallel) or `tokio` (async).",
+      "source_url": "https://doc.rust-lang.org/std/thread/index.html",
+      "source_type": "official_docs",
+      "commands": [
+        ". For thread pools: use"
+      ],
+      "steps": [
+        "```rust\\nuse std::thread;\\n\\nlet handle = thread::spawn(|| {\\n // do work\\n expensive_compute()\\n});\\nlet result = handle.join().unwrap(); // wait + retrieve\\n\\n// With captures (use move)\\nlet data = vec![1, 2, 3];\\nlet h = thread::spawn(move || {\\n data.iter().sum::<i32>()\\n});\\nprintln!(\"sum: {}\", h.join().unwrap());\\n```. For thread pools: use `rayon` (data-parallel) or `tokio` (async)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: .."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: spawn threads + return values"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-channels-mpsc-for-thread-communication",
+      "kind": "recipe",
+      "title": "rustc recipe: channels (mpsc) for thread communication",
+      "statement": "```rust\\nuse std::sync::mpsc;\\nuse std::thread;\\n\\nlet (tx, rx) = mpsc::channel();\\nfor i in 0..3 {\\n    let tx = tx.clone();\\n    thread::spawn(move || {\\n        tx.send(i * 10).unwrap();\\n    });\\n}\\ndrop(tx);  // close the sender so rx terminates\\nfor val in rx {  // iterator until all senders dropped\\n    println!(\"got: {}\", val);\\n}\\n```. `mpsc` = multiple producers, single consumer. For SPSC/MPMC: use `crossbeam-channel`.",
+      "source_url": "https://doc.rust-lang.org/std/sync/mpsc/index.html",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "```rust\\nuse std::sync::mpsc;\\nuse std::thread;\\n\\nlet (tx, rx) = mpsc::channel();\\nfor i in 0..3 {\\n let tx = tx.clone();\\n thread::spawn(move || {\\n tx.send(i * 10).unwrap();\\n });\\n}\\ndrop(tx); // close the sender so rx terminates\\nfor val in rx { // iterator until all senders dropped\\n println!(\"got: {}\", val);\\n}\\n```. `mpsc` = multiple producers, single consumer. For SPSC/MPMC: use `crossbeam-channel`"
+      ],
+      "constraints": [],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: channels (mpsc) for thread communication"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-async-await-with-tokio",
+      "kind": "recipe",
+      "title": "rustc recipe: async/await with tokio",
+      "statement": "```rust\\nuse tokio;\\n\\n#[tokio::main]\\nasync fn main() -> Result<(), Box<dyn std::error::Error>> {\\n    let body = reqwest::get(\"https://example.com\").await?.text().await?;\\n    println!(\"{}\", body);\\n    Ok(())\\n}\\n\\n// Concurrent\\nlet (a, b) = tokio::join!(fetch_a(), fetch_b());\\n\\n// Spawn task\\ntokio::spawn(async { /* runs in background */ });\\n```. For multi-runtime: `async-std` is alternative; `smol` is minimal.",
+      "source_url": "https://doc.rust-lang.org/book/ch20-00-async.html",
+      "source_type": "official_docs",
+      "commands": [
+        ". For multi-runtime:",
+        "is alternative;"
+      ],
+      "steps": [
+        "```rust\\nuse tokio;\\n\\n#[tokio::main]\\nasync fn main() -> Result<(), Box<dyn std::error::Error>> {\\n let body = reqwest::get(\"https://example.com\").await?.text().await?;\\n println!(\"{}\", body);\\n Ok(())\\n}\\n\\n// Concurrent\\nlet (a, b) = tokio::join!(fetch_a(), fetch_b());\\n\\n// Spawn task\\ntokio::spawn(async { /* runs in background */ });\\n```. For multi-runtime: `async-std` is alternative; `smol` is minimal"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ., is."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: async/await with tokio"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-serde-for-json-serialization",
+      "kind": "recipe",
+      "title": "rustc recipe: serde for JSON serialization",
+      "statement": "Cargo.toml: ```toml\\nserde = { version = \"1.0\", features = [\"derive\"] }\\nserde_json = \"1.0\"\\n```. ```rust\\nuse serde::{Serialize, Deserialize};\\n\\n#[derive(Serialize, Deserialize, Debug)]\\nstruct User {\\n    name: String,\\n    age: u32,\\n    #[serde(default)]\\n    role: Option<String>,\\n}\\n\\nlet u = User { name: \"Alice\".into(), age: 30, role: None };\\nlet json = serde_json::to_string(&u)?;\\nlet u2: User = serde_json::from_str(&json)?;\\n```",
+      "source_url": "https://doc.rust-lang.org/book/ch10-02-traits.html",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "Cargo.toml: ```toml\\nserde = { version = \"1.0\", features = [\"derive\"] }\\nserde_json = \"1.0\"\\n```. ```rust\\nuse serde::{Serialize, Deserialize};\\n\\n#[derive(Serialize, Deserialize, Debug)]\\nstruct User {\\n name: String,\\n age: u32,\\n #[serde(default)]\\n role: Option<String>,\\n}\\n\\nlet u = User { name: \"Alice\".into(), age: 30, role: None };\\nlet json = serde_json::to_string(&u)?;\\nlet u2: User = serde_json::from_str(&json)?;\\n```"
+      ],
+      "constraints": [],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: serde for JSON serialization"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-http-request-with-reqwest",
+      "kind": "recipe",
+      "title": "rustc recipe: HTTP request with reqwest",
+      "statement": "Cargo.toml: `reqwest = { version = \"0.12\", features = [\"json\", \"blocking\"] }`. Blocking: ```rust\\nlet body: serde_json::Value = reqwest::blocking::get(\"https://api.example.com\")?.json()?;\\n```. Async: ```rust\\n#[tokio::main]\\nasync fn main() -> Result<(), Box<dyn std::error::Error>> {\\n    let client = reqwest::Client::new();\\n    let resp = client.post(\"https://api/users\")\\n        .json(&User { name: \"Alice\".into(), age: 30 })\\n        .send().await?;\\n    println!(\"status: {}\", resp.status());\\n    Ok(())\\n}\\n```",
+      "source_url": "https://doc.rust-lang.org/std/io/index.html",
+      "source_type": "official_docs",
+      "commands": [
+        "reqwest = { version = \"0.12\", features = [\"json\", \"blocking\"] }",
+        ". Async:"
+      ],
+      "steps": [
+        "Cargo.toml: `reqwest = { version = \"0.12\", features = [\"json\", \"blocking\"] }`. Blocking: ```rust\\nlet body: serde_json::Value = reqwest::blocking::get(\"https://api.example.com\")?.json()?;\\n```. Async: ```rust\\n#[tokio::main]\\nasync fn main() -> Result<(), Box<dyn std::error::Error>> {\\n let client = reqwest::Client::new();\\n let resp = client.post(\"https://api/users\")\\n .json(&User { name: \"Alice\".into(), age: 30 })\\n .send().await?;\\n println!(\"status: {}\", resp.status());\\n Ok(())\\n}\\n```"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ., reqwest."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: HTTP request with reqwest"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-error-handling-with-anyhow-thiserror",
+      "kind": "recipe",
+      "title": "rustc recipe: error handling with anyhow + thiserror",
+      "statement": "For libraries (typed errors): ```rust\\nuse thiserror::Error;\\n#[derive(Error, Debug)]\\nenum MyError {\\n    #[error(\"io: {0}\")]\\n    Io(#[from] std::io::Error),\\n    #[error(\"missing config key '{0}'\")]\\n    MissingKey(String),\\n}\\n```. For apps (ergonomic any-error): ```rust\\nuse anyhow::{Result, Context};\\nfn parse_config() -> Result<Config> {\\n    let raw = std::fs::read_to_string(\"config.toml\").context(\"reading config\")?;\\n    toml::from_str(&raw).context(\"parsing TOML\")\\n}\\n```",
+      "source_url": "https://doc.rust-lang.org/book/ch09-02-recoverable-errors-with-result.html",
+      "source_type": "official_docs",
+      "commands": [
+        ". For apps (ergonomic any-error):"
+      ],
+      "steps": [
+        "For libraries (typed errors): ```rust\\nuse thiserror::Error;\\n#[derive(Error, Debug)]\\nenum MyError {\\n #[error(\"io: {0}\")]\\n Io(#[from] std::io::Error),\\n #[error(\"missing config key '{0}'\")]\\n MissingKey(String),\\n}\\n```. For apps (ergonomic any-error): ```rust\\nuse anyhow::{Result, Context};\\nfn parse_config() -> Result<Config> {\\n let raw = std::fs::read_to_string(\"config.toml\").context(\"reading config\")?;\\n toml::from_str(&raw).context(\"parsing TOML\")\\n}\\n```"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: .."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: error handling with anyhow + thiserror"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-write-run-unit-tests",
+      "kind": "recipe",
+      "title": "rustc recipe: write + run unit tests",
+      "statement": "```rust\\nfn add(a: i32, b: i32) -> i32 { a + b }\\n\\n#[cfg(test)]\\nmod tests {\\n    use super::*;\\n    #[test]\\n    fn adds_correctly() {\\n        assert_eq!(add(2, 3), 5);\\n    }\\n    #[test]\\n    #[should_panic(expected = \"divide\")]\\n    fn panics_on_zero() {\\n        let _ = 1 / 0;\\n    }\\n}\\n```. Run: `cargo test`. Single: `cargo test adds_correctly`. Show stdout: `cargo test -- --nocapture`.",
+      "source_url": "https://doc.rust-lang.org/book/ch11-00-testing.html",
+      "source_type": "official_docs",
+      "commands": [
+        ". Run:",
+        ". Single:",
+        ". Show stdout:"
+      ],
+      "steps": [
+        "```rust\\nfn add(a: i32, b: i32) -> i32 { a + b }\\n\\n#[cfg(test)]\\nmod tests {\\n use super::*;\\n #[test]\\n fn adds_correctly() {\\n assert_eq!(add(2, 3), 5);\\n }\\n #[test]\\n #[should_panic(expected = \"divide\")]\\n fn panics_on_zero() {\\n let _ = 1 / 0;\\n }\\n}\\n```. Run: `cargo test`. Single: `cargo test adds_correctly`. Show stdout: `cargo test -- --nocapture`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: .."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: write + run unit tests"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-configure-logging-with-tracing",
+      "kind": "recipe",
+      "title": "rustc recipe: configure logging with tracing",
+      "statement": "Cargo.toml: ```toml\\ntracing = \"0.1\"\\ntracing-subscriber = { version = \"0.3\", features = [\"env-filter\"] }\\n```. ```rust\\nuse tracing::{info, warn, error, instrument};\\nuse tracing_subscriber::EnvFilter;\\n\\nfn main() {\\n    tracing_subscriber::fmt()\\n        .with_env_filter(EnvFilter::from_default_env())\\n        .init();\\n    info!(user = \"alice\", \"logged in\");\\n}\\n\\n#[instrument]\\nfn handler(id: u64) { info!(\"processing\"); }\\n```. Run with `RUST_LOG=debug cargo run`.",
+      "source_url": "https://doc.rust-lang.org/std/io/index.html",
+      "source_type": "official_docs",
+      "commands": [
+        ". Run with"
+      ],
+      "steps": [
+        "Cargo.toml: ```toml\\ntracing = \"0.1\"\\ntracing-subscriber = { version = \"0.3\", features = [\"env-filter\"] }\\n```. ```rust\\nuse tracing::{info, warn, error, instrument};\\nuse tracing_subscriber::EnvFilter;\\n\\nfn main() {\\n tracing_subscriber::fmt()\\n .with_env_filter(EnvFilter::from_default_env())\\n .init();\\n info!(user = \"alice\", \"logged in\");\\n}\\n\\n#[instrument]\\nfn handler(id: u64) { info!(\"processing\"); }\\n```. Run with `RUST_LOG=debug cargo run`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: .."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: configure logging with tracing"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-pattern-matching-essentials",
+      "kind": "recipe",
+      "title": "rustc recipe: pattern matching essentials",
+      "statement": "```rust\\nmatch value {\\n    1 | 2 | 3 => \"low\",                  // or-patterns\\n    n if n > 100 => \"high\",            // guard\\n    Point { x: 0, .. } => \"on y-axis\", // struct destructure\\n    (a, b, _) => \"triple\",             // tuple\\n    [first, .., last] => \"slice\",      // slice with rest\\n    Some(x) => format!(\"some: {}\", x), // enum variant\\n    _ => \"other\",                       // catch-all\\n}\\n```. `if let Some(x) = opt { ... }` for single-arm match.",
+      "source_url": "https://doc.rust-lang.org/book/ch06-02-match.html",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "```rust\\nmatch value {\\n 1 | 2 | 3 => \"low\", // or-patterns\\n n if n > 100 => \"high\", // guard\\n Point { x: 0, .. } => \"on y-axis\", // struct destructure\\n (a, b, _) => \"triple\", // tuple\\n [first, .., last] => \"slice\", // slice with rest\\n Some(x) => format!(\"some: {}\", x), // enum variant\\n _ => \"other\", // catch-all\\n}\\n```. `if let Some(x) = opt { ... }` for single-arm match"
+      ],
+      "constraints": [],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: pattern matching essentials"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-format-strings-display-impl",
+      "kind": "recipe",
+      "title": "rustc recipe: format strings + Display impl",
+      "statement": "```rust\\nlet s = format!(\"{} is {} years old\", name, age);\\nlet hex = format!(\"{:#x}\", 255);          // 0xff\\nlet pad = format!(\"{:>10}\", \"hi\");         // right-align width 10\\nlet truncated = format!(\"{:.3}\", 3.14159);  // 3.142\\nlet debug = format!(\"{:?}\", vec![1,2,3]);   // [1, 2, 3]\\nlet pretty = format!(\"{:#?}\", my_struct);   // multi-line debug\\n\\nimpl std::fmt::Display for User {\\n    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {\\n        write!(f, \"{} ({})\", self.name, self.age)\\n    }\\n}\\n```",
+      "source_url": "https://doc.rust-lang.org/std/fmt/index.html",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "```rust\\nlet s = format!(\"{} is {} years old\", name, age);\\nlet hex = format!(\"{:#x}\", 255); // 0xff\\nlet pad = format!(\"{:>10}\", \"hi\"); // right-align width 10\\nlet truncated = format!(\"{:.3}\", 3.14159); // 3.142\\nlet debug = format!(\"{:?}\", vec![1,2,3]); // [1, 2, 3]\\nlet pretty = format!(\"{:#?}\", my_struct); // multi-line debug\\n\\nimpl std::fmt::Display for User {\\n fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {\\n write!(f, \"{} ({})\", self.name, self.age)\\n }\\n}\\n```"
+      ],
+      "constraints": [],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: format strings + Display impl"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-lifetimes-in-function-signatures",
+      "kind": "recipe",
+      "title": "rustc recipe: lifetimes in function signatures",
+      "statement": "```rust\\n// Single lifetime\\nfn first_word<'a>(s: &'a str) -> &'a str {\\n    s.split_whitespace().next().unwrap_or(\"\")\\n}\\n\\n// Multiple lifetimes\\nfn longer<'a, 'b>(x: &'a str, y: &'b str) -> &'a str\\nwhere 'b: 'a  // y lives at least as long as x\\n{\\n    if x.len() >= y.len() { x } else { x } // returns 'a-tied value\\n}\\n\\n// Struct holding references\\nstruct Holder<'a> {\\n    data: &'a [u8],\\n}\\n```. Lifetime elision: most cases don't need explicit annotations.",
+      "source_url": "https://doc.rust-lang.org/book/ch10-03-lifetime-syntax.html",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "```rust\\n// Single lifetime\\nfn first_word<'a>(s: &'a str) -> &'a str {\\n s.split_whitespace().next().unwrap_or(\"\")\\n}\\n\\n// Multiple lifetimes\\nfn longer<'a, 'b>(x: &'a str, y: &'b str) -> &'a str\\nwhere 'b: 'a // y lives at least as long as x\\n{\\n if x.len() >= y.len() { x } else { x } // returns 'a-tied value\\n}\\n\\n// Struct holding references\\nstruct Holder<'a> {\\n data: &'a [u8],\\n}\\n```. Lifetime elision: most cases don't need explicit annotations"
+      ],
+      "constraints": [
+        "```rust\\n// Single lifetime\\nfn first_word<'a>(s: &'a str) -> &'a str {\\n s.split_whitespace().next().unwrap_or(\"\")\\n}\\n\\n// Multiple lifetimes\\nfn longer<'a, 'b>(x: &'a str, y: &'b str) -> &'a str\\nwhere 'b: 'a // y lives at least as long as x\\n{\\n if x.len() >= y.len() { x } else { x } // returns 'a-tied value\\n}\\n\\n// Struct holding references\\nstruct Holder<'a> {\\n data: &'a [u8],\\n}\\n```. Lifetime elision: most cases don't need explicit annotations"
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: lifetimes in function signatures"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-from-into-trait-for-conversions",
+      "kind": "recipe",
+      "title": "rustc recipe: from / into trait for conversions",
+      "statement": "```rust\\nstruct UserId(u64);\\n\\nimpl From<u64> for UserId {\\n    fn from(n: u64) -> Self { UserId(n) }\\n}\\n\\n// Now both work:\\nlet id = UserId::from(42);\\nlet id: UserId = 42.into();\\nfn process(id: impl Into<UserId>) { ... }\\nprocess(42);\\n```. Free Into impl: defining `From<A> for B` automatically gives `Into<B> for A`. For fallible: `TryFrom` / `TryInto`.",
+      "source_url": "https://doc.rust-lang.org/std/convert/trait.From.html",
+      "source_type": "official_docs",
+      "commands": [
+        ". Free Into impl: defining",
+        "automatically gives",
+        ". For fallible:"
+      ],
+      "steps": [
+        "```rust\\nstruct UserId(u64);\\n\\nimpl From<u64> for UserId {\\n fn from(n: u64) -> Self { UserId(n) }\\n}\\n\\n// Now both work:\\nlet id = UserId::from",
+        "\\nlet id: UserId = 42.into();\\nfn process(id: impl Into<UserId>) { ... }\\nprocess",
+        "\\n```. Free Into impl: defining `From<A> for B` automatically gives `Into<B> for A`. For fallible: `TryFrom` / `TryInto`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ., automatically."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: from / into trait for conversions"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-conditional-compilation-with-cfg",
+      "kind": "recipe",
+      "title": "rustc recipe: conditional compilation with cfg",
+      "statement": "```rust\\n#[cfg(target_os = \"linux\")]\\nfn os_specific() { /* Linux only */ }\\n\\n#[cfg(any(target_os = \"macos\", target_os = \"linux\"))]\\nfn unix_like() { /* Unix */ }\\n\\n#[cfg(test)]\\nmod tests { /* compiled only with cargo test */ }\\n\\n// Feature-gated\\n#[cfg(feature = \"async\")]\\npub mod async_api { /* enabled via Cargo.toml feature */ }\\n\\n// Runtime check\\nif cfg!(target_os = \"windows\") { ... }\\n```",
+      "source_url": "https://doc.rust-lang.org/reference/conditional-compilation.html",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "```rust\\n#[cfg(target_os = \"linux\")]\\nfn os_specific() { /* Linux only */ }\\n\\n#[cfg(any(target_os = \"macos\", target_os = \"linux\"))]\\nfn unix_like() { /* Unix */ }\\n\\n#[cfg(test)]\\nmod tests { /* compiled only with cargo test */ }\\n\\n// Feature-gated\\n#[cfg(feature = \"async\")]\\npub mod async_api { /* enabled via Cargo.toml feature */ }\\n\\n// Runtime check\\nif cfg!(target_os = \"windows\") { ... }\\n```"
+      ],
+      "constraints": [
+        "```rust\\n#[cfg(target_os = \"linux\")]\\nfn os_specific() { /* Linux only */ }\\n\\n#[cfg(any(target_os = \"macos\", target_os = \"linux\"))]\\nfn unix_like() { /* Unix */ }\\n\\n#[cfg(test)]\\nmod tests { /* compiled only with cargo test */ }\\n\\n// Feature-gated\\n#[cfg(feature = \"async\")]\\npub mod async_api { /* enabled via Cargo.toml feature */ }\\n\\n// Runtime check\\nif cfg!(target_os = \"windows\") { ... }\\n```"
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: conditional compilation with cfg"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-declarative-macro-macro-rules",
+      "kind": "recipe",
+      "title": "rustc recipe: declarative macro (macro_rules!)",
+      "statement": "```rust\\nmacro_rules! min {\\n    ($a:expr, $b:expr) => {\\n        if $a < $b { $a } else { $b }\\n    };\\n    ($a:expr, $b:expr, $($rest:expr),+) => {\\n        min!($a, min!($b, $($rest),+))\\n    };\\n}\\nfn main() {\\n    println!(\"{}\", min!(3, 1, 2));  // 1\\n}\\n```. Common patterns: `$x:expr`, `$x:ident`, `$x:ty`, `$x:literal`, `$x:tt`. Repetition: `$( ... )*` (zero+), `$( ... )+` (one+).",
+      "source_url": "https://doc.rust-lang.org/book/ch19-06-macros.html",
+      "source_type": "official_docs",
+      "commands": [
+        ". Common patterns:",
+        ". Repetition:"
+      ],
+      "steps": [
+        "```rust\\nmacro_rules! min {\\n ($a:expr, $b:expr) => {\\n if $a < $b { $a } else { $b }\\n };\\n ($a:expr, $b:expr, $($rest:expr),+) => {\\n min!($a, min!($b, $($rest),+))\\n };\\n}\\nfn main() {\\n println!(\"{}\", min!(3, 1, 2)); // 1\\n}\\n```. Common patterns: `$x:expr`, `$x:ident`, `$x:ty`, `$x:literal`, `$x:tt`. Repetition: `$( ... )*` (zero+), `$( ... )+` (one+)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: .."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: declarative macro (macro_rules!)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-run-external-command-std-process-command",
+      "kind": "recipe",
+      "title": "rustc recipe: run external command (std::process::Command)",
+      "statement": "```rust\\nuse std::process::Command;\\n\\nlet output = Command::new(\"ls\")\\n    .arg(\"-la\")\\n    .output()?;\\nprintln!(\"status: {}\", output.status);\\nprintln!(\"stdout: {}\", String::from_utf8_lossy(&output.stdout));\\n\\n// Spawn for streaming\\nlet mut child = Command::new(\"long-job\").spawn()?;\\nchild.wait()?;\\n```",
+      "source_url": "https://doc.rust-lang.org/std/process/index.html",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "```rust\\nuse std::process::Command;\\n\\nlet output = Command::new(\"ls\")\\n .arg(\"-la\")\\n .output()?;\\nprintln!(\"status: {}\", output.status);\\nprintln!(\"stdout: {}\", String::from_utf8_lossy(&output.stdout));\\n\\n// Spawn for streaming\\nlet mut child = Command::new(\"long-job\").spawn()?;\\nchild.wait()?;\\n```"
+      ],
+      "constraints": [],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: run external command (std::process::Command)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-parse-format-datetime-chrono",
+      "kind": "recipe",
+      "title": "rustc recipe: parse + format datetime (chrono)",
+      "statement": "Cargo.toml: `chrono = \"0.4\"`. ```rust\\nuse chrono::{DateTime, Utc, NaiveDate};\\n\\nlet now: DateTime<Utc> = Utc::now();\\nlet iso = now.to_rfc3339();\\nlet parsed: DateTime<Utc> = \"2026-06-01T12:00:00Z\".parse()?;\\nlet date = NaiveDate::from_ymd_opt(2026, 6, 1).unwrap();\\nlet formatted = now.format(\"%Y-%m-%d %H:%M:%S\").to_string();\\n```. Modern alternative: `time` crate (more conservative API).",
+      "source_url": "https://doc.rust-lang.org/std/time/index.html",
+      "source_type": "official_docs",
+      "commands": [
+        "chrono = \"0.4\"",
+        ". Modern alternative:"
+      ],
+      "steps": [
+        "Cargo.toml: `chrono = \"0.4\"`. ```rust\\nuse chrono::{DateTime, Utc, NaiveDate};\\n\\nlet now: DateTime<Utc> = Utc::now();\\nlet iso = now.to_rfc3339();\\nlet parsed: DateTime<Utc> = \"2026-06-01T12:00:00Z\".parse()?;\\nlet date = NaiveDate::from_ymd_opt(2026, 6, 1).unwrap();\\nlet formatted = now.format(\"%Y-%m-%d %H:%M:%S\").to_string();\\n```. Modern alternative: `time` crate (more conservative API)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ., chrono."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: parse + format datetime (chrono)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-workspace-setup-for-monorepo",
+      "kind": "recipe",
+      "title": "rustc recipe: workspace setup for monorepo",
+      "statement": "Root `Cargo.toml`: ```toml\\n[workspace]\\nresolver = \"2\"\\nmembers = [\"crates/*\"]\\n\\n[workspace.dependencies]\\nserde = { version = \"1.0\", features = [\"derive\"] }\\ntokio = { version = \"1\", features = [\"full\"] }\\n```. In each crate: ```toml\\n[dependencies]\\nserde = { workspace = true }\\n```. Build all: `cargo build` from root. Build one: `cargo build -p crate-name`.",
+      "source_url": "https://rust-lang.github.io/rustup/",
+      "source_type": "official_docs",
+      "commands": [
+        "Cargo.toml",
+        ". In each crate:",
+        ". Build all:",
+        "from root. Build one:"
+      ],
+      "steps": [
+        "Root `Cargo.toml`: ```toml\\n[workspace]\\nresolver = \"2\"\\nmembers = [\"crates/*\"]\\n\\n[workspace.dependencies]\\nserde = { version = \"1.0\", features = [\"derive\"] }\\ntokio = { version = \"1\", features = [\"full\"] }\\n```. In each crate: ```toml\\n[dependencies]\\nserde = { workspace = true }\\n```. Build all: `cargo build` from root. Build one: `cargo build -p crate-name`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ., Cargo.toml, from."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: workspace setup for monorepo"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-cross-compile-to-another-target",
+      "kind": "recipe",
+      "title": "rustc recipe: cross-compile to another target",
+      "statement": "(1) Install target: `rustup target add x86_64-unknown-linux-musl`; (2) Build: `cargo build --target x86_64-unknown-linux-musl --release`; (3) For cross-compile with C deps: install the right linker (`brew install FiloSottile/musl-cross/musl-cross` for macOS\u2192Linux); (4) `.cargo/config.toml`: ```toml\\n[target.x86_64-unknown-linux-musl]\\nlinker = \"x86_64-linux-musl-gcc\"\\n```. Static binary on Linux: target musl (no glibc dependency).",
+      "source_url": "https://doc.rust-lang.org/book/ch01-01-installation.html",
+      "source_type": "official_docs",
+      "commands": [
+        "rustup target add x86_64-unknown-linux-musl",
+        "cargo build --target x86_64-unknown-linux-musl --release",
+        "brew install FiloSottile/musl-cross/musl-cross",
+        ".cargo/config.toml"
+      ],
+      "steps": [
+        "Install target: `rustup target add x86_64-unknown-linux-musl`",
+        "Build: `cargo build --target x86_64-unknown-linux-musl --release`",
+        "For cross-compile with C deps: install the right linker (`brew install FiloSottile/musl-cross/musl-cross` for macOS\u2192Linux)",
+        "`.cargo/config.toml`: ```toml\\n[target.x86_64-unknown-linux-musl]\\nlinker = \"x86_64-linux-musl-gcc\"\\n```. Static binary on Linux: target musl (no glibc dependency)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: .cargo/config.toml, brew, cargo, rustup."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: cross-compile to another target"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-release-vs-debug-profile",
+      "kind": "recipe",
+      "title": "rustc recipe: release vs debug profile",
+      "statement": "Debug (default): `cargo build` \u2014 fast compile, no optimizations, overflow checks on. Release: `cargo build --release` \u2014 optimized (`-O3`), no overflow checks (silently wraps), much slower compile. Customize in Cargo.toml: ```toml\\n[profile.release]\\nopt-level = 3\\nlto = \"thin\"          # link-time optimization\\ncodegen-units = 1     # better optimization, slower compile\\nstrip = true          # strip symbols (smaller binary)\\noverflow-checks = true  # opt back in for safety\\n```",
+      "source_url": "https://doc.rust-lang.org/reference/cfg-attribute.html",
+      "source_type": "official_docs",
+      "commands": [
+        "cargo build",
+        "cargo build --release",
+        "-O3"
+      ],
+      "steps": [
+        "Debug (default): `cargo build` \u2014 fast compile, no optimizations, overflow checks on. Release: `cargo build --release` \u2014 optimized (`-O3`), no overflow checks (silently wraps), much slower compile. Customize in Cargo.toml: ```toml\\n[profile.release]\\nopt-level = 3\\nlto = \"thin\" # link-time optimization\\ncodegen-units = 1 # better optimization, slower compile\\nstrip = true # strip symbols (smaller binary)\\noverflow-checks = true # opt back in for safety\\n```"
+      ],
+      "constraints": [
+        "Debug (default): `cargo build` \u2014 fast compile, no optimizations, overflow checks on. Release: `cargo build --release` \u2014 optimized (`-O3`), no overflow checks (silently wraps), much slower compile. Customize in Cargo.toml: ```toml\\n[profile.release]\\nopt-level = 3\\nlto = \"thin\" # link-time optimization\\ncodegen-units = 1 # better optimization, slower compile\\nstrip = true # strip symbols (smaller binary)\\noverflow-checks = true # opt back in for safety\\n```",
+        "Requires binaries or commands referenced in examples: -O3, cargo."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: release vs debug profile"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-write-use-a-custom-iterator",
+      "kind": "recipe",
+      "title": "rustc recipe: write + use a custom iterator",
+      "statement": "```rust\\nstruct Counter { count: u32, max: u32 }\\nimpl Iterator for Counter {\\n    type Item = u32;\\n    fn next(&mut self) -> Option<u32> {\\n        if self.count < self.max {\\n            self.count += 1;\\n            Some(self.count)\\n        } else {\\n            None\\n        }\\n    }\\n}\\n// Get all iterator adapters for free\\nlet sum: u32 = Counter { count: 0, max: 100 }.sum();\\n```",
+      "source_url": "https://doc.rust-lang.org/std/iter/trait.Iterator.html",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "```rust\\nstruct Counter { count: u32, max: u32 }\\nimpl Iterator for Counter {\\n type Item = u32;\\n fn next(&mut self) -> Option<u32> {\\n if self.count < self.max {\\n self.count += 1;\\n Some(self.count)\\n } else {\\n None\\n }\\n }\\n}\\n// Get all iterator adapters for free\\nlet sum: u32 = Counter { count: 0, max: 100 }.sum();\\n```"
+      ],
+      "constraints": [],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: write + use a custom iterator"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-use-clippy-for-linting",
+      "kind": "recipe",
+      "title": "rustc recipe: use clippy for linting",
+      "statement": "Install: `rustup component add clippy`. Run: `cargo clippy` (warnings) or `cargo clippy -- -D warnings` (fail on any). Auto-fix safe ones: `cargo clippy --fix`. Common useful lints: `clippy::pedantic`, `clippy::nursery`, `clippy::cargo`. Allow specific: `#[allow(clippy::too_many_arguments)]`. Run in CI: `cargo clippy --all-targets -- -D warnings`.",
+      "source_url": "https://rust-lang.github.io/rustup/concepts/components.html",
+      "source_type": "official_docs",
+      "commands": [
+        "rustup component add clippy",
+        "cargo clippy",
+        "cargo clippy -- -D warnings",
+        "cargo clippy --fix",
+        "clippy::pedantic",
+        "clippy::nursery",
+        "clippy::cargo",
+        "cargo clippy --all-targets -- -D warnings"
+      ],
+      "steps": [
+        "Install: `rustup component add clippy`. Run: `cargo clippy` (warnings) or `cargo clippy -- -D warnings` (fail on any). Auto-fix safe ones: `cargo clippy --fix`. Common useful lints: `clippy::pedantic`, `clippy::nursery`, `clippy::cargo`. Allow specific: `#[allow(clippy::too_many_arguments)]`. Run in CI: `cargo clippy --all-targets -- -D warnings`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: cargo, clippy::cargo, clippy::nursery, clippy::pedantic, rustup."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: use clippy for linting"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-format-with-rustfmt",
+      "kind": "recipe",
+      "title": "rustc recipe: format with rustfmt",
+      "statement": "Install: `rustup component add rustfmt`. Format: `cargo fmt`. Check (CI): `cargo fmt --check`. Configure: `rustfmt.toml` at repo root: ```toml\\nmax_width = 100\\ntab_spaces = 4\\nimports_granularity = \"Module\"\\ngroup_imports = \"StdExternalCrate\"\\n```. For unstable options: add `unstable_features = true`.",
+      "source_url": "https://rust-lang.github.io/rustup/concepts/components.html",
+      "source_type": "official_docs",
+      "commands": [
+        "rustup component add rustfmt",
+        "cargo fmt",
+        "cargo fmt --check",
+        "rustfmt.toml",
+        ". For unstable options: add"
+      ],
+      "steps": [
+        "Install: `rustup component add rustfmt`. Format: `cargo fmt`. Check (CI): `cargo fmt --check`. Configure: `rustfmt.toml` at repo root: ```toml\\nmax_width = 100\\ntab_spaces = 4\\nimports_granularity = \"Module\"\\ngroup_imports = \"StdExternalCrate\"\\n```. For unstable options: add `unstable_features = true`"
+      ],
+      "constraints": [
+        "Install: `rustup component add rustfmt`. Format: `cargo fmt`. Check (CI): `cargo fmt --check`. Configure: `rustfmt.toml` at repo root: ```toml\\nmax_width = 100\\ntab_spaces = 4\\nimports_granularity = \"Module\"\\ngroup_imports = \"StdExternalCrate\"\\n```. For unstable options: add `unstable_features = true`",
+        "Requires binaries or commands referenced in examples: ., cargo, rustfmt.toml, rustup."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: format with rustfmt"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-production-ready-main",
+      "kind": "recipe",
+      "title": "rustc recipe: production-ready main()",
+      "statement": "```rust\\nuse anyhow::Result;\\nuse tracing::{info, error};\\nuse tracing_subscriber::EnvFilter;\\n\\n#[tokio::main]\\nasync fn main() -> Result<()> {\\n    tracing_subscriber::fmt()\\n        .with_env_filter(EnvFilter::from_default_env())\\n        .with_target(false)\\n        .json()\\n        .init();\\n    info!(version = env!(\"CARGO_PKG_VERSION\"), \"starting\");\\n    if let Err(e) = run().await {\\n        error!(error = ?e, \"fatal\");\\n        std::process::exit(1);\\n    }\\n    Ok(())\\n}\\nasync fn run() -> Result<()> { /* app logic */ Ok(()) }\\n```",
+      "source_url": "https://doc.rust-lang.org/book/ch12-00-an-io-project.html",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "```rust\\nuse anyhow::Result;\\nuse tracing::{info, error};\\nuse tracing_subscriber::EnvFilter;\\n\\n#[tokio::main]\\nasync fn main() -> Result<()> {\\n tracing_subscriber::fmt()\\n .with_env_filter(EnvFilter::from_default_env())\\n .with_target(false)\\n .json()\\n .init();\\n info!(version = env!(\"CARGO_PKG_VERSION\"), \"starting\");\\n if let Err(e) = run().await {\\n error!(error = ?e, \"fatal\");\\n std::process::exit",
+        "\\n }\\n Ok(())\\n}\\nasync fn run() -> Result<()> { /* app logic */ Ok(()) }\\n```"
+      ],
+      "constraints": [],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: production-ready main()"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "rustc-recipe-rustc-recipe-write-a-benchmark",
+      "kind": "recipe",
+      "title": "rustc recipe: write a benchmark",
+      "statement": "Stable: use `criterion` crate. `Cargo.toml`: `[dev-dependencies] criterion = \"0.5\"`. `benches/my_bench.rs`: ```rust\\nuse criterion::{black_box, criterion_group, criterion_main, Criterion};\\nfn fib(n: u64) -> u64 { if n < 2 { n } else { fib(n-1) + fib(n-2) } }\\nfn bench_fib(c: &mut Criterion) {\\n    c.bench_function(\"fib 20\", |b| b.iter(|| fib(black_box(20))));\\n}\\ncriterion_group!(benches, bench_fib);\\ncriterion_main!(benches);\\n```. Run: `cargo bench`.",
+      "source_url": "https://doc.rust-lang.org/book/ch11-00-testing.html",
+      "source_type": "official_docs",
+      "commands": [
+        "criterion",
+        "Cargo.toml",
+        "benches/my_bench.rs",
+        ". Run:"
+      ],
+      "steps": [
+        "Stable: use `criterion` crate. `Cargo.toml`: `[dev-dependencies] criterion = \"0.5\"`. `benches/my_bench.rs`: ```rust\\nuse criterion::{black_box, criterion_group, criterion_main, Criterion};\\nfn fib(n: u64) -> u64 { if n < 2 { n } else { fib(n-1) + fib(n-2) } }\\nfn bench_fib(c: &mut Criterion) {\\n c.bench_function(\"fib 20\", |b| b.iter(|| fib(black_box",
+        ")));\\n}\\ncriterion_group!(benches, bench_fib);\\ncriterion_main!(benches);\\n```. Run: `cargo bench`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ., Cargo.toml, benches/my_bench.rs, criterion."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "rustc-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_rust_errors_recipes.py",
+        "legacy_tool_id": "rust-recipes",
+        "legacy_title": "rust recipe: write a benchmark"
+      },
+      "confidence": 0.92
+    }
+  ]
+}

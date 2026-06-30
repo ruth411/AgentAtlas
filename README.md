@@ -66,11 +66,10 @@ print(top.detail["flag_schema"][0])
 ## What's in the box
 
 - **7 structured query tools** advertised over MCP — `resolve_subject`, `get_subject_spec`, `get_capabilities`, `get_constraints`, `get_effects`, `resolve_action`, `get_workflow_plan`. All return typed records; none return prose.
-- **Structured `gh` catalog** — 74 subjects (every top-level command plus the major subcommands, including the destructive `delete` / `remove` / `archive` leaves), 779 typed capabilities, 82 typed constraints, typed effects with `destructive` / `mutates_remote_state` / `reversible` booleans. The flag/argv capabilities are `L3_runtime_verified` (parsed from a real `gh --help` run); the effect safety classifications are `L2_source_verified` (inferred from help text, not asserted by an experiment), and every record carries its own `verification_level` so the agent can tell them apart.
-- **Projection fallback** for the other 37 tool families — Ayiru projects structured records over the existing prose catalog when no first-class typed records exist yet. Responses carry `source: structured | projected` so the agent knows the difference.
+- **Structured catalog** — the current bulk DB is machine-readable only: 23 tool families, 2,400 subjects, 27,762 typed capabilities, 2,412 typed constraints, and 2,247 typed effects. The flag/argv capabilities are `L3_runtime_verified` (parsed from a real CLI/runtime surface); the effect safety classifications are `L2_source_verified` (inferred from help text, not asserted by an experiment), and every record carries its own `verification_level` so the agent can tell them apart.
 - **MCP server** — drop into Claude Desktop / Cursor / Cline / Continue via stdio JSON-RPC. Zero config.
 - **Python SDK** — sync + async clients for every typed surface.
-- **Legacy prose surfaces** (`ask`, `validate_command`, `search_tools`, `explain_risk`, `get_safe_workflow`, `get_tool_spec`) remain available but are hidden from `tools/list`. Pinned external callers still work; agents discovering tools fresh see only the typed surfaces.
+- **Legacy query surfaces** (`ask`, `validate_command`, `search_tools`, `explain_risk`, `get_safe_workflow`, `get_tool_spec`) remain available but are hidden from `tools/list`. The current bulk and bundled catalogs are structured-only, so fresh agents see and consume typed records by default.
 
 ---
 

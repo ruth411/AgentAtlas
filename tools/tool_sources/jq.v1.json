@@ -1,0 +1,2826 @@
+{
+  "family": "jq",
+  "version": "v1",
+  "artifact_id": "jq-curated-source-v1",
+  "generated_from": {
+    "kind": "legacy_seed_script",
+    "path": "tools/scripts/seed_jq_errors_recipes.py"
+  },
+  "entries": [
+    {
+      "entry_id": "jq-error-jq-error-cannot-index-type-with-key",
+      "kind": "error",
+      "title": "jq error: Cannot index <type> with \"<key>\"",
+      "statement": "You used `.key` on a value that isn't an object (e.g., on an array or string). Fix: (1) check input shape: `jq 'type' input.json` shows top-level type; (2) if input is array, use `.[0].key` (first element) or `.[].key` (all elements); (3) defensive: `.key // \"default\"` when key may be missing; (4) for optional path: `.?key` or `.key?` (silently null instead of erroring); (5) common: forgot `.[]` to iterate, applied object access to array.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        ".key",
+        "jq 'type' input.json",
+        ".key // \"default\""
+      ],
+      "steps": [
+        "check input shape: `jq 'type' input.json` shows top-level type",
+        "if input is array, use `.[0].key` (first element) or `.[].key` (all elements)",
+        "defensive: `.key // \"default\"` when key may be missing",
+        "for optional path: `.?key` or `.key?` (silently null instead of erroring)",
+        "common: forgot `.[]` to iterate, applied object access to array"
+      ],
+      "constraints": [
+        "check input shape: `jq 'type' input.json` shows top-level type",
+        "Requires binaries or commands referenced in examples: .key, jq."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-errors",
+        "legacy_title": "jq error: Cannot index <type> with \"<key>\""
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "jq-error-jq-error-cannot-iterate-over-null-null",
+      "kind": "error",
+      "title": "jq error: Cannot iterate over null (null)",
+      "statement": "You called `.[]` on null. Common when a key doesn't exist. Fix: (1) check path: `jq '.path.to.key | type'`; (2) defensive iterate: `.key // [] | .[]` (empty array if null); (3) optional: `.key?[]` (drops null silently); (4) walk safely: `try .key.subkey catch \"missing\"`; (5) inspect raw input first: `jq .` to confirm structure.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "jq '.path.to.key | type'",
+        ".key // [] | .[]",
+        "try .key.subkey catch \"missing\"",
+        "jq ."
+      ],
+      "steps": [
+        "check path: `jq '.path.to.key | type'`",
+        "defensive iterate: `.key // [] | .[]` (empty array if null)",
+        "optional: `.key?[]` (drops null silently)",
+        "walk safely: `try .key.subkey catch \"missing\"`",
+        "inspect raw input first: `jq .` to confirm structure"
+      ],
+      "constraints": [
+        "check path: `jq '.path.to.key | type'`",
+        "Requires binaries or commands referenced in examples: .key, jq, try."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-errors",
+        "legacy_title": "jq error: Cannot iterate over null (null)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "jq-error-jq-error-null-null-has-no-keys",
+      "kind": "error",
+      "title": "jq error: null (null) has no keys",
+      "statement": "Used `keys` or `keys_unsorted` on a null value (key was missing). Fix: (1) defensive: `(.config // {}) | keys`; (2) optional: `.config? | keys`; (3) check first: `if .config then .config | keys else [] end`; (4) for nested: `try .a.b.c | keys catch null`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "keys",
+        "keys_unsorted",
+        "if .config then .config | keys else [] end",
+        "try .a.b.c | keys catch null"
+      ],
+      "steps": [
+        "defensive: `(.config // {}) | keys`",
+        "optional: `.config? | keys`",
+        "check first: `if .config then .config | keys else [] end`",
+        "for nested: `try .a.b.c | keys catch null`"
+      ],
+      "constraints": [
+        "check first: `if .config then .config | keys else [] end`",
+        "Requires binaries or commands referenced in examples: if, keys, keys_unsorted, try."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-errors",
+        "legacy_title": "jq error: null (null) has no keys"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "jq-error-jq-error-parse-error-invalid-numeric-literal-at-line-n",
+      "kind": "error",
+      "title": "jq error: parse error: Invalid numeric literal at line N",
+      "statement": "Input isn't valid JSON \u2014 likely shell variable wasn't quoted, or you fed a non-JSON string. Fix: (1) test input is JSON: `cat input.json | jq .` should pretty-print without error; (2) for shell-built JSON: quote properly: `echo '{\"k\":1}' | jq .` (NOT `echo {k:1}`); (3) for HTTP API output: `curl ... | jq .` \u2014 confirm Content-Type is JSON (not HTML error page); (4) for JSONL streams: use `-s` (slurp) or process line-by-line.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "cat input.json | jq .",
+        "echo '{\"k\":1}' | jq .",
+        "echo {k:1}",
+        "curl ... | jq .",
+        "-s"
+      ],
+      "steps": [
+        "test input is JSON: `cat input.json | jq .` should pretty-print without error",
+        "for shell-built JSON: quote properly: `echo '{\"k\":1}' | jq .` (NOT `echo {k:1}`)",
+        "for HTTP API output: `curl ... | jq .` \u2014 confirm Content-Type is JSON (not HTML error page)",
+        "for JSONL streams: use `-s` (slurp) or process line-by-line"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -s, cat, curl, echo."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-errors",
+        "legacy_title": "jq error: parse error: Invalid numeric literal at line N"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "jq-error-jq-error-parse-error-expected-another-value-unexpected-end-of-input",
+      "kind": "error",
+      "title": "jq error: parse error: Expected another value / Unexpected end of input",
+      "statement": "JSON is truncated or empty. Fix: (1) check file: `wc -c file.json` \u2014 zero-byte file? `cat file.json` shows what's there; (2) for pipes: confirm the previous command produced output: `cmd | tee /tmp/debug.json | jq .`; (3) trailing newline OK; missing closing brace NOT OK: `echo '{\"k\":1}' | jq .` (works); `echo '{\"k\":1' | jq .` (fails); (4) for multi-doc streams: use `--seq` or `-s` flag.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "wc -c file.json",
+        "cat file.json",
+        "cmd | tee /tmp/debug.json | jq .",
+        "echo '{\"k\":1}' | jq .",
+        "echo '{\"k\":1' | jq .",
+        "--seq",
+        "-s"
+      ],
+      "steps": [
+        "check file: `wc -c file.json` \u2014 zero-byte file? `cat file.json` shows what's there",
+        "for pipes: confirm the previous command produced output: `cmd | tee /tmp/debug.json | jq .`",
+        "trailing newline OK; missing closing brace NOT OK: `echo '{\"k\":1}' | jq .` (works); `echo '{\"k\":1' | jq .` (fails)",
+        "for multi-doc streams: use `--seq` or `-s` flag"
+      ],
+      "constraints": [
+        "check file: `wc -c file.json` \u2014 zero-byte file? `cat file.json` shows what's there",
+        "Requires binaries or commands referenced in examples: --seq, -s, cat, cmd, echo, wc."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-errors",
+        "legacy_title": "jq error: parse error: Expected another value / Unexpected end of input"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "jq-error-jq-error-parse-error-trailing-garbage-after-value",
+      "kind": "error",
+      "title": "jq error: parse error: Trailing garbage after value",
+      "statement": "Multiple JSON values in input without --slurp. Fix: (1) for JSONL (one JSON per line): `jq -c .` works (default treats stream of values); (2) to combine all into one array: `jq -s .` (slurp); (3) for whitespace-separated values: jq handles natively (NDJSON); (4) for non-standard format (commas between?): pre-process with `sed`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "jq -c .",
+        "jq -s .",
+        "sed"
+      ],
+      "steps": [
+        "for JSONL (one JSON per line): `jq -c .` works (default treats stream of values)",
+        "to combine all into one array: `jq -s .` (slurp)",
+        "for whitespace-separated values: jq handles natively (NDJSON)",
+        "for non-standard format (commas between?): pre-process with `sed`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: jq, sed."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-errors",
+        "legacy_title": "jq error: parse error: Trailing garbage after value"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "jq-error-jq-error-name-0-is-not-defined-at-top-level",
+      "kind": "error",
+      "title": "jq error: <name>/0 is not defined at <top-level>",
+      "statement": "Function call with wrong arity or typo. Fix: (1) function name typo: `lenght` \u2192 `length`; (2) wrong arity: `select` needs an arg: `select(.x > 0)` (not `select`); (3) custom function not defined: load with `--slurpfile`/`--rawfile` or `import`; (4) check available functions: jq manual lists builtins.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "lenght",
+        "length",
+        "select",
+        "--slurpfile",
+        "--rawfile",
+        "import"
+      ],
+      "steps": [
+        "function name typo: `lenght` \u2192 `length`",
+        "wrong arity: `select` needs an arg: `select(.x > 0)` (not `select`)",
+        "custom function not defined: load with `--slurpfile`/`--rawfile` or `import`",
+        "check available functions: jq manual lists builtins"
+      ],
+      "constraints": [
+        "wrong arity: `select` needs an arg: `select(.x > 0)` (not `select`)",
+        "check available functions: jq manual lists builtins",
+        "Requires binaries or commands referenced in examples: --rawfile, --slurpfile, import, lenght, length, select."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-errors",
+        "legacy_title": "jq error: <name>/0 is not defined at <top-level>"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "jq-error-jq-error-invalid-path-expression",
+      "kind": "error",
+      "title": "jq error: Invalid path expression",
+      "statement": "Tried to assign to or update something that isn't a valid path (like a function call result). Fix: (1) for `|=` (update): left side must be a path \u2014 `.foo |= ascii_upcase` (\u2713); (2) `length |= ...` is NOT a path: re-write as `.field = (.field | length)`; (3) for nested assignment: `.a.b.c = 5` works; `.a.b | .c = 5` does NOT (the pipe breaks path-ness); (4) array assign: `.arr[0] = \"new\"` (specific index) or `.arr[] = \"all\"`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        ".foo |= ascii_upcase",
+        "length |= ...",
+        ".field = (.field | length)",
+        ".a.b.c = 5",
+        ".a.b | .c = 5"
+      ],
+      "steps": [
+        "for `|=` (update): left side must be a path \u2014 `.foo |= ascii_upcase` (\u2713)",
+        "`length |= ...` is NOT a path: re-write as `.field = (.field | length)`",
+        "for nested assignment: `.a.b.c = 5` works; `.a.b | .c = 5` does NOT (the pipe breaks path-ness)",
+        "array assign: `.arr[0] = \"new\"` (specific index) or `.arr[] = \"all\"`"
+      ],
+      "constraints": [
+        "for `|=` (update): left side must be a path \u2014 `.foo |= ascii_upcase` (\u2713)",
+        "Requires binaries or commands referenced in examples: .a.b, .a.b.c, .field, .foo, length."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-errors",
+        "legacy_title": "jq error: Invalid path expression"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "jq-error-jq-error-cannot-index-array-with-string-key",
+      "kind": "error",
+      "title": "jq error: Cannot index array with string \"<key>\"",
+      "statement": "Tried object access on an array. Fix: (1) iterate first: `.arr[] | .key`; (2) specific index: `.arr[0].key`; (3) check input: `jq 'type' input.json` \u2014 is the top level actually an array? (4) for arrays-of-arrays: nested `.arr[][0]`; (5) inspect: `jq '.arr | type'`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "jq 'type' input.json",
+        "jq '.arr | type'"
+      ],
+      "steps": [
+        "iterate first: `.arr[] | .key`",
+        "specific index: `.arr[0].key`",
+        "check input: `jq 'type' input.json` \u2014 is the top level actually an array?",
+        "for arrays-of-arrays: nested `.arr[][0]`",
+        "inspect: `jq '.arr | type'`"
+      ],
+      "constraints": [
+        "check input: `jq 'type' input.json` \u2014 is the top level actually an array?",
+        "Requires binaries or commands referenced in examples: jq."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-errors",
+        "legacy_title": "jq error: Cannot index array with string \"<key>\""
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "jq-error-jq-error-jq-1-compile-error",
+      "kind": "error",
+      "title": "jq error: jq: 1 compile error",
+      "statement": "Syntax error in your filter \u2014 jq prints additional context. Fix: (1) read the error \u2014 usually points to the bad char; (2) common: missing semicolon between function definitions: `def f: ...;  def g: ...;`; (3) unmatched braces/parens: `{(a)}` vs `{a}`; (4) string interpolation requires quotes: `\"\\(.x)\"` (inside double quotes); (5) for complex filters: build incrementally in pipeline \u2014 test each piece.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "def f: ...; def g: ...;"
+      ],
+      "steps": [
+        "read the error \u2014 usually points to the bad char",
+        "common: missing semicolon between function definitions: `def f: ...; def g: ...;`",
+        "unmatched braces/parens: `{(a)}` vs `{a}`",
+        "string interpolation requires quotes: `\"\\(.x)\"` (inside double quotes)",
+        "for complex filters: build incrementally in pipeline \u2014 test each piece"
+      ],
+      "constraints": [
+        "string interpolation requires quotes: `\"\\(.x)\"` (inside double quotes)",
+        "Requires binaries or commands referenced in examples: def."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-errors",
+        "legacy_title": "jq error: jq: 1 compile error"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "jq-error-jq-error-number-is-not-a-string-or-vice-versa",
+      "kind": "error",
+      "title": "jq error: number is not a string (or vice versa)",
+      "statement": "Function expects string but got number (or other type mismatch). Fix: (1) explicit conversion: `tostring` (any \u2192 string), `tonumber` (string \u2192 number); (2) for interpolation: `\"value: \\(.n)\"` (jq stringifies automatically); (3) for arithmetic: `tonumber + 5`; (4) common: `split` needs string arg: `.field | tostring | split(\",\")`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "tostring",
+        "tonumber",
+        "tonumber + 5",
+        "split",
+        ".field | tostring | split(\",\")"
+      ],
+      "steps": [
+        "explicit conversion: `tostring` (any \u2192 string), `tonumber` (string \u2192 number)",
+        "for interpolation: `\"value: \\(.n)\"` (jq stringifies automatically)",
+        "for arithmetic: `tonumber + 5`",
+        "common: `split` needs string arg: `.field | tostring | split(\",\")`"
+      ],
+      "constraints": [
+        "common: `split` needs string arg: `.field | tostring | split(\",\")`",
+        "Requires binaries or commands referenced in examples: .field, split, tonumber, tostring."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-errors",
+        "legacy_title": "jq error: number is not a string (or vice versa)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "jq-error-jq-error-number-too-large-overflow",
+      "kind": "error",
+      "title": "jq error: Number too large / overflow",
+      "statement": "Value exceeds jq's 64-bit float precision (~2^53 for integers). Fix: (1) for IDs that overflow (e.g. 64-bit unsigned IDs from APIs): emit as STRING from upstream; (2) jq treats all numbers as floats \u2014 for arbitrary precision use external tool (Python, awk with bignum); (3) for representation only (no math): keep as string: `\"\\(.bigid)\"`; (4) test boundary: `jq -n '9007199254740992 == 9007199254740993'` returns true (precision lost).",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "jq -n '9007199254740992 == 9007199254740993'"
+      ],
+      "steps": [
+        "for IDs that overflow (e.g. 64-bit unsigned IDs from APIs): emit as STRING from upstream",
+        "jq treats all numbers as floats \u2014 for arbitrary precision use external tool (Python, awk with bignum)",
+        "for representation only (no math): keep as string: `\"\\(.bigid)\"`",
+        "test boundary: `jq -n '9007199254740992 == 9007199254740993'` returns true (precision lost)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: jq."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-errors",
+        "legacy_title": "jq error: Number too large / overflow"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "jq-error-jq-error-could-not-parse-args-bad-arg-argjson",
+      "kind": "error",
+      "title": "jq error: Could not parse args (Bad --arg / --argjson)",
+      "statement": "Wrong syntax for command-line args. Fix: (1) `--arg NAME VALUE`: value treated as STRING \u2014 `jq --arg x foo '.[$x]'`; (2) `--argjson NAME JSON`: parsed as JSON: `jq --argjson n 42 '. + $n'`; (3) `--rawfile NAME PATH`: load file content as string; (4) `--slurpfile NAME PATH`: parse file as JSON; (5) refer to vars with `$name` in filter.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "--arg NAME VALUE",
+        "jq --arg x foo '.[$x]'",
+        "--argjson NAME JSON",
+        "jq --argjson n 42 '. + $n'",
+        "--rawfile NAME PATH",
+        "--slurpfile NAME PATH"
+      ],
+      "steps": [
+        "`--arg NAME VALUE`: value treated as STRING \u2014 `jq --arg x foo '.[$x]'`",
+        "`--argjson NAME JSON`: parsed as JSON: `jq --argjson n 42 '. + $n'`",
+        "`--rawfile NAME PATH`: load file content as string",
+        "`--slurpfile NAME PATH`: parse file as JSON",
+        "refer to vars with `$name` in filter"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: --arg, --argjson, --rawfile, --slurpfile, jq."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-errors",
+        "legacy_title": "jq error: Could not parse args (Bad --arg / --argjson)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "jq-error-jq-error-bad-json-in-slurpfile-argjson",
+      "kind": "error",
+      "title": "jq error: Bad JSON in --slurpfile / --argjson",
+      "statement": "The file or value passed isn't valid JSON. Fix: (1) validate first: `jq . file.json` should succeed; (2) `--rawfile` accepts ANY text (loads as one string) \u2014 useful for non-JSON input; (3) common: file has BOM or stray Windows CRLF \u2014 `dos2unix file.json` or `sed -i 's/\\r$//' file.json`; (4) for JSONL: combine first: `jq -s . lines.jsonl > combined.json` then `--slurpfile`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "jq . file.json",
+        "--rawfile",
+        "dos2unix file.json",
+        "sed -i 's/\\r$//' file.json",
+        "jq -s . lines.jsonl > combined.json",
+        "--slurpfile"
+      ],
+      "steps": [
+        "validate first: `jq . file.json` should succeed",
+        "`--rawfile` accepts ANY text (loads as one string) \u2014 useful for non-JSON input",
+        "common: file has BOM or stray Windows CRLF \u2014 `dos2unix file.json` or `sed -i 's/\\r$//' file.json`",
+        "for JSONL: combine first: `jq -s . lines.jsonl > combined.json` then `--slurpfile`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: --rawfile, --slurpfile, dos2unix, jq, sed."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-errors",
+        "legacy_title": "jq error: Bad JSON in --slurpfile / --argjson"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "jq-error-jq-error-assigning-to-a-non-path",
+      "kind": "error",
+      "title": "jq error: assigning to a non-path",
+      "statement": "Same root as 'Invalid path expression'. Left side of `=` or `|=` must be a valid path. Fix: (1) DON'T pipe before assignment: `.a |= (. * 2)` (good) vs `.a | . *= 2` (bad); (2) for transforms: `map(. * 2)` over arrays; (3) for adding a field: `. + {newfield: 42}` or `.newfield = 42`; (4) for deletion: `del(.field)` (a function, not an assignment).",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        ".a |= (. * 2)",
+        ".a | . *= 2",
+        ". + {newfield: 42}",
+        ".newfield = 42"
+      ],
+      "steps": [
+        "DON'T pipe before assignment: `.a |= (. * 2)` (good) vs `.a | . *= 2` (bad)",
+        "for transforms: `map(. * 2)` over arrays",
+        "for adding a field: `. + {newfield: 42}` or `.newfield = 42`",
+        "for deletion: `del(.field)` (a function, not an assignment)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ., .a, .newfield."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-errors",
+        "legacy_title": "jq error: assigning to a non-path"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "jq-error-jq-error-sigpipe-broken-pipe",
+      "kind": "error",
+      "title": "jq error: SIGPIPE / Broken pipe",
+      "statement": "Downstream command (e.g., `head`) closed the pipe before jq finished. Usually harmless but produces error output. Fix: (1) handle with stderr redirect: `jq . huge.json 2>/dev/null | head`; (2) avoid: emit only needed entries: `jq '.[0:10]'` (slice) instead of `jq '.[]' | head`; (3) for stream processing: use `jq` with `--stream` mode for huge inputs; (4) ignore via `|| true` in scripts.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "head",
+        "jq . huge.json 2>/dev/null | head",
+        "jq '.[0:10]'",
+        "jq '.[]' | head",
+        "jq",
+        "--stream"
+      ],
+      "steps": [
+        "handle with stderr redirect: `jq . huge.json 2>/dev/null | head`",
+        "avoid: emit only needed entries: `jq '.[0:10]'` (slice) instead of `jq '.[]' | head`",
+        "for stream processing: use `jq` with `--stream` mode for huge inputs",
+        "ignore via `|| true` in scripts"
+      ],
+      "constraints": [
+        "avoid: emit only needed entries: `jq '.[0:10]'` (slice) instead of `jq '.[]' | head`",
+        "Requires binaries or commands referenced in examples: --stream, head, jq."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-errors",
+        "legacy_title": "jq error: SIGPIPE / Broken pipe"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "jq-error-jq-error-getpath-0-expects-an-array",
+      "kind": "error",
+      "title": "jq error: getpath/0 expects an array",
+      "statement": "`getpath` needs `[\"a\", \"b\", \"c\"]` form, not dot-notation string. Fix: (1) correct: `getpath([\"a\",\"b\",\"c\"])`; (2) WRONG: `getpath(.a.b.c)`; (3) for dynamic paths: `getpath([$key1, $key2])`; (4) alternative for static: just use dot notation: `.a.b.c`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "getpath",
+        ".a.b.c"
+      ],
+      "steps": [
+        "correct: `getpath([\"a\",\"b\",\"c\"])`",
+        "WRONG: `getpath(.a.b.c)`",
+        "for dynamic paths: `getpath([$key1, $key2])`",
+        "alternative for static: just use dot notation: `.a.b.c`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: .a.b.c, getpath."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-errors",
+        "legacy_title": "jq error: getpath/0 expects an array"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "jq-error-jq-error-name-2-is-not-defined-wrong-arity",
+      "kind": "error",
+      "title": "jq error: <name>/2 is not defined (wrong arity)",
+      "statement": "Built-in function expects different number of args. Fix: (1) check manual: `select/1` (takes 1 arg: `select(.x > 0)`); `map/1` (takes 1: `map(. * 2)`); (2) common: `add` takes no args: `[1,2,3] | add` (not `add(...)`); (3) `reduce` takes 3 components: `reduce .[] as $x (0; . + $x)`; (4) read error carefully \u2014 it names the arity.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "select/1",
+        "map/1",
+        "add",
+        "reduce",
+        "reduce .[] as $x (0; . + $x)"
+      ],
+      "steps": [
+        "check manual: `select/1` (takes 1 arg: `select(.x > 0)`); `map/1` (takes 1: `map(. * 2)`)",
+        "common: `add` takes no args: `[1,2,3] | add` (not `add(...)`)",
+        "`reduce` takes 3 components: `reduce .[] as $x (0; . + $x)`",
+        "read error carefully \u2014 it names the arity"
+      ],
+      "constraints": [
+        "check manual: `select/1` (takes 1 arg: `select(.x > 0)`); `map/1` (takes 1: `map(. * 2)`)",
+        "Requires binaries or commands referenced in examples: add, map/1, reduce, select/1."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-errors",
+        "legacy_title": "jq error: <name>/2 is not defined (wrong arity)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "jq-error-jq-error-date-format-unknown-time-zone",
+      "kind": "error",
+      "title": "jq error: Date format / unknown time zone",
+      "statement": "Date parsing failed \u2014 input doesn't match jq's expected format. Fix: (1) `fromdateiso8601` expects RFC3339: `\"2024-12-01T10:30:00Z\" | fromdateiso8601`; (2) `fromdate` expects same; (3) for custom formats use `strptime(\"%Y-%m-%d\") | mktime`; (4) check format: log timestamps are often LOCAL TIME, need TZ suffix; (5) `now | strftime(\"%Y-%m-%dT%H:%M:%SZ\")` for ISO-style output.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "fromdateiso8601",
+        "fromdate",
+        "now | strftime(\"%Y-%m-%dT%H:%M:%SZ\")"
+      ],
+      "steps": [
+        "`fromdateiso8601` expects RFC3339: `\"2024-12-01T10:30:00Z\" | fromdateiso8601`",
+        "`fromdate` expects same",
+        "for custom formats use `strptime(\"%Y-%m-%d\") | mktime`",
+        "check format: log timestamps are often LOCAL TIME, need TZ suffix",
+        "`now | strftime(\"%Y-%m-%dT%H:%M:%SZ\")` for ISO-style output"
+      ],
+      "constraints": [
+        "check format: log timestamps are often LOCAL TIME, need TZ suffix",
+        "Requires binaries or commands referenced in examples: fromdate, fromdateiso8601, now."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-errors",
+        "legacy_title": "jq error: Date format / unknown time zone"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "jq-error-jq-error-cannot-index-with-foo-using-string-when-expected-number",
+      "kind": "error",
+      "title": "jq error: cannot index with \"foo\" (using string when expected number)",
+      "statement": "Confusion between object key access vs array index. Fix: (1) `.array[0]` (number index for arrays); `.obj.key` or `.obj[\"key\"]` (string for objects); (2) `[\"key with spaces\"]` works on objects only; (3) for unknown type: `if type == \"array\" then .[0] else .key end`; (4) for `keys` on arrays: returns indices (0, 1, 2...).",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        ".obj.key",
+        "if type == \"array\" then .[0] else .key end",
+        "keys"
+      ],
+      "steps": [
+        "`.array[0]` (number index for arrays); `.obj.key` or `.obj[\"key\"]` (string for objects)",
+        "`[\"key with spaces\"]` works on objects only",
+        "for unknown type: `if type == \"array\" then .[0] else .key end`",
+        "for `keys` on arrays: returns indices (0, 1, 2...)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: .obj.key, if, keys."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-errors",
+        "legacy_title": "jq error: cannot index with \"foo\" (using string when expected number)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "jq-error-jq-error-error-def-should-follow-as-variable-scope",
+      "kind": "error",
+      "title": "jq error: error: 'def' should follow 'as' / variable scope",
+      "statement": "Custom function definition syntax issue or scope error. Fix: (1) correct def: `def double: . * 2;` (semicolon terminates); (2) inline use: `def double: . * 2; .[] | double`; (3) with arg: `def add($x): . + $x; 5 | add(3)`; (4) variables: `. as $x | $x + 5`; (5) recursive: `def is_even: . % 2 == 0;` works inside `def`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "def double: . * 2;",
+        "def double: . * 2; .[] | double",
+        "def add($x): . + $x; 5 | add(3)",
+        ". as $x | $x + 5",
+        "def is_even: . % 2 == 0;",
+        "def"
+      ],
+      "steps": [
+        "correct def: `def double: . * 2;` (semicolon terminates)",
+        "inline use: `def double: . * 2; .[] | double`",
+        "with arg: `def add($x): . + $x; 5 | add",
+        "`",
+        "variables: `. as $x | $x + 5`",
+        "recursive: `def is_even: . % 2 == 0;` works inside `def`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ., def."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-errors",
+        "legacy_title": "jq error: error: 'def' should follow 'as' / variable scope"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "jq-error-jq-error-array-x-is-not-a-string",
+      "kind": "error",
+      "title": "jq error: array (`[\"x\"]`) is not a string",
+      "statement": "Function expects scalar but got array. Fix: (1) extract first: `.[0]`; (2) join: `join(\",\")`; (3) sum-like reduce: `[1,2,3] | add`; (4) common: `.tags | join(\", \")` to make CSV.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        ".tags | join(\", \")"
+      ],
+      "steps": [
+        "extract first: `.[0]`",
+        "join: `join(\",\")`",
+        "sum-like reduce: `[1,2,3] | add`",
+        "common: `.tags | join(\", \")` to make CSV"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: .tags."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-errors",
+        "legacy_title": "jq error: array (`[\"x\"]`) is not a string"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "jq-error-jq-error-try-x-catch-message",
+      "kind": "error",
+      "title": "jq error: try .x catch <message>",
+      "statement": "Not an error \u2014 `try/catch` lets you handle errors. Pattern: `try .field.subfield catch \"missing\"`. Re-throw with `try ... catch error`. For optional path only: `.?field` (silent null) is shorter.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "try/catch",
+        "try .field.subfield catch \"missing\"",
+        "try ... catch error"
+      ],
+      "steps": [
+        "Not an error \u2014 `try/catch` lets you handle errors. Pattern: `try .field.subfield catch \"missing\"`. Re-throw with `try ... catch error`. For optional path only: `.?field` (silent null) is shorter"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: try, try/catch."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-errors",
+        "legacy_title": "jq error: try .x catch <message>"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "jq-error-jq-error-unfinished-string-at-line-n",
+      "kind": "error",
+      "title": "jq error: Unfinished string at line N",
+      "statement": "String literal in JSON input has no closing quote (corrupted input). Fix: (1) check input: `cat -A input.json` shows special chars; (2) for multi-line strings: JSON strings can't span lines unescaped \u2014 `\\n` instead; (3) for shell-built JSON: quoting escapes get mangled \u2014 use heredoc: `jq . <<EOF\\n{\"k\":\"v\"}\\nEOF`; (4) for HTTP API: server may have returned an error page mid-stream.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "cat -A input.json",
+        "jq . <<EOF\\n{\"k\":\"v\"}\\nEOF"
+      ],
+      "steps": [
+        "check input: `cat -A input.json` shows special chars",
+        "for multi-line strings: JSON strings can't span lines unescaped \u2014 `\\n` instead",
+        "for shell-built JSON: quoting escapes get mangled \u2014 use heredoc: `jq . <<EOF\\n{\"k\":\"v\"}\\nEOF`",
+        "for HTTP API: server may have returned an error page mid-stream"
+      ],
+      "constraints": [
+        "check input: `cat -A input.json` shows special chars",
+        "Requires binaries or commands referenced in examples: cat, jq."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-errors",
+        "legacy_title": "jq error: Unfinished string at line N"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "jq-error-jq-error-slurp-null-input-conflict",
+      "kind": "error",
+      "title": "jq error: --slurp + --null-input conflict",
+      "statement": "`-s` collects ALL input into one array; `-n` ignores input \u2014 these don't mix sensibly. Fix: (1) for transform pipeline: just `-s`: `jq -s 'map(.x)' file1 file2`; (2) for ad-hoc generation (no input): just `-n`: `jq -n '{generated: \"value\"}'`; (3) for combining: `jq -n --slurpfile arr file.json '$arr | map(.x)'`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "-s",
+        "-n",
+        "jq -s 'map(.x)' file1 file2",
+        "jq -n '{generated: \"value\"}'",
+        "jq -n --slurpfile arr file.json '$arr | map(.x)'"
+      ],
+      "steps": [
+        "for transform pipeline: just `-s`: `jq -s 'map(.x)' file1 file2`",
+        "for ad-hoc generation (no input): just `-n`: `jq -n '{generated: \"value\"}'`",
+        "for combining: `jq -n --slurpfile arr file.json '$arr | map(.x)'`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -n, -s, jq."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-errors",
+        "legacy_title": "jq error: --slurp + --null-input conflict"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "jq-error-jq-error-select-returned-no-output-filter-dropped-everything",
+      "kind": "error",
+      "title": "jq error: select returned no output (filter dropped everything)",
+      "statement": "Not an error \u2014 `select` is a filter; if nothing matches, output is empty. Fix: (1) for default value when empty: pipe through `// \"none\"`; (2) for count of matches: `[ ... | select(...) ] | length`; (3) to wrap in array: `[ .[] | select(.x > 0) ]`; (4) verify expectation: drop the select temporarily to see what's there.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "select",
+        "// \"none\""
+      ],
+      "steps": [
+        "for default value when empty: pipe through `// \"none\"`",
+        "for count of matches: `[ ... | select(...) ] | length`",
+        "to wrap in array: `[ .[] | select(.x > 0) ]`",
+        "verify expectation: drop the select temporarily to see what's there"
+      ],
+      "constraints": [
+        "verify expectation: drop the select temporarily to see what's there",
+        "Requires binaries or commands referenced in examples: //, select."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-errors",
+        "legacy_title": "jq error: select returned no output (filter dropped everything)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "jq-error-jq-error-cannot-find-module-import-failed",
+      "kind": "error",
+      "title": "jq error: cannot find module / import failed",
+      "statement": "Used `import` or `include` but module path is wrong. Fix: (1) jq looks in `~/.jq` by default for `.jq` files; (2) explicit path: `jq -L /path/to/modules 'import \"mymod\" as m; m::myfunc'`; (3) file must be `name.jq`; import without `.jq` extension; (4) namespace: `import \"foo\" as f` then call as `f::funcname`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "import",
+        "include",
+        ".jq",
+        "jq -L /path/to/modules 'import \"mymod\" as m; m::myfunc'",
+        "name.jq",
+        "import \"foo\" as f",
+        "f::funcname"
+      ],
+      "steps": [
+        "jq looks in `~/.jq` by default for `.jq` files",
+        "explicit path: `jq -L /path/to/modules 'import \"mymod\" as m; m::myfunc'`",
+        "file must be `name.jq`; import without `.jq` extension",
+        "namespace: `import \"foo\" as f` then call as `f::funcname`"
+      ],
+      "constraints": [
+        "file must be `name.jq`; import without `.jq` extension",
+        "Requires binaries or commands referenced in examples: .jq, f::funcname, import, include, jq, name.jq."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-errors",
+        "legacy_title": "jq error: cannot find module / import failed"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "jq-error-jq-error-range-with-negative-step-or-wrong-types",
+      "kind": "error",
+      "title": "jq error: Range with negative step or wrong types",
+      "statement": "`range` requires numeric args, step must be non-zero. Fix: (1) `range(0; 10)` \u2192 0..9; `range(0; 10; 2)` \u2192 0,2,4,6,8; (2) reverse: `range(10; 0; -1)`; (3) for floats: works fine `range(0; 1; 0.1)`; (4) common: for slice indices use `.[$i:$j]` not `range`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "range"
+      ],
+      "steps": [
+        "`range(0; 10)` \u2192 0..9; `range(0; 10; 2)` \u2192 0,2,4,6,8",
+        "reverse: `range(10; 0; -1)`",
+        "for floats: works fine `range(0; 1; 0.1)`",
+        "common: for slice indices use `.[$i:$j]` not `range`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: range."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-errors",
+        "legacy_title": "jq error: Range with negative step or wrong types"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "jq-error-jq-error-output-not-valid-json-when-using-r-without-final-transform",
+      "kind": "error",
+      "title": "jq error: Output not valid JSON when using -r without final transform",
+      "statement": "`-r` strips quotes from strings \u2014 if you mean to keep them, omit. Fix: (1) for shell-consumed string: `-r` is what you want: `jq -r '.name'` \u2192 `Alice`; (2) for JSON output: drop `-r`: `jq '.name'` \u2192 `\"Alice\"`; (3) for keeping JSON shape but extracting only strings: `--raw-output0` (NUL-separated) for safe shell consumption with newlines in values.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "-r",
+        "jq -r '.name'",
+        "Alice",
+        "jq '.name'",
+        "--raw-output0"
+      ],
+      "steps": [
+        "for shell-consumed string: `-r` is what you want: `jq -r '.name'` \u2192 `Alice`",
+        "for JSON output: drop `-r`: `jq '.name'` \u2192 `\"Alice\"`",
+        "for keeping JSON shape but extracting only strings: `--raw-output0` (NUL-separated) for safe shell consumption with newlines in values"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: --raw-output0, -r, Alice, jq."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-errors",
+        "legacy_title": "jq error: Output not valid JSON when using -r without final transform"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "jq-error-jq-error-too-many-open-files-with-many-input-files",
+      "kind": "error",
+      "title": "jq error: too many open files (with many input files)",
+      "statement": "Hit `ulimit -n`. Fix: (1) check: `ulimit -n`; (2) raise: `ulimit -n 4096`; (3) better: use `--slurp` with cat: `cat *.json | jq -s 'add'`; (4) for parallel: limit concurrency: `find . -name '*.json' | xargs -n 100 jq -s 'add'`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "ulimit -n",
+        "ulimit -n 4096",
+        "--slurp",
+        "cat *.json | jq -s 'add'",
+        "find . -name '*.json' | xargs -n 100 jq -s 'add'"
+      ],
+      "steps": [
+        "check: `ulimit -n`",
+        "raise: `ulimit -n 4096`",
+        "better: use `--slurp` with cat: `cat *.json | jq -s 'add'`",
+        "for parallel: limit concurrency: `find . -name '*.json' | xargs -n 100 jq -s 'add'`"
+      ],
+      "constraints": [
+        "check: `ulimit -n`",
+        "Requires binaries or commands referenced in examples: --slurp, cat, find, ulimit."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-errors",
+        "legacy_title": "jq error: too many open files (with many input files)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-extract-a-single-field",
+      "kind": "recipe",
+      "title": "jq recipe: extract a single field",
+      "statement": "`jq '.name'` for top-level. Nested: `jq '.user.email'`. Dynamic: `jq --arg k name '.[$k]'`. From array: `jq '.[].name'` (each name). Pretty: `jq -r '.name'` strips quotes for shell consumption.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "jq '.name'",
+        "jq '.user.email'",
+        "jq --arg k name '.[$k]'",
+        "jq '.[].name'",
+        "jq -r '.name'"
+      ],
+      "steps": [
+        "`jq '.name'` for top-level. Nested: `jq '.user.email'`. Dynamic: `jq --arg k name '.[$k]'`. From array: `jq '.[].name'` (each name). Pretty: `jq -r '.name'` strips quotes for shell consumption"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: jq."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: extract a single field"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-array-element-by-index-or-slice",
+      "kind": "recipe",
+      "title": "jq recipe: array element by index or slice",
+      "statement": "First: `jq '.[0]'`. Last: `jq '.[-1]'`. Slice (Python-style): `jq '.[2:5]'` (indices 2,3,4). Reverse: `jq 'reverse'`. All: `jq '.[]'`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "jq '.[0]'",
+        "jq '.[-1]'",
+        "jq '.[2:5]'",
+        "jq 'reverse'",
+        "jq '.[]'"
+      ],
+      "steps": [
+        "First: `jq '.[0]'`. Last: `jq '.[-1]'`. Slice (Python-style): `jq '.[2:5]'` (indices 2,3,4). Reverse: `jq 'reverse'`. All: `jq '.[]'`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: jq."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: array element by index or slice"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-filter-array-elements-with-select",
+      "kind": "recipe",
+      "title": "jq recipe: filter array elements with select",
+      "statement": "`jq '.[] | select(.age > 18)'` keeps only matching. Multiple conditions: `select(.age > 18 and .country == \"US\")`. OR: `select(.role == \"admin\" or .role == \"owner\")`. Negation: `select(.deleted | not)`. Wrap in array: `[.[] | select(...)]`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "jq '.[] | select(.age > 18)'"
+      ],
+      "steps": [
+        "`jq '.[] | select(.age > 18)'` keeps only matching. Multiple conditions: `select(.age > 18 and .country == \"US\")`. OR: `select(.role == \"admin\" or .role == \"owner\")`. Negation: `select(.deleted | not)`. Wrap in array: `[.[] | select(...)]`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: jq."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: filter array elements with select"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-transform-with-map",
+      "kind": "recipe",
+      "title": "jq recipe: transform with map",
+      "statement": "`jq 'map(.field)'` extracts a field from each item, returns array. Transform: `map({id: .id, name: .name | ascii_upcase})`. Numeric: `map(.price * 1.1)`. Combined with select: `map(select(.active) | .name)`. Equivalent: `[.[] | ...]`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "jq 'map(.field)'"
+      ],
+      "steps": [
+        "`jq 'map(.field)'` extracts a field from each item, returns array. Transform: `map({id: .id, name: .name | ascii_upcase})`. Numeric: `map(.price * 1.1)`. Combined with select: `map(select(.active) | .name)`. Equivalent: `[.[] | ...]`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: jq."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: transform with map"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-build-a-new-object",
+      "kind": "recipe",
+      "title": "jq recipe: build a new object",
+      "statement": "`jq '{name: .name, email: .email}'`. Shorthand (when key=field): `jq '{name, email}'`. With computed: `jq '{full: \"\\(.first) \\(.last)\", age: (now - .born_ts) / 31556952 | floor}'`. Conditional fields: `{name} + (if .admin then {role: \"admin\"} else {} end)`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "jq '{name: .name, email: .email}'",
+        "jq '{name, email}'",
+        "jq '{full: \"\\(.first) \\(.last)\", age: (now - .born_ts) / 31556952 | floor}'"
+      ],
+      "steps": [
+        "`jq '{name: .name, email: .email}'`. Shorthand (when key=field): `jq '{name, email}'`. With computed: `jq '{full: \"\\(.first) \\(.last)\", age: (now - .born_ts) / 31556952 | floor}'`. Conditional fields: `{name} + (if .admin then {role: \"admin\"} else {} end)`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: jq."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: build a new object"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-update-modify-a-field",
+      "kind": "recipe",
+      "title": "jq recipe: update / modify a field (|=)",
+      "statement": "Replace value: `.name = \"new\"`. Update with function: `.name |= ascii_upcase`. Nested update: `.user.email |= ascii_downcase`. All array elements: `.[].price |= (. * 1.1)`. Combined: `map(.email |= ascii_downcase)`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        ".name = \"new\"",
+        ".name |= ascii_upcase",
+        ".user.email |= ascii_downcase"
+      ],
+      "steps": [
+        "Replace value: `.name = \"new\"`. Update with function: `.name |= ascii_upcase`. Nested update: `.user.email |= ascii_downcase`. All array elements: `.[].price |= (. * 1.1)`. Combined: `map(.email |= ascii_downcase)`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: .name, .user.email."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: update / modify a field (|=)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-add-or-remove-keys",
+      "kind": "recipe",
+      "title": "jq recipe: add or remove keys",
+      "statement": "Add: `. + {new_key: \"value\"}` or `.new_key = \"value\"`. Delete: `del(.unwanted)` or `del(.a, .b)`. Nested delete: `del(.user.secret)`. Conditional add: `. + (if .enable then {feature: true} else {} end)`. Replace whole object: `{kept: .kept}` (other keys dropped).",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        ". + {new_key: \"value\"}",
+        ".new_key = \"value\"",
+        ". + (if .enable then {feature: true} else {} end)"
+      ],
+      "steps": [
+        "Add: `. + {new_key: \"value\"}` or `.new_key = \"value\"`. Delete: `del(.unwanted)` or `del(.a, .b)`. Nested delete: `del(.user.secret)`. Conditional add: `. + (if .enable then {feature: true} else {} end)`. Replace whole object: `{kept: .kept}` (other keys dropped)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ., .new_key."
+      ],
+      "effect": {
+        "kind": "secret_exposure",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": true,
+        "risk_level": "high",
+        "reasons": [
+          "The action references secrets, tokens, or API keys."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: add or remove keys"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-get-unique-values",
+      "kind": "recipe",
+      "title": "jq recipe: get unique values",
+      "statement": "`jq '[.[] | .category] | unique'` produces sorted unique list. Unique by computed key: `unique_by(.id)`. Count unique: `[.[] | .category] | unique | length`. Frequency map: `group_by(.category) | map({key: .[0].category, value: length}) | from_entries`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "jq '[.[] | .category] | unique'"
+      ],
+      "steps": [
+        "`jq '[.[] | .category] | unique'` produces sorted unique list. Unique by computed key: `unique_by(.id)`. Count unique: `[.[] | .category] | unique | length`. Frequency map: `group_by(.category) | map({key: .[0].category, value: length}) | from_entries`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: jq."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: get unique values"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-group-by-a-field",
+      "kind": "recipe",
+      "title": "jq recipe: group by a field",
+      "statement": "`jq 'group_by(.category)'` produces array of arrays. Summarize per group: `group_by(.category) | map({category: .[0].category, count: length, total: map(.amount) | add})`. Equivalent to SQL GROUP BY.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "jq 'group_by(.category)'"
+      ],
+      "steps": [
+        "`jq 'group_by(.category)'` produces array of arrays. Summarize per group: `group_by(.category) | map({category: .[0].category, count: length, total: map(.amount) | add})`. Equivalent to SQL GROUP BY"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: jq."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: group by a field"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-sort-by-field",
+      "kind": "recipe",
+      "title": "jq recipe: sort by field",
+      "statement": "`jq 'sort_by(.date)'` ascending. Descending: `sort_by(.date) | reverse`. Multi-key: `sort_by(.last, .first)`. Custom: `sort_by(.priority * -1, .name)` (negate for desc on that key). For simple arrays: just `sort`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "jq 'sort_by(.date)'",
+        "sort"
+      ],
+      "steps": [
+        "`jq 'sort_by(.date)'` ascending. Descending: `sort_by(.date) | reverse`. Multi-key: `sort_by(.last, .first)`. Custom: `sort_by(.priority * -1, .name)` (negate for desc on that key). For simple arrays: just `sort`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: jq, sort."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: sort by field"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-sum-average-a-field",
+      "kind": "recipe",
+      "title": "jq recipe: sum / average a field",
+      "statement": "Sum: `jq '[.[] | .amount] | add'`. Average: `[.[] | .amount] | add / length`. Max: `[.[] | .amount] | max`. Or `max_by(.amount)` for the whole object. Min: `min` / `min_by(.amount)`. Stats in one pass: `[.[] | .amount] | {sum: add, avg: add/length, max, min}`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "jq '[.[] | .amount] | add'",
+        "min"
+      ],
+      "steps": [
+        "Sum: `jq '[.[] | .amount] | add'`. Average: `[.[] | .amount] | add / length`. Max: `[.[] | .amount] | max`. Or `max_by(.amount)` for the whole object. Min: `min` / `min_by(.amount)`. Stats in one pass: `[.[] | .amount] | {sum: add, avg: add/length, max, min}`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: jq, min."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: sum / average a field"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-object-entries-key-value-pairs",
+      "kind": "recipe",
+      "title": "jq recipe: object \u2194 entries (key-value pairs)",
+      "statement": "Object \u2192 array: `to_entries` produces `[{key:\"a\", value:1}, ...]`. Array \u2192 object: `from_entries`. Rename keys: `to_entries | map(.key |= ascii_upcase) | from_entries`. Filter keys: `to_entries | map(select(.key != \"secret\")) | from_entries`. Transform values: `to_entries | map(.value |= tostring) | from_entries`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "to_entries",
+        "from_entries",
+        "to_entries | map(.key |= ascii_upcase) | from_entries",
+        "to_entries | map(select(.key != \"secret\")) | from_entries",
+        "to_entries | map(.value |= tostring) | from_entries"
+      ],
+      "steps": [
+        "Object \u2192 array: `to_entries` produces `[{key:\"a\", value:1}, ...]`. Array \u2192 object: `from_entries`. Rename keys: `to_entries | map(.key |= ascii_upcase) | from_entries`. Filter keys: `to_entries | map(select(.key != \"secret\")) | from_entries`. Transform values: `to_entries | map(.value |= tostring) | from_entries`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: from_entries, to_entries."
+      ],
+      "effect": {
+        "kind": "secret_exposure",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": true,
+        "risk_level": "high",
+        "reasons": [
+          "The action references secrets, tokens, or API keys."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: object \u2194 entries (key-value pairs)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-string-operations",
+      "kind": "recipe",
+      "title": "jq recipe: string operations",
+      "statement": "Split: `\"a,b,c\" | split(\",\")` \u2192 `[\"a\",\"b\",\"c\"]`. Join: `[\"a\",\"b\"] | join(\"-\")` \u2192 `\"a-b\"`. Case: `ascii_upcase`, `ascii_downcase`. Trim: `ltrimstr(\" \")` / `rtrimstr(\" \")`. Replace: `gsub(\"foo\"; \"bar\")` (regex). Length: `length` (works on strings too). Test pattern: `test(\"^foo\")`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "ascii_upcase",
+        "ascii_downcase",
+        "length"
+      ],
+      "steps": [
+        "Split: `\"a,b,c\" | split(\",\")` \u2192 `[\"a\",\"b\",\"c\"]`. Join: `[\"a\",\"b\"] | join(\"-\")` \u2192 `\"a-b\"`. Case: `ascii_upcase`, `ascii_downcase`. Trim: `ltrimstr(\" \")` / `rtrimstr(\" \")`. Replace: `gsub(\"foo\"; \"bar\")` (regex). Length: `length` (works on strings too). Test pattern: `test(\"^foo\")`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ascii_downcase, ascii_upcase, length."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: string operations"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-regex-match-and-capture",
+      "kind": "recipe",
+      "title": "jq recipe: regex match and capture",
+      "statement": "Test: `test(\"^[0-9]+$\")` returns true/false. Match: `match(\"foo(.+)\"; \"i\")` returns object with offsets + captures (i = case-insensitive). Extract capture: `match(\"version: ([0-9]+)\") | .captures[0].string`. Find all: `scan(\"\\\\d+\")` yields all matches as a stream.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "Test: `test(\"^[0-9]+$\")` returns true/false. Match: `match(\"foo(.+)\"; \"i\")` returns object with offsets + captures (i = case-insensitive). Extract capture: `match(\"version: ([0-9]+)\") | .captures[0].string`. Find all: `scan(\"\\\\d+\")` yields all matches as a stream"
+      ],
+      "constraints": [],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: regex match and capture"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-format-dates",
+      "kind": "recipe",
+      "title": "jq recipe: format dates",
+      "statement": "From ISO: `\"2024-12-01T10:00:00Z\" | fromdateiso8601` (returns Unix timestamp). To ISO: `now | todateiso8601`. Custom format: `strftime(\"%Y-%m-%d %H:%M\")`. Parse custom: `strptime(\"%Y-%m-%d\") | mktime`. Now: `now` (Unix epoch).",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "now | todateiso8601",
+        "now"
+      ],
+      "steps": [
+        "From ISO: `\"2024-12-01T10:00:00Z\" | fromdateiso8601` (returns Unix timestamp). To ISO: `now | todateiso8601`. Custom format: `strftime(\"%Y-%m-%d %H:%M\")`. Parse custom: `strptime(\"%Y-%m-%d\") | mktime`. Now: `now` (Unix epoch)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: now."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: format dates"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-conditional-logic-if-then-else",
+      "kind": "recipe",
+      "title": "jq recipe: conditional logic (if-then-else)",
+      "statement": "`if .x > 10 then \"big\" else \"small\" end`. With elif: `if .a then 1 elif .b then 2 else 3 end`. Truthiness: null and false are falsy, everything else truthy (including empty arrays). Default value: `.x // \"default\"` (the `//` alternative operator \u2014 uses RHS when LHS is null or false).",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "if .x > 10 then \"big\" else \"small\" end",
+        "if .a then 1 elif .b then 2 else 3 end",
+        ".x // \"default\""
+      ],
+      "steps": [
+        "`if .x > 10 then \"big\" else \"small\" end`. With elif: `if .a then 1 elif .b then 2 else 3 end`. Truthiness: null and false are falsy, everything else truthy (including empty arrays). Default value: `.x // \"default\"` (the `//` alternative operator \u2014 uses RHS when LHS is null or false)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: .x, if."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: conditional logic (if-then-else)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-alternative-operator-default-values",
+      "kind": "recipe",
+      "title": "jq recipe: alternative operator // (default values)",
+      "statement": "`.maybe_missing // \"default\"` returns RHS if LHS is null or false. Chained: `.a // .b // \"final fallback\"`. For empty filters too: `.maybe_empty[] // \"placeholder\"` \u2014 but this iterates; usually you want `(.maybe_empty // []) | .[]`. Use case: API responses with optional fields.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        ".maybe_missing // \"default\"",
+        ".a // .b // \"final fallback\""
+      ],
+      "steps": [
+        "`.maybe_missing // \"default\"` returns RHS if LHS is null or false. Chained: `.a // .b // \"final fallback\"`. For empty filters too: `.maybe_empty[] // \"placeholder\"` \u2014 but this iterates; usually you want `(.maybe_empty // []) | .[]`. Use case: API responses with optional fields"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: .a, .maybe_missing."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: alternative operator // (default values)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-flatten-nested-arrays",
+      "kind": "recipe",
+      "title": "jq recipe: flatten nested arrays",
+      "statement": "`[[1,2],[3,4]] | flatten` \u2192 `[1,2,3,4]`. Single level: `flatten(1)`. Deep: `flatten` (default = all levels). For nested objects: jq has no built-in deep flatten \u2014 write recursive: `.. | objects`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "flatten",
+        ".. | objects"
+      ],
+      "steps": [
+        "`[[1,2],[3,4]] | flatten` \u2192 `[1,2,3,4]`. Single level: `flatten",
+        "`. Deep: `flatten` (default = all levels). For nested objects: jq has no built-in deep flatten \u2014 write recursive: `.. | objects`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: .., flatten."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: flatten nested arrays"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-recurse-into-nested-structures",
+      "kind": "recipe",
+      "title": "jq recipe: recurse into nested structures (..)",
+      "statement": "`..` yields every node in the tree (DFS). All objects: `.. | objects`. All strings: `.. | strings`. Find specific value: `.. | select(type == \"object\" and has(\"target_field\"))`. Useful when JSON shape is dynamic / unknown.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        ".. | objects",
+        ".. | strings",
+        ".. | select(type == \"object\" and has(\"target_field\"))"
+      ],
+      "steps": [
+        "`..` yields every node in the tree (DFS). All objects: `.. | objects`. All strings: `.. | strings`. Find specific value: `.. | select(type == \"object\" and has(\"target_field\"))`. Useful when JSON shape is dynamic / unknown"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ..."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: recurse into nested structures (..)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-pretty-print-json-default-vs-compact",
+      "kind": "recipe",
+      "title": "jq recipe: pretty-print JSON (default) vs compact",
+      "statement": "Pretty (default): `jq .` indents 2 spaces. Compact: `jq -c .` (one line per value \u2014 good for JSONL output). Tab indent: `jq --tab .`. Specific indent: `jq --indent 4 .`. Sort keys: `jq -S .` (lexicographic order).",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "jq .",
+        "jq -c .",
+        "jq --tab .",
+        "jq --indent 4 .",
+        "jq -S ."
+      ],
+      "steps": [
+        "Pretty (default): `jq .` indents 2 spaces. Compact: `jq -c .` (one line per value \u2014 good for JSONL output). Tab indent: `jq --tab .`. Specific indent: `jq --indent 4 .`. Sort keys: `jq -S .` (lexicographic order)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: jq."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: pretty-print JSON (default) vs compact"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-raw-string-output-r",
+      "kind": "recipe",
+      "title": "jq recipe: raw string output (-r)",
+      "statement": "`jq -r '.name'` strips quotes \u2014 output: `Alice` not `\"Alice\"`. Essential for shell consumption: `name=$(jq -r '.name' file.json)`. Combined with `[]`: `jq -r '.users[].email'` produces one email per line. Multi-value safe: `jq -r '.users[] | [.id, .name] | @tsv'` for tab-separated.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "jq -r '.name'",
+        "Alice",
+        "jq -r '.users[].email'",
+        "jq -r '.users[] | [.id, .name] | @tsv'"
+      ],
+      "steps": [
+        "`jq -r '.name'` strips quotes \u2014 output: `Alice` not `\"Alice\"`. Essential for shell consumption: `name=$(jq -r '.name' file.json)`. Combined with `[]`: `jq -r '.users[].email'` produces one email per line. Multi-value safe: `jq -r '.users[] | [.id, .name] | @tsv'` for tab-separated"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: Alice, jq."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: raw string output (-r)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-slurp-multiple-json-documents-s",
+      "kind": "recipe",
+      "title": "jq recipe: slurp multiple JSON documents (-s)",
+      "statement": "`jq -s . file1 file2` reads all into one array. Then process: `jq -s '[.[] | .users] | flatten' file1 file2`. For JSONL: `jq -s '.' lines.jsonl`. Compact JSONL out: `jq -c '.[]' < combined.json` (per-line emit).",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "jq -s . file1 file2",
+        "jq -s '[.[] | .users] | flatten' file1 file2",
+        "jq -s '.' lines.jsonl",
+        "jq -c '.[]' < combined.json"
+      ],
+      "steps": [
+        "`jq -s . file1 file2` reads all into one array. Then process: `jq -s '[.[] | .users] | flatten' file1 file2`. For JSONL: `jq -s '.' lines.jsonl`. Compact JSONL out: `jq -c '.[]' < combined.json` (per-line emit)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: jq."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: slurp multiple JSON documents (-s)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-inject-shell-variables-arg-argjson",
+      "kind": "recipe",
+      "title": "jq recipe: inject shell variables (--arg, --argjson)",
+      "statement": "String: `jq --arg name \"$NAME\" '.users[] | select(.name == $name)'`. JSON value: `jq --argjson count 5 '.[0:$count]'` (parsed as number). Multiple: `jq --arg user $USER --argjson admin true '...'`. Better than embedding: avoids shell-quoting issues with `\"$NAME\"`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "jq --arg name \"$NAME\" '.users[] | select(.name == $name)'",
+        "jq --argjson count 5 '.[0:$count]'",
+        "jq --arg user $USER --argjson admin true '...'"
+      ],
+      "steps": [
+        "String: `jq --arg name \"$NAME\" '.users[] | select(.name == $name)'`. JSON value: `jq --argjson count 5 '.[0:$count]'` (parsed as number). Multiple: `jq --arg user $USER --argjson admin true '...'`. Better than embedding: avoids shell-quoting issues with `\"$NAME\"`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: jq."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: inject shell variables (--arg, --argjson)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-read-json-from-another-file-slurpfile-rawfile",
+      "kind": "recipe",
+      "title": "jq recipe: read JSON from another file (--slurpfile, --rawfile)",
+      "statement": "`--slurpfile NAME PATH` parses file as JSON, binds to `$NAME` as array. `--rawfile NAME PATH` loads file as raw string (any text). Example: `jq --slurpfile users users.json '.activity | map(. + (.user_id as $id | $users[] | select(.id == $id)))'`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "--slurpfile NAME PATH",
+        "--rawfile NAME PATH",
+        "jq --slurpfile users users.json '.activity | map(. + (.user_id as $id | $users[] | select(.id == $id)))'"
+      ],
+      "steps": [
+        "`--slurpfile NAME PATH` parses file as JSON, binds to `$NAME` as array. `--rawfile NAME PATH` loads file as raw string (any text). Example: `jq --slurpfile users users.json '.activity | map(. + (.user_id as $id | $users[] | select(.id == $id)))'`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: --rawfile, --slurpfile, jq."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: read JSON from another file (--slurpfile, --rawfile)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-process-curl-output-parse-api-responses",
+      "kind": "recipe",
+      "title": "jq recipe: process curl output (parse API responses)",
+      "statement": "Direct pipe: `curl -s api.example.com/users | jq '.[] | .name'`. Failure-aware: `curl -fsSL ... | jq` (the `-f` fails on 4xx so jq doesn't see HTML); save + inspect: `curl -s ... | tee /tmp/api.json | jq '.results[0]'`; follow pagination: ```bash\\nnext=\"...\"; while [ -n \"$next\" ]; do\\n  resp=$(curl -s \"$next\")\\n  echo \"$resp\" | jq '.data[]'\\n  next=$(echo \"$resp\" | jq -r '.next_url')\\ndone\\n```.",
+      "source_url": "https://jqlang.org/tutorial/",
+      "source_type": "official_docs",
+      "commands": [
+        "curl -s api.example.com/users | jq '.[] | .name'",
+        "curl -fsSL ... | jq",
+        "-f",
+        "curl -s ... | tee /tmp/api.json | jq '.results[0]'"
+      ],
+      "steps": [
+        "Direct pipe: `curl -s api.example.com/users | jq '.[] | .name'`. Failure-aware: `curl -fsSL ... | jq` (the `-f` fails on 4xx so jq doesn't see HTML); save + inspect: `curl -s ... | tee /tmp/api.json | jq '.results[0]'`; follow pagination: ```bash\\nnext=\"...\"; while [ -n \"$next\" ]; do\\n resp=$(curl -s \"$next\")\\n echo \"$resp\" | jq '.data[]'\\n next=$(echo \"$resp\" | jq -r '.next_url')\\ndone\\n```"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -f, curl."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: process curl output (parse API responses)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-generate-json-from-scratch-n-null-input",
+      "kind": "recipe",
+      "title": "jq recipe: generate JSON from scratch (-n / null input)",
+      "statement": "`jq -n '{name: \"Alice\", age: 30}'` produces an object \u2014 no input needed. From shell vars: `jq -n --arg name \"$NAME\" --argjson age \"$AGE\" '{name: $name, age: $age}'`. Generate sequences: `jq -n '[range(1;11)]'` \u2192 `[1,2,3,4,5,6,7,8,9,10]`. Build complex: `jq -n '{api: {version: \"v1\", endpoints: [\"users\",\"posts\"]}}'`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "jq -n '{name: \"Alice\", age: 30}'",
+        "jq -n --arg name \"$NAME\" --argjson age \"$AGE\" '{name: $name, age: $age}'",
+        "jq -n '[range(1;11)]'",
+        "jq -n '{api: {version: \"v1\", endpoints: [\"users\",\"posts\"]}}'"
+      ],
+      "steps": [
+        "`jq -n '{name: \"Alice\", age: 30}'` produces an object \u2014 no input needed. From shell vars: `jq -n --arg name \"$NAME\" --argjson age \"$AGE\" '{name: $name, age: $age}'`. Generate sequences: `jq -n '[range(1;11)]'` \u2192 `[1,2,3,4,5,6,7,8,9,10]`. Build complex: `jq -n '{api: {version: \"v1\", endpoints: [\"users\",\"posts\"]}}'`"
+      ],
+      "constraints": [
+        "`jq -n '{name: \"Alice\", age: 30}'` produces an object \u2014 no input needed. From shell vars: `jq -n --arg name \"$NAME\" --argjson age \"$AGE\" '{name: $name, age: $age}'`. Generate sequences: `jq -n '[range(1;11)]'` \u2192 `[1,2,3,4,5,6,7,8,9,10]`. Build complex: `jq -n '{api: {version: \"v1\", endpoints: [\"users\",\"posts\"]}}'`",
+        "Requires binaries or commands referenced in examples: jq."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: generate JSON from scratch (-n / null input)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-reduce-aggregate-to-single-value",
+      "kind": "recipe",
+      "title": "jq recipe: reduce / aggregate to single value",
+      "statement": "Sum array: `reduce .[] as $x (0; . + $x)`. Build object: `reduce .users[] as $u ({}; . + {($u.id): $u.name})`. Max-by tracking value: `reduce .[] as $x (null; if . == null or $x.val > .val then $x else . end)`. Pattern: `reduce STREAM as $VAR (INIT; UPDATE)`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "reduce .[] as $x (0; . + $x)",
+        "reduce .users[] as $u ({}; . + {($u.id): $u.name})",
+        "reduce .[] as $x (null; if . == null or $x.val > .val then $x else . end)",
+        "reduce STREAM as $VAR (INIT; UPDATE)"
+      ],
+      "steps": [
+        "Sum array: `reduce .[] as $x (0; . + $x)`. Build object: `reduce .users[] as $u ({}; . + {($u.id): $u.name})`. Max-by tracking value: `reduce .[] as $x (null; if . == null or $x.val > .val then $x else . end)`. Pattern: `reduce STREAM as $VAR (INIT; UPDATE)`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: reduce."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: reduce / aggregate to single value"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-walk-recursively-transforming",
+      "kind": "recipe",
+      "title": "jq recipe: walk recursively transforming",
+      "statement": "`walk(...)` applies a filter to every node in the tree. Lowercase all string values: `walk(if type == \"string\" then ascii_downcase else . end)`. Remove all nulls: `walk(if type == \"object\" then with_entries(select(.value != null)) else . end)`. Trim all strings: `walk(if type == \"string\" then ltrimstr(\" \") | rtrimstr(\" \") else . end)`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "`walk(...)` applies a filter to every node in the tree. Lowercase all string values: `walk(if type == \"string\" then ascii_downcase else . end)`. Remove all nulls: `walk(if type == \"object\" then with_entries(select(.value != null)) else . end)`. Trim all strings: `walk(if type == \"string\" then ltrimstr(\" \") | rtrimstr(\" \") else . end)`"
+      ],
+      "constraints": [],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: walk recursively transforming"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-count-occurrences-histogram",
+      "kind": "recipe",
+      "title": "jq recipe: count occurrences (histogram)",
+      "statement": "By field: `jq 'group_by(.status) | map({(.[0].status): length}) | add'`. Result: `{\"ok\": 47, \"error\": 3, \"pending\": 5}`. Just counts (no keys): `jq 'group_by(.status) | map(length)'`. Combined with sort: `... | to_entries | sort_by(.value) | reverse`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "jq 'group_by(.status) | map({(.[0].status): length}) | add'",
+        "jq 'group_by(.status) | map(length)'",
+        "... | to_entries | sort_by(.value) | reverse"
+      ],
+      "steps": [
+        "By field: `jq 'group_by(.status) | map({(.[0].status): length}) | add'`. Result: `{\"ok\": 47, \"error\": 3, \"pending\": 5}`. Just counts (no keys): `jq 'group_by(.status) | map(length)'`. Combined with sort: `... | to_entries | sort_by(.value) | reverse`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ..., jq."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: count occurrences (histogram)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-extract-top-n-or-bottom-n",
+      "kind": "recipe",
+      "title": "jq recipe: extract top N or bottom N",
+      "statement": "Top 5 by score (desc): `sort_by(.score) | reverse | .[0:5]`. Bottom 5: `sort_by(.score) | .[0:5]`. Top 10% by score: `sort_by(-.score) | .[0: (length / 10 | floor)]`. Combined with grouping: `group_by(.dept) | map(sort_by(-.salary) | .[0])` (top earner per dept).",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "Top 5 by score (desc): `sort_by(.score) | reverse | .[0:5]`. Bottom 5: `sort_by(.score) | .[0:5]`. Top 10% by score: `sort_by(-.score) | .[0: (length / 10 | floor)]`. Combined with grouping: `group_by(.dept) | map(sort_by(-.salary) | .[0])` (top earner per dept)"
+      ],
+      "constraints": [],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: extract top N or bottom N"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-build-csv-output-csv-tsv",
+      "kind": "recipe",
+      "title": "jq recipe: build CSV output (@csv / @tsv)",
+      "statement": "From array: `jq -r '.users[] | [.id, .name, .email] | @csv'` (handles quoting). TSV: `... | @tsv` (tab-separated, faster to consume). With headers: `(.users[0] | keys_unsorted), (.users[] | [.[]]) | @csv` (first row = headers). Custom: build strings with `\"\\(.a),\\(.b)\"` if @csv doesn't fit.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "jq -r '.users[] | [.id, .name, .email] | @csv'",
+        "... | @tsv"
+      ],
+      "steps": [
+        "From array: `jq -r '.users[] | [.id, .name, .email] | @csv'` (handles quoting). TSV: `... | @tsv` (tab-separated, faster to consume). With headers: `(.users[0] | keys_unsorted), (.users[] | [.[]]) | @csv` (first row = headers). Custom: build strings with `\"\\(.a),\\(.b)\"` if @csv doesn't fit"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ..., jq."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: build CSV output (@csv / @tsv)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-build-uri-query-string-uri",
+      "kind": "recipe",
+      "title": "jq recipe: build URI query string (@uri)",
+      "statement": "`jq -nr --arg q 'hello world' '\"https://api.com/search?q=\\($q | @uri)\"'`. @uri URL-encodes its input. Build whole query: `{q: $query, page: $page} | to_entries | map(\"\\(.key)=\\(.value | tostring | @uri)\") | join(\"&\")`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "jq -nr --arg q 'hello world' '\"https://api.com/search?q=\\($q | @uri)\"'"
+      ],
+      "steps": [
+        "`jq -nr --arg q 'hello world' '\"https://api.com/search?q=\\($q | @uri)\"'`. @uri URL-encodes its input. Build whole query: `{q: $query, page: $page} | to_entries | map(\"\\(.key)=\\(.value | tostring | @uri)\") | join(\"&\")`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: jq."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: build URI query string (@uri)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-handle-paths-with-dots-in-keys",
+      "kind": "recipe",
+      "title": "jq recipe: handle paths with dots in keys",
+      "statement": "`jq '.[\"key.with.dots\"]'` (bracket-quote form). Dynamic path: `jq --arg k 'a.b' '.[$k]'`. For nested paths with dots: `getpath([\"a.b\", \"c\"])`. For YAML-converted JSON where dots are common: use `getpath` consistently.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "jq '.[\"key.with.dots\"]'",
+        "jq --arg k 'a.b' '.[$k]'",
+        "getpath"
+      ],
+      "steps": [
+        "`jq '.[\"key.with.dots\"]'` (bracket-quote form). Dynamic path: `jq --arg k 'a.b' '.[$k]'`. For nested paths with dots: `getpath([\"a.b\", \"c\"])`. For YAML-converted JSON where dots are common: use `getpath` consistently"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: getpath, jq."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: handle paths with dots in keys"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-stream-very-large-files-stream",
+      "kind": "recipe",
+      "title": "jq recipe: stream very large files (--stream)",
+      "statement": "`jq --stream` emits path-value pairs without loading entire JSON in memory. Format: `[[\"path\",\"to\"], value]` per line. Reconstruct subtrees: `jq --stream 'select(length == 2 and .[0][0] == \"users\")'`. Use case: multi-GB JSON files that don't fit in RAM. Tools to compose: `gron` for grep-style, `dasel` for path-based.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "jq --stream",
+        "jq --stream 'select(length == 2 and .[0][0] == \"users\")'",
+        "gron",
+        "dasel"
+      ],
+      "steps": [
+        "`jq --stream` emits path-value pairs without loading entire JSON in memory. Format: `[[\"path\",\"to\"], value]` per line. Reconstruct subtrees: `jq --stream 'select(length == 2 and .[0][0] == \"users\")'`. Use case: multi-GB JSON files that don't fit in RAM. Tools to compose: `gron` for grep-style, `dasel` for path-based"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: dasel, gron, jq."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: stream very large files (--stream)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-combine-multiple-json-files-union-merge",
+      "kind": "recipe",
+      "title": "jq recipe: combine multiple JSON files (union/merge)",
+      "statement": "Concatenate arrays: `jq -s 'add' file1.json file2.json` (treats top-level as arrays). Merge objects (later wins): `jq -s '.[0] * .[1]'`. Deep merge (recursive): `jq -s 'reduce .[] as $x ({}; . * $x)'` (jq's `*` is non-recursive \u2014 for true deep merge, custom def needed). Concatenate as JSONL: `cat file1.json file2.json | jq -c '.'`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "jq -s 'add' file1.json file2.json",
+        "jq -s '.[0] * .[1]'",
+        "jq -s 'reduce .[] as $x ({}; . * $x)'",
+        "cat file1.json file2.json | jq -c '.'"
+      ],
+      "steps": [
+        "Concatenate arrays: `jq -s 'add' file1.json file2.json` (treats top-level as arrays). Merge objects (later wins): `jq -s '.[0] * .[1]'`. Deep merge (recursive): `jq -s 'reduce .[] as $x ({}; . * $x)'` (jq's `*` is non-recursive \u2014 for true deep merge, custom def needed). Concatenate as JSONL: `cat file1.json file2.json | jq -c '.'`"
+      ],
+      "constraints": [
+        "Concatenate arrays: `jq -s 'add' file1.json file2.json` (treats top-level as arrays). Merge objects (later wins): `jq -s '.[0] * .[1]'`. Deep merge (recursive): `jq -s 'reduce .[] as $x ({}; . * $x)'` (jq's `*` is non-recursive \u2014 for true deep merge, custom def needed). Concatenate as JSONL: `cat file1.json file2.json | jq -c '.'`",
+        "Requires binaries or commands referenced in examples: cat, jq."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: combine multiple JSON files (union/merge)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-process-kubernetes-docker-output",
+      "kind": "recipe",
+      "title": "jq recipe: process Kubernetes / docker output",
+      "statement": "K8s pods by status: `kubectl get pods -o json | jq -r '.items[] | select(.status.phase != \"Running\") | .metadata.name'`. Docker container IPs: `docker inspect $(docker ps -q) | jq -r '.[] | \"\\(.Name) \\(.NetworkSettings.IPAddress)\"'`. Helm values: `helm get values -o json my-release | jq '.image'`.",
+      "source_url": "https://jqlang.org/tutorial/",
+      "source_type": "official_docs",
+      "commands": [
+        "kubectl get pods -o json | jq -r '.items[] | select(.status.phase != \"Running\") | .metadata.name'",
+        "docker inspect $(docker ps -q) | jq -r '.[] | \"\\(.Name) \\(.NetworkSettings.IPAddress)\"'",
+        "helm get values -o json my-release | jq '.image'"
+      ],
+      "steps": [
+        "K8s pods by status: `kubectl get pods -o json | jq -r '.items[] | select(.status.phase != \"Running\") | .metadata.name'`. Docker container IPs: `docker inspect $(docker ps -q) | jq -r '.[] | \"\\(.Name) \\(.NetworkSettings.IPAddress)\"'`. Helm values: `helm get values -o json my-release | jq '.image'`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: docker, helm, kubectl."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: process Kubernetes / docker output"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-json-patch-partial-update",
+      "kind": "recipe",
+      "title": "jq recipe: JSON Patch / partial update",
+      "statement": "RFC 6902 not built-in, but jq can build patches: `[{op: \"replace\", path: \"/name\", value: \"new\"}]`. Apply patch operations: ```jq\\nreduce .[] as $op (.; \\n  if $op.op == \"replace\" then setpath($op.path | split(\"/\") | .[1:]; $op.value) \\n  elif $op.op == \"remove\" then delpaths([$op.path | split(\"/\") | .[1:]]) \\n  else . end)\\n```. For real JSON Patch: external tools like `json-patch`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        ". For real JSON Patch: external tools like"
+      ],
+      "steps": [
+        "RFC 6902 not built-in, but jq can build patches: `[{op: \"replace\", path: \"/name\", value: \"new\"}]`. Apply patch operations: ```jq\\nreduce .[] as $op (.; \\n if $op.op == \"replace\" then setpath($op.path | split(\"/\") | .[1:]; $op.value) \\n elif $op.op == \"remove\" then delpaths([$op.path | split(\"/\") | .[1:]]) \\n else . end)\\n```. For real JSON Patch: external tools like `json-patch`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: .."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: JSON Patch / partial update"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-validate-json-structure",
+      "kind": "recipe",
+      "title": "jq recipe: validate JSON structure",
+      "statement": "`jq -e .` exits non-zero on null/empty (good for shell scripts). Type check: `jq -e 'type == \"object\" and has(\"required_key\")' file.json`. Schema-like: `jq -e '. | (.name | type == \"string\") and (.age | type == \"number\")' file.json`. Just is-it-valid: `jq empty file.json` returns nothing on success, fails on parse error.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "jq -e .",
+        "jq -e 'type == \"object\" and has(\"required_key\")' file.json",
+        "jq -e '. | (.name | type == \"string\") and (.age | type == \"number\")' file.json",
+        "jq empty file.json"
+      ],
+      "steps": [
+        "`jq -e .` exits non-zero on null/empty (good for shell scripts). Type check: `jq -e 'type == \"object\" and has(\"required_key\")' file.json`. Schema-like: `jq -e '. | (.name | type == \"string\") and (.age | type == \"number\")' file.json`. Just is-it-valid: `jq empty file.json` returns nothing on success, fails on parse error"
+      ],
+      "constraints": [
+        "`jq -e .` exits non-zero on null/empty (good for shell scripts). Type check: `jq -e 'type == \"object\" and has(\"required_key\")' file.json`. Schema-like: `jq -e '. | (.name | type == \"string\") and (.age | type == \"number\")' file.json`. Just is-it-valid: `jq empty file.json` returns nothing on success, fails on parse error",
+        "Requires binaries or commands referenced in examples: jq."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: validate JSON structure"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "jq-recipe-jq-recipe-define-and-use-custom-functions",
+      "kind": "recipe",
+      "title": "jq recipe: define and use custom functions",
+      "statement": "Inline: `jq 'def average: add / length; .scores | average' data.json`. With args: `jq 'def take($n): .[0:$n]; .items | take(5)'`. Recursive: `jq 'def repeat(s; $n): if $n <= 0 then \"\" else s + repeat(s; $n - 1) end; repeat(\"-\"; 10)'`. Library: save in `~/.jq/mylib.jq`, then `jq 'import \"mylib\" as m; m::myfunc' file.json`.",
+      "source_url": "https://jqlang.org/manual/",
+      "source_type": "official_docs",
+      "commands": [
+        "jq 'def average: add / length; .scores | average' data.json",
+        "jq 'def take($n): .[0:$n]; .items | take(5)'",
+        "jq 'def repeat(s; $n): if $n <= 0 then \"\" else s + repeat(s; $n - 1) end; repeat(\"-\"; 10)'",
+        "jq 'import \"mylib\" as m; m::myfunc' file.json"
+      ],
+      "steps": [
+        "Inline: `jq 'def average: add / length; .scores | average' data.json`. With args: `jq 'def take($n): .[0:$n]; .items | take",
+        "'`. Recursive: `jq 'def repeat(s; $n): if $n <= 0 then \"\" else s + repeat(s; $n - 1) end; repeat(\"-\"; 10)'`. Library: save in `~/.jq/mylib.jq`, then `jq 'import \"mylib\" as m; m::myfunc' file.json`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: jq."
+      ],
+      "effect": {
+        "kind": "compute",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "jq-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_jq_errors_recipes.py",
+        "legacy_tool_id": "jq-recipes",
+        "legacy_title": "jq recipe: define and use custom functions"
+      },
+      "confidence": 0.92
+    }
+  ]
+}

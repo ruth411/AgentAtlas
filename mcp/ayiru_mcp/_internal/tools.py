@@ -450,13 +450,12 @@ _TOOL_REGISTRY: list[McpTool] = [
             "THE structured surface. Returns typed CapabilityRecord rows "
             "for a subject — `capability_type` ∈ {invocation, "
             "configuration, constraint, effect, environment, deprecation, "
-            "workflow, metadata}, `detail` (structured dict for "
-            "well-modelled subjects, prose string for legacy projection), "
-            "`source` ∈ {structured, projected}, verification metadata. "
-            "Prefer `source: structured` results — they are ingested from "
-            "real `--help` output with typed argv / flag fields. Set "
-            "`accepted_only_structured: true` to force structured-only "
-            "answers."
+            "workflow, metadata}, structured `detail` dicts, and "
+            "verification metadata. The current bundled catalog is "
+            "machine-readable only: rows are ingested from real `--help` "
+            "output with typed argv / flag fields. "
+            "`accepted_only_structured` remains for backward-compatibility "
+            "with older mixed catalogs."
         ),
         input_schema={
             "type": "object",
@@ -484,9 +483,9 @@ _TOOL_REGISTRY: list[McpTool] = [
                     "type": "boolean",
                     "default": False,
                     "description": (
-                        "When true, hides projected (prose) records — "
-                        "returns only typed structured rows. Use for "
-                        "strict machine-readable consumption."
+                        "When true, returns only typed structured rows. "
+                        "Useful when querying older mixed catalogs; the "
+                        "current bundled catalog is already structured-only."
                     ),
                 },
                 "verification_min": {

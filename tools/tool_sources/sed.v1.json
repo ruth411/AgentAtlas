@@ -1,0 +1,2800 @@
+{
+  "family": "sed",
+  "version": "v1",
+  "artifact_id": "sed-curated-source-v1",
+  "generated_from": {
+    "kind": "legacy_seed_script",
+    "path": "tools/scripts/seed_sed_errors_recipes.py"
+  },
+  "entries": [
+    {
+      "entry_id": "sed-error-sed-error-e-expression-1-char-n-unknown-command",
+      "kind": "error",
+      "title": "sed error: -e expression #1, char N: unknown command",
+      "statement": "sed didn't recognize the command character at column N. Fix: (1) check valid commands: s/p/d/q/i/a/c/r/w/n/N/D/P/G/H/g/h/b/t/x/y/=/l plus GNU extensions (T/F/Q/z/e); (2) common typo: `sed 's/a/b'` (missing closing delimiter) \u2014 sed reads next char as the next command; (3) for shell quoting: use single quotes to prevent shell interpretation: `sed 's/$foo/bar/'`; (4) check delimiter consistency: if you used `/` to start an `s` command, you must close with `/` (or pick another like `|`).",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/sed-commands-list.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed 's/a/b'",
+        "sed 's/$foo/bar/'",
+        "s"
+      ],
+      "steps": [
+        "check valid commands: s/p/d/q/i/a/c/r/w/n/N/D/P/G/H/g/h/b/t/x/y/=/l plus GNU extensions (T/F/Q/z/e)",
+        "common typo: `sed 's/a/b'` (missing closing delimiter) \u2014 sed reads next char as the next command",
+        "for shell quoting: use single quotes to prevent shell interpretation: `sed 's/$foo/bar/'`",
+        "check delimiter consistency: if you used `/` to start an `s` command, you must close with `/` (or pick another like `|`)"
+      ],
+      "constraints": [
+        "check valid commands: s/p/d/q/i/a/c/r/w/n/N/D/P/G/H/g/h/b/t/x/y/=/l plus GNU extensions (T/F/Q/z/e)",
+        "check delimiter consistency: if you used `/` to start an `s` command, you must close with `/` (or pick another like `|`)",
+        "Requires binaries or commands referenced in examples: s, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-errors",
+        "legacy_title": "sed error: -e expression #1, char N: unknown command"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sed-error-sed-error-unterminated-s-command",
+      "kind": "error",
+      "title": "sed error: unterminated `s' command",
+      "statement": "Missing closing delimiter in substitution. Fix: (1) basic syntax: `s/pattern/replacement/flags` \u2014 three delimiters minimum; (2) if pattern or replacement contains `/`: switch delimiter \u2014 `s|/path/foo|/new/path|` (the char right after `s` is the delimiter); (3) for multi-line in shell: use double-quoted with continuation OR a script file; (4) common typo: `sed 's/a/b'` missing final `/`.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/The-_0022s_0022-Command.html",
+      "source_type": "official_docs",
+      "commands": [
+        "s/pattern/replacement/flags",
+        "s",
+        "sed 's/a/b'"
+      ],
+      "steps": [
+        "basic syntax: `s/pattern/replacement/flags` \u2014 three delimiters minimum",
+        "if pattern or replacement contains `/`: switch delimiter \u2014 `s|/path/foo|/new/path|` (the char right after `s` is the delimiter)",
+        "for multi-line in shell: use double-quoted with continuation OR a script file",
+        "common typo: `sed 's/a/b'` missing final `/`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: s, s/pattern/replacement/flags, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-errors",
+        "legacy_title": "sed error: unterminated `s' command"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sed-error-sed-error-extra-characters-after-command",
+      "kind": "error",
+      "title": "sed error: extra characters after command",
+      "statement": "sed found unexpected text after a command that should have ended. Fix: (1) common: `s/a/b/g extra` \u2014 anything after the flags is parsed as next command; (2) for multiple commands: separate with `;` OR `-e`: `sed -e 's/a/b/' -e 's/c/d/'` or `sed 's/a/b/; s/c/d/'`; (3) for command groups: `{ ... }` braces required; (4) GNU sed quirks: some BSD sed implementations don't accept `;` separator \u2014 use `-e`.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Common-Commands.html",
+      "source_type": "official_docs",
+      "commands": [
+        "s/a/b/g extra",
+        "-e",
+        "sed -e 's/a/b/' -e 's/c/d/'",
+        "sed 's/a/b/; s/c/d/'"
+      ],
+      "steps": [
+        "common: `s/a/b/g extra` \u2014 anything after the flags is parsed as next command",
+        "for multiple commands: separate with `;` OR `-e`: `sed -e 's/a/b/' -e 's/c/d/'` or `sed 's/a/b/; s/c/d/'`",
+        "for command groups: `{ ... }` braces required",
+        "GNU sed quirks: some BSD sed implementations don't accept `;` separator \u2014 use `-e`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -e, s/a/b/g, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-errors",
+        "legacy_title": "sed error: extra characters after command"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sed-error-sed-error-can-t-read-file-no-such-file-or-directory",
+      "kind": "error",
+      "title": "sed error: can't read <file>: No such file or directory",
+      "statement": "Input file doesn't exist or wrong path. Fix: (1) verify: `ls -la <file>`; (2) for stdin: omit filename, pipe in: `cat file.txt | sed '...'`; (3) for multiple files: list them: `sed 's/a/b/' file1.txt file2.txt` (sed processes each then concatenates output); (4) for relative paths inside `r` (read) or `w` (write) commands: relative to cwd, not script.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Invoking-sed.html",
+      "source_type": "official_docs",
+      "commands": [
+        "ls -la <file>",
+        "cat file.txt | sed '...'",
+        "sed 's/a/b/' file1.txt file2.txt",
+        "r",
+        "w"
+      ],
+      "steps": [
+        "verify: `ls -la <file>`",
+        "for stdin: omit filename, pipe in: `cat file.txt | sed '...'`",
+        "for multiple files: list them: `sed 's/a/b/' file1.txt file2.txt` (sed processes each then concatenates output)",
+        "for relative paths inside `r` (read) or `w` (write) commands: relative to cwd, not script"
+      ],
+      "constraints": [
+        "verify: `ls -la <file>`",
+        "Requires binaries or commands referenced in examples: cat, ls, r, sed, w."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-errors",
+        "legacy_title": "sed error: can't read <file>: No such file or directory"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sed-error-sed-error-macos-bsd-sed-requires-after-i-for-in-place",
+      "kind": "error",
+      "title": "sed error: macOS BSD sed requires '' after -i for in-place",
+      "statement": "macOS / BSD sed has different `-i` syntax than GNU sed. Fix: (1) BSD/macOS: `sed -i '' 's/a/b/' file.txt` (empty string = no backup); (2) GNU: `sed -i 's/a/b/' file.txt` (no `''`); (3) with backup: `sed -i.bak 's/a/b/' file.txt` (works on both); (4) for portability: GNU sed on Mac via `brew install gnu-sed` then use `gsed`; (5) for scripts: detect OS and branch.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Invoking-sed.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-i",
+        "sed -i '' 's/a/b/' file.txt",
+        "sed -i 's/a/b/' file.txt",
+        "sed -i.bak 's/a/b/' file.txt",
+        "brew install gnu-sed",
+        "gsed"
+      ],
+      "steps": [
+        "BSD/macOS: `sed -i '' 's/a/b/' file.txt` (empty string = no backup)",
+        "GNU: `sed -i 's/a/b/' file.txt` (no `''`)",
+        "with backup: `sed -i.bak 's/a/b/' file.txt` (works on both)",
+        "for portability: GNU sed on Mac via `brew install gnu-sed` then use `gsed`",
+        "for scripts: detect OS and branch"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -i, brew, gsed, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-errors",
+        "legacy_title": "sed error: macOS BSD sed requires '' after -i for in-place"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sed-error-sed-error-1-invalid-command-code-macos-bsd-sed",
+      "kind": "error",
+      "title": "sed error: 1: \"...\": invalid command code (macOS BSD sed)",
+      "statement": "BSD sed rejects some constructs GNU sed accepts \u2014 often `;` between commands, `\\n` in replacement, or extended regex shortcuts. Fix: (1) use `-e` instead of `;`: `sed -e 's/a/b/' -e 's/c/d/' file.txt`; (2) for literal newline in replacement: use `\\` + actual newline: `sed 's/foo/bar\\\\\\nbaz/' file.txt`; (3) for extended regex: `-E` (both GNU and BSD support it); (4) for full GNU compatibility: install gnu-sed.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Common-Commands.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-e",
+        "sed -e 's/a/b/' -e 's/c/d/' file.txt",
+        "sed 's/foo/bar\\\\\\nbaz/' file.txt",
+        "-E"
+      ],
+      "steps": [
+        "use `-e` instead of `;`: `sed -e 's/a/b/' -e 's/c/d/' file.txt`",
+        "for literal newline in replacement: use `\\` + actual newline: `sed 's/foo/bar\\\\\\nbaz/' file.txt`",
+        "for extended regex: `-E` (both GNU and BSD support it)",
+        "for full GNU compatibility: install gnu-sed"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -E, -e, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-errors",
+        "legacy_title": "sed error: 1: \"...\": invalid command code (macOS BSD sed)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sed-error-sed-error-unmatched-no-closing-brace",
+      "kind": "error",
+      "title": "sed error: Unmatched `{' (no closing brace)",
+      "statement": "Command group started with `{` but no matching `}`. Fix: (1) every `{ ... }` block needs a `}` on its own (in many implementations); (2) modern GNU sed accepts `{...}` on one line: `sed '/start/,/end/{s/old/new/;p}' file`; (3) for BSD/POSIX: separate with `\\n` or `-e`: `sed -e '/foo/,/bar/{' -e 's/a/b/' -e '}' file`; (4) check nested braces.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Common-Commands.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed '/start/,/end/{s/old/new/;p}' file",
+        "-e",
+        "sed -e '/foo/,/bar/{' -e 's/a/b/' -e '}' file"
+      ],
+      "steps": [
+        "every `{ ... }` block needs a `}` on its own (in many implementations)",
+        "modern GNU sed accepts `{...}` on one line: `sed '/start/,/end/{s/old/new/;p}' file`",
+        "for BSD/POSIX: separate with `\\n` or `-e`: `sed -e '/foo/,/bar/{' -e 's/a/b/' -e '}' file`",
+        "check nested braces"
+      ],
+      "constraints": [
+        "every `{ ... }` block needs a `}` on its own (in many implementations)",
+        "check nested braces",
+        "Requires binaries or commands referenced in examples: -e, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-errors",
+        "legacy_title": "sed error: Unmatched `{' (no closing brace)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sed-error-sed-error-unknown-option-to-s-bad-flag",
+      "kind": "error",
+      "title": "sed error: unknown option to `s' (bad flag)",
+      "statement": "Flag at end of substitution command isn't recognized. Fix: (1) valid s flags: `g` (global), `p` (print), `<N>` (Nth match), `i`/`I` (case-insensitive, GNU), `e` (execute, GNU), `M` (multiline, GNU); (2) common typo: `s/a/b/gi` works in GNU but BSD may require `s/a/b/Ig` order; (3) for write to file: `s/a/b/w file.txt` \u2014 `w` and filename must be the last component; (4) BSD sed: `i` flag for case-insensitive may not be supported \u2014 use `[Aa][Bb]` patterns instead.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/The-_0022s_0022-Command.html",
+      "source_type": "official_docs",
+      "commands": [
+        "g",
+        "p",
+        "i",
+        "I",
+        "e",
+        "M",
+        "s/a/b/gi",
+        "s/a/b/Ig"
+      ],
+      "steps": [
+        "valid s flags: `g` (global), `p` (print), `<N>` (Nth match), `i`/`I` (case-insensitive, GNU), `e` (execute, GNU), `M` (multiline, GNU)",
+        "common typo: `s/a/b/gi` works in GNU but BSD may require `s/a/b/Ig` order",
+        "for write to file: `s/a/b/w file.txt` \u2014 `w` and filename must be the last component",
+        "BSD sed: `i` flag for case-insensitive may not be supported \u2014 use `[Aa][Bb]` patterns instead"
+      ],
+      "constraints": [
+        "for write to file: `s/a/b/w file.txt` \u2014 `w` and filename must be the last component",
+        "Requires binaries or commands referenced in examples: I, M, e, g, i, p, s/a/b/Ig, s/a/b/gi."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-errors",
+        "legacy_title": "sed error: unknown option to `s' (bad flag)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sed-error-sed-error-e-vs-r-difference-gnu-vs-bsd-ere-flag",
+      "kind": "error",
+      "title": "sed error: -E vs -r difference (GNU vs BSD ERE flag)",
+      "statement": "Extended regex flag is `-E` (POSIX, both GNU and BSD) or `-r` (GNU only, deprecated). Fix: (1) use `-E` everywhere \u2014 works on both; (2) ERE differences from BRE: `+`, `?`, `|`, `()`, `{n,m}` are literal in BRE but special in ERE; (3) for portability: stick to BRE (no flag needed) when possible; (4) for richer regex (PCRE-like): use `perl -pe` instead of sed.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/BRE-vs-ERE.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-E",
+        "-r",
+        "perl -pe"
+      ],
+      "steps": [
+        "use `-E` everywhere \u2014 works on both",
+        "ERE differences from BRE: `+`, `?`, `|`, `()`, `{n,m}` are literal in BRE but special in ERE",
+        "for portability: stick to BRE (no flag needed) when possible",
+        "for richer regex (PCRE-like): use `perl -pe` instead of sed"
+      ],
+      "constraints": [
+        "for portability: stick to BRE (no flag needed) when possible",
+        "Requires binaries or commands referenced in examples: -E, -r, perl."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-errors",
+        "legacy_title": "sed error: -E vs -r difference (GNU vs BSD ERE flag)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sed-error-sed-error-backreference-1-doesn-t-capture-expected-text",
+      "kind": "error",
+      "title": "sed error: backreference \\1 doesn't capture expected text",
+      "statement": "Subexpression groupings in BRE require `\\(...\\)`; in ERE use plain `(...)`. Fix: (1) BRE (default): `sed 's/\\([a-z]*\\)/[\\1]/' file`; (2) ERE (`-E`): `sed -E 's/([a-z]*)/[\\1]/' file`; (3) greedy by default: `*` and `+` match longest; for shortest match use a more restrictive class: `[^/]*`; (4) max 9 backreferences: \\1 through \\9; (5) `&` in replacement refers to the whole match.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Back_002dreferences-and-Subexpressions.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed 's/\\([a-z]*\\)/[\\1]/' file",
+        "-E",
+        "sed -E 's/([a-z]*)/[\\1]/' file"
+      ],
+      "steps": [
+        "BRE (default): `sed 's/\\([a-z]*\\)/[\\1]/' file`",
+        "ERE (`-E`): `sed -E 's/([a-z]*)/[\\1]/' file`",
+        "greedy by default: `*` and `+` match longest; for shortest match use a more restrictive class: `[^/]*`",
+        "max 9 backreferences: \\1 through \\9",
+        "`&` in replacement refers to the whole match"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -E, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-errors",
+        "legacy_title": "sed error: backreference \\1 doesn't capture expected text"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sed-error-sed-error-greedy-regex-matches-too-much",
+      "kind": "error",
+      "title": "sed error: greedy regex matches too much",
+      "statement": "`.*` consumes from first match to last possible match on the line. Fix: (1) use a negated class: `[^/]*` matches everything-not-slash (greedy within constraint); (2) anchor: `^pattern` or `pattern$` constrains start/end; (3) sed regex doesn't support non-greedy (`*?`) \u2014 that's a Perl/PCRE feature; (4) for non-greedy semantics: pipe to `grep -o` or `awk` or `perl -pe`.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Regular-Expressions.html",
+      "source_type": "official_docs",
+      "commands": [
+        "grep -o",
+        "awk",
+        "perl -pe"
+      ],
+      "steps": [
+        "use a negated class: `[^/]*` matches everything-not-slash (greedy within constraint)",
+        "anchor: `^pattern` or `pattern$` constrains start/end",
+        "sed regex doesn't support non-greedy (`*?`) \u2014 that's a Perl/PCRE feature",
+        "for non-greedy semantics: pipe to `grep -o` or `awk` or `perl -pe`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: awk, grep, perl."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-errors",
+        "legacy_title": "sed error: greedy regex matches too much"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sed-error-sed-error-anchors-and-don-t-work-as-expected-with-n-command",
+      "kind": "error",
+      "title": "sed error: anchors ^ and $ don't work as expected with N command",
+      "statement": "After `N` joins lines into pattern space, the `\\n` becomes literal \u2014 `^` only matches the very start of pattern space, `$` only the very end. Fix: (1) use `M` flag for multiline mode: `sed -nE 's/^foo/bar/M' file` matches start of any line in pattern space; (2) for explicit per-line: match `\\nfoo` instead of `^foo`; (3) for end of any line: match `bar\\n` instead of `bar$`; (4) for cross-line operations: it's often easier to use awk or perl.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/regexp-extensions.html",
+      "source_type": "official_docs",
+      "commands": [
+        "N",
+        "M",
+        "sed -nE 's/^foo/bar/M' file"
+      ],
+      "steps": [
+        "use `M` flag for multiline mode: `sed -nE 's/^foo/bar/M' file` matches start of any line in pattern space",
+        "for explicit per-line: match `\\nfoo` instead of `^foo`",
+        "for end of any line: match `bar\\n` instead of `bar$`",
+        "for cross-line operations: it's often easier to use awk or perl"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: M, N, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-errors",
+        "legacy_title": "sed error: anchors ^ and $ don't work as expected with N command"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sed-error-sed-error-branch-to-undefined-label",
+      "kind": "error",
+      "title": "sed error: branch to undefined label",
+      "statement": "`b` or `t` command references a label not defined in the script. Fix: (1) define label with `:name` before the branch: `sed ':a;s/  /\\t/;t a' file` (loops until no more); (2) label scope: within the current script; (3) common typo: `:a` (define) vs `b a` (branch) \u2014 name must match exactly; (4) labels can be reused (multiple branches to same label).",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Programming-Commands.html",
+      "source_type": "official_docs",
+      "commands": [
+        "b",
+        "t",
+        ":name",
+        "sed ':a;s/ /\\t/;t a' file",
+        ":a",
+        "b a"
+      ],
+      "steps": [
+        "define label with `:name` before the branch: `sed ':a;s/ /\\t/;t a' file` (loops until no more)",
+        "label scope: within the current script",
+        "common typo: `:a` (define) vs `b a` (branch) \u2014 name must match exactly",
+        "labels can be reused (multiple branches to same label)"
+      ],
+      "constraints": [
+        "common typo: `:a` (define) vs `b a` (branch) \u2014 name must match exactly",
+        "Requires binaries or commands referenced in examples: :a, :name, b, sed, t."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-errors",
+        "legacy_title": "sed error: branch to undefined label"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sed-error-sed-error-delimiter-conflict-in-s-slash-inside-pattern",
+      "kind": "error",
+      "title": "sed error: delimiter conflict in s/// (slash inside pattern)",
+      "statement": "Slashes in pattern or replacement conflict with the default delimiter. Fix: (1) use a different delimiter: `s|/path/foo|/new/path|`; (2) any printable char works: `s,foo,bar,`, `s#foo#bar#`, `s_foo_bar_`; (3) escape the slash: `s/\\/path/\\/new\\/path/` (ugly); (4) for addresses too: `\\#/var/log#d` (escape delimiter when defining a regex address with custom delim).",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/The-_0022s_0022-Command.html",
+      "source_type": "official_docs",
+      "commands": [
+        "s_foo_bar_"
+      ],
+      "steps": [
+        "use a different delimiter: `s|/path/foo|/new/path|`",
+        "any printable char works: `s,foo,bar,`, `s#foo#bar#`, `s_foo_bar_`",
+        "escape the slash: `s/\\/path/\\/new\\/path/` (ugly)",
+        "for addresses too: `\\#/var/log#d` (escape delimiter when defining a regex address with custom delim)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: s_foo_bar_."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-errors",
+        "legacy_title": "sed error: delimiter conflict in s/// (slash inside pattern)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sed-error-sed-error-not-capturing-whole-match-as-expected",
+      "kind": "error",
+      "title": "sed error: & not capturing whole match as expected",
+      "statement": "`&` in replacement refers to the entire matched text. If you want a subexpression, use `\\1`. Fix: (1) `s/[0-9]+/[&]/g` wraps every number in brackets; (2) literal `&` in replacement: `\\&`; (3) for partial: parenthesize + backref: `s/(foo)bar/\\1baz/`; (4) for case-changing: GNU extensions `\\u`/`\\l`/`\\U`/`\\L`/`\\E` \u2014 uppercase next char / lowercase next / uppercase all / lowercase all / end conversion.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Back_002dreferences-and-Subexpressions.html",
+      "source_type": "official_docs",
+      "commands": [],
+      "steps": [
+        "`s/[0-9]+/[&]/g` wraps every number in brackets",
+        "literal `&` in replacement: `\\&`",
+        "for partial: parenthesize + backref: `s/(foo)bar/\\1baz/`",
+        "for case-changing: GNU extensions `\\u`/`\\l`/`\\U`/`\\L`/`\\E` \u2014 uppercase next char / lowercase next / uppercase all / lowercase all / end conversion"
+      ],
+      "constraints": [],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-errors",
+        "legacy_title": "sed error: & not capturing whole match as expected"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sed-error-sed-error-missing-command-after-address",
+      "kind": "error",
+      "title": "sed error: missing command after address",
+      "statement": "An address (line number or pattern) was given but no command follows. Fix: (1) address+command: `sed '5d'` deletes line 5; `sed '/foo/p'` prints lines matching `foo`; (2) range: `sed '5,10d'` deletes lines 5\u201310; (3) regex range: `sed '/start/,/end/d'`; (4) command-less address is an error \u2014 there's no implicit print or anything.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Addresses.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed '5d'",
+        "sed '/foo/p'",
+        "foo",
+        "sed '5,10d'",
+        "sed '/start/,/end/d'"
+      ],
+      "steps": [
+        "address+command: `sed '5d'` deletes line 5; `sed '/foo/p'` prints lines matching `foo`",
+        "range: `sed '5,10d'` deletes lines 5\u201310",
+        "regex range: `sed '/start/,/end/d'`",
+        "command-less address is an error \u2014 there's no implicit print or anything"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: foo, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-errors",
+        "legacy_title": "sed error: missing command after address"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sed-error-sed-error-q-command-exit-code-unexpected",
+      "kind": "error",
+      "title": "sed error: q command exit code unexpected",
+      "statement": "GNU sed `q [N]` (or `Q [N]`) exits with status N; some shell pipelines depend on this. Fix: (1) for default exit 0: `sed '5q'` (quits after line 5); (2) for explicit exit code: `sed '/error/q 1'` quits with status 1 on first match; (3) BSD sed may not support `q N`; (4) for grep-like: `sed -n '/pattern/{p;q}'` prints and exits on first match.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Common-Commands.html",
+      "source_type": "official_docs",
+      "commands": [
+        "q [N]",
+        "Q [N]",
+        "sed '5q'",
+        "sed '/error/q 1'",
+        "q N",
+        "sed -n '/pattern/{p;q}'"
+      ],
+      "steps": [
+        "for default exit 0: `sed '5q'` (quits after line 5)",
+        "for explicit exit code: `sed '/error/q 1'` quits with status 1 on first match",
+        "BSD sed may not support `q N`",
+        "for grep-like: `sed -n '/pattern/{p;q}'` prints and exits on first match"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: Q, q, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-errors",
+        "legacy_title": "sed error: q command exit code unexpected"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sed-error-sed-error-piping-output-through-sed-loses-last-line-if-no-trailing-newli",
+      "kind": "error",
+      "title": "sed error: piping output through sed loses last line if no trailing newline",
+      "statement": "POSIX sed assumes line-terminated input; final line without `\\n` may be ignored on some implementations. Fix: (1) GNU sed handles this correctly; BSD/macOS may not; (2) ensure trailing newline: `echo \"$var\" | sed '...'` (echo adds newline); (3) `printf '%s\\n'` instead of `printf '%s'`; (4) for binary or unusual data: consider awk or perl which have explicit record terminators.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Invoking-sed.html",
+      "source_type": "official_docs",
+      "commands": [
+        "echo \"$var\" | sed '...'",
+        "printf '%s\\n'",
+        "printf '%s'"
+      ],
+      "steps": [
+        "GNU sed handles this correctly; BSD/macOS may not",
+        "ensure trailing newline: `echo \"$var\" | sed '...'` (echo adds newline)",
+        "`printf '%s\\n'` instead of `printf '%s'`",
+        "for binary or unusual data: consider awk or perl which have explicit record terminators"
+      ],
+      "constraints": [
+        "ensure trailing newline: `echo \"$var\" | sed '...'` (echo adds newline)",
+        "Requires binaries or commands referenced in examples: echo, printf."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-errors",
+        "legacy_title": "sed error: piping output through sed loses last line if no trailing newline"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sed-error-sed-error-character-class-space-not-recognized",
+      "kind": "error",
+      "title": "sed error: character class [[:space:]] not recognized",
+      "statement": "POSIX classes (`[[:space:]]`, `[[:digit:]]`, etc) work in modern sed but ancient versions may not. Fix: (1) for `[[:space:]]`: ` ` (literal space) + `\\t` may be enough; (2) alternatives: `[ \\t]` for space-or-tab; (3) for digits: `[0-9]`; (4) check version: `sed --version` (GNU) \u2014 old enough seds may not support; (5) for non-printables: `[[:cntrl:]]`, `[[:print:]]`.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Character-Classes-and-Bracket-Expressions.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed --version"
+      ],
+      "steps": [
+        "for `[[:space:]]`: ` ` (literal space) + `\\t` may be enough",
+        "alternatives: `[ \\t]` for space-or-tab",
+        "for digits: `[0-9]`",
+        "check version: `sed --version` (GNU) \u2014 old enough seds may not support",
+        "for non-printables: `[[:cntrl:]]`, `[[:print:]]`"
+      ],
+      "constraints": [
+        "check version: `sed --version` (GNU) \u2014 old enough seds may not support",
+        "Requires binaries or commands referenced in examples: sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-errors",
+        "legacy_title": "sed error: character class [[:space:]] not recognized"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sed-error-sed-error-perl-style-regex-d-w-s-not-working",
+      "kind": "error",
+      "title": "sed error: perl-style regex \\d, \\w, \\s not working",
+      "statement": "sed uses BRE/ERE \u2014 not PCRE. `\\d`, `\\w`, `\\s` are Perl-isms. Fix: (1) `\\d` \u2192 `[0-9]` (or POSIX `[[:digit:]]`); (2) `\\w` \u2192 `[A-Za-z0-9_]` (or `[[:alnum:]_]`); (3) `\\s` \u2192 `[[:space:]]` or `[ \\t]`; (4) `\\b` (word boundary): GNU sed supports it; BSD sed doesn't \u2014 use `\\<` and `\\>` (GNU) or workaround; (5) for full PCRE: use `perl -pe` instead.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/regexp-extensions.html",
+      "source_type": "official_docs",
+      "commands": [
+        "perl -pe"
+      ],
+      "steps": [
+        "`\\d` \u2192 `[0-9]` (or POSIX `[[:digit:]]`)",
+        "`\\w` \u2192 `[A-Za-z0-9_]` (or `[[:alnum:]_]`)",
+        "`\\s` \u2192 `[[:space:]]` or `[ \\t]`",
+        "`\\b` (word boundary): GNU sed supports it; BSD sed doesn't \u2014 use `\\<` and `\\>` (GNU) or workaround",
+        "for full PCRE: use `perl -pe` instead"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: perl."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-errors",
+        "legacy_title": "sed error: perl-style regex \\d, \\w, \\s not working"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sed-error-sed-error-cannot-perform-substitution-that-requires-n-newline-in-replace",
+      "kind": "error",
+      "title": "sed error: cannot perform substitution that requires \\n newline in replacement",
+      "statement": "Embedding a real newline in replacement text. Fix: (1) GNU: `\\n` in replacement = literal newline (with `-E` or default); (2) BSD: must use `\\` + actual newline in script: `sed 's/a/b\\\\\\nc/' file` (the `\\\\\\n` is shell-escaped); (3) workaround: pipe through `tr`: `sed 's/a/bMARKERc/' | tr 'MARKER' '\\n'`; (4) for adding lines: use `a` (append) or `i` (insert) commands.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Common-Commands.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-E",
+        "sed 's/a/b\\\\\\nc/' file",
+        "tr",
+        "sed 's/a/bMARKERc/' | tr 'MARKER' '\\n'",
+        "a",
+        "i"
+      ],
+      "steps": [
+        "GNU: `\\n` in replacement = literal newline (with `-E` or default)",
+        "BSD: must use `\\` + actual newline in script: `sed 's/a/b\\\\\\nc/' file` (the `\\\\\\n` is shell-escaped)",
+        "workaround: pipe through `tr`: `sed 's/a/bMARKERc/' | tr 'MARKER' '\\n'`",
+        "for adding lines: use `a` (append) or `i` (insert) commands"
+      ],
+      "constraints": [
+        "BSD: must use `\\` + actual newline in script: `sed 's/a/b\\\\\\nc/' file` (the `\\\\\\n` is shell-escaped)",
+        "Requires binaries or commands referenced in examples: -E, a, i, sed, tr."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-errors",
+        "legacy_title": "sed error: cannot perform substitution that requires \\n newline in replacement"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sed-error-sed-error-i-bak-left-bak-files-everywhere-cleanup-confusion",
+      "kind": "error",
+      "title": "sed error: -i.bak left .bak files everywhere (cleanup confusion)",
+      "statement": "`-i.bak` saves a `<file>.bak` for every modified file. Fix: (1) intentional safety net \u2014 review then delete: `find . -name '*.bak' -delete`; (2) for no backup: GNU `sed -i ''` doesn't work \u2014 use `sed -i` (no suffix); BSD `sed -i ''` (empty string); (3) for explicit backup dir: not supported natively \u2014 script around with `cp` then `sed`.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Invoking-sed.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-i.bak",
+        "find . -name '*.bak' -delete",
+        "sed -i ''",
+        "sed -i",
+        "cp",
+        "sed"
+      ],
+      "steps": [
+        "intentional safety net \u2014 review then delete: `find . -name '*.bak' -delete`",
+        "for no backup: GNU `sed -i ''` doesn't work \u2014 use `sed -i` (no suffix); BSD `sed -i ''` (empty string)",
+        "for explicit backup dir: not supported natively \u2014 script around with `cp` then `sed`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -i.bak, cp, find, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-errors",
+        "legacy_title": "sed error: -i.bak left .bak files everywhere (cleanup confusion)"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sed-error-sed-error-crashes-on-huge-single-line-input",
+      "kind": "error",
+      "title": "sed error: crashes on huge single-line input",
+      "statement": "Pattern space holds the whole line; multi-GB lines exhaust memory. Fix: (1) split first: `sed 's/\\(.\\{1000\\}\\)/&\\n/g' bigfile` (chunks every 1000 chars); (2) use awk with `RS` (record separator) for non-newline records; (3) for streaming binary: tool other than sed \u2014 `dd`, `head -c`, custom Python; (4) for huge input: sed is line-oriented and assumes lines fit in memory.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Invoking-sed.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed 's/\\(.\\{1000\\}\\)/&\\n/g' bigfile",
+        "RS",
+        "dd",
+        "head -c"
+      ],
+      "steps": [
+        "split first: `sed 's/\\(.\\{1000\\}\\)/&\\n/g' bigfile` (chunks every 1000 chars)",
+        "use awk with `RS` (record separator) for non-newline records",
+        "for streaming binary: tool other than sed \u2014 `dd`, `head -c`, custom Python",
+        "for huge input: sed is line-oriented and assumes lines fit in memory"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: RS, dd, head, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-errors",
+        "legacy_title": "sed error: crashes on huge single-line input"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sed-error-sed-error-shell-variable-inside-single-quotes-not-expanded",
+      "kind": "error",
+      "title": "sed error: shell variable inside single quotes not expanded",
+      "statement": "`sed '...$var...'` \u2014 single quotes prevent shell from expanding `$var`. Fix: (1) double quotes: `sed \"s/foo/$var/\"` (vars expand, but shell metachars need escape); (2) close-open quote trick: `sed 's/foo/'$var'/g'`; (3) safer: assign to a sed variable via env: `export VAR=...; sed \"s/foo/$VAR/\"`; (4) for vars with special regex chars: escape first (`printf '%q'` in bash isn't enough \u2014 escape `/`, `&`, `\\`).",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Invoking-sed.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed '...$var...'",
+        "sed \"s/foo/$var/\"",
+        "sed 's/foo/'$var'/g'",
+        "export VAR=...; sed \"s/foo/$VAR/\"",
+        "printf '%q'"
+      ],
+      "steps": [
+        "double quotes: `sed \"s/foo/$var/\"` (vars expand, but shell metachars need escape)",
+        "close-open quote trick: `sed 's/foo/'$var'/g'`",
+        "safer: assign to a sed variable via env: `export VAR=...; sed \"s/foo/$VAR/\"`",
+        "for vars with special regex chars: escape first (`printf '%q'` in bash isn't enough \u2014 escape `/`, `&`, `\\`)"
+      ],
+      "constraints": [
+        "double quotes: `sed \"s/foo/$var/\"` (vars expand, but shell metachars need escape)",
+        "Requires binaries or commands referenced in examples: export, printf, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-errors",
+        "legacy_title": "sed error: shell variable inside single quotes not expanded"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sed-error-sed-error-addressing-first-last-line-wrong",
+      "kind": "error",
+      "title": "sed error: addressing first/last line wrong",
+      "statement": "Common: `1d` deletes first line (works), `$d` deletes last line (works), but `0,/pattern/d` and `,N` aren't always supported. Fix: (1) `1d` first; `$d` last; (2) `5,$d` from line 5 to end; (3) `0,/pat/` (GNU): from start up to first match \u2014 note `0,` won't include the match itself; (4) `/start/,/end/` is regex range; (5) tail/head are simpler if you just need first/last N: `head -n -1` for all-but-last-line.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Addresses.html",
+      "source_type": "official_docs",
+      "commands": [
+        "1d",
+        "head -n -1"
+      ],
+      "steps": [
+        "`1d` first; `$d` last",
+        "`5,$d` from line 5 to end",
+        "`0,/pat/` (GNU): from start up to first match \u2014 note `0,` won't include the match itself",
+        "`/start/,/end/` is regex range",
+        "tail/head are simpler if you just need first/last N: `head -n -1` for all-but-last-line"
+      ],
+      "constraints": [
+        "tail/head are simpler if you just need first/last N: `head -n -1` for all-but-last-line",
+        "Requires binaries or commands referenced in examples: 1d, head."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-errors",
+        "legacy_title": "sed error: addressing first/last line wrong"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sed-error-sed-error-s-a-b-ng-nth-match-plus-global-doesn-t-work-as-expected",
+      "kind": "error",
+      "title": "sed error: s/a/b/Ng (Nth match plus global) doesn't work as expected",
+      "statement": "`s/a/b/3` replaces only the 3rd match. `s/a/b/3g` (GNU) replaces 3rd and all subsequent. BSD sed may not support combining. Fix: (1) `s/a/b/Ng` is GNU-only \u2014 for BSD use a different approach; (2) for 'replace only first match': default (no flag) does that; (3) for 'replace last match only': counter-intuitive in sed \u2014 easier in awk.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/The-_0022s_0022-Command.html",
+      "source_type": "official_docs",
+      "commands": [
+        "s/a/b/3",
+        "s/a/b/3g",
+        "s/a/b/Ng"
+      ],
+      "steps": [
+        "`s/a/b/Ng` is GNU-only \u2014 for BSD use a different approach",
+        "for 'replace only first match': default (no flag) does that",
+        "for 'replace last match only': counter-intuitive in sed \u2014 easier in awk"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: s/a/b/3, s/a/b/3g, s/a/b/Ng."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-errors",
+        "legacy_title": "sed error: s/a/b/Ng (Nth match plus global) doesn't work as expected"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sed-error-sed-error-file-modification-time-preserved-by-accident-with-i",
+      "kind": "error",
+      "title": "sed error: file modification time preserved by accident with -i",
+      "statement": "GNU sed `-i` updates mtime on rewrite; some sed versions don't preserve original timestamps. Fix: (1) if you need atime/mtime preservation: store + restore: `mtime=$(stat -c %Y file); sed -i '...' file; touch -d \"@$mtime\" file`; (2) for in-place that DOESN'T touch mtime: use `--follow-symlinks` for symlink-safe edit; (3) for atomic update: write to temp then mv (mv preserves nothing).",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Invoking-sed.html",
+      "source_type": "official_docs",
+      "commands": [
+        "-i",
+        "--follow-symlinks"
+      ],
+      "steps": [
+        "if you need atime/mtime preservation: store + restore: `mtime=$(stat -c %Y file); sed -i '...' file; touch -d \"@$mtime\" file`",
+        "for in-place that DOESN'T touch mtime: use `--follow-symlinks` for symlink-safe edit",
+        "for atomic update: write to temp then mv (mv preserves nothing)"
+      ],
+      "constraints": [
+        "if you need atime/mtime preservation: store + restore: `mtime=$(stat -c %Y file); sed -i '...' file; touch -d \"@$mtime\" file`",
+        "Requires binaries or commands referenced in examples: --follow-symlinks, -i."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-errors",
+        "legacy_title": "sed error: file modification time preserved by accident with -i"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sed-error-sed-error-hold-space-and-pattern-space-confusion",
+      "kind": "error",
+      "title": "sed error: hold space and pattern space confusion",
+      "statement": "Two buffers: pattern space (current line) and hold space (separate storage). Common ops: `h` (overwrite hold with pattern), `H` (append pattern to hold), `g` (overwrite pattern with hold), `G` (append hold to pattern), `x` (swap). Fix: (1) for reversing file: `sed -n '1!G;h;$p' file` (classic); (2) for cross-line replacement: build up multi-line pattern with `N` (join next line); (3) for debugging hold space: temporarily `x` to see it (visible in output).",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Programming-Commands.html",
+      "source_type": "official_docs",
+      "commands": [
+        "h",
+        "H",
+        "g",
+        "G",
+        "x",
+        "sed -n '1!G;h;$p' file",
+        "N"
+      ],
+      "steps": [
+        "for reversing file: `sed -n '1!G;h;$p' file` (classic)",
+        "for cross-line replacement: build up multi-line pattern with `N` (join next line)",
+        "for debugging hold space: temporarily `x` to see it (visible in output)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: G, H, N, g, h, sed, x."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-errors",
+        "legacy_title": "sed error: hold space and pattern space confusion"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sed-error-sed-error-m-multiline-flag-not-supported-on-older-sed",
+      "kind": "error",
+      "title": "sed error: M (multiline) flag not supported on older sed",
+      "statement": "GNU sed only \u2014 for `^` and `$` to anchor each embedded line in multi-line pattern space. Fix: (1) GNU: `sed -nE 's/^foo/bar/M; p' file`; (2) BSD: no M flag \u2014 work line-by-line or use awk; (3) for complex multi-line: pre-process with `tr` or pipe through perl with `-0` (null record separator).",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/regexp-extensions.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed -nE 's/^foo/bar/M; p' file",
+        "tr",
+        "-0"
+      ],
+      "steps": [
+        "GNU: `sed -nE 's/^foo/bar/M; p' file`",
+        "BSD: no M flag \u2014 work line-by-line or use awk",
+        "for complex multi-line: pre-process with `tr` or pipe through perl with `-0` (null record separator)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -0, sed, tr."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-errors",
+        "legacy_title": "sed error: M (multiline) flag not supported on older sed"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sed-error-sed-warning-s-command-appears-without-text-after-delimiter",
+      "kind": "error",
+      "title": "sed warning: 's' command appears without text after delimiter",
+      "statement": "Empty replacement: `s/foo//g` (deletes matched text) \u2014 not an error if intentional. Fix: (1) intentional delete: `s/foo//g` is the idiom; (2) `d` command deletes whole line if it matches: `/foo/d`; (3) for selective: `s/foo bar baz//g` deletes the specific phrase.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/The-_0022s_0022-Command.html",
+      "source_type": "official_docs",
+      "commands": [
+        "s/foo//g",
+        "d",
+        "/foo/d",
+        "s/foo bar baz//g"
+      ],
+      "steps": [
+        "intentional delete: `s/foo//g` is the idiom",
+        "`d` command deletes whole line if it matches: `/foo/d`",
+        "for selective: `s/foo bar baz//g` deletes the specific phrase"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: /foo/d, d, s/foo, s/foo//g."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-errors",
+        "legacy_title": "sed warning: 's' command appears without text after delimiter"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-basic-substitution",
+      "kind": "recipe",
+      "title": "sed recipe: basic substitution",
+      "statement": "Single match per line: `sed 's/foo/bar/' file`. All matches: `sed 's/foo/bar/g' file`. Case-insensitive (GNU): `sed 's/foo/bar/gi' file`. Only Nth match per line: `sed 's/foo/bar/3' file`. Only on lines matching pattern: `sed '/condition/s/foo/bar/' file`. On line range: `sed '5,10s/foo/bar/' file`.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/The-_0022s_0022-Command.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed 's/foo/bar/' file",
+        "sed 's/foo/bar/g' file",
+        "sed 's/foo/bar/gi' file",
+        "sed 's/foo/bar/3' file",
+        "sed '/condition/s/foo/bar/' file",
+        "sed '5,10s/foo/bar/' file"
+      ],
+      "steps": [
+        "Single match per line: `sed 's/foo/bar/' file`. All matches: `sed 's/foo/bar/g' file`. Case-insensitive (GNU): `sed 's/foo/bar/gi' file`. Only Nth match per line: `sed 's/foo/bar/3' file`. Only on lines matching pattern: `sed '/condition/s/foo/bar/' file`. On line range: `sed '5,10s/foo/bar/' file`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: basic substitution"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-in-place-edit-gnu-and-bsd",
+      "kind": "recipe",
+      "title": "sed recipe: in-place edit (GNU and BSD)",
+      "statement": "GNU: `sed -i 's/foo/bar/g' file.txt`. BSD/macOS: `sed -i '' 's/foo/bar/g' file.txt` (the empty `''` is required). With backup: `sed -i.bak 's/foo/bar/g' file.txt` (creates file.txt.bak \u2014 works on both). Cross-platform script: `sed -i.bak 's/foo/bar/g' file && rm file.bak`. Modern alternative: `perl -i -pe 's/foo/bar/g' file` (consistent across platforms).",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Invoking-sed.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed -i 's/foo/bar/g' file.txt",
+        "sed -i '' 's/foo/bar/g' file.txt",
+        "sed -i.bak 's/foo/bar/g' file.txt",
+        "sed -i.bak 's/foo/bar/g' file && rm file.bak",
+        "perl -i -pe 's/foo/bar/g' file"
+      ],
+      "steps": [
+        "GNU: `sed -i 's/foo/bar/g' file.txt`. BSD/macOS: `sed -i '' 's/foo/bar/g' file.txt` (the empty `''` is required). With backup: `sed -i.bak 's/foo/bar/g' file.txt` (creates file.txt.bak \u2014 works on both). Cross-platform script: `sed -i.bak 's/foo/bar/g' file && rm file.bak`. Modern alternative: `perl -i -pe 's/foo/bar/g' file` (consistent across platforms)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: perl, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: in-place edit (GNU and BSD)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-print-only-matching-lines-sed-as-grep",
+      "kind": "recipe",
+      "title": "sed recipe: print only matching lines (sed as grep)",
+      "statement": "`sed -n '/pattern/p' file` \u2014 `-n` suppresses default print; `p` explicitly prints. Equivalent to: `grep 'pattern' file` (grep is faster). With context: `sed -n '/pattern/{N;p}' file` (line + next). Inverse (lines NOT matching): `sed -n '/pattern/!p' file` \u2014 equivalent to `grep -v`.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Common-Commands.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed -n '/pattern/p' file",
+        "-n",
+        "p",
+        "grep 'pattern' file",
+        "sed -n '/pattern/{N;p}' file",
+        "sed -n '/pattern/!p' file",
+        "grep -v"
+      ],
+      "steps": [
+        "`sed -n '/pattern/p' file` \u2014 `-n` suppresses default print; `p` explicitly prints. Equivalent to: `grep 'pattern' file` (grep is faster). With context: `sed -n '/pattern/{N;p}' file` (line + next). Inverse (lines NOT matching): `sed -n '/pattern/!p' file` \u2014 equivalent to `grep -v`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -n, grep, p, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: print only matching lines (sed as grep)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-delete-lines-matching-pattern",
+      "kind": "recipe",
+      "title": "sed recipe: delete lines matching pattern",
+      "statement": "`sed '/pattern/d' file`. Multiple patterns: `sed -e '/foo/d' -e '/bar/d' file`. Range delete: `sed '/start/,/end/d' file` (deletes start-line through end-line inclusive). Inverse (keep only matching): `sed -n '/pattern/p' file`. By line number: `sed '5d' file` (line 5); `sed '5,10d' file` (lines 5\u201310); `sed '$d' file` (last line).",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Common-Commands.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed '/pattern/d' file",
+        "sed -e '/foo/d' -e '/bar/d' file",
+        "sed '/start/,/end/d' file",
+        "sed -n '/pattern/p' file",
+        "sed '5d' file",
+        "sed '5,10d' file",
+        "sed '$d' file"
+      ],
+      "steps": [
+        "`sed '/pattern/d' file`. Multiple patterns: `sed -e '/foo/d' -e '/bar/d' file`. Range delete: `sed '/start/,/end/d' file` (deletes start-line through end-line inclusive). Inverse (keep only matching): `sed -n '/pattern/p' file`. By line number: `sed '5d' file` (line 5); `sed '5,10d' file` (lines 5\u201310); `sed '$d' file` (last line)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: delete lines matching pattern"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-delete-blank-lines",
+      "kind": "recipe",
+      "title": "sed recipe: delete blank lines",
+      "statement": "Empty (zero-length): `sed '/^$/d' file`. Whitespace-only: `sed '/^[[:space:]]*$/d' file`. GNU short: `sed -E '/^\\s*$/d' file`. Squeeze multiple blanks to one: `sed '/^$/N;/^\\n$/D' file` (uses N + D for state).",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Common-Commands.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed '/^$/d' file",
+        "sed '/^[[:space:]]*$/d' file",
+        "sed -E '/^\\s*$/d' file",
+        "sed '/^$/N;/^\\n$/D' file"
+      ],
+      "steps": [
+        "Empty (zero-length): `sed '/^$/d' file`. Whitespace-only: `sed '/^[[:space:]]*$/d' file`. GNU short: `sed -E '/^\\s*$/d' file`. Squeeze multiple blanks to one: `sed '/^$/N;/^\\n$/D' file` (uses N + D for state)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: delete blank lines"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-print-specific-line-range",
+      "kind": "recipe",
+      "title": "sed recipe: print specific line range",
+      "statement": "`sed -n '5,10p' file` \u2014 lines 5 through 10. From start: `sed -n '1,10p' file` (or just `head -n 10`). To end: `sed -n '10,$p' file`. Single line: `sed -n '5p' file` (or `sed '5q' file` for stop-at). Print line N then quit (fast on huge files): `sed -n '5{p;q}' file`.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Addresses.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed -n '5,10p' file",
+        "sed -n '1,10p' file",
+        "head -n 10",
+        "sed -n '10,$p' file",
+        "sed -n '5p' file",
+        "sed '5q' file",
+        "sed -n '5{p;q}' file"
+      ],
+      "steps": [
+        "`sed -n '5,10p' file` \u2014 lines 5 through 10. From start: `sed -n '1,10p' file` (or just `head -n 10`). To end: `sed -n '10,$p' file`. Single line: `sed -n '5p' file` (or `sed '5q' file` for stop-at). Print line N then quit (fast on huge files): `sed -n '5{p;q}' file`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: head, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: print specific line range"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-insert-append-change-lines",
+      "kind": "recipe",
+      "title": "sed recipe: insert / append / change lines",
+      "statement": "Insert before line: `sed '5i\\\\\\nNEW LINE' file` (GNU; backslash + newline required by POSIX). GNU 4+: `sed '5i NEW LINE' file` (one-liner). Append after line: `sed '5a NEW LINE' file`. Change (replace) line: `sed '5c NEW LINE' file`. Before pattern match: `sed '/pattern/i NEW LINE' file`. After pattern match: `sed '/pattern/a NEW LINE' file`.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Common-Commands.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed '5i\\\\\\nNEW LINE' file",
+        "sed '5i NEW LINE' file",
+        "sed '5a NEW LINE' file",
+        "sed '5c NEW LINE' file",
+        "sed '/pattern/i NEW LINE' file",
+        "sed '/pattern/a NEW LINE' file"
+      ],
+      "steps": [
+        "Insert before line: `sed '5i\\\\\\nNEW LINE' file` (GNU; backslash + newline required by POSIX). GNU 4+: `sed '5i NEW LINE' file` (one-liner). Append after line: `sed '5a NEW LINE' file`. Change (replace) line: `sed '5c NEW LINE' file`. Before pattern match: `sed '/pattern/i NEW LINE' file`. After pattern match: `sed '/pattern/a NEW LINE' file`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: insert / append / change lines"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-extract-substring-with-backreference",
+      "kind": "recipe",
+      "title": "sed recipe: extract substring with backreference",
+      "statement": "Capture + replace with subgroup: `sed -E 's/.*name=\"([^\"]+)\".*/\\1/' file`. BRE: `sed 's/.*name=\"\\([^\"]*\\)\".*/\\1/' file` (escape parens). Print only the match: combine with `-n` and `p`: `sed -nE 's/.*name=\"([^\"]+)\".*/\\1/p' file`. For extracting many fields: chain with multiple `s///`.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Back_002dreferences-and-Subexpressions.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed -E 's/.*name=\"([^\"]+)\".*/\\1/' file",
+        "sed 's/.*name=\"\\([^\"]*\\)\".*/\\1/' file",
+        "-n",
+        "p",
+        "sed -nE 's/.*name=\"([^\"]+)\".*/\\1/p' file",
+        "s///"
+      ],
+      "steps": [
+        "Capture + replace with subgroup: `sed -E 's/.*name=\"([^\"]+)\".*/\\1/' file`. BRE: `sed 's/.*name=\"\\([^\"]*\\)\".*/\\1/' file` (escape parens). Print only the match: combine with `-n` and `p`: `sed -nE 's/.*name=\"([^\"]+)\".*/\\1/p' file`. For extracting many fields: chain with multiple `s///`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -n, p, s///, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: extract substring with backreference"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-strip-trailing-whitespace-from-every-line",
+      "kind": "recipe",
+      "title": "sed recipe: strip trailing whitespace from every line",
+      "statement": "`sed 's/[[:space:]]*$//' file`. Just trailing spaces (no tabs): `sed 's/ *$//' file`. In-place: `sed -i 's/[[:space:]]*$//' file`. For leading whitespace: `sed 's/^[[:space:]]*//' file`. Both leading and trailing: `sed 's/^[[:space:]]*//;s/[[:space:]]*$//' file`.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/The-_0022s_0022-Command.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed 's/[[:space:]]*$//' file",
+        "sed 's/ *$//' file",
+        "sed -i 's/[[:space:]]*$//' file",
+        "sed 's/^[[:space:]]*//' file",
+        "sed 's/^[[:space:]]*//;s/[[:space:]]*$//' file"
+      ],
+      "steps": [
+        "`sed 's/[[:space:]]*$//' file`. Just trailing spaces (no tabs): `sed 's/ *$//' file`. In-place: `sed -i 's/[[:space:]]*$//' file`. For leading whitespace: `sed 's/^[[:space:]]*//' file`. Both leading and trailing: `sed 's/^[[:space:]]*//;s/[[:space:]]*$//' file`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: strip trailing whitespace from every line"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-squeeze-multiple-blank-lines-to-one",
+      "kind": "recipe",
+      "title": "sed recipe: squeeze multiple blank lines to one",
+      "statement": "`sed '/^$/N;/^\\n$/D' file` \u2014 joins consecutive blanks then deletes the duplicate. GNU alternative: `cat -s file` (much simpler). Strip all blank lines: `sed '/^$/d' file`.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Programming-Commands.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed '/^$/N;/^\\n$/D' file",
+        "cat -s file",
+        "sed '/^$/d' file"
+      ],
+      "steps": [
+        "`sed '/^$/N;/^\\n$/D' file` \u2014 joins consecutive blanks then deletes the duplicate. GNU alternative: `cat -s file` (much simpler). Strip all blank lines: `sed '/^$/d' file`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: cat, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: squeeze multiple blank lines to one"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-number-lines-like-cat-n",
+      "kind": "recipe",
+      "title": "sed recipe: number lines (like cat -n)",
+      "statement": "`sed = file | sed 'N;s/\\n/\\t/'` \u2014 `=` prints line number, then second sed joins with tab. Modern simpler: `cat -n file` or `nl file`. Number only matching lines: `sed -n '/pattern/{=;p}' file | sed 'N;s/\\n/ /'`.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Other-Commands.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed = file | sed 'N;s/\\n/\\t/'",
+        "cat -n file",
+        "nl file",
+        "sed -n '/pattern/{=;p}' file | sed 'N;s/\\n/ /'"
+      ],
+      "steps": [
+        "`sed = file | sed 'N;s/\\n/\\t/'` \u2014 `=` prints line number, then second sed joins with tab. Modern simpler: `cat -n file` or `nl file`. Number only matching lines: `sed -n '/pattern/{=;p}' file | sed 'N;s/\\n/ /'`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: cat, nl, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: number lines (like cat -n)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-convert-crlf-to-lf-and-reverse",
+      "kind": "recipe",
+      "title": "sed recipe: convert CRLF to LF (and reverse)",
+      "statement": "Windows \u2192 Unix: `sed -i 's/\\r$//' file.txt`. Or: `dos2unix file.txt` (dedicated tool). Unix \u2192 Windows: `sed -i 's/$/\\r/' file.txt`. Or: `unix2dos file.txt`. Verify: `file file.txt` or `cat -A file.txt` (shows `^M` for `\\r`).",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/The-_0022s_0022-Command.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed -i 's/\\r$//' file.txt",
+        "dos2unix file.txt",
+        "sed -i 's/$/\\r/' file.txt",
+        "unix2dos file.txt",
+        "file file.txt",
+        "cat -A file.txt"
+      ],
+      "steps": [
+        "Windows \u2192 Unix: `sed -i 's/\\r$//' file.txt`. Or: `dos2unix file.txt` (dedicated tool). Unix \u2192 Windows: `sed -i 's/$/\\r/' file.txt`. Or: `unix2dos file.txt`. Verify: `file file.txt` or `cat -A file.txt` (shows `^M` for `\\r`)"
+      ],
+      "constraints": [
+        "Windows \u2192 Unix: `sed -i 's/\\r$//' file.txt`. Or: `dos2unix file.txt` (dedicated tool). Unix \u2192 Windows: `sed -i 's/$/\\r/' file.txt`. Or: `unix2dos file.txt`. Verify: `file file.txt` or `cat -A file.txt` (shows `^M` for `\\r`)",
+        "Requires binaries or commands referenced in examples: cat, dos2unix, file, sed, unix2dos."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: convert CRLF to LF (and reverse)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-convert-tabs-to-spaces-or-reverse",
+      "kind": "recipe",
+      "title": "sed recipe: convert tabs to spaces (or reverse)",
+      "statement": "Tabs to 4 spaces: `sed -i 's/\\t/    /g' file`. Better tool: `expand -t 4 file > file.new && mv file.new file`. Spaces to tabs: `unexpand -t 4 file > file.new && mv file.new file`. Inline with sed: `sed -i 's/    /\\t/g' file` (but `unexpand` is smarter \u2014 only converts leading whitespace).",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/The-_0022s_0022-Command.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed -i 's/\\t/ /g' file",
+        "expand -t 4 file > file.new && mv file.new file",
+        "unexpand -t 4 file > file.new && mv file.new file",
+        "sed -i 's/ /\\t/g' file",
+        "unexpand"
+      ],
+      "steps": [
+        "Tabs to 4 spaces: `sed -i 's/\\t/ /g' file`. Better tool: `expand -t 4 file > file.new && mv file.new file`. Spaces to tabs: `unexpand -t 4 file > file.new && mv file.new file`. Inline with sed: `sed -i 's/ /\\t/g' file` (but `unexpand` is smarter \u2014 only converts leading whitespace)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: expand, sed, unexpand."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: convert tabs to spaces (or reverse)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-multiple-commands-in-one-invocation",
+      "kind": "recipe",
+      "title": "sed recipe: multiple commands in one invocation",
+      "statement": "Semicolon (GNU): `sed 's/a/b/; s/c/d/' file`. Multiple `-e` (POSIX, portable): `sed -e 's/a/b/' -e 's/c/d/' file`. Script file: `sed -f script.sed file` (one command per line in script.sed). Combined commands on one line via braces: `sed '/start/,/end/{s/old/new/;s/foo/bar/}' file`.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Invoking-sed.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed 's/a/b/; s/c/d/' file",
+        "-e",
+        "sed -e 's/a/b/' -e 's/c/d/' file",
+        "sed -f script.sed file",
+        "sed '/start/,/end/{s/old/new/;s/foo/bar/}' file"
+      ],
+      "steps": [
+        "Semicolon (GNU): `sed 's/a/b/; s/c/d/' file`. Multiple `-e` (POSIX, portable): `sed -e 's/a/b/' -e 's/c/d/' file`. Script file: `sed -f script.sed file` (one command per line in script.sed). Combined commands on one line via braces: `sed '/start/,/end/{s/old/new/;s/foo/bar/}' file`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: -e, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: multiple commands in one invocation"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-replace-text-only-on-specific-lines",
+      "kind": "recipe",
+      "title": "sed recipe: replace text only on specific lines",
+      "statement": "By line number: `sed '5s/foo/bar/' file` \u2014 only line 5. By range: `sed '5,10s/foo/bar/' file`. By pattern: `sed '/start/,/end/s/foo/bar/' file` \u2014 between start and end markers. By condition: `sed '/^#/!s/foo/bar/' file` \u2014 only on lines NOT starting with `#`.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Addresses.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed '5s/foo/bar/' file",
+        "sed '5,10s/foo/bar/' file",
+        "sed '/start/,/end/s/foo/bar/' file",
+        "sed '/^#/!s/foo/bar/' file"
+      ],
+      "steps": [
+        "By line number: `sed '5s/foo/bar/' file` \u2014 only line 5. By range: `sed '5,10s/foo/bar/' file`. By pattern: `sed '/start/,/end/s/foo/bar/' file` \u2014 between start and end markers. By condition: `sed '/^#/!s/foo/bar/' file` \u2014 only on lines NOT starting with `#`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: replace text only on specific lines"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-comment-uncomment-a-config-block",
+      "kind": "recipe",
+      "title": "sed recipe: comment / uncomment a config block",
+      "statement": "Comment lines in a block: `sed -i '/\\[section\\]/,/^\\[/s/^/#/' config.ini` (prepend `#` from `[section]` to next `[`). Uncomment lines in a block: `sed -i '/\\[section\\]/,/^\\[/s/^#//' config.ini`. Toggle single line by pattern: `sed -i 's/^# *\\(key=value\\)/\\1/' config` (uncomment) or `sed -i 's/^\\(key=value\\)/#\\1/' config` (comment).",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Common-Commands.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed -i '/\\[section\\]/,/^\\[/s/^/#/' config.ini",
+        "sed -i '/\\[section\\]/,/^\\[/s/^#//' config.ini",
+        "sed -i 's/^# *\\(key=value\\)/\\1/' config",
+        "sed -i 's/^\\(key=value\\)/#\\1/' config"
+      ],
+      "steps": [
+        "Comment lines in a block: `sed -i '/\\[section\\]/,/^\\[/s/^/#/' config.ini` (prepend `#` from `[section]` to next `[`). Uncomment lines in a block: `sed -i '/\\[section\\]/,/^\\[/s/^#//' config.ini`. Toggle single line by pattern: `sed -i 's/^# *\\(key=value\\)/\\1/' config` (uncomment) or `sed -i 's/^\\(key=value\\)/#\\1/' config` (comment)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: comment / uncomment a config block"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-read-from-file-at-a-position-r-command",
+      "kind": "recipe",
+      "title": "sed recipe: read from file at a position (r command)",
+      "statement": "Insert file contents after line 5: `sed '5r insert.txt' main.txt`. Insert after every line matching pattern: `sed '/pattern/r insert.txt' main.txt`. Insert at start: `sed '1i\\\\' main.txt && cat insert.txt main.txt` (easier with cat). For templates: combine `r` with substitution to inject blocks.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Programming-Commands.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed '5r insert.txt' main.txt",
+        "sed '/pattern/r insert.txt' main.txt",
+        "sed '1i\\\\' main.txt && cat insert.txt main.txt",
+        "r"
+      ],
+      "steps": [
+        "Insert file contents after line 5: `sed '5r insert.txt' main.txt`. Insert after every line matching pattern: `sed '/pattern/r insert.txt' main.txt`. Insert at start: `sed '1i\\\\' main.txt && cat insert.txt main.txt` (easier with cat). For templates: combine `r` with substitution to inject blocks"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: r, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: read from file at a position (r command)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-write-matched-lines-to-file-w-command",
+      "kind": "recipe",
+      "title": "sed recipe: write matched lines to file (w command)",
+      "statement": "Save matching lines to a separate file: `sed -n '/pattern/w matches.txt' file`. Combined with substitution: `sed 's/foo/bar/w changes.txt' file`. Multiple files based on content: ```\\nsed -n '/^ERROR/w errors.txt\\n        /^WARN/w warnings.txt\\n        /^INFO/w info.txt' log.txt\\n```. Append-mode: GNU `W` writes only first line of pattern space.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Programming-Commands.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed -n '/pattern/w matches.txt' file",
+        "sed 's/foo/bar/w changes.txt' file",
+        ". Append-mode: GNU"
+      ],
+      "steps": [
+        "Save matching lines to a separate file: `sed -n '/pattern/w matches.txt' file`. Combined with substitution: `sed 's/foo/bar/w changes.txt' file`. Multiple files based on content: ```\\nsed -n '/^ERROR/w errors.txt\\n /^WARN/w warnings.txt\\n /^INFO/w info.txt' log.txt\\n```. Append-mode: GNU `W` writes only first line of pattern space"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ., sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: write matched lines to file (w command)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-use-extended-regex-e",
+      "kind": "recipe",
+      "title": "sed recipe: use extended regex (-E)",
+      "statement": "`sed -E 's/(foo|bar)/X/g' file` \u2014 `|`, `+`, `?`, `(...)` are unescaped meta chars. Without `-E` (BRE): `sed 's/\\(foo\\|bar\\)/X/g' file` (needs escapes). POSIX (works on GNU + BSD): `-E`. Old GNU: `-r` (same as `-E` but deprecated). Inside a pattern: `\\w+` etc are NOT POSIX \u2014 see error claim about Perl-style.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/BRE-vs-ERE.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed -E 's/(foo|bar)/X/g' file",
+        "-E",
+        "sed 's/\\(foo\\|bar\\)/X/g' file",
+        "-r"
+      ],
+      "steps": [
+        "`sed -E 's/(foo|bar)/X/g' file` \u2014 `|`, `+`, `?`, `(...)` are unescaped meta chars. Without `-E` (BRE): `sed 's/\\(foo\\|bar\\)/X/g' file` (needs escapes). POSIX (works on GNU + BSD): `-E`. Old GNU: `-r` (same as `-E` but deprecated). Inside a pattern: `\\w+` etc are NOT POSIX \u2014 see error claim about Perl-style"
+      ],
+      "constraints": [
+        "`sed -E 's/(foo|bar)/X/g' file` \u2014 `|`, `+`, `?`, `(...)` are unescaped meta chars. Without `-E` (BRE): `sed 's/\\(foo\\|bar\\)/X/g' file` (needs escapes). POSIX (works on GNU + BSD): `-E`. Old GNU: `-r` (same as `-E` but deprecated). Inside a pattern: `\\w+` etc are NOT POSIX \u2014 see error claim about Perl-style",
+        "Requires binaries or commands referenced in examples: -E, -r, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: use extended regex (-E)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-reverse-all-lines-tac-equivalent",
+      "kind": "recipe",
+      "title": "sed recipe: reverse all lines (tac equivalent)",
+      "statement": "`sed -n '1!G;h;$p' file` \u2014 classic one-liner using hold space. Better tool: `tac file` (GNU) or `tail -r file` (BSD). For reversed pipeline: `cat file | sed -n '1!G;h;$p'`. On macOS without tac: `tail -r file` works.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Programming-Commands.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed -n '1!G;h;$p' file",
+        "tac file",
+        "tail -r file",
+        "cat file | sed -n '1!G;h;$p'"
+      ],
+      "steps": [
+        "`sed -n '1!G;h;$p' file` \u2014 classic one-liner using hold space. Better tool: `tac file` (GNU) or `tail -r file` (BSD). For reversed pipeline: `cat file | sed -n '1!G;h;$p'`. On macOS without tac: `tail -r file` works"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: cat, sed, tac, tail."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: reverse all lines (tac equivalent)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-print-only-first-n-lines",
+      "kind": "recipe",
+      "title": "sed recipe: print only first N lines",
+      "statement": "First 10: `sed 10q file` (faster than `head -n 10` on huge files because sed stops reading). First match then quit: `sed '/pattern/q' file`. Up to and including the first match: `sed '/pattern/{p;q}' file` (GNU). Use case: parse only header section of a log file.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Common-Commands.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed 10q file",
+        "head -n 10",
+        "sed '/pattern/q' file",
+        "sed '/pattern/{p;q}' file"
+      ],
+      "steps": [
+        "First 10: `sed 10q file` (faster than `head -n 10` on huge files because sed stops reading). First match then quit: `sed '/pattern/q' file`. Up to and including the first match: `sed '/pattern/{p;q}' file` (GNU). Use case: parse only header section of a log file"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: head, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: print only first N lines"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-print-only-last-n-lines-use-tail",
+      "kind": "recipe",
+      "title": "sed recipe: print only last N lines (use tail)",
+      "statement": "sed alone is awkward for last-N. Use tail: `tail -n 10 file`. For 'last line only': `sed -n '$p' file`. For 'all but last line': `sed '$d' file`. For 'lines from N to end': `sed -n 'N,$p' file`.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Addresses.html",
+      "source_type": "official_docs",
+      "commands": [
+        "tail -n 10 file",
+        "sed -n '$p' file",
+        "sed '$d' file",
+        "sed -n 'N,$p' file"
+      ],
+      "steps": [
+        "sed alone is awkward for last-N. Use tail: `tail -n 10 file`. For 'last line only': `sed -n '$p' file`. For 'all but last line': `sed '$d' file`. For 'lines from N to end': `sed -n 'N,$p' file`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: sed, tail."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: print only last N lines (use tail)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-case-conversion-gnu-only",
+      "kind": "recipe",
+      "title": "sed recipe: case conversion (GNU only)",
+      "statement": "Uppercase all: `sed 's/.*/\\U&/' file` \u2014 `\\U` starts uppercase, `&` is the whole match. Lowercase all: `sed 's/.*/\\L&/' file`. Capitalize first letter: `sed 's/.*/\\u&/' file` \u2014 `\\u` uppercases just next char. Lowercase first letter: `sed 's/.*/\\l&/' file`. Within match: `sed 's/\\(foo\\)/\\U\\1\\E/' file` \u2014 `\\E` ends conversion.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/regexp-extensions.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed 's/.*/\\U&/' file",
+        "sed 's/.*/\\L&/' file",
+        "sed 's/.*/\\u&/' file",
+        "sed 's/.*/\\l&/' file",
+        "sed 's/\\(foo\\)/\\U\\1\\E/' file"
+      ],
+      "steps": [
+        "Uppercase all: `sed 's/.*/\\U&/' file` \u2014 `\\U` starts uppercase, `&` is the whole match. Lowercase all: `sed 's/.*/\\L&/' file`. Capitalize first letter: `sed 's/.*/\\u&/' file` \u2014 `\\u` uppercases just next char. Lowercase first letter: `sed 's/.*/\\l&/' file`. Within match: `sed 's/\\(foo\\)/\\U\\1\\E/' file` \u2014 `\\E` ends conversion"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: case conversion (GNU only)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-increment-number-with-sed-awkward-but-possible",
+      "kind": "recipe",
+      "title": "sed recipe: increment number with sed (awkward but possible)",
+      "statement": "sed isn't designed for arithmetic. For just '+1' on integers: ```sh\\nsed -E 's/([0-9]+)/{ echo $((\\1+1)) }/e' file\\n```. Easier with awk: `awk '{ for (i=1;i<=NF;i++) if ($i ~ /^[0-9]+$/) $i++; print }' file`. For version bumps: `bumpver` tool or custom script.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Programming-Commands.html",
+      "source_type": "official_docs",
+      "commands": [
+        ". Easier with awk:",
+        ". For version bumps:"
+      ],
+      "steps": [
+        "sed isn't designed for arithmetic. For just '+1' on integers: ```sh\\nsed -E 's/([0-9]+)/{ echo $((\\1+1)) }/e' file\\n```. Easier with awk: `awk '{ for (i=1;i<=NF;i++) if ($i ~ /^[0-9]+$/) $i++; print }' file`. For version bumps: `bumpver` tool or custom script"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: .."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: increment number with sed (awkward but possible)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-join-lines-that-match-a-pattern",
+      "kind": "recipe",
+      "title": "sed recipe: join lines that match a pattern",
+      "statement": "Join continuation lines ending in `\\`: `sed -E ':a; /\\\\$/{N; s/\\\\\\n//; ba}' file`. Read top-down: label `a`, if line ends with `\\` then append next + remove escaped newline + branch back to `a`. For one-liner per record (paragraph mode): `sed 'N;s/\\n/ /;P;D'`.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Programming-Commands.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed -E ':a; /\\\\$/{N; s/\\\\\\n//; ba}' file",
+        "a",
+        "sed 'N;s/\\n/ /;P;D'"
+      ],
+      "steps": [
+        "Join continuation lines ending in `\\`: `sed -E ':a; /\\\\$/{N; s/\\\\\\n//; ba}' file`. Read top-down: label `a`, if line ends with `\\` then append next + remove escaped newline + branch back to `a`. For one-liner per record (paragraph mode): `sed 'N;s/\\n/ /;P;D'`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: a, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: join lines that match a pattern"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-use-sed-for-simple-templating",
+      "kind": "recipe",
+      "title": "sed recipe: use sed for simple templating",
+      "statement": "Replace placeholders: `sed -e \"s/{{name}}/$NAME/g\" -e \"s/{{version}}/$VERSION/g\" template.txt > output.txt`. For multiple vars: chain with `-e` or use envsubst: `NAME=Alice envsubst < template.txt`. For complex templating: use jinja2 (Python) or Mustache implementations.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/The-_0022s_0022-Command.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed -e \"s/{{name}}/$NAME/g\" -e \"s/{{version}}/$VERSION/g\" template.txt > output.txt",
+        "-e"
+      ],
+      "steps": [
+        "Replace placeholders: `sed -e \"s/{{name}}/$NAME/g\" -e \"s/{{version}}/$VERSION/g\" template.txt > output.txt`. For multiple vars: chain with `-e` or use envsubst: `NAME=Alice envsubst < template.txt`. For complex templating: use jinja2 (Python) or Mustache implementations"
+      ],
+      "constraints": [
+        "Replace placeholders: `sed -e \"s/{{name}}/$NAME/g\" -e \"s/{{version}}/$VERSION/g\" template.txt > output.txt`. For multiple vars: chain with `-e` or use envsubst: `NAME=Alice envsubst < template.txt`. For complex templating: use jinja2 (Python) or Mustache implementations",
+        "Requires binaries or commands referenced in examples: -e, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: use sed for simple templating"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-use-sed-in-a-pipeline",
+      "kind": "recipe",
+      "title": "sed recipe: use sed in a pipeline",
+      "statement": "Filter pipe: `cat file | sed 's/error/ERROR/' | grep ERROR`. Modify command output: `ls -la | sed 's/ \\+/ /g'` (collapse multi-spaces). Inside subshell: `for f in $(find . -name '*.txt' | sed 's|^\\./||'); do ...; done`. Combine with cut/awk: `ps aux | sed -n '2,$p' | awk '{print $2}'`.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Invoking-sed.html",
+      "source_type": "official_docs",
+      "commands": [
+        "cat file | sed 's/error/ERROR/' | grep ERROR",
+        "ls -la | sed 's/ \\+/ /g'",
+        "for f in $(find . -name '*.txt' | sed 's|^\\./||'); do ...; done",
+        "ps aux | sed -n '2,$p' | awk '{print $2}'"
+      ],
+      "steps": [
+        "Filter pipe: `cat file | sed 's/error/ERROR/' | grep ERROR`. Modify command output: `ls -la | sed 's/ \\+/ /g'` (collapse multi-spaces). Inside subshell: `for f in $(find . -name '*.txt' | sed 's|^\\./||'); do ...; done`. Combine with cut/awk: `ps aux | sed -n '2,$p' | awk '{print $2}'`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: cat, for, ls, ps."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: use sed in a pipeline"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-substitute-with-shell-variable",
+      "kind": "recipe",
+      "title": "sed recipe: substitute with shell variable",
+      "statement": "Double quotes (vars expand): `sed \"s/foo/$VAR/g\" file`. Caveat: `$VAR` containing `/` or `&` or `\\` breaks. Escape first: ```sh\\nESC=$(printf '%s' \"$VAR\" | sed 's/[\\\\/&]/\\\\\\\\&/g')\\nsed \"s/foo/$ESC/g\" file\\n```. Safer for paths: change delimiter: `sed \"s|foo|$VAR|g\" file` (still need to escape `|` if it appears).",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/The-_0022s_0022-Command.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed \"s/foo/$VAR/g\" file",
+        ". Safer for paths: change delimiter:"
+      ],
+      "steps": [
+        "Double quotes (vars expand): `sed \"s/foo/$VAR/g\" file`. Caveat: `$VAR` containing `/` or `&` or `\\` breaks. Escape first: ```sh\\nESC=$(printf '%s' \"$VAR\" | sed 's/[\\\\/&]/\\\\\\\\&/g')\\nsed \"s/foo/$ESC/g\" file\\n```. Safer for paths: change delimiter: `sed \"s|foo|$VAR|g\" file` (still need to escape `|` if it appears)"
+      ],
+      "constraints": [
+        "Double quotes (vars expand): `sed \"s/foo/$VAR/g\" file`. Caveat: `$VAR` containing `/` or `&` or `\\` breaks. Escape first: ```sh\\nESC=$(printf '%s' \"$VAR\" | sed 's/[\\\\/&]/\\\\\\\\&/g')\\nsed \"s/foo/$ESC/g\" file\\n```. Safer for paths: change delimiter: `sed \"s|foo|$VAR|g\" file` (still need to escape `|` if it appears)",
+        "Requires binaries or commands referenced in examples: ., sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: substitute with shell variable"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-extract-just-the-matched-portion",
+      "kind": "recipe",
+      "title": "sed recipe: extract just the matched portion",
+      "statement": "Print matches only: `sed -nE 's/.*foo([^bar]*)bar.*/\\1/p' file`. Cleaner with grep: `grep -oE 'pattern' file`. For URL extraction: `grep -oE 'https?://[^[:space:]]+' file` is much easier than sed equivalent.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Back_002dreferences-and-Subexpressions.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed -nE 's/.*foo([^bar]*)bar.*/\\1/p' file",
+        "grep -oE 'pattern' file",
+        "grep -oE 'https?://[^[:space:]]+' file"
+      ],
+      "steps": [
+        "Print matches only: `sed -nE 's/.*foo([^bar]*)bar.*/\\1/p' file`. Cleaner with grep: `grep -oE 'pattern' file`. For URL extraction: `grep -oE 'https?://[^[:space:]]+' file` is much easier than sed equivalent"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: grep, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: extract just the matched portion"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-replace-nth-occurrence-on-each-line",
+      "kind": "recipe",
+      "title": "sed recipe: replace nth occurrence on each line",
+      "statement": "Replace only Nth match per line: `sed 's/foo/bar/3' file` \u2014 only 3rd `foo` on each line. Replace from Nth onward (GNU): `sed 's/foo/bar/3g' file` \u2014 3rd, 4th, 5th... all. Skip first N: `sed -E 's/(foo){2}/\\1bar/' file` (replace after 2nd occurrence).",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/The-_0022s_0022-Command.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed 's/foo/bar/3' file",
+        "foo",
+        "sed 's/foo/bar/3g' file",
+        "sed -E 's/(foo){2}/\\1bar/' file"
+      ],
+      "steps": [
+        "Replace only Nth match per line: `sed 's/foo/bar/3' file` \u2014 only 3rd `foo` on each line. Replace from Nth onward (GNU): `sed 's/foo/bar/3g' file` \u2014 3rd, 4th, 5th... all. Skip first N: `sed -E 's/(foo){2}/\\1bar/' file` (replace after 2nd occurrence)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: foo, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: replace nth occurrence on each line"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-swap-two-columns-separated-by-delimiter",
+      "kind": "recipe",
+      "title": "sed recipe: swap two columns separated by delimiter",
+      "statement": "Swap CSV columns: `sed -E 's/^([^,]+),([^,]+),(.*)/\\2,\\1,\\3/' file.csv` \u2014 swap first two. For tab-separated: `sed -E 's/^([^\\t]+)\\t([^\\t]+)/\\2\\t\\1/' file`. For arbitrary positions: easier with `awk`: `awk -F, '{print $2,$1,$3,$4}' OFS=, file.csv`.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Back_002dreferences-and-Subexpressions.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed -E 's/^([^,]+),([^,]+),(.*)/\\2,\\1,\\3/' file.csv",
+        "sed -E 's/^([^\\t]+)\\t([^\\t]+)/\\2\\t\\1/' file",
+        "awk",
+        "awk -F, '{print $2,$1,$3,$4}' OFS=, file.csv"
+      ],
+      "steps": [
+        "Swap CSV columns: `sed -E 's/^([^,]+),([^,]+),(.*)/\\2,\\1,\\3/' file.csv` \u2014 swap first two. For tab-separated: `sed -E 's/^([^\\t]+)\\t([^\\t]+)/\\2\\t\\1/' file`. For arbitrary positions: easier with `awk`: `awk -F, '{print $2,$1,$3,$4}' OFS=, file.csv`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: awk, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: swap two columns separated by delimiter"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-delete-every-nth-line",
+      "kind": "recipe",
+      "title": "sed recipe: delete every Nth line",
+      "statement": "Every other line (1st, 3rd, ...): `sed -n '1~2p' file` (GNU step syntax). Every 3rd line: `sed -n '1~3p' file`. Skip first 5, then every other: `sed -n '5~2p' file`. Inverse: `sed '0~2d' file` (delete every 2nd).",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Addresses.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed -n '1~2p' file",
+        "sed -n '1~3p' file",
+        "sed -n '5~2p' file",
+        "sed '0~2d' file"
+      ],
+      "steps": [
+        "Every other line (1st, 3rd, ...): `sed -n '1~2p' file` (GNU step syntax). Every 3rd line: `sed -n '1~3p' file`. Skip first 5, then every other: `sed -n '5~2p' file`. Inverse: `sed '0~2d' file` (delete every 2nd)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: delete every Nth line"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-print-line-containing-pattern-and-surrounding-context",
+      "kind": "recipe",
+      "title": "sed recipe: print line containing pattern AND surrounding context",
+      "statement": "1 line before + after: `sed -nE '/pattern/{x;p;x;p;N;p}' file` (uses hold space \u2014 gnarly). Way easier with grep: `grep -A 1 -B 1 'pattern' file`. For N lines after: `grep -A 3 'pattern' file`.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Programming-Commands.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed -nE '/pattern/{x;p;x;p;N;p}' file",
+        "grep -A 1 -B 1 'pattern' file",
+        "grep -A 3 'pattern' file"
+      ],
+      "steps": [
+        "1 line before + after: `sed -nE '/pattern/{x;p;x;p;N;p}' file` (uses hold space \u2014 gnarly). Way easier with grep: `grep -A 1 -B 1 'pattern' file`. For N lines after: `grep -A 3 'pattern' file`"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: grep, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: print line containing pattern AND surrounding context"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-split-joined-lines",
+      "kind": "recipe",
+      "title": "sed recipe: split joined lines",
+      "statement": "Split on `;`: `sed 's/;/\\n/g' file`. Split on `, `: `sed 's/, /\\n/g' file`. Caveat: `\\n` in replacement is GNU \u2014 for BSD use literal newline (`\\` then newline). Alternative: `tr ';' '\\n' < file` (simpler for single-char split).",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/The-_0022s_0022-Command.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed 's/;/\\n/g' file",
+        "sed 's/, /\\n/g' file",
+        "tr ';' '\\n' < file"
+      ],
+      "steps": [
+        "Split on `;`: `sed 's/;/\\n/g' file`. Split on `, `: `sed 's/, /\\n/g' file`. Caveat: `\\n` in replacement is GNU \u2014 for BSD use literal newline (`\\` then newline). Alternative: `tr ';' '\\n' < file` (simpler for single-char split)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: sed, tr."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: split joined lines"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-remove-ansi-color-escape-codes",
+      "kind": "recipe",
+      "title": "sed recipe: remove ANSI color escape codes",
+      "statement": "`sed -E 's/\\x1b\\[[0-9;]*m//g' colored.txt`. (For non-printable: `\\x1b` is the ESC char. `[0-9;]*m` matches the ANSI sequence.) Alternative tools: `ansi2txt`, `perl -pe 's/\\e\\[[0-9;]*m//g'`. Use case: capture colored CLI output then strip codes for grep/diff.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/regexp-extensions.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed -E 's/\\x1b\\[[0-9;]*m//g' colored.txt",
+        "ansi2txt",
+        "perl -pe 's/\\e\\[[0-9;]*m//g'"
+      ],
+      "steps": [
+        "`sed -E 's/\\x1b\\[[0-9;]*m//g' colored.txt`. (For non-printable: `\\x1b` is the ESC char. `[0-9;]*m` matches the ANSI sequence.) Alternative tools: `ansi2txt`, `perl -pe 's/\\e\\[[0-9;]*m//g'`. Use case: capture colored CLI output then strip codes for grep/diff"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: ansi2txt, perl, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: remove ANSI color escape codes"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-keep-only-lines-between-two-patterns-range-filter",
+      "kind": "recipe",
+      "title": "sed recipe: keep only lines between two patterns (range filter)",
+      "statement": "Print: `sed -n '/start/,/end/p' file` \u2014 lines from `/start/` to `/end/` inclusive. Delete the range: `sed '/start/,/end/d' file`. Replace only in range: `sed '/start/,/end/s/foo/bar/g' file`. First occurrence only: in awk: `awk '/start/,/end/' file` (same syntax).",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Addresses.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed -n '/start/,/end/p' file",
+        "/start/",
+        "/end/",
+        "sed '/start/,/end/d' file",
+        "sed '/start/,/end/s/foo/bar/g' file",
+        "awk '/start/,/end/' file"
+      ],
+      "steps": [
+        "Print: `sed -n '/start/,/end/p' file` \u2014 lines from `/start/` to `/end/` inclusive. Delete the range: `sed '/start/,/end/d' file`. Replace only in range: `sed '/start/,/end/s/foo/bar/g' file`. First occurrence only: in awk: `awk '/start/,/end/' file` (same syntax)"
+      ],
+      "constraints": [
+        "Requires binaries or commands referenced in examples: /end/, /start/, awk, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: keep only lines between two patterns (range filter)"
+      },
+      "confidence": 0.92
+    },
+    {
+      "entry_id": "sed-recipe-sed-recipe-production-safe-in-place-edit-atomic",
+      "kind": "recipe",
+      "title": "sed recipe: production-safe in-place edit (atomic)",
+      "statement": "Default `sed -i` isn't truly atomic \u2014 for safety: ```sh\\nsed 's/foo/bar/g' file > file.tmp && mv file.tmp file\\n```. Or use `--follow-symlinks` for symlink-safe edits. For team workflows: `git diff` after edit, verify changes are what you want before commit. For batch operations across many files: `find . -name '*.conf' -exec sed -i 's/foo/bar/g' {} +`.",
+      "source_url": "https://www.gnu.org/software/sed/manual/html_node/Invoking-sed.html",
+      "source_type": "official_docs",
+      "commands": [
+        "sed -i",
+        ". Or use",
+        "for symlink-safe edits. For team workflows:",
+        "after edit, verify changes are what you want before commit. For batch operations across many files:"
+      ],
+      "steps": [
+        "Default `sed -i` isn't truly atomic \u2014 for safety: ```sh\\nsed 's/foo/bar/g' file > file.tmp && mv file.tmp file\\n```. Or use `--follow-symlinks` for symlink-safe edits. For team workflows: `git diff` after edit, verify changes are what you want before commit. For batch operations across many files: `find . -name '*.conf' -exec sed -i 's/foo/bar/g' {} +`"
+      ],
+      "constraints": [
+        "Default `sed -i` isn't truly atomic \u2014 for safety: ```sh\\nsed 's/foo/bar/g' file > file.tmp && mv file.tmp file\\n```. Or use `--follow-symlinks` for symlink-safe edits. For team workflows: `git diff` after edit, verify changes are what you want before commit. For batch operations across many files: `find . -name '*.conf' -exec sed -i 's/foo/bar/g' {} +`",
+        "Requires binaries or commands referenced in examples: ., after, for, sed."
+      ],
+      "effect": {
+        "kind": "filesystem",
+        "destructive": false,
+        "reversible": true,
+        "mutates_remote_state": false,
+        "may_cost_money": false,
+        "may_expose_secrets": false,
+        "risk_level": "medium",
+        "reasons": [
+          "No explicit risk rule matched; require confirmation until the action is classified."
+        ]
+      },
+      "provenance": {
+        "source_artifact_id": "sed-curated-source-v1",
+        "migration_method": "legacy_seed_projection_v1",
+        "legacy_seed_script": "tools/scripts/seed_sed_errors_recipes.py",
+        "legacy_tool_id": "sed-recipes",
+        "legacy_title": "sed recipe: production-safe in-place edit (atomic)"
+      },
+      "confidence": 0.92
+    }
+  ]
+}
