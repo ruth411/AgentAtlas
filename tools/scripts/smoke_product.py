@@ -26,25 +26,22 @@ def _table_count(database_path: Path, table: str) -> int:
         conn.close()
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--database", default=str(DEFAULT_DB))
-    parser.add_argument("--catalog", default=str(DEFAULT_CATALOG))
-    args = parser.parse_args()
-
-    database_path = Path(args.database)
-    catalog_path = Path(args.catalog)
+def run_smoke(
+    *,
+    database_path: Path,
+    catalog_path: Path,
+) -> dict[str, object]:
     if not database_path.is_file():
-        raise SystemExit(f"Bulk DB not found: {database_path}")
+        raise FileNotFoundError(f"Bulk DB not found: {database_path}")
     if not catalog_path.is_file():
-        raise SystemExit(f"Bundled catalog not found: {catalog_path}")
+        raise FileNotFoundError(f"Bundled catalog not found: {catalog_path}")
 
     subjects = _table_count(database_path, "subjects")
     capabilities = _table_count(database_path, "capabilities")
     constraints = _table_count(database_path, "constraints")
     effects = _table_count(database_path, "effects")
     if min(subjects, capabilities, constraints, effects) <= 0:
-        raise SystemExit("Structured tables are unexpectedly empty.")
+        raise RuntimeError("Structured tables are unexpectedly empty.")
 
     bulk_engine = QueryEngine(ClaimStore(database_url=f"sqlite:///{database_path}"))
     ask = bulk_engine.ask(
@@ -53,7 +50,7 @@ def main() -> int:
         limit=1,
     )
     if ask.fallback_recommended or not ask.answers:
-        raise SystemExit("Structured ask() smoke failed for ssh local port forward.")
+        raise RuntimeError("Structured ask() smoke failed for ssh local port forward.")
 
     bundle_engine = QueryEngine(ClaimStore(database_url=f"sqlite:///{catalog_path}"))
     capabilities_response = bundle_engine.get_capabilities(
@@ -62,25 +59,46 @@ def main() -> int:
         limit=1,
     )
     if not capabilities_response.capabilities:
-        raise SystemExit("Bundled catalog get_capabilities() returned no invocation rows.")
+        raise RuntimeError("Bundled catalog get_capabilities() returned no invocation rows.")
     if capabilities_response.capabilities[0].source != "structured":
-        raise SystemExit("Bundled catalog returned a non-structured capability row.")
+        raise RuntimeError("Bundled catalog returned a non-structured capability row.")
 
     effects_response = bundle_engine.get_effects(
         subject_id="ssh-error-ssh-error-permission-denied-publickey"
     )
     if not effects_response.effects:
-        raise SystemExit("Bundled catalog get_effects() returned no effect rows.")
+        raise RuntimeError("Bundled catalog get_effects() returned no effect rows.")
 
+    return {
+        "subjects": subjects,
+        "capabilities": capabilities,
+        "constraints": constraints,
+        "effects": effects,
+        "ask_top": ask.answers[0].claim_id,
+        "bundle_cap": capabilities_response.capabilities[0].capability_id,
+        "bundle_effects": len(effects_response.effects),
+    }
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--database", default=str(DEFAULT_DB))
+    parser.add_argument("--catalog", default=str(DEFAULT_CATALOG))
+    args = parser.parse_args()
+
+    result = run_smoke(
+        database_path=Path(args.database),
+        catalog_path=Path(args.catalog),
+    )
     print(
         "Smoke OK:",
-        f"subjects={subjects}",
-        f"capabilities={capabilities}",
-        f"constraints={constraints}",
-        f"effects={effects}",
-        f"ask_top={ask.answers[0].claim_id}",
-        f"bundle_cap={capabilities_response.capabilities[0].capability_id}",
-        f"bundle_effects={len(effects_response.effects)}",
+        f"subjects={result['subjects']}",
+        f"capabilities={result['capabilities']}",
+        f"constraints={result['constraints']}",
+        f"effects={result['effects']}",
+        f"ask_top={result['ask_top']}",
+        f"bundle_cap={result['bundle_cap']}",
+        f"bundle_effects={result['bundle_effects']}",
     )
     return 0
 

@@ -18,8 +18,8 @@
 [![License MIT](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
 
 [![Structured coverage gh](https://img.shields.io/badge/structured--coverage_gh-74%2F74_subcommands-22C55E?style=flat-square)](#-tool-catalog)
-[![Capabilities](https://img.shields.io/badge/typed_capabilities-779-7C3AED?style=flat-square)](#-tool-catalog)
-[![Tool families](https://img.shields.io/badge/tool_families-38-0EA5E9?style=flat-square)](#-tool-catalog)
+[![Capabilities](https://img.shields.io/badge/typed_capabilities-32733-7C3AED?style=flat-square)](#-tool-catalog)
+[![Tool families](https://img.shields.io/badge/tool_families-28-0EA5E9?style=flat-square)](#-tool-catalog)
 [![MCP](https://img.shields.io/badge/MCP_ready-F97316?style=flat-square)](#-use-it-with-claude-cursor-cline-mcp)
 
 </div>
@@ -66,7 +66,7 @@ print(top.detail["flag_schema"][0])
 ## What's in the box
 
 - **7 structured query tools** advertised over MCP — `resolve_subject`, `get_subject_spec`, `get_capabilities`, `get_constraints`, `get_effects`, `resolve_action`, `get_workflow_plan`. All return typed records; none return prose.
-- **Structured catalog** — the current bulk DB is machine-readable only: 23 tool families, 2,400 subjects, 27,762 typed capabilities, 2,412 typed constraints, and 2,247 typed effects. The flag/argv capabilities are `L3_runtime_verified` (parsed from a real CLI/runtime surface); the effect safety classifications are `L2_source_verified` (inferred from help text, not asserted by an experiment), and every record carries its own `verification_level` so the agent can tell them apart.
+- **Structured catalog** — the current bulk DB is machine-readable only: 28 tool families, 3,237 subjects, 32,733 typed capabilities, 3,988 typed constraints, and 3,084 typed effects. The flag/argv capabilities are `L3_runtime_verified` (parsed from a real CLI/runtime surface); the effect safety classifications are `L2_source_verified` (inferred from help text, not asserted by an experiment), and every record carries its own `verification_level` so the agent can tell them apart.
 - **MCP server** — drop into Claude Desktop / Cursor / Cline / Continue via stdio JSON-RPC. Zero config.
 - **Python SDK** — sync + async clients for every typed surface.
 - **Legacy query surfaces** (`ask`, `validate_command`, `search_tools`, `explain_risk`, `get_safe_workflow`, `get_tool_spec`) remain available but are hidden from `tools/list`. The current bulk and bundled catalogs are structured-only, so fresh agents see and consume typed records by default.
@@ -106,7 +106,7 @@ Or open <http://localhost:8000/docs> for the interactive API.
 ### 🐳 Docker
 **~3 minutes**<br/>
 Zero Python setup<br/>
-Full catalog (3,600+ claims, ~1,590 verified)<br/>
+Full structured catalog (28 families, 3,237 subjects)<br/>
 <br/>
 [→ Jump to Docker](#-path-1-docker-easiest)
 
@@ -162,7 +162,7 @@ cd ayiru
 docker build -t ayiru .
 ```
 
-> **What's happening?** Docker is building a self-contained image with Python, Ayiru, and the full 3,600+ claim catalog (~1,590 verification-accepted across 31 tool families, the rest cited but pending review). Takes ~2 minutes the first time.
+> **What's happening?** Docker is building a self-contained image with Python, Ayiru, and the full structured catalog: 28 tool families, 3,237 subjects, 32,733 typed capabilities, 3,988 typed constraints, and 3,084 typed effects. Takes ~2 minutes the first time.
 
 #### Step 3 — Run it
 
@@ -262,7 +262,7 @@ Two flavors depending on what you want:
 ayiru seed --reset
 ayiru serve --reload
 
-# (b) Full catalog — 3,600+ claims, 38 tool families
+# (b) Full structured catalog — 28 tool families, 3,237 subjects
 AYIRU_DATABASE_URL="sqlite:///$(pwd)/backend/ayiru_v0.2_bulk.db" \
     ayiru serve --reload
 ```
@@ -390,7 +390,7 @@ with Ayiru(base_url="http://localhost:8000") as client:
 ## 🤖 Use it with Claude, Cursor, Cline (MCP)
 
 The recommended way to use Ayiru with a coding agent is the standalone
-`ayiru-mcp` package. It ships with a pre-built `gh` catalog inside the
+`ayiru-mcp` package. It ships with a pre-built structured catalog inside the
 wheel — no server, no database to point at, no API key.
 
 ### Install (any MCP client)
@@ -447,13 +447,10 @@ that don't share tokens with the catalog rank worse.
 
 ### Catalog scope
 
-The bundled wheel ships the **structured `gh` catalog only** (~1.5 MB):
-74 subjects, 779 typed capabilities, 82 constraints and 74 effects — and
-zero prose claims. It's the typed-first MVP for the install-and-go pitch.
-The full multi-tool prose catalog (`git`, `docker`, `kubectl`, `ffmpeg`,
-…) lives in the FastAPI backend described above; running it locally via
-Docker or `pip install ayiru` adds the broader catalog across 38 tool
-families.
+The bundled wheel ships the **full structured catalog** (~52 MB SQLite):
+28 tool families, 3,237 subjects, 32,733 typed capabilities, 3,988
+constraints, and 3,084 effects. It is machine-readable only: no prose
+claims, no evidence rows, no fallback publication tables.
 
 <details>
 <summary><b>Dev path: <code>python -m app.mcp_server</code> against the full catalog</b></summary>
@@ -484,7 +481,11 @@ catalog lives in read-only `site-packages`).
 
 ## 📦 Tool Catalog
 
-Ayiru indexes **3,600+ claims across 38 tool families (157 surfaces)** with full per-command depth. Each "deep" tool is decomposed into **five surfaces** so an agent's query can target the right slice:
+Ayiru's published DB is a **structured catalog**: 28 tool families, 3,237
+subjects, 32,733 capabilities, 3,988 constraints, and 3,084 effects. The
+older depth-pass ingestion work still matters because many families were
+originally sourced through a five-surface decomposition before being compiled
+into typed rows:
 
 | Surface | What's on it |
 |---|---|
@@ -570,7 +571,11 @@ flowchart LR
     GRAPH -->|cited answer| AGENT
 ```
 
-**Six ingestion lanes** pull evidence from trusted sources. A **deterministic orchestrator** validates schema, classifies risk, scores confidence, deduplicates, and detects conflicts. Accepted claims compile into canonical `ToolSpec` records. A **runtime sandbox** verifies safe checks (e.g. `git --version`) and promotes claims. **Agents query the result.**
+Structured ingesters and curated source artifacts compile into typed
+`subjects`, `capabilities`, `constraints`, and `effects` rows. Legacy
+claim/evidence ingestion lanes still exist in the codebase for historical and
+specialized workflows, but the current bulk and bundled catalogs that agents
+query are structured-only.
 
 ---
 
@@ -623,7 +628,7 @@ ayiru/
 ├── backend/
 │   ├── app/                # FastAPI app, MCP server, services
 │   ├── alembic/            # Migrations
-│   ├── ayiru_v0.2_bulk.db  # 🌟 Full catalog (3,600+ claims, ~1,590 accepted)
+│   ├── ayiru_v0.2_bulk.db  # 🌟 Full structured catalog (28 families, 3,237 subjects)
 │   └── tests/              # 790 hermetic tests
 ├── clients/python/         # ayiru-client SDK + LangChain adapter
 ├── tools/                  # URL lists + seed scripts (per tool)
@@ -639,7 +644,7 @@ ayiru/
 - **Five-surface tool decomposition.** Each major tool splits into `-cli`, `-config`, `-recipes`, `-errors`, and one topic-specific surface. Lets agents direct queries and lets the matcher rank within the right neighborhood.
 - **Protocol-based dependency injection.** Every external dep (HTTP client, MCP runner, sandbox) is a `typing.Protocol`. Tests inject fakes; production injects real things. Hermetic test suite.
 - **Adversarial tests, not happy-path tests.** Every ingestion lane has tests for SSRF, redirect attacks, oversized responses, malformed inputs, structured 422s.
-- **Semantic re-rank via fastembed.** Hybrid lexical + cosine using `BAAI/bge-small-en-v1.5` (~130 MB ONNX, no torch). Embeddings stored per-claim, re-ranked on top of lexical first pass.
+- **Structured-first retrieval.** Agents hit typed subject/capability/constraint/effect rows first. Legacy claim-search and embedding paths remain in code, but the shipped catalogs do not depend on prose rows.
 
 </details>
 
@@ -696,6 +701,32 @@ pip install -e 'clients/python[langchain]'
 ```
 
 See [clients/python/README.md](clients/python/README.md) for the full reference.
+
+---
+
+## 🧪 Catalog Maintenance
+
+For the current structured-only product, the operator workflow is:
+
+```bash
+# Rebuild the bundled MCP catalog from the current bulk DB, run smoke,
+# and print coverage + freshness summaries.
+backend/.venv/bin/python tools/scripts/rebuild_structured_product.py
+
+# If you've edited tools/tool_sources/*.v1.json, upsert those curated
+# source artifacts into the bulk DB first.
+backend/.venv/bin/python tools/scripts/rebuild_structured_product.py --refresh-curated
+
+# Per-family audits
+backend/.venv/bin/python tools/scripts/report_tool_coverage.py --database backend/ayiru_v0.2_bulk.db --top 10
+backend/.venv/bin/python tools/scripts/report_catalog_freshness.py --database backend/ayiru_v0.2_bulk.db --top 10
+```
+
+`tools/tool_sources/*.v1.json` is the checked-in machine-readable source layer
+for the current curated families. `tools/scripts/compile_curated_sources.py`
+validates and ingests those artifacts directly; `smoke_product.py` verifies
+that `ask()`, `get_capabilities()`, and `get_effects()` still work against the
+bulk DB and the bundled MCP catalog.
 
 ---
 
@@ -757,7 +788,7 @@ The MCP server is local-first. By default it assumes the caller is a trusted loc
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `AYIRU_DATABASE_URL` | `sqlite:///./ayiru.db` | SQLAlchemy URL. Point at `backend/ayiru_v0.2_bulk.db` for the full catalog. |
+| `AYIRU_DATABASE_URL` | `sqlite:///./ayiru.db` | SQLAlchemy URL. Point at `backend/ayiru_v0.2_bulk.db` for the full structured catalog. |
 | `AYIRU_API_KEY` | unset | Required Bearer token for write endpoints plus `/audit/*`, `/ingestion/*`, and `/verification-results*` reads. |
 | `AYIRU_TRUSTED_HOSTS` | unset | Optional comma-separated host allowlist for inbound HTTP `Host` headers. Supports exact hosts and `*.example.com` wildcard entries. |
 | `AYIRU_MCP_SHARED_SECRET` | unset | When set, requires MCP clients to send `params.ayiru_shared_secret` in the `initialize` request before any other MCP method is allowed. |
@@ -777,7 +808,7 @@ The MCP server is local-first. By default it assumes the caller is a trusted loc
 - **PyPI publication.** `pip install ayiru` doesn't work yet. Install from source for now.
 - **Hosted version.** No SaaS. Run it yourself.
 - **~15 tools have only thin coverage** — `terraform`, `vercel`, `wget`, `vim`, etc. Next on the depth-pass queue.
-- **Freshness story is manual.** Re-running `ayiru ingest --resume` re-fetches changed pages, but no automated upstream change detection yet.
+- **Freshness refresh is still manual.** `report_catalog_freshness.py` shows staleness; re-ingesting upstream sources is still an operator step.
 - **SQLite only in CI.** Schema is Postgres-portable but no live Postgres tests in CI.
 - **No external auth provider.** Bearer-token only for now.
 

@@ -40,6 +40,49 @@ def _bundle_families(database_path: Path) -> str:
     return ",".join(row[0] for row in rows)
 
 
+def compile_all_curated_sources(
+    *,
+    database_url: str,
+    rebuild_bundle: bool = False,
+    bundle_output: str = str(DEFAULT_BUNDLE),
+) -> dict[str, object]:
+    files = _tool_source_files()
+    if not files:
+        raise SystemExit("No curated source files found under tools/tool_sources/")
+
+    store = StructuredKnowledgeStore(database_url=database_url)
+    now = datetime.now(timezone.utc)
+    totals = {"subjects": 0, "capabilities": 0, "constraints": 0, "effects": 0}
+    per_family: list[dict[str, object]] = []
+
+    for path in files:
+        document = load_curated_tool_source(path)
+        written = ingest_curated_tool_source(store, document, now=now)
+        for key, value in written.items():
+            totals[key] += value
+        per_family.append({"family": document["family"], **written})
+
+    result: dict[str, object] = {
+        "families": per_family,
+        "totals": totals,
+    }
+
+    if rebuild_bundle:
+        from tools.scripts.build_slim_catalog import build
+
+        database_path = Path(database_url.removeprefix("sqlite:///")).resolve()
+        build_counts = build(
+            database_path,
+            Path(bundle_output),
+            _bundle_families(database_path).split(","),
+            structured_only=True,
+        )
+        result["bundle_output"] = str(bundle_output)
+        result["bundle_counts"] = build_counts
+
+    return result
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -59,23 +102,18 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    files = _tool_source_files()
-    if not files:
-        raise SystemExit("No curated source files found under tools/tool_sources/")
+    result = compile_all_curated_sources(
+        database_url=args.database,
+        rebuild_bundle=args.rebuild_bundle,
+        bundle_output=args.bundle_output,
+    )
+    totals = result["totals"]
 
-    store = StructuredKnowledgeStore(database_url=args.database)
-    now = datetime.now(timezone.utc)
-    totals = {"subjects": 0, "capabilities": 0, "constraints": 0, "effects": 0}
-
-    for path in files:
-        document = load_curated_tool_source(path)
-        written = ingest_curated_tool_source(store, document, now=now)
-        for key, value in written.items():
-            totals[key] += value
+    for family_result in result["families"]:
         print(
-            f"{document['family']}: {written['subjects']} subjects, "
-            f"{written['capabilities']} caps, {written['constraints']} constraints, "
-            f"{written['effects']} effects"
+            f"{family_result['family']}: {family_result['subjects']} subjects, "
+            f"{family_result['capabilities']} caps, {family_result['constraints']} constraints, "
+            f"{family_result['effects']} effects"
         )
 
     print(
@@ -84,15 +122,6 @@ def main() -> int:
     )
 
     if args.rebuild_bundle:
-        from tools.scripts.build_slim_catalog import build
-
-        database_path = Path(args.database.removeprefix("sqlite:///")).resolve()
-        build(
-            database_path,
-            Path(args.bundle_output),
-            _bundle_families(database_path).split(","),
-            structured_only=True,
-        )
         print(f"Rebuilt bundled catalog at {args.bundle_output}")
 
     return 0
