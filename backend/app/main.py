@@ -2,7 +2,10 @@ import os
 import threading
 import time
 from collections import deque
+from importlib.metadata import PackageNotFoundError, version as installed_version
 from math import ceil
+from pathlib import Path
+import tomllib
 
 from fastapi import FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
@@ -39,6 +42,26 @@ _DEFAULT_ASK_RATE_LIMIT_WINDOW_SECONDS = 60
 # would be a no-op against a deliberate attacker.
 _RATE_LIMIT_TRUST_FORWARDED_FOR_ENV = "AYIRU_RATE_LIMIT_TRUST_FORWARDED_FOR"
 _TRUSTED_HOSTS_ENV = "AYIRU_TRUSTED_HOSTS"
+
+
+def _runtime_version() -> str:
+    here = Path(__file__).resolve()
+    for parent in here.parents:
+        pyproject = parent / "pyproject.toml"
+        if not pyproject.is_file():
+            continue
+        try:
+            project = tomllib.loads(pyproject.read_text(encoding="utf-8")).get("project", {})
+        except Exception:
+            continue
+        if project.get("name") == "ayiru":
+            raw = project.get("version")
+            if isinstance(raw, str) and raw.strip():
+                return raw.strip()
+    try:
+        return installed_version("ayiru")
+    except PackageNotFoundError:
+        return "0.0.0+unknown"
 
 
 class RequestBodySizeLimitMiddleware:
@@ -353,7 +376,7 @@ _API_ROUTERS = (
 )
 
 
-app = FastAPI(title="Ayiru", version="0.1.0")
+app = FastAPI(title="Ayiru", version=_runtime_version())
 app.add_middleware(RequestBodySizeLimitMiddleware)
 app.add_middleware(LegacyDeprecationHeaderMiddleware)
 app.add_middleware(AskRateLimitMiddleware)

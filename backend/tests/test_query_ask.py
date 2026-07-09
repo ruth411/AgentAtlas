@@ -18,7 +18,6 @@ Pin the v0.2 retrieval contract:
 from __future__ import annotations
 
 from datetime import datetime, timezone
-
 import pytest
 
 from app.schemas.claim import KnowledgeClaim
@@ -217,13 +216,28 @@ def _publish_workflow(
 
 
 def _seed_structured_gh_subject(store: ClaimStore) -> None:
+    _seed_structured_subject(
+        store,
+        subject_id="gh-pr-create",
+        name="gh pr create (create a pull request)",
+        family="gh",
+    )
+
+
+def _seed_structured_subject(
+    store: ClaimStore,
+    *,
+    subject_id: str,
+    name: str,
+    family: str,
+) -> None:
     structured = StructuredKnowledgeStore(session_factory=store._session_factory)
     structured.upsert_subject_graph(
         StructuredSubject(
-            subject_id="gh-pr-create",
+            subject_id=subject_id,
             subject_kind="tool",
-            name="gh pr create (create a pull request)",
-            family="gh",
+            name=name,
+            family=family,
             verification_level=VerificationLevel.L3_RUNTIME_VERIFIED,
             provenance_claim_ids=[],
             created_at=FIXED_TIME,
@@ -231,19 +245,19 @@ def _seed_structured_gh_subject(store: ClaimStore) -> None:
         ),
         capabilities=[
             StructuredCapability(
-                capability_id="cap-gh-pr-create-invocation",
-                subject_id="gh-pr-create",
+                capability_id=f"cap-{subject_id}-invocation",
+                subject_id=subject_id,
                 capability_type="invocation",
-                title="gh pr create invocation",
+                title=f"{name} invocation",
                 detail={
                     "kind": "invocation",
-                    "command": "gh pr create",
+                    "command": name.split(" (", 1)[0],
                     "source_url": "https://cli.github.com/manual/gh_pr_create",
-                    "usage_signature": "gh pr create [flags]",
-                    "synopsis": "Create a pull request on GitHub.",
+                    "usage_signature": f"{name.split(' (', 1)[0]} [flags]",
+                    "synopsis": name,
                     "argv_schema": {
-                        "program": "gh",
-                        "subcommand_path": ["pr", "create"],
+                        "program": name.split()[0],
+                        "subcommand_path": name.split(" (", 1)[0].split()[1:],
                         "positionals": [],
                     },
                     "flag_schema": [
@@ -275,11 +289,11 @@ def _seed_structured_gh_subject(store: ClaimStore) -> None:
         ],
         constraints=[
             StructuredConstraint(
-                constraint_id="constraint-gh-pr-create-project",
-                subject_id="gh-pr-create",
+                constraint_id=f"constraint-{subject_id}-project",
+                subject_id=subject_id,
                 constraint_kind="auth_scope",
                 detail={
-                    "command": "gh pr create",
+                    "command": name.split(" (", 1)[0],
                     "source_url": "https://cli.github.com/manual/gh_pr_create",
                     "scope": "project",
                 },
@@ -289,8 +303,8 @@ def _seed_structured_gh_subject(store: ClaimStore) -> None:
         ],
         effects=[
             StructuredEffect(
-                effect_id="effect-gh-pr-create-mutation",
-                subject_id="gh-pr-create",
+                effect_id=f"effect-{subject_id}-mutation",
+                subject_id=subject_id,
                 effect_kind="mutation",
                 destructive=False,
                 reversible=False,
@@ -298,9 +312,9 @@ def _seed_structured_gh_subject(store: ClaimStore) -> None:
                 may_cost_money=False,
                 may_expose_secrets=False,
                 detail={
-                    "command": "gh pr create",
+                    "command": name.split(" (", 1)[0],
                     "source_url": "https://cli.github.com/manual/gh_pr_create",
-                    "synopsis": "Create a pull request on GitHub.",
+                    "synopsis": name,
                 },
                 created_at=FIXED_TIME,
                 updated_at=FIXED_TIME,
@@ -387,6 +401,53 @@ def test_resolve_subject_and_subject_spec_read_structured_subjects(
     assert spec is not None
     assert spec.subject_id == "gh-pr-create"
     assert spec.interfaces == ["cli"]
+
+
+def test_resolve_subject_family_hint_filters_without_replacing_query(
+    engine: QueryEngine, store: ClaimStore
+) -> None:
+    _seed_structured_gh_subject(store)
+    _seed_structured_subject(
+        store,
+        subject_id="gh-pr-view",
+        name="gh pr view",
+        family="gh",
+    )
+    _seed_structured_subject(
+        store,
+        subject_id="ansible-ansible-windows-win-user-right",
+        name="ansible.windows.win_user_right",
+        family="ansible",
+    )
+
+    response = engine.resolve_subject(
+        subject_hint="pr create",
+        family_hint="gh",
+        limit=1,
+    )
+
+    assert response.matches[0].subject_id == "gh-pr-create"
+    assert response.total == 2
+
+
+def test_resolve_subject_short_family_token_does_not_match_unrelated_suffixes(
+    engine: QueryEngine, store: ClaimStore
+) -> None:
+    _seed_structured_gh_subject(store)
+    _seed_structured_subject(
+        store,
+        subject_id="ansible-ansible-windows-win-user-right",
+        name="ansible.windows.win_user_right",
+        family="ansible",
+    )
+
+    response = engine.resolve_subject(subject_hint="gh")
+
+    assert any(match.subject_id == "gh-pr-create" for match in response.matches)
+    assert all(
+        match.subject_id != "ansible-ansible-windows-win-user-right"
+        for match in response.matches
+    )
 
 
 def test_get_capabilities_constraints_and_effects_project_claim_types(

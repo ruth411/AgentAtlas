@@ -23,6 +23,7 @@ classifiers = [
 dependencies = [
   # Shared schemas, claim store, query engine, lean contracts.
   "ayiru-core>=0.1,<0.2",
+  "ayiru-mcp>=0.2.1,<0.3",
   "alembic>=1.13,<2.0",
   "fastapi>=0.115,<1.0",
   # Stage 22-stretch — ONNX-backed embedding model for semantic re-rank

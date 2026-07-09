@@ -9,6 +9,7 @@ CODEX_HANDOFF.md
 
 # Internal architecture notes — local only, do not publish
 docs/ARCHITECTURE.md
+plan.md
 
 # OS / editor junk
 .DS_Store

@@ -10,7 +10,10 @@ dependency footprint.
 from __future__ import annotations
 
 import json
+from importlib.metadata import PackageNotFoundError, version as installed_version
+from pathlib import Path
 from typing import Any, Literal
+import tomllib
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -32,7 +35,29 @@ AUTHENTICATION_REQUIRED = -32003
 # revision Claude Desktop / Cursor ship as of this release.
 PROTOCOL_VERSION = "2024-11-05"
 SERVER_NAME = "Ayiru"
-SERVER_VERSION = "0.1.0"
+
+
+def _runtime_version() -> str:
+    here = Path(__file__).resolve()
+    for parent in here.parents:
+        pyproject = parent / "pyproject.toml"
+        if not pyproject.is_file():
+            continue
+        try:
+            project = tomllib.loads(pyproject.read_text(encoding="utf-8")).get("project", {})
+        except Exception:
+            continue
+        if project.get("name") == "ayiru-mcp":
+            raw = project.get("version")
+            if isinstance(raw, str) and raw.strip():
+                return raw.strip()
+    try:
+        return installed_version("ayiru-mcp")
+    except PackageNotFoundError:
+        return "0.0.0+unknown"
+
+
+SERVER_VERSION = _runtime_version()
 
 
 # -------- Wire-level frames --------

@@ -11,6 +11,9 @@ silently remove one path or forget the deprecation header.
 
 from __future__ import annotations
 
+import tomllib
+from pathlib import Path
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -69,3 +72,9 @@ def test_v1_audit_events_endpoint_present(client) -> None:
     response = client.get("/v1/audit/events")
     assert response.status_code == 200
     assert "events" in response.json()
+
+
+def test_fastapi_app_version_matches_backend_pyproject() -> None:
+    pyproject = Path(__file__).resolve().parents[1] / "pyproject.toml"
+    project = tomllib.loads(pyproject.read_text(encoding="utf-8"))["project"]
+    assert app.version == project["version"]

@@ -15,6 +15,8 @@ from __future__ import annotations
 
 import json
 import sys
+import tomllib
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -49,6 +51,13 @@ def test_unknown_subcommand_exits_with_usage_error() -> None:
     with pytest.raises(SystemExit) as exc:
         main(["definitely-not-a-real-subcommand"])
     assert exc.value.code == 2
+
+
+def test_backend_package_declares_mcp_dependency() -> None:
+    pyproject = Path(__file__).resolve().parents[1] / "pyproject.toml"
+    project = tomllib.loads(pyproject.read_text(encoding="utf-8"))["project"]
+    dependencies = project["dependencies"]
+    assert any(str(dep).startswith("ayiru-mcp") for dep in dependencies)
 
 
 # ---------------------------------------------------------------------------

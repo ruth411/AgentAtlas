@@ -273,13 +273,12 @@ class QueryEngine:
         limit: int = 20,
     ) -> ResolveSubjectResponse:
         query = subject_hint.strip()
-        if family_hint:
-            query = family_hint.strip()
         normalized_query = query.lower()
+        normalized_family = family_hint.strip().lower() if family_hint else None
         scored_matches: list[tuple[int, SubjectSummary]] = []
 
         if kind in {None, "tool", "api", "sdk", "adk", "subject"}:
-            for subject in self._store.list_structured_subjects(family=family_hint):
+            for subject in self._store.list_structured_subjects(family=normalized_family):
                 if kind is not None and subject.subject_kind != kind:
                     continue
                 score, reason = _score_structured_subject(subject, normalized_query)
@@ -296,18 +295,32 @@ class QueryEngine:
                 )
 
         if kind in {None, "tool", "api", "sdk", "adk", "subject"}:
-            tool_matches = self.search_tools(query=query, limit=limit, offset=0)
-            for item in tool_matches.matches:
-                spec = self._store.get_canonical_tool_spec(item.tool_id)
+            tool_specs = _paginate_all(
+                lambda lim, off: self._store.list_canonical_tool_specs(
+                    limit=lim,
+                    offset=off,
+                ),
+                page_size=100,
+                hard_cap=2_000,
+            )
+            for spec in tool_specs:
+                summary = _tool_spec_to_subject_summary(
+                    spec,
+                    match_reason="tool spec match",
+                )
+                if normalized_family is not None and summary.family.lower() != normalized_family:
+                    continue
+                score, reason = _score_tool_spec(spec, normalized_query)
+                if score <= 0:
+                    continue
                 if spec is None:
                     continue
-                summary = _tool_spec_to_subject_summary(spec, match_reason=item.match_reason)
                 if kind is not None and summary.subject_kind != kind:
                     continue
-                score, _ = _score_tool_spec(spec, normalized_query)
+                summary = _tool_spec_to_subject_summary(spec, match_reason=reason)
                 scored_matches.append((score, summary))
 
-        if kind in {None, "workflow", "subject"}:
+        if normalized_family is None and kind in {None, "workflow", "subject"}:
             workflow_specs = _paginate_all(
                 lambda lim, off: self._store.list_canonical_workflow_specs(
                     limit=lim,
@@ -337,20 +350,18 @@ class QueryEngine:
                 item[1].subject_id,
             )
         )
-        matches: list[SubjectSummary] = []
+        deduped_matches: list[SubjectSummary] = []
         seen_subject_ids: set[str] = set()
         for _, summary in scored_matches:
             if summary.subject_id in seen_subject_ids:
                 continue
             seen_subject_ids.add(summary.subject_id)
-            matches.append(summary)
-            if len(matches) >= limit:
-                break
+            deduped_matches.append(summary)
         return ResolveSubjectResponse(
             subject_hint=subject_hint,
             kind=kind,  # type: ignore[arg-type]
-            matches=matches,
-            total=len(matches),
+            matches=deduped_matches[:limit],
+            total=len(deduped_matches),
             limit=limit,
         )
 
@@ -1937,15 +1948,24 @@ def _score_structured_subject(subject: StructuredSubject, query: str) -> tuple[i
     name_text = subject.name.lower()
     if query == subject.subject_id.lower():
         return 100, "subject_id exact"
-    if query in subject_id_text:
+    if _contains_token_sequence(subject_id_text, query):
         return 80, f"subject_id substring '{query}'"
-    if query in name_text:
+    if _contains_token_sequence(name_text, query):
         return 60, f"name substring '{query}'"
     subject_tokens = set(_tokenize_question(subject_id_text)) | set(_tokenize_question(name_text))
     overlap = sorted(query_tokens & subject_tokens)
     if overlap:
         return 30 + len(overlap) * 5, f"token overlap on {overlap!r}"
     return 0, ""
+
+
+def _contains_token_sequence(text: str, query: str) -> bool:
+    text_tokens = _tokenize_question(text)
+    query_tokens = _tokenize_question(query)
+    if not text_tokens or not query_tokens or len(query_tokens) > len(text_tokens):
+        return False
+    width = len(query_tokens)
+    return any(text_tokens[index : index + width] == query_tokens for index in range(len(text_tokens) - width + 1))
 
 
 def _score_structured_capability_for_question(

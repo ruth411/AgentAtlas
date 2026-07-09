@@ -26,6 +26,7 @@ import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+import tomllib
 
 import pytest
 
@@ -235,6 +236,12 @@ def test_initialize_returns_protocol_version_and_server_info(
     assert result["serverInfo"]["name"] == proto.SERVER_NAME
     assert result["serverInfo"]["version"] == proto.SERVER_VERSION
     assert "tools" in result["capabilities"]
+
+
+def test_protocol_server_version_matches_mcp_pyproject() -> None:
+    pyproject = Path(__file__).resolve().parents[2] / "mcp" / "pyproject.toml"
+    project = tomllib.loads(pyproject.read_text(encoding="utf-8"))["project"]
+    assert proto.SERVER_VERSION == project["version"]
 
 
 def test_initialize_requires_shared_secret_when_configured(store: ClaimStore) -> None:
