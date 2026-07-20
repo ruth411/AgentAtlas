@@ -24,6 +24,7 @@ from ayiru_client import (
     ResolveSubjectResponse,
     SearchToolsResponse,
     SubjectSpecResponse,
+    ToolSpec,
     ValidateCommandResponse,
     WorkflowPlanResponse,
     __version__,
@@ -272,6 +273,17 @@ def test_sync_resolve_action_and_workflow_plan(sync_client_factory, claim_store)
     assert any(item.goal == "deploy preview sdk test" for item in plan.plans)
 
 
+def test_sync_get_tool_spec_returns_typed_response(
+    sync_client_factory, claim_store
+) -> None:
+    _publish_tool_spec(claim_store)
+    with sync_client_factory() as client:
+        spec = client.get_tool_spec("docker")
+    assert isinstance(spec, ToolSpec)
+    assert spec.tool_id == "docker"
+    assert spec.risk_profile.default_risk_level == "low"
+
+
 def test_sync_get_tool_spec_raises_on_unknown(sync_client_factory) -> None:
     with sync_client_factory() as client, pytest.raises(AyiruError) as exc:
         client.get_tool_spec("definitely-not-a-real-tool")
@@ -380,6 +392,17 @@ async def test_async_structured_methods(async_client_factory, claim_store) -> No
     assert resolution.subject_id == "docker"
     assert isinstance(plan, WorkflowPlanResponse)
     assert any(item.goal == "deploy preview async sdk test" for item in plan.plans)
+
+
+async def test_async_get_tool_spec_returns_typed_response(
+    async_client_factory, claim_store
+) -> None:
+    _publish_tool_spec(claim_store)
+    async with async_client_factory() as client:
+        spec = await client.get_tool_spec("docker")
+    assert isinstance(spec, ToolSpec)
+    assert spec.tool_id == "docker"
+    assert spec.risk_profile.default_risk_level == "low"
 
 
 async def test_async_get_tool_spec_raises_on_unknown(async_client_factory) -> None:

@@ -14,7 +14,7 @@
 *Google is for humans. Ayiru is for agents. Your agent calls a typed API and gets back typed records — `subject_id`, `capability_type`, `argv_schema`, `flag_schema`, `effect_kind`, `verification_level` — not prose. No webpage surfing, no LLM-in-the-loop summarisation, no hallucinated flags.*
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-3776AB?logo=python&logoColor=white&style=for-the-badge)](https://www.python.org/downloads/)
-[![Tests](https://img.shields.io/badge/850_tests_✓-2EA44F?style=for-the-badge)](#-verify-it-works)
+[![Tests](https://img.shields.io/badge/888_tests_✓-2EA44F?style=for-the-badge)](#-verify-it-works)
 [![License MIT](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
 
 [![Structured coverage gh](https://img.shields.io/badge/structured--coverage_gh-74%2F74_subcommands-22C55E?style=flat-square)](#-tool-catalog)
@@ -70,6 +70,8 @@ print(top.detail["flag_schema"][0])
 - **MCP server** — drop into Claude Desktop / Cursor / Cline / Continue via stdio JSON-RPC. Zero config.
 - **Python SDK** — sync + async clients for every typed surface.
 - **Legacy query surfaces** (`ask`, `validate_command`, `search_tools`, `explain_risk`, `get_safe_workflow`, `get_tool_spec`) remain available but are hidden from `tools/list`. The current bulk and bundled catalogs are structured-only, so fresh agents see and consume typed records by default.
+
+> **Current status:** Ayiru is already a strong MCP for AI agents, but not the final polished default yet. The stdio server, bundled `ayiru-mcp` package, structured tool surface, and test coverage are real; the remaining gap is mostly product polish: broader CI enforcement of packaged-MCP release checks, deeper coverage for thinner tool families, and continued narrowing around the 7-tool structured public contract.
 
 ---
 

@@ -103,7 +103,8 @@ class AsyncAyiru:
         return ValidateCommandResponse.model_validate(data)
 
     async def get_tool_spec(self, tool_id: str) -> ToolSpec:
-        return await self._get(f"/query/tools/{tool_id}")  # type: ignore[return-value]
+        data = await self._get(f"/query/tools/{tool_id}")
+        return ToolSpec.model_validate(data)
 
     async def resolve_subject(
         self,

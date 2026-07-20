@@ -58,11 +58,28 @@ def _resolve_bundled_catalog_path() -> Path:
     return extracted
 
 
+def _truthy_env(name: str) -> bool:
+    value = os.environ.get(name, "").strip().lower()
+    return value in {"1", "true", "yes", "on"}
+
+
+def _configure_database_url(catalog: Path) -> str:
+    bundled_url = f"sqlite:///{catalog}"
+    if _truthy_env("AYIRU_MCP_ALLOW_EXTERNAL_DB"):
+        configured = os.environ.get("AYIRU_DATABASE_URL", "").strip()
+        if configured:
+            return configured
+    os.environ["AYIRU_DATABASE_URL"] = bundled_url
+    return bundled_url
+
+
 def main() -> None:
     catalog = _resolve_bundled_catalog_path()
     # Point ayiru-core's session.py at the bundled DB BEFORE we import
     # anything that calls `create_database_engine()` at import time.
-    os.environ.setdefault("AYIRU_DATABASE_URL", f"sqlite:///{catalog}")
+    # Ignore ambient AYIRU_DATABASE_URL by default so `ayiru-mcp` stays
+    # install-and-go; only an explicit opt-in may override the bundled DB.
+    _configure_database_url(catalog)
 
     # Lazy import after the env var is set so the engine resolver sees it.
     from ayiru_mcp._internal.server import build_default_server
@@ -73,7 +90,9 @@ def main() -> None:
     # and the ayiru-core schemas. `fastembed` stays unimported unless the
     # caller explicitly invoked `ask()` in semantic mode AND the optional
     # `[semantic]` extra is installed.
-    build_default_server().serve(stdin=sys.stdin, stdout=sys.stdout)
+    build_default_server(
+        allow_hidden_tools=False,
+    ).serve(stdin=sys.stdin, stdout=sys.stdout)
 
 
 if __name__ == "__main__":

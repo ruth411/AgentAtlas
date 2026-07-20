@@ -119,7 +119,8 @@ class Ayiru:
         """Fetch the canonical ToolSpec for a tool. Raises AyiruError(404)
         when no spec has been published for that tool_id."""
 
-        return self._get(f"/query/tools/{tool_id}")  # type: ignore[return-value]
+        data = self._get(f"/query/tools/{tool_id}")
+        return ToolSpec.model_validate(data)
 
     def resolve_subject(
         self,

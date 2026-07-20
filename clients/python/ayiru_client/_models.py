@@ -317,26 +317,95 @@ class SavingsResponse(_SDKModel):
     usd_per_million_input_tokens: float = Field(gt=0.0)
 
 
-# Tool spec is large and lane-dependent; keep it as a passthrough dict
-# rather than mirroring 200+ lines of schema. Callers who want typed
-# access can build their own Pydantic model over the dict.
-ToolSpec = dict[str, Any]
+class PublicationIssue(_SDKModel):
+    code: str = Field(min_length=1)
+    message: str = Field(min_length=1)
+    source_claim_ids: list[str] = Field(default_factory=list)
+
+
+class AuthRequirement(_SDKModel):
+    required: bool | None = None
+    methods: list[str] = Field(default_factory=list)
+
+
+class RiskProfile(_SDKModel):
+    reads_private_data: bool | None = None
+    mutates_local_state: bool | None = None
+    mutates_remote_state: bool | None = None
+    can_delete_resources: bool | None = None
+    can_incur_cost: bool | None = None
+    exposes_secrets: bool | None = None
+    default_risk_level: _RiskLevel
+
+
+class CommandSpec(_SDKModel):
+    name: str = Field(min_length=1)
+    summary: str = Field(min_length=1)
+    risk_level: _RiskLevel
+    side_effects: list[str] = Field(default_factory=list)
+    requires_confirmation: bool = False
+
+
+class ToolExample(_SDKModel):
+    title: str = Field(min_length=1)
+    example: str = Field(min_length=1)
+
+
+class FailureMode(_SDKModel):
+    condition: str = Field(min_length=1)
+    recovery_steps: list[str] = Field(default_factory=list)
+
+
+class Provenance(_SDKModel):
+    source_claim_ids: list[str] = Field(default_factory=list)
+    source_evidence_ids: list[str] = Field(default_factory=list)
+    compiled_at: datetime
+    compiled_by: str = Field(min_length=1)
+    verification_level: _VerificationLevel
+
+
+class ToolSpec(_SDKModel):
+    tool_id: str = Field(min_length=1)
+    name: str = Field(min_length=1)
+    interfaces: list[str] = Field(default_factory=list)
+    capabilities: list[str] = Field(default_factory=list)
+    commands: list[CommandSpec] = Field(default_factory=list)
+    inputs: list[str] = Field(default_factory=list)
+    outputs: list[str] = Field(default_factory=list)
+    auth: AuthRequirement
+    side_effects: list[str] = Field(default_factory=list)
+    risk_profile: RiskProfile
+    examples: list[ToolExample] = Field(default_factory=list)
+    workflows: list[str] = Field(default_factory=list)
+    failure_modes: list[FailureMode] = Field(default_factory=list)
+    recovery_steps: list[str] = Field(default_factory=list)
+    provenance: Provenance
+    verification_level: _VerificationLevel
+    publication_issues: list[PublicationIssue] = Field(default_factory=list)
+    content_hash: str | None = None
 
 
 __all__ = [
     "Answer",
+    "AuthRequirement",
     "AskResponse",
     "CapabilityRecord",
+    "CommandSpec",
     "ConstraintSetResponse",
     "EvidenceCitation",
     "EffectProfileResponse",
+    "FailureMode",
     "GetCapabilitiesResponse",
+    "PublicationIssue",
+    "Provenance",
     "ResolveActionResponse",
     "ResolveSubjectResponse",
+    "RiskProfile",
     "SavingsResponse",
     "SearchToolsResponse",
     "SubjectSpecResponse",
     "SubjectSummary",
+    "ToolExample",
     "ToolMatchSummary",
     "ToolSpec",
     "ValidateCommandResponse",

@@ -32,10 +32,17 @@ from app.services.claim_store import ClaimStore, get_claim_store
 
 
 class McpServer:
-    def __init__(self, store: ClaimStore, *, shared_secret: str | None = None) -> None:
+    def __init__(
+        self,
+        store: ClaimStore,
+        *,
+        shared_secret: str | None = None,
+        allow_hidden_tools: bool = True,
+    ) -> None:
         self._store = store
         self._shared_secret = shared_secret
         self._authenticated = shared_secret is None
+        self._allow_hidden_tools = allow_hidden_tools
 
     # -------- Public API --------
 
@@ -211,7 +218,7 @@ class McpServer:
                 proto.INVALID_PARAMS,
                 "tools/call 'arguments' must be a JSON object.",
             )
-        tool = find_tool(name)
+        tool = self._find_callable_tool(name)
         if tool is None:
             return proto.make_error(
                 request.id,
@@ -252,6 +259,14 @@ class McpServer:
             _success_content(payload),
         )
 
+    def _find_callable_tool(self, name: str):
+        tool = find_tool(name)
+        if tool is None:
+            return None
+        if self._allow_hidden_tools or tool.advertised:
+            return tool
+        return None
+
 
 # -------- Content envelope helpers --------
 
@@ -278,12 +293,13 @@ def _error_content(message: str) -> dict[str, Any]:
     }
 
 
-def build_default_server() -> McpServer:
+def build_default_server(*, allow_hidden_tools: bool = True) -> McpServer:
     """Factory for the production entry point: pulls the ClaimStore
     dependency the same way every other route layer does."""
     return McpServer(
         get_claim_store(),
         shared_secret=configured_mcp_shared_secret(),
+        allow_hidden_tools=allow_hidden_tools,
     )
 
 
