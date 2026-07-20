@@ -71,8 +71,6 @@ print(top.detail["flag_schema"][0])
 - **Python SDK** — sync + async clients for every typed surface.
 - **Legacy query surfaces** (`ask`, `validate_command`, `search_tools`, `explain_risk`, `get_safe_workflow`, `get_tool_spec`) remain available but are hidden from `tools/list`. The current bulk and bundled catalogs are structured-only, so fresh agents see and consume typed records by default.
 
-> **Current status:** Ayiru is already a strong MCP for AI agents, but not the final polished default yet. The stdio server, bundled `ayiru-mcp` package, structured tool surface, and test coverage are real; the remaining gap is mostly product polish: broader CI enforcement of packaged-MCP release checks, deeper coverage for thinner tool families, and continued narrowing around the 7-tool structured public contract.
-
 ---
 
 ### Get started in 30 seconds
@@ -172,7 +170,7 @@ docker build -t ayiru .
 docker run --rm -p 8000:8000 ayiru
 ```
 
-The published image defaults `AYIRU_STRICT_TOOL_LOCK=1`, so network-exposed
+The Docker image defaults `AYIRU_STRICT_TOOL_LOCK=1`, so network-exposed
 container deployments reject unknown `tool_id`s by default. Opt out only if
 you intentionally want uncurated tool ingestion:
 
@@ -294,7 +292,7 @@ Open <http://localhost:8000/docs> in your browser or run the curl command from P
 Same as Path 2, plus:
 
 ```bash
-# Run the test suite (~55 seconds, 790 tests)
+# Run the test suite (~1 minute, 888 tests)
 cd backend
 .venv/bin/python -m pytest -q
 
@@ -433,18 +431,13 @@ No hallucination because no prose to misread.
 
 The legacy prose surfaces (`ask`, `validate_command`, `search_tools`,
 `explain_risk`, `get_safe_workflow`, `get_tool_spec`) remain registered for
-backward compatibility but are hidden from `tools/list`. Agents discovering
-tools fresh see only the typed surfaces; pinned external callers that invoke
-the old tools by name still work.
+backward compatibility but are hidden from `tools/list`. Fresh tool discovery
+shows only the typed surfaces.
 
 The bundled `ayiru-mcp` contract is documented in
 [`docs/mcp_v1_contract.md`](docs/mcp_v1_contract.md). The current bundled
 catalog ships no published workflow specs yet, so `get_workflow_plan` may
-honestly return zero plans until that data lands.
-
-If you want the blunt assessment: Ayiru is already good enough to use as an
-agent MCP today. The remaining work is not "make MCP work"; it is "make the
-packaged MCP path boring and undeniable."
+return zero plans.
 
 ### Semantic re-rank (optional)
 
@@ -458,7 +451,7 @@ that don't share tokens with the catalog rank worse.
 
 ### Catalog scope
 
-The bundled wheel ships the **full structured catalog** (~52 MB SQLite):
+The bundled wheel ships the **full structured catalog** (~49 MB SQLite):
 28 tool families, 3,237 subjects, 32,733 typed capabilities, 3,988
 constraints, and 3,084 effects. It is machine-readable only: no prose
 claims, no evidence rows, no fallback publication tables.
@@ -483,9 +476,9 @@ still register the legacy entry point:
 }
 ```
 
-This path advertises the same 6 read tools plus an extra `submit_claim`
-write surface (hidden from the published `ayiru-mcp` wheel because its
-catalog lives in read-only `site-packages`).
+This path advertises the same 7 structured tools. Hidden legacy tools plus
+`submit_claim` remain callable in the writable backend/dev path, but they are
+not advertised by the published `ayiru-mcp` wheel.
 </details>
 
 ---
@@ -640,7 +633,7 @@ ayiru/
 │   ├── app/                # FastAPI app, MCP server, services
 │   ├── alembic/            # Migrations
 │   ├── ayiru_v0.2_bulk.db  # 🌟 Full structured catalog (28 families, 3,237 subjects)
-│   └── tests/              # 790 hermetic tests
+│   └── tests/              # 888 hermetic tests
 ├── clients/python/         # ayiru-client SDK + LangChain adapter
 ├── tools/                  # URL lists + seed scripts (per tool)
 ├── contracts/              # Versioned JSON trust + ingestion contracts
@@ -665,16 +658,28 @@ ayiru/
 
 Live interactive docs at **<http://localhost:8000/docs>** when the server is running.
 
-### Agent-facing API (under `/v1/query/`)
+### Structured query API (under `/v1/query/`)
 
 | Endpoint | Purpose |
 |---|---|
-| `POST /v1/query/ask` | 🔥 **Headline.** NL question → ranked, cited answers |
-| `POST /v1/query/validate-command` | 🛡️ Safety verdict for a command |
+| `POST /v1/query/resolve-subject` | Resolve a fuzzy hint into typed subjects |
+| `GET /v1/query/subjects/{subject_id}` | Canonical `SubjectSpec` |
+| `POST /v1/query/capabilities` | Typed capability records |
+| `POST /v1/query/constraints` | Typed constraints and prerequisites |
+| `POST /v1/query/effects` | Typed effects and aggregate risk signals |
+| `POST /v1/query/resolve-action` | One-shot action grounding |
+| `POST /v1/query/workflow-plan` | Published workflow plans |
+
+### Compatibility query API
+
+| Endpoint | Purpose |
+|---|---|
+| `POST /v1/query/ask` | Natural-language question → ranked, cited answers |
+| `POST /v1/query/validate-command` | Safety verdict for a command |
 | `GET /v1/query/tools/{tool_id}` | Canonical `ToolSpec` |
 | `GET /v1/query/search-tools?q=` | Search published tools |
 | `POST /v1/query/explain-risk` | Risk classification with reasons |
-| `POST /v1/query/safe-workflow` | Workflows for a goal, safest first |
+| `POST /v1/query/safe-workflow` | Legacy workflow lookup |
 
 <details>
 <summary><b>📥 Operator + pipeline endpoints</b></summary>
@@ -692,7 +697,7 @@ Live interactive docs at **<http://localhost:8000/docs>** when the server is run
 ## 🐍 Python SDK
 
 ```python
-from ayiru_client import Ayiru, AyiruAsync
+from ayiru_client import Ayiru, AsyncAyiru
 
 # Sync
 with Ayiru(base_url="http://localhost:8000") as c:
@@ -701,7 +706,7 @@ with Ayiru(base_url="http://localhost:8000") as c:
         print(a.top.statement)
 
 # Async
-async with AyiruAsync(base_url="http://localhost:8000") as c:
+async with AsyncAyiru(base_url="http://localhost:8000") as c:
     a = await c.ask("...")
 ```
 
@@ -761,7 +766,7 @@ Probe with ~45 questions, check tests + ruff, commit. See `tools/scripts/seed_*_
 ```bash
 cd backend
 
-# Run all 790 tests (~55 seconds)
+# Run all 888 tests (~1 minute)
 .venv/bin/python -m pytest -q
 
 # Lint
