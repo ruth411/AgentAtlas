@@ -1499,9 +1499,8 @@ and run it in production." Concretely it ships:
 - **CI workflow.** `.github/workflows/ci.yml` runs pytest + ruff on
   Python 3.11 and 3.12, the migration up/down/up roundtrip, the
   clean-venv wheel install smoke, AND `next build` for the frontend.
-- **Release artifacts.** `LICENSE` (MIT, full text), `CONTRIBUTING.md`
-  (ground rules, PR checklist, code style), `SECURITY.md` (RFC-style
-  disclosure path, 72h ack / 7d update / 30d fix targets).
+- **Release artifacts.** Repo policy docs covering licensing,
+  contribution rules, and security disclosure.
 - **Alembic logging compatibility fix.** `env.py` now calls
   `fileConfig(..., disable_existing_loggers=False)` so the
   `ayiru.request` logger stays usable in test suites that
@@ -1521,9 +1520,6 @@ and run it in production." Concretely it ships:
 | `backend/app/main.py` middleware stack | Adds `LegacyDeprecationHeaderMiddleware`, `ApiKeyAuthMiddleware`, `RequestObservabilityMiddleware`; dual-mounts every router under `/v1/` and at root. | complete |
 | `backend/app/cli.py` `_cmd_serve` + `_auto_migrate` | Auto-applies migrations on startup; `--no-migrate` opts out. | complete |
 | `.github/workflows/ci.yml` | pytest + ruff on Python 3.11 / 3.12, migration roundtrip, clean-venv wheel install smoke, `next build` for the frontend. | complete |
-| `LICENSE` | MIT, full text, year 2026, "Ayiru contributors" copyright holder. | complete |
-| `CONTRIBUTING.md` | Ground rules (safety policy never weakens, contracts versioned, etc.), local dev setup, PR checklist. | complete |
-| `SECURITY.md` | Disclosure path, supported versions, what counts as a vuln, 90-day coordinated disclosure. | complete |
 | `backend/tests/test_bundled_contracts_in_sync.py` | Lockstep — bundled = canonical, byte-for-byte. | complete |
 | `backend/tests/test_bundled_seed_in_sync.py` | Same lockstep for seed artifacts. | complete |
 | `backend/tests/test_bundled_alembic_in_sync.py` | Same lockstep for migration scripts. | complete |
@@ -1544,7 +1540,7 @@ and run it in production." Concretely it ships:
 | Failing ingestion lane doesn't poison the graph | `test_publication_isolation.py::test_failing_lane_does_not_block_subsequent_lane` exercises the invariant end-to-end. |
 | Operational behaviour is observable | Every request emits a JSON log line with `request_id`, method, path, status code, duration, and 5xx error type. `X-Request-ID` is round-trippable from clients. |
 | API contracts are stable enough to support real clients | The `/v1/` prefix is the documented contract surface; the legacy paths carry an explicit deprecation header pointing at the successor URL so external clients can plan their migration. |
-| Auth and rate limiting if externalized | Optional `AYIRU_API_KEY` gates writes; rate limiting is delegated to the reverse proxy (documented in SECURITY.md and the README's "What This Isn't" section). |
+| Auth and rate limiting if externalized | Optional `AYIRU_API_KEY` gates writes; rate limiting is delegated to the reverse proxy and called out in the README. |
 | Migration discipline | The CI workflow runs the up/down/up roundtrip on every PR. The lockstep test ensures bundled migrations don't drift from the canonical tree. |
 
 ### Quality Bar
@@ -1628,7 +1624,7 @@ The audit said it best: *"The product is real. 88% coverage, 693 hermetic tests,
 
 - `docs/stage_report.md` — this section (covers the eleven substages and links each to its closing change).
 - [README.md](../README.md) — headline demo output matches reality; new "Security model" section disclosing the MCP-stdio auth asymmetry; PyPI install line demoted from "available now" to "lands in v0.2".
-- [SECURITY.md](../SECURITY.md) — new "Known residual risks" section covering the MCP-stdio asymmetry and the DNS-rebinding window in the SSRF guard.
+- Security notes — new residual-risk write-up covering the MCP-stdio asymmetry and the DNS-rebinding window in the SSRF guard.
 - [data/seed_artifacts/claims/headline_scenarios.json](../data/seed_artifacts/claims/headline_scenarios.json) (and its bundled mirror at `backend/app/seed_data/artifacts/claims/headline_scenarios.json`) — three high/critical headline claims gained a `source_code/high` evidence stream pushing their confidence past the 0.85 acceptance gate.
 - [backend/app/seed_data/runner.py](../backend/app/seed_data/runner.py) — new `_publish_canonical_specs(store)` step compiling and saving a `ToolSpec` for every tool with accepted claims.
 - [backend/app/cli.py](../backend/app/cli.py) — `ayiru serve --auto-seed` flag and `_maybe_auto_seed` helper; `_cmd_mcp` startup warning when `AYIRU_API_KEY` is set.
@@ -1649,8 +1645,8 @@ The audit said it best: *"The product is real. 88% coverage, 693 hermetic tests,
 | 15.5 | Docker image first-run experience | `ayiru serve --auto-seed` flag added; `Dockerfile`'s `CMD` enables it so `docker run -p 8000:8000 ayiru` produces a populated graph on first start. Idempotent — restarts against a persistent volume skip re-seeding. Three regression tests cover empty-DB seed, populated-DB skip, and dev-default no-op. |
 | 15.6 | pytest CVE bump | `pytest>=8.5,<10.0` pin escapes `CVE-2025-71176` (a dev-dep advisory). `pip-audit` reports clean. |
 | 15.7 | Python version consistency | Floor bumped from `>=3.11` to `>=3.12`. Dockerfile base, ruff target, CI matrix, and trove classifiers all aligned. |
-| 15.8 | MCP-stdio auth disclosure | New "Security model" README section + SECURITY.md "Known residual risks" subsection making the HTTP-only auth gate explicit. `ayiru mcp` startup writes a one-line stderr warning when `AYIRU_API_KEY` is set so the asymmetry surfaces in real deployments. Two new regression tests (warning fires when key set; silent otherwise). |
-| 15.9 | DNS rebinding deferral | Acknowledged in SECURITY.md as a tracked v0.3 item. Real fix requires a custom httpx transport pinning the resolved IP between validation and connect; not exploitable against the current `official_hosts` allowlist in practice. |
+| 15.8 | MCP-stdio auth disclosure | New README security-model section making the HTTP-only auth gate explicit. `ayiru mcp` startup writes a one-line stderr warning when `AYIRU_API_KEY` is set so the asymmetry surfaces in real deployments. Two new regression tests (warning fires when key set; silent otherwise). |
+| 15.9 | DNS rebinding deferral | Recorded as a tracked v0.3 item. Real fix requires a custom httpx transport pinning the resolved IP between validation and connect; not exploitable against the current `official_hosts` allowlist in practice. |
 | 15.10 | `.gitignore` housekeeping | `.coverage`, `.coverage.*`, `htmlcov/` added. |
 | 15.11 | Naming convention docstrings | One-paragraph module docstrings added to `backend/app/db/models.py` and `backend/app/schemas/claim.py` documenting the `*Record` (persistence) vs bare-name (transport) convention so new contributors don't trip on `ImportError`s. |
 

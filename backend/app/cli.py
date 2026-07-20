@@ -450,7 +450,7 @@ def _cmd_mcp(_args: argparse.Namespace) -> int:
             "Without that secret, the stdio JSON-RPC server accepts all "
             "framed requests, including writes (submit_claim). Ensure only "
             "trusted local callers can reach this process, or set "
-            "AYIRU_MCP_SHARED_SECRET. See SECURITY.md §Known residual risks.\n"
+            "AYIRU_MCP_SHARED_SECRET.\n"
         )
         sys.stderr.flush()
     build_default_server().serve()

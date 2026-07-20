@@ -397,7 +397,7 @@ for router in _API_ROUTERS:
     app.include_router(router, prefix="/v1")
 
 # Legacy mount (un-versioned, deprecated). Removed in 0.2.0; transition
-# window documented in CONTRIBUTING.md and the Stage 14 stage_report.
+# window documented in the Stage 14 stage report.
 for router in _API_ROUTERS:
     app.include_router(router)
 

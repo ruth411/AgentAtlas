@@ -15,7 +15,6 @@
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-3776AB?logo=python&logoColor=white&style=for-the-badge)](https://www.python.org/downloads/)
 [![Tests](https://img.shields.io/badge/888_tests_✓-2EA44F?style=for-the-badge)](#-verify-it-works)
-[![License MIT](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
 
 [![Structured coverage gh](https://img.shields.io/badge/structured--coverage_gh-74%2F74_subcommands-22C55E?style=flat-square)](#-tool-catalog)
 [![Capabilities](https://img.shields.io/badge/typed_capabilities-32733-7C3AED?style=flat-square)](#-tool-catalog)
@@ -796,7 +795,7 @@ The MCP server is local-first. By default it assumes the caller is a trusted loc
 </tr>
 </table>
 
-> ⚠️ For any network-exposed deployment, set `AYIRU_API_KEY`, put it behind a reverse proxy with rate limiting, and only enable forwarded-client rate-limit keying when that proxy is trusted. See [SECURITY.md](SECURITY.md).
+> ⚠️ For any network-exposed deployment, set `AYIRU_API_KEY`, put it behind a reverse proxy with rate limiting, and only enable forwarded-client rate-limit keying when that proxy is trusted.
 
 ---
 
@@ -835,17 +834,9 @@ The MCP server is local-first. By default it assumes the caller is a trusted loc
 
 ## 📚 More
 
-- 🤝 [Contributing](CONTRIBUTING.md)
-- 🛡️ [Security policy](SECURITY.md)
 - 📖 [Stage report](docs/stage_report.md) (historical per-stage audit)
 - 🔒 [Trust contract](docs/trust_contract.md)
 - 🐍 [SDK README](clients/python/README.md)
-
----
-
-## 📜 License
-
-**MIT** — see [LICENSE](LICENSE).
 
 ## 🙏 Built with
 
