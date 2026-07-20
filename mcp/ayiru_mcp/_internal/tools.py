@@ -351,15 +351,13 @@ _TOOL_REGISTRY: list[McpTool] = [
     McpTool(
         name="resolve_subject",
         description=(
-            "FIRST CALL before acting on any developer tool, API, SDK, or "
-            "workflow. Resolves a fuzzy human-facing hint (e.g. 'open a "
-            "pull request', 'gh pr create', 'github') to a typed list of "
-            "subjects with `subject_id`s you can then feed to "
-            "`get_capabilities`, `get_constraints`, `get_effects`, or "
-            "`resolve_action`. Returns SubjectSummary records (typed: "
-            "subject_id, subject_kind, family, capability_count, "
-            "verification_level) — NO prose. If the LLM is uncertain "
-            "which tool the user means, call this first."
+            "Use this first when the user names a tool, command, API, SDK, "
+            "or workflow in normal language. It turns a fuzzy hint (for "
+            "example 'open a pull request', 'gh pr create', or 'github') "
+            "into matching subjects with stable `subject_id`s that you can "
+            "pass to `get_capabilities`, `get_constraints`, "
+            "`get_effects`, or `resolve_action`. Returns typed subject "
+            "summaries only — no prose answer synthesis."
         ),
         input_schema={
             "type": "object",
@@ -413,12 +411,11 @@ _TOOL_REGISTRY: list[McpTool] = [
     McpTool(
         name="get_subject_spec",
         description=(
-            "Return the full typed spec for a known `subject_id` "
-            "(SubjectSpecResponse: name, family, interfaces, capabilities, "
-            "workflows, verification_level, provenance_claim_ids). Use "
-            "this after `resolve_subject` when you need the spec body, "
-            "not just the summary. Returns null-equivalent error if the "
-            "subject is unknown."
+            "Fetch the full typed record for a known `subject_id`: name, "
+            "family, interfaces, related capabilities, related workflows, "
+            "and verification metadata. Use this after `resolve_subject` "
+            "when you need the full subject body instead of just the "
+            "summary row."
         ),
         input_schema={
             "type": "object",
@@ -447,15 +444,11 @@ _TOOL_REGISTRY: list[McpTool] = [
     McpTool(
         name="get_capabilities",
         description=(
-            "THE structured surface. Returns typed CapabilityRecord rows "
-            "for a subject — `capability_type` ∈ {invocation, "
-            "configuration, constraint, effect, environment, deprecation, "
-            "workflow, metadata}, structured `detail` dicts, and "
-            "verification metadata. The current bundled catalog is "
-            "machine-readable only: rows are ingested from real `--help` "
-            "output with typed argv / flag fields. "
-            "`accepted_only_structured` remains for backward-compatibility "
-            "with older mixed catalogs."
+            "List the structured things a subject can do or expose. Use "
+            "this after `resolve_subject` to get typed command, argument, "
+            "flag, configuration, metadata, and related capability rows "
+            "for the chosen `subject_id`, plus verification metadata for "
+            "each row."
         ),
         input_schema={
             "type": "object",
@@ -517,11 +510,10 @@ _TOOL_REGISTRY: list[McpTool] = [
     McpTool(
         name="get_constraints",
         description=(
-            "Typed constraint records — what the agent must satisfy "
-            "BEFORE running an action: auth scopes, environment "
-            "preconditions, deprecation status. Call this before "
-            "`resolve_action` if you want to surface gating requirements "
-            "early."
+            "List what must be true before an action is safe or valid: "
+            "required auth scopes, environment preconditions, and "
+            "deprecation or policy gates. Call this before execution if "
+            "you want to surface prerequisites explicitly."
         ),
         input_schema={
             "type": "object",
@@ -558,11 +550,10 @@ _TOOL_REGISTRY: list[McpTool] = [
     McpTool(
         name="get_effects",
         description=(
-            "Typed effect profile — destructive, mutates_remote_state, "
-            "reversible, may_cost_money, may_expose_secrets. Returns "
-            "EffectProfileResponse with aggregate_risk_level and "
-            "requires_confirmation. Call this before executing any "
-            "action that could change remote state."
+            "List what changes if this subject or action runs: whether it "
+            "is destructive, mutates remote state, is reversible, may cost "
+            "money, or may expose secrets. Use this before execution when "
+            "the action could change local or remote state."
         ),
         input_schema={
             "type": "object",
@@ -592,12 +583,11 @@ _TOOL_REGISTRY: list[McpTool] = [
     McpTool(
         name="resolve_action",
         description=(
-            "End-to-end action grounding. Given a subject_id + intent + "
-            "optional literal command, returns the matched capability, "
-            "supporting capabilities, constraints, effects, "
-            "safe_to_auto_execute, requires_human_confirmation, and "
-            "verdict reasons. The one-shot machine-readable answer for "
-            "'what should I run, what does it need, what does it do'."
+            "One-shot grounding for a concrete intended action. Given a "
+            "`subject_id`, an action intent, and optionally a literal "
+            "command, it returns the top structured capability plus the "
+            "relevant constraints, effects, risk verdict, and execution "
+            "safety fields."
         ),
         input_schema={
             "type": "object",
@@ -646,12 +636,11 @@ _TOOL_REGISTRY: list[McpTool] = [
     McpTool(
         name="get_workflow_plan",
         description=(
-            "Goal-matched workflow plans, safest-first. Returns typed "
-            "WorkflowPlanSummary records (workflow_id, subject_ids, "
-            "step_count, aggregate_risk_level, verification_level, "
-            "requires_confirmation). Use when the user states a "
-            "multi-step goal ('deploy a Helm release', 'cut a GitHub "
-            "release') rather than a single command."
+            "Find published multi-step workflows for a goal, ordered "
+            "safest-first. Use this when the user asks for an outcome "
+            "that may require several actions rather than one command. "
+            "It can honestly return zero plans when the bundled catalog "
+            "has no published workflow for that goal yet."
         ),
         input_schema={
             "type": "object",

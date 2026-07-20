@@ -130,9 +130,13 @@ def main() -> int:
         smoke = run_smoke(database_path=database_path, catalog_path=bundle_path)
         print(
             "smoke:",
-            f"ask_top={smoke['ask_top']}",
+            f"bulk_subject_id={smoke['bulk_subject_id']}",
+            f"bulk_cap={smoke['bulk_cap']}",
+            f"bulk_effects={smoke['bulk_effects']}",
+            f"bundle_subject_id={smoke['bundle_subject_id']}",
             f"bundle_cap={smoke['bundle_cap']}",
             f"bundle_effects={smoke['bundle_effects']}",
+            f"bundle_action={smoke['bundle_action']}",
         )
 
     if not args.skip_coverage:

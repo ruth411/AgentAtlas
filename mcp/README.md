@@ -5,9 +5,39 @@
 Your coding agent calls 7 typed MCP tools and gets back typed records:
 `subject_id`, `capability_type`, `argv_schema`, `flag_schema`, `effect_kind`,
 `verification_level`. No prose, no webpage surfing, no hallucinated flags.
-Ships with a structured-first **`gh` catalog** parsed from real
-`gh ... --help` output — 74 subjects, 779 typed capabilities, 82 typed
-constraints, 74 typed effects. No server, no database to set up, no API key.
+Ships with a bundled structured catalog covering **28 tool families**,
+3,237 subjects, 32,733 typed capabilities, 3,988 typed constraints, and
+3,084 typed effects. No server, no database to set up, no API key.
+
+## v1 Contract
+
+The general-release target for `ayiru-mcp` is a small, stable, read-only
+surface. The visible MCP contract is the seven structured tools below:
+
+- `resolve_subject`
+- `get_subject_spec`
+- `get_capabilities`
+- `get_constraints`
+- `get_effects`
+- `resolve_action`
+- `get_workflow_plan`
+
+Legacy prose tools stay registered only for back-compat and remain hidden from
+`tools/list`. Fresh MCP hosts should discover only the typed structured tools.
+The behavior-level contract is documented in
+[`docs/mcp_v1_contract.md`](../docs/mcp_v1_contract.md).
+
+## Compatibility
+
+| Host | Status | Notes |
+|---|---|---|
+| Claude Desktop | Supported | Primary local-first target; uses stdio JSON-RPC with no extra config beyond `command: "ayiru-mcp"` |
+| Cursor | Supported | Same stdio MCP shape as Claude Desktop |
+| Cline | Supported | Same stdio MCP shape; configure under the extension's MCP settings |
+
+Ayiru only promises the structured seven-tool surface above across those hosts.
+If a host depends on hidden legacy tools, treat that as a back-compat path, not
+as the product contract.
 
 ## Install
 
@@ -102,27 +132,30 @@ from typed metadata; there's no prose for it to misread.
 
 ## What's in the catalog
 
-The bundled wheel ships **structured `gh` only** — every `gh` subcommand
-parsed from real `--help` output into typed rows:
+The bundled wheel ships the current structured Ayiru catalog, not a
+single-family demo slice. The checked-in bundle currently includes 28
+families:
+
+`ansible`, `awk`, `brew`, `cargo`, `curl`, `docker`, `ffmpeg`, `gh`,
+`git`, `go`, `helm`, `jq`, `kubectl`, `magick`, `openssl`, `pip`, `pnpm`,
+`poetry`, `psql`, `rsync`, `rustc`, `sed`, `sqlite3`, `ssh`, `supabase`,
+`terraform`, `vercel`, `vim`.
+
+At the time of this README revision the bundled row counts are:
 
 | Table | Rows | What's in it |
 |---|---|---|
-| `subjects` | 74 | One row per `gh` subcommand (`gh-pr-create`, `gh-repo-delete`, …) including the destructive `delete` / `remove` / `archive` leaves |
-| `capabilities` | 779 | Typed `invocation` / `configuration` / `metadata` rows with `argv_schema` + `flag_schema` |
-| `constraints` | 82 | Typed auth-scope and environment-precondition rows |
-| `effects` | 74 | Typed `destructive` / `mutates_remote_state` / `reversible` booleans |
+| `subjects` | 3,237 | One row per structured subject in the bundled families |
+| `capabilities` | 32,733 | Typed `invocation` / `configuration` / `metadata` rows with `argv_schema` + `flag_schema` |
+| `constraints` | 3,988 | Typed auth-scope and environment-precondition rows |
+| `effects` | 3,084 | Typed `destructive` / `mutates_remote_state` / `reversible` booleans |
 
-Total wheel size: ~2 MB (bundled SQLite catalog with pre-computed embeddings).
+Total wheel size: ~6 MB (bundled SQLite catalog with pre-computed embeddings).
 Each row carries its own `verification_level`: the flag/argv `capabilities`
 are `L3_runtime_verified` (the parser ran the binary), while the inferred
 `effects` and text-derived `constraints` are `L2_source_verified` — the
 safety classification is grounded in the help text but not asserted by an
 experiment, and the catalog says so rather than over-claiming L3.
-
-The wider catalog (38 tool families, prose-projection fallback for the 37
-without structured ingestion yet) lives in the FastAPI backend — see the
-main repo's [README](https://github.com/ruth411/ayiru) for the self-hosted
-path.
 
 ## Optional: semantic re-rank
 
@@ -155,10 +188,28 @@ backward compatibility but are hidden from `tools/list`. Pinned external
 callers that invoke them by name still work; fresh tool discovery only
 shows the typed surfaces above.
 
+The bundled catalog currently ships no published workflow specs, so
+`get_workflow_plan` is part of the stable public surface but may honestly
+return zero plans until workflow data is populated.
+
 The catalog is read-only — there's no write surface on the bundled wheel
 because `site-packages` isn't user-writable on most systems. Self-hosters
 who want the writeable `submit_claim` surface should use the FastAPI
 backend instead.
+
+## Release Check
+
+From a checkout, run:
+
+```bash
+make mcp-release-check
+```
+
+That runs the MCP contract tests, bundled-catalog tests, structured product
+rebuild + smoke, a fresh-wheel-install smoke for `ayiru-core` +
+`ayiru-mcp` against a temporary rebuilt bundle, and the Python client
+integration suite against the current repo state. It requires PyPI access
+to resolve third-party runtime wheels.
 
 ## License
 

@@ -437,6 +437,15 @@ backward compatibility but are hidden from `tools/list`. Agents discovering
 tools fresh see only the typed surfaces; pinned external callers that invoke
 the old tools by name still work.
 
+The bundled `ayiru-mcp` contract is documented in
+[`docs/mcp_v1_contract.md`](docs/mcp_v1_contract.md). The current bundled
+catalog ships no published workflow specs yet, so `get_workflow_plan` may
+honestly return zero plans until that data lands.
+
+If you want the blunt assessment: Ayiru is already good enough to use as an
+agent MCP today. The remaining work is not "make MCP work"; it is "make the
+packaged MCP path boring and undeniable."
+
 ### Semantic re-rank (optional)
 
 ```bash
@@ -727,8 +736,9 @@ backend/.venv/bin/python tools/scripts/report_catalog_freshness.py --database ba
 `tools/tool_sources/*.v1.json` is the checked-in machine-readable source layer
 for the current curated families. `tools/scripts/compile_curated_sources.py`
 validates and ingests those artifacts directly; `smoke_product.py` verifies
-that `ask()`, `get_capabilities()`, and `get_effects()` still work against the
-bulk DB and the bundled MCP catalog.
+that `resolve_subject()`, `get_capabilities()`, `get_effects()`, and
+`resolve_action()` still work against both the bulk DB and the bundled MCP
+catalog.
 
 ---
 

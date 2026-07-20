@@ -16,7 +16,7 @@ STRUCTURED_DB := backend/ayiru_structured_gh.db
 SLIM_DB := mcp/ayiru_mcp/data/catalog.db
 TOOL_FAMILIES := gh
 
-.PHONY: help catalog-structured slim-catalog audit purge reingest catalog-snapshot test
+.PHONY: help catalog-structured slim-catalog audit purge reingest catalog-snapshot test mcp-release-check
 
 help:
 	@echo "Ayiru catalog targets:"
@@ -27,6 +27,7 @@ help:
 	@echo "  reingest            Re-fetch + re-sanitize junk claims in $(BULK_DB)"
 	@echo "  catalog-snapshot    Refresh the Git LFS snapshot of $(BULK_DB)"
 	@echo "  test                Run the backend + SDK test suites"
+	@echo "  mcp-release-check   Rebuild the bundled MCP catalog and run MCP release verification"
 
 # Deterministic: provision a fresh schema-only DB, then ingest structured gh
 # from real `gh --help` output. No network, no prose crawl.
@@ -64,4 +65,11 @@ catalog-snapshot:
 
 test:
 	cd backend && .venv/bin/python -m pytest -q
+	./backend/.venv/bin/pytest clients/python/tests -q
+
+mcp-release-check:
+	cd backend && .venv/bin/python -m pytest -q tests/test_mcp_server.py tests/test_build_slim_catalog.py
+	PYTHONPATH=$(abspath backend):$(abspath mcp) $(PY) -m pytest mcp/tests -q
+	$(PY) tools/scripts/rebuild_structured_product.py --bundle-output /tmp/ayiru-mcp-release-catalog.db --skip-coverage --skip-freshness
+	$(PY) tools/scripts/smoke_mcp_wheel.py --catalog /tmp/ayiru-mcp-release-catalog.db
 	./backend/.venv/bin/pytest clients/python/tests -q

@@ -60,6 +60,13 @@ from app.services.ids import (
     generate_evidence_id,
     generate_verification_id,
 )
+from app.services.structured_knowledge_store import (
+    StructuredCapability,
+    StructuredConstraint,
+    StructuredEffect,
+    StructuredKnowledgeStore,
+    StructuredSubject,
+)
 from tests.helpers import risk_assessment, valid_sha256
 
 
@@ -216,6 +223,106 @@ def _publish_workflow(store: ClaimStore, *, workflow_id: str = "w1") -> None:
             ),
             verification_level=VerificationLevel.L2_SOURCE_VERIFIED,
         )
+    )
+
+
+def _seed_structured_subject(
+    store: ClaimStore,
+    *,
+    subject_id: str = "gh-pr-create",
+    name: str = "gh pr create (create a pull request)",
+    family: str = "gh",
+) -> None:
+    structured = StructuredKnowledgeStore(session_factory=store._session_factory)
+    command = name.split(" (", 1)[0]
+    structured.upsert_subject_graph(
+        StructuredSubject(
+            subject_id=subject_id,
+            subject_kind="tool",
+            name=name,
+            family=family,
+            verification_level=VerificationLevel.L3_RUNTIME_VERIFIED,
+            provenance_claim_ids=[],
+            created_at=FIXED_TIME,
+            updated_at=FIXED_TIME,
+        ),
+        capabilities=[
+            StructuredCapability(
+                capability_id=f"cap-{subject_id}-invocation",
+                subject_id=subject_id,
+                capability_type="invocation",
+                title=f"{name} invocation",
+                detail={
+                    "kind": "invocation",
+                    "command": command,
+                    "source_url": "https://cli.github.com/manual/gh_pr_create",
+                    "usage_signature": f"{command} [flags]",
+                    "synopsis": name,
+                    "argv_schema": {
+                        "program": command.split()[0],
+                        "subcommand_path": command.split()[1:],
+                        "positionals": [],
+                    },
+                    "flag_schema": [
+                        {
+                            "name": "--title",
+                            "short": "-t",
+                            "takes_value": True,
+                            "value_name": "string",
+                            "value_type": "string",
+                            "repeatable": False,
+                            "required": False,
+                            "deprecated": False,
+                            "inherited": False,
+                            "description": "Title for the pull request",
+                            "default": None,
+                            "choices": [],
+                        }
+                    ],
+                },
+                verification_status=VerificationStatus.ACCEPTED,
+                verification_level=VerificationLevel.L3_RUNTIME_VERIFIED,
+                confidence=0.99,
+                confidence_band=ConfidenceBand.STRONG,
+                risk_level=RiskLevel.MEDIUM,
+                provenance_claim_ids=[],
+                created_at=FIXED_TIME,
+                updated_at=FIXED_TIME,
+            )
+        ],
+        constraints=[
+            StructuredConstraint(
+                constraint_id=f"constraint-{subject_id}-auth",
+                subject_id=subject_id,
+                constraint_kind="auth_scope",
+                detail={
+                    "command": command,
+                    "source_url": "https://cli.github.com/manual/gh_pr_create",
+                    "scope": "project",
+                },
+                created_at=FIXED_TIME,
+                updated_at=FIXED_TIME,
+            )
+        ],
+        effects=[
+            StructuredEffect(
+                effect_id=f"effect-{subject_id}-mutation",
+                subject_id=subject_id,
+                effect_kind="mutation",
+                destructive=False,
+                reversible=False,
+                mutates_remote_state=True,
+                may_cost_money=False,
+                may_expose_secrets=False,
+                detail={
+                    "command": command,
+                    "source_url": "https://cli.github.com/manual/gh_pr_create",
+                    "synopsis": name,
+                },
+                created_at=FIXED_TIME,
+                updated_at=FIXED_TIME,
+            )
+        ],
     )
 
 
@@ -404,6 +511,20 @@ def test_every_tool_has_required_metadata(server: McpServer) -> None:
         assert schema["additionalProperties"] is False
 
 
+def test_public_tool_descriptions_explain_standard_flow(server: McpServer) -> None:
+    raw = server.handle_frame(_frame("tools/list"))
+    response = json.loads(raw)
+    tools = {tool["name"]: tool for tool in response["result"]["tools"]}
+
+    assert "Use this first" in tools["resolve_subject"]["description"]
+    assert "subject_id" in tools["resolve_subject"]["description"]
+    assert "command, argument, flag" in tools["get_capabilities"]["description"]
+    assert "before an action is safe or valid" in tools["get_constraints"]["description"]
+    assert "what changes if this subject or action runs" in tools["get_effects"]["description"]
+    assert "One-shot grounding" in tools["resolve_action"]["description"]
+    assert "return zero plans" in tools["get_workflow_plan"]["description"]
+
+
 def test_tools_list_count_matches_registry() -> None:
     # 7 advertised structured surfaces (resolve_subject, get_subject_spec,
     # get_capabilities, get_constraints, get_effects, resolve_action,
@@ -491,6 +612,74 @@ def test_submit_claim_registry_annotations() -> None:
     assert submit.advertised is False
     assert submit.annotations is not None
     assert submit.annotations["readOnlyHint"] is False
+
+
+def test_public_mcp_server_rejects_hidden_tool_calls(store: ClaimStore) -> None:
+    """The bundled `ayiru-mcp` wheel advertises a read-only seven-tool
+    contract. Hidden tools stay registered for backend dev/back-compat
+    contexts, but the public packaged path must not execute them by name."""
+    server = McpServer(store, allow_hidden_tools=False)
+
+    raw = server.handle_frame(
+        _frame(
+            "tools/call",
+            params={"name": "submit_claim", "arguments": {}},
+            request_id=99,
+        )
+    )
+    response = json.loads(raw)
+
+    assert response["error"]["code"] == proto.TOOL_NOT_FOUND
+    assert response["id"] == 99
+
+
+def test_resolve_subject_happy_path_returns_typed_match(
+    server: McpServer,
+    store: ClaimStore,
+) -> None:
+    _seed_structured_subject(store)
+
+    response = _call_tool(
+        server,
+        "resolve_subject",
+        {"subject_hint": "open a pull request", "limit": 1},
+    )
+
+    assert response["result"]["isError"] is False
+    structured = response["result"]["structuredContent"]
+    assert structured["matches"][0]["subject_id"] == "gh-pr-create"
+    assert structured["matches"][0]["family"] == "gh"
+    assert structured["matches"][0]["verification_level"] == "L3_runtime_verified"
+    text_block = response["result"]["content"][0]
+    assert json.loads(text_block["text"]) == structured
+
+
+def test_resolve_action_happy_path_returns_structured_projection(
+    server: McpServer,
+    store: ClaimStore,
+) -> None:
+    _seed_structured_subject(store)
+
+    response = _call_tool(
+        server,
+        "resolve_action",
+        {
+            "subject_id": "gh-pr-create",
+            "action_intent": "create a pull request",
+            "command": "gh pr create --title hello",
+            "limit": 1,
+        },
+    )
+
+    assert response["result"]["isError"] is False
+    structured = response["result"]["structuredContent"]
+    assert structured["subject_id"] == "gh-pr-create"
+    assert structured["resolution_mode"] == "command_match"
+    assert structured["top_capability"] is not None
+    assert structured["top_capability"]["source"] == "structured"
+    assert structured["constraints"]
+    assert structured["effects"]
+    assert structured["fallback_recommended"] is False
 
 
 # ---------------------------------------------------------------------------
